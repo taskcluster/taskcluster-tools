@@ -4,6 +4,7 @@ var _             = require('lodash');
 var auth          = require('./auth');
 var Promise       = require('promise');
 var debug         = require('debug')('lib:utils');
+var assert        = require('assert');
 
 // Export debug module for use in browser
 window.DEBUG      = require('debug');
@@ -116,6 +117,70 @@ var createTaskClusterMixin = function(options) {
       );
     },
 
+    /** Load state from a map from property to promise */
+    loadState: function(promisedState) {
+      assert(promisedState instanceof Object, "Expected an object");
+
+      // map from promised state property to load iteration count, so that old
+      // loads that are resolved after newer requests aren't overwriting newer
+      // state information
+      if (this.__promisedStateIterationMap === undefined) {
+        this.__promisedStateIterationMap = {};
+      }
+
+      // Construct and set initial state and construct current
+      // promisedStateIterationMap
+      var promisedStateIterationMap = {};
+      var state = {};
+      _.forIn(promisedState, function(promise, key) {
+        // Set loading state
+        state[key + 'Loaded'] = false;
+        state[key + 'Error']  = undefined;
+        state[key]            = undefined;
+        // Ensure that there is already an iteration
+        if (this.__promisedStateIterationMap[key] === undefined) {
+          this.__promisedStateIterationMap[key] = 0;
+        }
+        // Create a new iteration
+        this.__promisedStateIterationMap[key] += 1;
+        // Remember the current iteration
+        promisedStateIterationMap[key] = this.__promisedStateIterationMap[key];
+      }, this);
+      this.setState(state);
+
+      // Construct a method that'll set state loaded and ignore old state if
+      // a new promise for the property has arrived since
+      var setLoaded = function(key, result, err) {
+        // Ignore state, if loadState have been called again with this property
+        var currentIteration = this.__promisedStateIterationMap[key];
+        if (promisedStateIterationMap[key] === currentIteration) {
+          var state = {};
+          state[key + 'Loaded'] = true;
+          state[key + 'Error']  = err;
+          state[key]            = result;
+          this.setState(state);
+        }
+      }.bind(this);
+
+      // Update state as promises are resolved
+      var promises = _.map(promisedState, function(promise, key) {
+        return Promise.resolve(promise).then(function(result) {
+          // Set result state
+          setLoaded(key, result, undefined);
+        }, function(err) {
+          debug("Error loading '%s', err: %s, as JSON: %j",
+                key, err, err, err.stack);
+          // Set error state
+          setLoaded(key, undefined, err || new Error("Unknown Error"));
+        });
+      });
+
+      // Return promise all promises are resolved
+      return Promise.all(promises).then(function() {
+        return undefined;
+      });
+    },
+
     /** Reload state given properties to reload with */
     reload: function(props) {
       // If there is no `load` function then we're done
@@ -128,59 +193,8 @@ var createTaskClusterMixin = function(options) {
         props = this.props;
       }
 
-      // Create a new reload iteration and remember the reload iteration
-      // to avoid overwriting state if a newer reload iteration have begun
-      if (this.__reloadIteration === undefined) {
-        this.__reloadIteration = 0;
-      }
-      this.__reloadIteration += 1;
-      var currentReloadIteration = this.__reloadIteration;
-
-      // Get a mapping from state properties to promises
-      var statePromises = this.load(props) || {};
-
-      // Construct and set initial state
-      var state = {};
-      _.forIn(statePromises, function(promise, key) {
-        // Set loading state
-        state[key + 'Loaded'] = false;
-        state[key + 'Error']  = undefined;
-        state[key]            = undefined;
-      });
-      this.setState(state);
-
-      // Construct a setState method that'll ignore old state and bind to this
-      var setState = function(state) {
-        // Ignore state, if reload have been called again
-        if (this.__reloadIteration === currentReloadIteration) {
-          this.setState(state);
-        }
-      }.bind(this);
-
-      // Update state as promises are resolved
-      var promises = _.map(statePromises, function(promise, key) {
-        return Promise.resolve(promise).then(function(result) {
-          // Set result state
-          var state = {};
-          state[key + 'Loaded'] = true;
-          state[key + 'Error']  = undefined;
-          state[key]            = result;
-          setState(state);
-        }, function(err) {
-          debug("Error loading '%s', err: %s, as JSON: %j", key, err, err, err.stack);
-          // Set error state
-          var state = {};
-          state[key + 'Loaded'] = true;
-          state[key + 'Error']  = err || new Error("Unknown Error");
-          state[key]            = undefined;
-          setState(state);
-        });
-      });
-
-      // Return promise all promises are resolved
-      return Promise.all(promises).then(function() {
-        return undefined;
-      });
+      // Load state from promised state given by this.load()
+      return this.loadState(this.load(props) || {});
     },
 
     /**

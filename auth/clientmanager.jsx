@@ -4,7 +4,7 @@ var bs              = require('react-bootstrap');
 var ClientEditor    = require('./clienteditor');
 var utils           = require('../lib/utils');
 var taskcluster     = require('taskcluster-client');
-var moment          = require('moment');
+var format          = require('../lib/format');
 
 /** Create client manager */
 var ClientManager = React.createClass({
@@ -95,7 +95,7 @@ var ClientManager = React.createClass({
           onClick={this.selectClientId.bind(this, client.clientId)}>
         <td>{client.name}</td>
         <td><code>{client.clientId}</code></td>
-        <td>{moment(client.expires).fromNow()}</td>
+        <td><format.DateView date={client.expires}/></td>
       </tr>
     );
   },
