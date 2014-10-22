@@ -5,9 +5,8 @@ var auth          = require('./auth');
 var Promise       = require('promise');
 var debug         = require('debug')('lib:utils');
 var assert        = require('assert');
+var format        = require('./format');
 
-
-window.taskcluster = require('taskcluster-client');
 /** Logic for loading and maintaining state using taskcluster-client
 
 
@@ -215,7 +214,10 @@ var createTaskClusterMixin = function(options) {
 
     /** Render a spinner */
     renderSpinner: function() {
-      return <b>Loading...</b>;
+      return (
+        <format.Spin/>
+      );
+      //return <b>Loading...</b>;
     },
 
     /**

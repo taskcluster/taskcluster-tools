@@ -20,6 +20,11 @@ var ClientEditor = React.createClass({
     })
   ],
 
+  propTypes: {
+    // Method to refresh client list
+    refreshClientList:  React.PropTypes.func.isRequired
+  },
+
   getDefaultProps: function() {
     return {
       currentClientId:  undefined     // undefined implies. "Create Client"
@@ -28,10 +33,15 @@ var ClientEditor = React.createClass({
 
   getInitialState: function() {
     return {
-      clientLoaded:   false,
-      clientError:    undefined,
-      client:         undefined,
-      editing:        true        // Editing or viewing
+      // Loading client or loaded client
+      clientLoaded:     false,
+      clientError:      undefined,
+      client:           undefined,
+      // Edit or viewing current state
+      editing:          true,
+      // Operation details, if currently doing anything
+      working:          false,
+      error:            null
     };
   },
 
@@ -48,18 +58,31 @@ var ClientEditor = React.createClass({
           name:           "",
           description:    ""
         },
-        editing:          true
+        editing:          true,
+        working:          false,
+        error:            null
       };
     } else {
       // Load currentClientId
       return {
         client:           this.auth.client(props.currentClientId),
-        editing:          false
+        editing:          false,
+        working:          false,
+        error:            null
       };
     }
   },
 
   render: function() {
+    // display errors from operations
+    if (this.state.error) {
+      return (
+        <bs.Alert bsStyle="danger" onDismiss={this.dismissError}>
+          <strong>Error executing operation</strong>
+          {this.state.error.toString()}
+        </bs.Alert>
+      );
+    }
     var isCreating = this.props.currentClientId === undefined;
     var isEditing  = (isCreating || this.state.editing);
     var title      = "Create New Client";
@@ -67,7 +90,7 @@ var ClientEditor = React.createClass({
       title = (isEditing ? "Edit Client" : "View Client");
     }
     return this.renderWaitFor('client') || (
-      <span>
+      <span className="client-editor">
         <h3>{title}</h3>
         <hr style={{marginBottom: 10}}/>
         <div className="form-horizontal">
@@ -75,7 +98,7 @@ var ClientEditor = React.createClass({
             <label className="control-label col-md-3">ClientId</label>
             <div className="col-md-9">
               <div className="form-control-static">
-                &nbsp;<code>{this.state.client.clientId}</code>
+                <code>{this.state.client.clientId}</code>
               </div>
             </div>
           </div>
@@ -83,7 +106,20 @@ var ClientEditor = React.createClass({
             <label className="control-label col-md-3">AccessToken</label>
             <div className="col-md-9">
               <div className="form-control-static">
-                &nbsp;<code>{this.state.client.accessToken}</code>
+                <code className="client-editor-access-token">
+                  {this.state.client.accessToken}
+                </code>
+                {
+                  isEditing && !isCreating ?
+                  <bs.Button
+                    bsStyle="warning"
+                    bsSize="xsmall"
+                    onClick={this.resetAccessToken}
+                    disabled={this.state.working}>
+                    <bs.Glyphicon glyph="fire"/>&nbsp;Reset
+                  </bs.Button>
+                  : undefined
+                }
               </div>
             </div>
           </div>
@@ -133,23 +169,63 @@ var ClientEditor = React.createClass({
               {isEditing ? this.renderScopeEditor() : this.renderScopes()}
             </div>
           </div>
+          <hr/>
+          <div className="form-group">
+            <div className="col-md-9 col-md-offset-3">
+              <div className="form-control-static">
+                {
+                  isEditing ?
+                    (isCreating ?
+                        this.renderCreatingToolbar()
+                      :
+                        this.renderEditingToolbar()
+                    )
+                  :
+                    <bs.ButtonToolbar>
+                      <bs.Button bsStyle="success"
+                                 onClick={this.startEditing}
+                                 disabled={this.state.working}>
+                        <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Client
+                      </bs.Button>
+                    </bs.ButtonToolbar>
+                }
+              </div>
+            </div>
+          </div>
         </div>
-        <hr style={{marginTop: 0}}/>
-        <bs.ButtonToolbar className="pull-right" style={{paddingBottom: 20}}>
-          <bs.Button bsStyle="primary">
-            <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
-          </bs.Button>
-          <bs.Button bsStyle="warning">
-            <bs.Glyphicon glyph="fire"/>&nbsp;Reset AccessToken
-          </bs.Button>
-          <bs.Button bsStyle="danger">
-            <bs.Glyphicon glyph="trash"/>&nbsp;Delete Client
-          </bs.Button>
-        </bs.ButtonToolbar>
       </span>
     );
-                  //<bs.Button bsStyle="primary">Create Client</bs.Button>
-                  //<bs.Button bsStyle="warning">Edit Client</bs.Button>
+  },
+
+  /** Render editing toolbar */
+  renderEditingToolbar: function() {
+    return (
+      <bs.ButtonToolbar>
+        <bs.Button bsStyle="success"
+                   onClick={this.saveClient}
+                   disabled={this.state.working}>
+          <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
+        </bs.Button>
+        <bs.Button bsStyle="danger"
+                   onClick={this.deleteClient}
+                   disabled={this.state.working}>
+          <bs.Glyphicon glyph="trash"/>&nbsp;Delete Client
+        </bs.Button>
+      </bs.ButtonToolbar>
+    );
+  },
+
+  /** Render creation toolbar */
+  renderCreatingToolbar: function() {
+    return (
+      <bs.ButtonToolbar>
+        <bs.Button bsStyle="primary"
+                   onClick={this.createClient}
+                   disabled={this.state.working}>
+          <bs.Glyphicon glyph="plus"/>&nbsp;Create Client
+        </bs.Button>
+      </bs.ButtonToolbar>
+    );
   },
 
   /** Render description editor */
@@ -177,8 +253,8 @@ var ClientEditor = React.createClass({
   /** Handle changes in the editor */
   onChange: function() {
     var state = _.cloneDeep(this.state);
-    state.client.description  = this.refs.description.getValue();
-    state.client.name         = this.refs.name.getValue();
+    state.client.description  = this.refs.description.getDOMNode().value;
+    state.client.name         = this.refs.name.getDOMNode().value;
     this.setState(state);
   },
 
@@ -263,6 +339,74 @@ var ClientEditor = React.createClass({
         }
       </ul>
     );
+  },
+
+  /** Reset accessToken for current client */
+  resetAccessToken: function() {
+    // resetCredentials returns exactly what client() returns, so this will work
+    this.loadState({
+      client:     this.auth.resetCredentials(this.state.client.clientId),
+      editing:    false
+    });
+  },
+
+  /** Start editing */
+  startEditing: function() {
+    this.setState({editing: true});
+  },
+
+  /** Create new client */
+  createClient: function() {
+    this.setState({working: true});
+    this.auth.createClient(this.state.client.clientId, {
+      scopes:       this.state.client.scopes,
+      name:         this.state.client.name,
+      description:  this.state.client.description,
+      expires:      this.state.client.expires,
+    }).then(function() {
+      this.props.refreshClientList();
+      this.reload();
+    }.bind(this), function(err) {
+      this.setState({
+        working:  false,
+        error:    err
+      });
+    }.bind(this));
+  },
+
+  /** Save current client */
+  saveClient: function() {
+    this.loadState({
+      client:     this.auth.modifyClient(this.state.client.clientId, {
+        scopes:       this.state.client.scopes,
+        name:         this.state.client.name,
+        description:  this.state.client.description,
+        expires:      this.state.client.expires,
+      }),
+      editing:    false
+    });
+  },
+
+  /** Delete current client */
+  deleteClient: function() {
+    this.setState({working: true});
+    this.auth.removeClient(this.state.client.clientId).then(function() {
+      this.props.refreshClientList();
+      this.reload();
+    }.bind(this), function(err) {
+      this.setState({
+        working:  false,
+        error:    err
+      });
+    }.bind(this));
+  },
+
+  /** Reset error state from operation*/
+  dismissError: function() {
+    this.setState({
+      working:      false,
+      error:        null
+    });
   }
 });
 

@@ -5,6 +5,7 @@ var assert        = require('assert');
 var marked        = require('marked');
 var bs            = require('react-bootstrap');
 var moment        = require('moment');
+var spinjs        = require('spin.js');
 
 /** Render Markdown and handle all the particularities */
 var Markdown = React.createClass({
@@ -96,3 +97,46 @@ var DateView = React.createClass({
 
 // Export DateView
 exports.DateView = DateView;
+
+
+/** Create spinner to use when loading */
+var Spin = React.createClass({
+  propTypes: {
+    loaded:    React.PropTypes.bool,
+    lines:     React.PropTypes.number,
+    length:    React.PropTypes.number,
+    width:     React.PropTypes.number,
+    radius:    React.PropTypes.number,
+    corners:   React.PropTypes.number,
+    rotate:    React.PropTypes.number,
+    direction: React.PropTypes.oneOf([1, -1]),
+    color:     React.PropTypes.string,
+    speed:     React.PropTypes.number,
+    trail:     React.PropTypes.number,
+    shadow:    React.PropTypes.bool,
+    hwaccell:  React.PropTypes.bool,
+    className: React.PropTypes.string,
+    zIndex:    React.PropTypes.number,
+    top:       React.PropTypes.string,
+    left:      React.PropTypes.string
+  },
+
+  getDefaultProps: function() {
+    return {};
+  },
+
+  componentDidMount: function() {
+    this.spinner = new spinjs(this.props).spin(this.refs.spinner.getDOMNode());
+  },
+
+  render: function() {
+    return <div ref="spinner" style={{margin: 30}}/>;
+  },
+
+  componentWillUnmount: function() {
+    this.spinner.stop();
+  }
+});
+
+// Export Spin
+exports.Spin = Spin;

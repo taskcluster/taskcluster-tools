@@ -6,13 +6,14 @@ var COMMON_MODULES = [
   'react',
   'react-bootstrap',
   'jquery',
-  'slugid',
   'promise',
+  'taskcluster-client',
+  'slugid',
   'debug',
   'lodash',
-  'moment',
   'marked',
-  'taskcluster-client'
+  'moment',
+  'spin.js'
 ];
 
 // Setup grunt

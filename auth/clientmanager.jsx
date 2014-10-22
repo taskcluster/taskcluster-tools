@@ -62,7 +62,8 @@ var ClientManager = React.createClass({
           </bs.ButtonToolbar>
         </bs.Col>
         <bs.Col md={6}>
-          <ClientEditor currentClientId={this.state.selectedClientId}/>
+          <ClientEditor currentClientId={this.state.selectedClientId}
+                        refreshClientList={this.reload}/>
         </bs.Col>
       </bs.Row>
     );
