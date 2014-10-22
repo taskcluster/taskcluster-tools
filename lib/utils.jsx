@@ -6,9 +6,6 @@ var Promise       = require('promise');
 var debug         = require('debug')('lib:utils');
 var assert        = require('assert');
 
-// Export debug module for use in browser
-window.DEBUG      = require('debug');
-
 
 window.taskcluster = require('taskcluster-client');
 /** Logic for loading and maintaining state using taskcluster-client

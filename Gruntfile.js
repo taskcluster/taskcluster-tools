@@ -1,6 +1,20 @@
 var path      = require('path');
 var reactify  = require('reactify');
 
+// Common modules to compiled into a single bundle
+var COMMON_MODULES = [
+  'react',
+  'react-bootstrap',
+  'jquery',
+  'slugid',
+  'promise',
+  'debug',
+  'lodash',
+  'moment',
+  'marked',
+  'taskcluster-client'
+];
+
 // Setup grunt
 module.exports = function(grunt) {
   // Configuration for the grunt tasks
@@ -32,11 +46,21 @@ module.exports = function(grunt) {
         transform:  [reactify],   // Process JSX files with reactify
         watch:      true,         // Use watchify (caching modules)
         keepAlive:  false,
+        external:   COMMON_MODULES,
         browserifyOptions: {
           debug:      true,
+          externalRequireName: 'require',
           fullPaths:    false,    // Set this false for newer versions
           extensions:   ['.jsx']  // Makes require() look for .jsx files
         }
+      },
+      common: {
+        options: {
+          external: [],
+          require:  COMMON_MODULES
+        },
+        src:    [],
+        dest:   path.join('build', 'common.bundle.js')
       }
     },
     jade: {
@@ -108,6 +132,7 @@ module.exports = function(grunt) {
       dest:   path.join('build', file.replace(/\.jsx?$/, '.bundle.js'))
     };
   });
+  // return console.log(JSON.stringify(config.browserify, null, 2));
 
   // Compile Jade files
   files
