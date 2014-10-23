@@ -54,18 +54,26 @@ var Navigation = React.createClass({
 
   /** Listen for credentials-changed events */
   componentDidMount: function() {
-    auth.on('credentials-changed', this.handleCredentialsChanged);
+    window.addEventListener(
+      'credentials-changed',
+      this.handleCredentialsChanged,
+      false
+    );
   },
 
   /** Stop listening for credentials-changed events */
   componentWillUnmount: function() {
-    auth.removeListener('credentials-changed', this.handleCredentialsChanged);
+    window.removeEventListener(
+      'credentials-changed',
+      this.handleCredentialsChanged,
+      false
+    );
   },
 
   /** Credentials changed */
-  handleCredentialsChanged: function(credentials) {
+  handleCredentialsChanged: function(e) {
     // Reload credentials
-    this.setState({credentials: credentials});
+    this.setState({credentials: e.detail});
   },
 
   /** Render navigation bar */

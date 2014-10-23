@@ -60,17 +60,25 @@ var CredentialsPreferences = React.createClass({
 
   /** Listen for credentials-changed events */
   componentDidMount: function() {
-    auth.on('credentials-changed', this.handleCredentialsChanged);
+    window.addEventListener(
+      'credentials-changed',
+      this.handleCredentialsChanged,
+      false
+    );
   },
 
   /** Stop listening for credentials-changed events */
   componentWillUnmount: function() {
-    auth.removeListener('credentials-changed', this.handleCredentialsChanged);
+    window.removeEventListener(
+      'credentials-changed',
+      this.handleCredentialsChanged,
+      false
+    );
   },
 
   /** handle changes to credentials */
-  handleCredentialsChanged: function(creds) {
-    creds = creds || {};
+  handleCredentialsChanged: function(e) {
+    creds = e.detail || {};
     // Update clients with new credentials
     var certificate = JSON.stringify(
       creds.certificate || {},

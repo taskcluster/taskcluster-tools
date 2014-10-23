@@ -13,7 +13,12 @@ var COMMON_MODULES = [
   'lodash',
   'marked',
   'moment',
-  'spin.js'
+  'spin.js',
+  // global modules too
+  'url',
+  'querystring',
+  'path',
+  'assert'
 ];
 
 // Setup grunt

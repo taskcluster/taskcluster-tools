@@ -65,7 +65,11 @@ var createTaskClusterMixin = function(options) {
       this._createClients(auth.loadCredentials());
 
       // Listen for changes to credentials
-      auth.on('credentials-changed', this.handleCredentialsChanged);
+      window.addEventListener(
+        'credentials-changed',
+        this.handleCredentialsChanged,
+        false
+      );
 
       // Reload state (initial load)
       this.reload();
@@ -91,9 +95,9 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** handle changes to credentials */
-    handleCredentialsChanged: function(credentials) {
+    handleCredentialsChanged: function(e) {
       // Update clients with new credentials
-      this._createClients(credentials);
+      this._createClients(e.detail);
 
       // Reload state now that we have new credentials
       this.reload();
@@ -102,7 +106,11 @@ var createTaskClusterMixin = function(options) {
     /** Stop listening for events */
     componentWillUnmount: function() {
       // Remove credentials-changed event handler
-      auth.removeListener('credentials-changed', this.handleCredentialsChanged);
+      window.removeEventListener(
+        'credentials-changed',
+        this.handleCredentialsChanged,
+        false
+      );
     },
 
     /** Load state from a map from property to promise */
