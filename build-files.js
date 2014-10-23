@@ -12,7 +12,11 @@ module.exports = [
 
   // Login
   'login/index.jade',
-  'login/app.jsx'
+  'login/app.jsx',
+
+  // Preferences
+  'preferences/index.jade',
+  'preferences/app.jsx'
 ].map(function(file) {
   return path.join(__dirname, file);
 });

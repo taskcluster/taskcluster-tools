@@ -24,11 +24,6 @@ if (credentials.clientId &&
 
   // If this window was opened by another window
   if (window.opener) {
-    // Inform the window that wanted to login that credentials have changed
-    window.opener.postMessage({
-      method:       'credentials-updated'
-    }, location.origin);
-
     // Close window
     window.close();
   }

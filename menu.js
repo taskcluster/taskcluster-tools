@@ -9,5 +9,9 @@ module.exports = [
   {
     title:          "Credentials",
     link:           '/login'
+  },
+  {
+    title:          "Preferences",
+    link:           '/preferences'
   }
 ];
