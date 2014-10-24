@@ -1,5 +1,8 @@
 var path      = require('path');
 var reactify  = require('reactify');
+var stream    = require('stream');
+var exorcist  = require('exorcist');
+var concat    = require('concat-stream')
 
 // Common modules to compiled into a single bundle
 var COMMON_MODULES = [
@@ -21,8 +24,42 @@ var COMMON_MODULES = [
   'assert'
 ];
 
+var wrapExorcist = function(dest) {
+  return function(err, src, next) {
+    var s = new stream.Readable();
+    s._read = function noop() {};
+    s.push(src);
+    s.push(null);
+
+    s.pipe(exorcist(dest))
+     .pipe(concat({encoding: 'string'}, function(data) {
+      next(err, data);
+    }));
+  };
+};
+
+
+
 // Setup grunt
 module.exports = function(grunt) {
+
+  var createSourceMap = function(err, src, next) {
+    //var mapfile = grunt.template.process('<%= folders.output %>/<%= filenames.js %>.map');
+    console.log("data:");
+    console.log(grunt.template.process('<%= data %>'));
+    //console.log(mapfile);
+    //console.log(grunt.template.process('<%= filenames.js %>'));
+    next(err, src);
+    /*
+    var s = new stream.Readable();
+    s._read = function noop() {};
+    s.push(src);
+    s.push(null);
+    s.pipe(exorcist(mapfile).on('finish', function() {
+      next(err, src);
+    }));*/
+  };
+
   // Configuration for the grunt tasks
   var config = {
     // Copy all files over, so that images and assets is available, but also
@@ -62,8 +99,11 @@ module.exports = function(grunt) {
       },
       common: {
         options: {
-          external: [],
-          require:  COMMON_MODULES
+          external:       [],
+          require:        COMMON_MODULES,
+          postBundleCB:   wrapExorcist(
+                            path.join('build', 'common.bundle.js.map')
+                          )
         },
         src:    [],
         dest:   path.join('build', 'common.bundle.js')
@@ -133,9 +173,13 @@ module.exports = function(grunt) {
      .filter(RegExp.prototype.test.bind(/\.jsx?$/))
      .map(path.relative.bind(path, __dirname))
      .forEach(function(file) {
+    var target = path.join('build', file.replace(/\.jsx?$/, '.bundle.js'));
     config.browserify[file] = {
-      src:    './' + file,  // './' is necessary to load a local module
-      dest:   path.join('build', file.replace(/\.jsx?$/, '.bundle.js'))
+      src:              './' + file,  //'./' is necessary to load a local module
+      dest:             target,
+      options: {
+        postBundleCB:   wrapExorcist(target + '.map')
+      }
     };
   });
   // return console.log(JSON.stringify(config.browserify, null, 2));
