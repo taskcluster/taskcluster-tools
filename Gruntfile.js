@@ -17,6 +17,7 @@ var COMMON_MODULES = [
   'marked',
   'moment',
   'spin.js',
+  'react-font-awesome',
   // global modules too
   'url',
   'querystring',
@@ -163,7 +164,26 @@ module.exports = function(grunt) {
     },
     clean: [
       "build/"
-    ]
+    ],
+    aws_s3: {
+      options: {
+        // Get AWS credentials from environment
+        accessKeyId:        process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey:    process.env.AWS_SECRET_ACCESS_KEY,
+        bucket:             'taskcluster-tools',
+        region:             'us-west-2',
+        maxRetries:         10,
+        sslEnabled:         true,
+        uploadConcurrency:  5,
+        debug:              false,    // dry-run
+        gzip:               true
+      },
+      production: {
+        files: [
+          {expand: true, cwd: 'build/', src: ['**'], dest: '/'}
+        ]
+      }
+    }
   };
 
   var files = require('./build-files');

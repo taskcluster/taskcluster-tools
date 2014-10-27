@@ -1,10 +1,6 @@
 /** @jsx React.DOM */
-var layout      = require('../lib/layout');
-var React       = require('react');
-var bs          = require('react-bootstrap');
 var $           = require('jquery');
 var querystring = require('querystring');
-var login       = require('./login');
 var auth        = require('../lib/auth');
 
 // Load credentials for querystring
@@ -26,20 +22,11 @@ if (credentials.clientId &&
   if (window.opener) {
     // Close window
     window.close();
+  } else {
+    window.location = '/';
   }
+} else {
+  // Redirect to the login page
+  window.location = auth.buildLoginURL();
 }
 
-
-// Render component
-$(function() {
-  layout.renderNavigation({
-    activePage:   '/login'      // Matching entry in menu.js
-  });
-  var credentials = auth.loadCredentials() || {};
-  React.renderComponent(
-    <login.CredentialsManager clientId={credentials.clientId}
-                              accessToken={credentials.accessToken}
-                              certificate={credentials.certificate}/>,
-    $('#container')[0]
-  );
-});

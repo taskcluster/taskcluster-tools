@@ -3,17 +3,12 @@ var bs          = require('react-bootstrap');
 var React       = require('react');
 var $           = require('jquery');
 var menu        = require('../menu');
-var url         = require('url');
 var auth        = require('./auth');
+var awesome     = require('react-font-awesome');
+
 
 /** Navigation bar for layout.jade */
 var Navigation = React.createClass({
-  getDefaultProps: function() {
-    return {
-      activePage:     ''
-    };
-  },
-
   /** Get initial state */
   getInitialState: function() {
     return {
@@ -23,25 +18,8 @@ var Navigation = React.createClass({
 
   /** Log-in open a authentication URL */
   login: function() {
-    var target = url.format({
-      protocol:       window.location.protocol,
-      host:           window.location.host,
-      pathname:       '/login'
-    });
-    var authUrl = url.format({
-      protocol:       'http',
-      host:           'localhost:60550',    // TODO: Fix this when deploying
-      query: {
-        target:       target,
-        description: [
-          "TaskCluster Tools offers various way to create and inspect both tasks",
-          "and task-graphs."
-        ].join('\n')
-      }
-    });
-
     // Open login url
-    window.open(authUrl, '_blank');
+    window.open(auth.buildLoginURL(), '_blank');
   },
 
   /** Log out (clear credentials) */
@@ -89,12 +67,16 @@ var Navigation = React.createClass({
 
     // Find active menu entry
     var activeEntry = menu.filter(function(entry) {
-      return entry.link === this.props.activePage;
+      return entry.link === window.location.pathname;
     }, this)[0] || {title: "Unknown Page"};
+    // Remove title on landing page
+    if (window.location.pathname === '/') {
+      activeEntry = {title: ""};
+    }
 
     // Construct the navbar
     return (
-      <bs.Navbar inverse={true} staticTop={true} brand={branding}>
+      <bs.Navbar fluid={true} inverse={true} staticTop={true} brand={branding}>
         <div className="navbar-text">
           {activeEntry.title}
         </div>
@@ -107,6 +89,9 @@ var Navigation = React.createClass({
                 }
                 return (
                   <bs.MenuItem key={index} href={entry.link}>
+                    <awesome.Icon
+                      type={entry.icon || 'wrench'}
+                      fixedWidth/>&nbsp;&nbsp;
                     {entry.title}
                   </bs.MenuItem>
                 );
@@ -116,14 +101,12 @@ var Navigation = React.createClass({
           {
             ( this.state.credentials ?
               <bs.NavItem onSelect={this.logout}>
-                <bs.Glyphicon glyph="log-out"/>
-                &nbsp;
+                <bs.Glyphicon glyph="log-out"/>&nbsp;
                 Log out
               </bs.NavItem>
             :
               <bs.NavItem onSelect={this.login}>
-                <bs.Glyphicon glyph="log-in"/>
-                &nbsp;
+                <bs.Glyphicon glyph="log-in"/>&nbsp;
                 Log in
               </bs.NavItem>
             )
@@ -136,14 +119,9 @@ var Navigation = React.createClass({
 
 
 /** Render Navigation */
-var renderNavigation = function(options) {
-  $(function() {
-    React.renderComponent(
-      <Navigation activePage={options.activePage}/>,
-      $('#navbar')[0]
-    );
-  });
-};
-
-// Export renderNavigation
-exports.renderNavigation = renderNavigation;
+$(function() {
+  React.renderComponent(
+    <Navigation/>,
+    $('#navbar')[0]
+  );
+});

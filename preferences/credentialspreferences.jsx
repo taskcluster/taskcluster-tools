@@ -105,67 +105,65 @@ var CredentialsPreferences = React.createClass({
       isTemporary = this.refs.temporary.getChecked();
     }
     return (
-      <bs.Row>
-        <bs.Col md={6} mdOffset={3}>
-          <h1>TaskCluster Credentials</h1>
-          <p>
-            Some tools and actions requires TaskCluster credentials, you can
-            login to <code>auth.taskcluster.net</code> and obtain temporary
-            credentials, or you can enter some static credentials here.
-          </p>
-          <form className="form-horizontal">
-            <bs.Input type="text"
-                      label="ClientId"
-                      ref="clientId"
-                      defaultValue={creds.clientId || ''}
-                      placeholder="ClientId"
-                      labelClassName="col-md-2"
-                      wrapperClassName="col-md-10"/>
-            <bs.Input type="text"
-                      label="AccessToken"
-                      ref="accessToken"
-                      defaultValue={creds.accessToken || ''}
-                      placeholder="AccessToken"
-                      labelClassName="col-md-2"
-                      wrapperClassName="col-md-10"/>
-            <bs.Input type="textarea"
-                      label="Certificate"
-                      ref="certificate"
-                      onChange={this.handleChange}
-                      defaultValue={certificate}
-                      disabled={!isTemporary}
-                      rows={12}
-                      bsStyle={this.state.parseError ? 'error' : undefined}
-                      hasFeedback
-                      placeholder="Certificate as JSON..."
-                      labelClassName="col-md-2"
-                      wrapperClassName="col-md-10"/>
-            <bs.Input type="checkbox"
-                      label="Temporary credentials"
-                      ref="temporary"
-                      onChange={this.handleChange}
-                      defaultChecked={isTemporary}
-                      wrapperClassName="col-xs-offset-2 col-xs-10"/>
-            <div className="form-group">
-              <div className="col-xs-offset-2 col-xs-10">
-                <bs.ButtonToolbar>
-                  <bs.Button bsStyle="primary"
-                             onClick={this.save}
-                             disabled={this.state.parseError}>
-                    Save Changes
+      <span>
+        <h3>TaskCluster Credentials</h3>
+        <p>
+          Some tools and actions requires TaskCluster credentials, you can
+          login to <code>auth.taskcluster.net</code> and obtain temporary
+          credentials, or you can enter some static credentials here.
+        </p>
+        <form className="form-horizontal">
+          <bs.Input type="text"
+                    label="ClientId"
+                    ref="clientId"
+                    defaultValue={creds.clientId || ''}
+                    placeholder="ClientId"
+                    labelClassName="col-md-2"
+                    wrapperClassName="col-md-10"/>
+          <bs.Input type="text"
+                    label="AccessToken"
+                    ref="accessToken"
+                    defaultValue={creds.accessToken || ''}
+                    placeholder="AccessToken"
+                    labelClassName="col-md-2"
+                    wrapperClassName="col-md-10"/>
+          <bs.Input type="textarea"
+                    label="Certificate"
+                    ref="certificate"
+                    onChange={this.handleChange}
+                    defaultValue={certificate}
+                    disabled={!isTemporary}
+                    rows={12}
+                    bsStyle={this.state.parseError ? 'error' : undefined}
+                    hasFeedback
+                    placeholder="Certificate as JSON..."
+                    labelClassName="col-md-2"
+                    wrapperClassName="col-md-10"/>
+          <bs.Input type="checkbox"
+                    label="Temporary credentials"
+                    ref="temporary"
+                    onChange={this.handleChange}
+                    defaultChecked={isTemporary}
+                    wrapperClassName="col-xs-offset-2 col-xs-10"/>
+          <div className="form-group">
+            <div className="col-xs-offset-2 col-xs-10">
+              <bs.ButtonToolbar>
+                <bs.Button bsStyle="primary"
+                           onClick={this.save}
+                           disabled={this.state.parseError}>
+                  Save Changes
+                </bs.Button>
+                <bs.OverlayTrigger placement="top"
+                                   overlay={this.renderRemoveTooltip()}>
+                  <bs.Button bsStyle="danger" onClick={this.remove}>
+                    Remove
                   </bs.Button>
-                  <bs.OverlayTrigger placement="top"
-                                     overlay={this.renderRemoveTooltip()}>
-                    <bs.Button bsStyle="danger" onClick={this.remove}>
-                      Remove
-                    </bs.Button>
-                  </bs.OverlayTrigger>
-                </bs.ButtonToolbar>
-              </div>
+                </bs.OverlayTrigger>
+              </bs.ButtonToolbar>
             </div>
-          </form>
-        </bs.Col>
-      </bs.Row>
+          </div>
+        </form>
+      </span>
     );
   },
 

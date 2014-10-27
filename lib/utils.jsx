@@ -5,10 +5,11 @@ var auth          = require('./auth');
 var Promise       = require('promise');
 var debug         = require('debug')('lib:utils');
 var assert        = require('assert');
-var format        = require('./format');
+var awesome       = require('react-font-awesome');
+var taskcluster   = require('taskcluster-client');
+var debug         = require('debug')('lib:utils');
 
 /** Logic for loading and maintaining state using taskcluster-client
-
 
 implementors can provide:
   load()
@@ -33,23 +34,6 @@ implementors can provide:
   }
   When rendering !propertyLoaded) will be true if it either haven't started
   loading or is loading...
-
-
-implementors can provide:
-  bindings() and handleMessage(message)
-  In this case, bindings() must return a list of bindings based on this.state,
-  this mixin will invoke bindings() whenever state changes and do a deepEquals
-  to the current listener bindings.
-  If they differ, the listener will be reinitialized.
-  Whenever a message arrives from the listener it will be given to handleMessage
-  which must also be defined, then method can then update state as necessary.
-
-  Note, bindings() shouldn't have any side-effects!
-  This will also add the following state:
-  {
-    isListening:    true || false
-  }
-
 
 */
 var createTaskClusterMixin = function(options) {
@@ -215,9 +199,10 @@ var createTaskClusterMixin = function(options) {
     /** Render a spinner */
     renderSpinner: function() {
       return (
-        <format.Spin/>
+        <div style={{textAlign: 'center', margin: 20}}>
+          <awesome.Icon type="spinner" size="2x" spin/>
+        </div>
       );
-      //return <b>Loading...</b>;
     },
 
     /**
@@ -243,3 +228,123 @@ var createTaskClusterMixin = function(options) {
 
 // Export createTaskClusterMixin
 exports.createTaskClusterMixin = createTaskClusterMixin;
+
+/**
+  implementors can provide:
+  bindings() and handleMessage(message)
+  In this case, bindings() must return a list of bindings based on this.state,
+  this mixin will invoke bindings() whenever state changes and do a deepEquals
+  to the current listener bindings.
+  If they differ, the listener will be reinitialized.
+  Whenever a message arrives from the listener it will be given to handleMessage
+  which must also be defined, then method can then update state as necessary.
+
+  Note, bindings() shouldn't have any side-effects!
+  This will also add the following state:
+  {
+    listening:    true || false || null // when connecting
+  }
+*/
+var createWebListenerMixin = function(options) {
+  // Set default options
+  options = _.defaults({}, options, {
+    bindings:     [] // initial bindings
+  });
+  return {
+    /** Start listening if bindings are configured */
+    componentDidMount: function() {
+      this.__listener = null;
+
+      if (options.bindings.length > 0) {
+        this.startListening(options.bindings.length);
+      }
+    },
+
+    /** Stop listening */
+    componentWillUnmount: function() {
+      this.stopListening();
+    },
+
+    /** Start listening */
+    startListening: function(bindings) {
+      // Get bindings if none are provided
+      if (!bindings || bindings.length === 0) {
+        return Promise.resolve(undefined);
+      }
+
+      // If not listening start listening
+      if (!this.__listener) {
+        this.__listener = new taskcluster.WebListener();
+        this.__listener.on('message', this.handleMessage);
+        this.__listener.on('error', function(err) {
+          debug("Error while listening: %s, %j", err, err);
+          if (!err) {
+            err = new Error("Unknown error");
+          }
+          this.setState({listeningError: err});
+          this.stopListening();
+        }.bind(this));
+
+        // Bind to bindings
+        var bound = bindings.map(function(binding) {
+          return this.__listener.bind(binding);
+        }, this);
+
+        this.setState({
+          listening:        null,
+          listeningError:   undefined
+        });
+        return Promise.all(bound.concat([
+          this.__listener.resume()
+        ])).then(function() {
+          debug("Listening for messages...");
+          this.setState({
+            listening:        true,
+            listeningError:   undefined
+          });
+        }.bind(this), function(err) {
+          debug("Error while listening: %s, %j", err, err);
+          if (!err) {
+            err = new Error("Unknown error");
+          }
+          this.setState({listeningError: err});
+          return this.stopListening();
+        }.bind(this));
+      }
+
+      // Bind to all new bindings
+      this.setState({
+        listening:        null,
+        listeningError:   undefined
+      });
+      return Promise.all(bindings.map(function(binding) {
+        return this.__listener.bind(binding);
+      }, this)).then(function() {
+        this.setState({
+          listening:        true,
+          listeningError:   undefined
+        });
+      }.bind(this), function(err) {
+        debug("Error while listening: %s, %j", err, err);
+        if (!err) {
+          err = new Error("Unknown error");
+        }
+        this.setState({listeningError: err});
+        return this.stopListening();
+      }.bind(this));
+    },
+
+    /** Stop listening, if already listening */
+    stopListening: function() {
+      this.setState({listening: false});
+      if (this.__listener) {
+        var closed = this.__listener.close();
+        this.__listener = null;
+        return closed;
+      }
+      return Promise.resolve(undefined);
+    }
+  };
+};
+
+exports.createWebListenerMixin = createWebListenerMixin;
