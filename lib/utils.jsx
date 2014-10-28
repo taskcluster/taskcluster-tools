@@ -9,33 +9,40 @@ var awesome       = require('react-font-awesome');
 var taskcluster   = require('taskcluster-client');
 var debug         = require('debug')('lib:utils');
 
-/** Logic for loading and maintaining state using taskcluster-client
-
-implementors can provide:
-  load()
-  returns a map from {property: promise}
-  When the promise is successful state will be set as follows:
-  {
-    propertyLoaded:   true,
-    propertyError:    undefined,
-    property:         result from promise
-  }
-  If the promise is resolved unsuccessfully state will be set as follows:
-  {
-    propertyLoaded:   true,
-    propertyError:    Error Object,
-    property:         undefined
-  }
-  While the promise is waiting to be resolved state will be set as follows:
-  {
-    propertyLoaded:   false,
-    propertyError:    undefined,
-    property:         undefined
-  }
-  When rendering !propertyLoaded) will be true if it either haven't started
-  loading or is loading...
-
-*/
+/**
+ * Logic for loading state using taskcluster-client
+ *
+ * Implementors can provide:
+ *   - `load(props)` returns a map from property to state,
+ *     example: `{property: promise}`.
+ *
+ * Implementors can also call `loadState({property: promise})` with a mapping
+ * from property to promise.
+ *
+ * When a promise is successful state will be set as follows:
+ * {
+ *   propertyLoaded:   true,
+ *   propertyError:    undefined,
+ *   property:         result from promise
+ * }
+ *
+ * If a promise is resolved unsuccessfully state will be set as follows:
+ * {
+ *   propertyLoaded:   true,
+ *   propertyError:    Error Object,
+ *   property:         undefined
+ * }
+ *
+ * While a promise is waiting to be resolved state will be set as follows:
+ * {
+ *   propertyLoaded:   false,
+ *   propertyError:    undefined,
+ *   property:         undefined
+ * }
+ *
+ * When rendering `!propertyLoaded` will be true if it either haven't started
+ * loading or is loading.
+ */
 var createTaskClusterMixin = function(options) {
   // Set default options
   options = _.defaults({}, options, {
@@ -230,21 +237,21 @@ var createTaskClusterMixin = function(options) {
 exports.createTaskClusterMixin = createTaskClusterMixin;
 
 /**
-  implementors can provide:
-  bindings() and handleMessage(message)
-  In this case, bindings() must return a list of bindings based on this.state,
-  this mixin will invoke bindings() whenever state changes and do a deepEquals
-  to the current listener bindings.
-  If they differ, the listener will be reinitialized.
-  Whenever a message arrives from the listener it will be given to handleMessage
-  which must also be defined, then method can then update state as necessary.
-
-  Note, bindings() shouldn't have any side-effects!
-  This will also add the following state:
-  {
-    listening:    true || false || null // when connecting
-  }
-*/
+ * Logic for listening to Pulse exchanges using WebListener
+ *
+ * This mixin offers method:
+ *  - `startListening(bindings)`
+ *  - `stopListening()`
+ *
+ * You can call `startListening(bindings)` repeatedly to listen to additional
+ * bindings.
+ *
+ * This mixin adds the state property `listening` to state as follows:
+ *
+ * {
+ *    listening:    true || false || null // null when connecting
+ * }
+ */
 var createWebListenerMixin = function(options) {
   // Set default options
   options = _.defaults({}, options, {
@@ -347,4 +354,103 @@ var createWebListenerMixin = function(options) {
   };
 };
 
+// Export createWebListenerMixin
 exports.createWebListenerMixin = createWebListenerMixin;
+
+
+/** Escape a string for use in a regular expression */
+var escapeForRegularExpression = function(string) {
+  return string.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+};
+
+
+/** Apply a hexa decimal */
+var escapeChar = function(character, string) {
+  assert(character.length === 1, "character must have length 1");
+  var regExp = new RegExp(escapeForRegularExpression(character), 'g');
+  return string.replace(regExp, function(c) {
+    return '%' + c.charCodeAt(0).toString(16);
+  });
+};
+
+// Export escapeChar
+exports.escapeChar = escapeChar;
+
+/** Unescape a specific character, reversing escapeChar */
+var unescapeChar = function(character, string) {
+  assert(character.length === 1, "character must have length 1");
+  var needle = '%' + character.charCodeAt(0).toString(16);
+  var regExp = new RegExp(escapeForRegularExpression(needle), 'g');
+  return string.replace(regExp, character);
+};
+
+// Export unescapeChar
+exports.unescapeChar = unescapeChar;
+
+/** Encode string for use in window.location.hash */
+var encodeFragment = function(string) {
+  return string.replace(/[^a-zA-Z0-9!$&'()*+,;=:@\-._~?\/]/g, function(c) {
+    return '%' + c.charCodeAt(0).toString(16);
+  });
+};
+
+// Export encodeFragment
+exports.encodeFragment = encodeFragment;
+
+var createLocationHashMixin =  function(options) {
+  assert((options.save instanceof Function &&
+          options.load instanceof Function) ||
+         options.key, "save/load or key must given");
+  // Provide default options
+  options = _.defaults({}, options, {
+    defaultValue:     '',
+    save: function() {
+      return this.state[options.key] || options.defaultValue;
+    },
+    load: function(data) {
+      var state = {};
+      state[options.key] = data || options.defaultValue;
+      if (this.state[options.key] !== state[options.key]) {
+        this.setState(state);
+      }
+    }
+  });
+  return {
+    componentWillMount: function() {
+      this.__previousHashFragment = undefined;
+      this.handleHashChange();
+    },
+
+    componentDidMount: function() {
+      window.addEventListener('hashchange', this.handleHashChange, false);
+    },
+
+    componentWillUnmount: function() {
+      window.removeEventListener('hashchange', this.handleHashChange, false);
+    },
+
+    componentDidUpdate: function() {
+      var hash          = decodeURIComponent(window.location.hash.substr(1));
+      var fragments     = hash.split('/');
+      var oldFragment   = fragments[this.props.hashIndex] || '';
+      var newFragment   = escapeChar('/', options.save.call(this) || '');
+      if (oldFragment !== newFragment) {
+        fragments[this.props.hashIndex] = newFragment;
+        window.location.hash = '#' + encodeFragment(fragments.join('/'));
+      }
+    },
+
+    handleHashChange: function() {
+      var hash      = decodeURIComponent(window.location.hash.substr(1));
+      var fragments = hash.split('/');
+      var fragment  = fragments[this.props.hashIndex] || '';
+      if (this.__previousHashFragment !== fragment) {
+        this.__previousHashFragment = fragment;
+        options.load.call(this, unescapeChar('/', fragment));
+      }
+    }
+  };
+};
+
+// Export createLocationHashMixin
+exports.createLocationHashMixin = createLocationHashMixin;

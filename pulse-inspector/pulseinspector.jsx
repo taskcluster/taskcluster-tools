@@ -6,6 +6,7 @@ var taskcluster     = require('taskcluster-client');
 var format          = require('../lib/format');
 var _               = require('lodash');
 var JSONInspector   = require('react-json-inspector');
+var slugid          = require('slugid');
 
 
 var PulseInspector = React.createClass({
@@ -13,15 +14,48 @@ var PulseInspector = React.createClass({
   mixins: [
     utils.createWebListenerMixin({
       startOnMount:     false
+    }),
+    utils.createLocationHashMixin({
+      save: function() {
+        var bindings = this.state.bindings || [];
+        return bindings.map(function(binding) {
+          return [
+            binding.exchange,
+            binding.routingKeyPattern
+          ].map(utils.escapeChar.bind(utils, ':')).join(':');
+        }).map(utils.escapeChar.bind(utils, ',')).join(',');
+      },
+      load: function(data) {
+        if (data === '') {
+          return this.setState({bindings: []});
+        }
+        var bindings = data
+          .split(',')
+          .map(utils.escapeChar.bind(utils, ','))
+          .map(function(entry) {
+            var parts = entry.split(':').map(utils.escapeChar.bind(utils, ':'));
+            return {
+              exchange:           parts[0],
+              routingKeyPattern:  parts[1]
+            }
+          });
+        this.setState({bindings: bindings});
+      }
     })
   ],
+
+  getDefaultProps: function() {
+    return {
+      hashIndex:        0
+    };
+  },
 
   /** Create initial state */
   getInitialState: function() {
     return {
       bindings:         [],       // List of bindings
       messages:         [],       // List of messages received
-      expandedMessage:  null,     // Currently expanded message
+      expandedMessage:  null,     // _idForInspector of current message
       listening:        false,    // State of listening, set by WebListenerMixin
       listeningError:   undefined // Listening error set  by WebListenerMixin
     };
@@ -83,7 +117,10 @@ var PulseInspector = React.createClass({
     console.log(this.refs.downloadLink.getDOMNode());
     console.log(this.refs.downloadLink.getDOMNode().href);
     var downloadUrl = "data:application/json;base64," + btoa(JSON.stringify(
-      this.state.messages,
+      this.state.messages.map(function(message) {
+        // We shouldn't expose _idForInspector as it's made up here!
+        return _.pick(message, 'exchange', 'routingKey', 'payload');
+      }),
       null,
       2
     ));
@@ -188,10 +225,10 @@ var PulseInspector = React.createClass({
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
   handleMessage: function(message) {
+    message._idForInspector = slugid.v4();
     var messages = _.cloneDeep(this.state.messages);
     messages.unshift(message);
     this.setState({messages: messages});
-    console.log(message);
   },
 
   /** Render table of messages */
@@ -207,7 +244,7 @@ var PulseInspector = React.createClass({
         <tbody>
           {
             this.state.messages.map(function(message, index) {
-              if (message === this.state.expandedMessage) {
+              if (message._idForInspector === this.state.expandedMessage) {
                 return (
                   <tr key={index}>
                     {this.renderMessage(message)}
@@ -268,7 +305,7 @@ var PulseInspector = React.createClass({
 
   /** Set expended message, note we rely on object reference comparison here */
   expandMessage: function(message) {
-    this.setState({expandedMessage: message});
+    this.setState({expandedMessage: message._idForInspector});
   },
 
   /** Render a listening error */

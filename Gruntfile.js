@@ -173,7 +173,7 @@ module.exports = function(grunt) {
           '**/*.html',    '**/*.jade',
           '**/*.js',      '**/*.js.map',      '**/*.jsx',
           '**/*.css',     '**/*.css.map',     '**/*.less',
-          '**/*.svg'
+          '**/*.svg',     '**/*.json'
         ],
       },
       binary: {
@@ -183,7 +183,7 @@ module.exports = function(grunt) {
           '!**/*.html',   '!**/*.jade',
           '!**/*.js',     '!**/*.js.map',     '!**/*.jsx',
           '!**/*.css',    '!**/*.css.map',    '!**/*.less',
-          '!**/*.svg'
+          '!**/*.svg',    '!**/*.json'
         ],
       }
     },
