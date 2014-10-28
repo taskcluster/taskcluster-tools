@@ -25,13 +25,13 @@ var COMMON_MODULES = [
   'assert'
 ];
 
+/** Create an function split source maps put in post bundle callback */
 var wrapExorcist = function(dest) {
   return function(err, src, next) {
     var s = new stream.Readable();
     s._read = function noop() {};
     s.push(src);
     s.push(null);
-
     s.pipe(exorcist(dest))
      .pipe(concat({encoding: 'string'}, function(data) {
       next(err, data);
@@ -40,26 +40,8 @@ var wrapExorcist = function(dest) {
 };
 
 
-
 // Setup grunt
 module.exports = function(grunt) {
-
-  var createSourceMap = function(err, src, next) {
-    //var mapfile = grunt.template.process('<%= folders.output %>/<%= filenames.js %>.map');
-    console.log("data:");
-    console.log(grunt.template.process('<%= data %>'));
-    //console.log(mapfile);
-    //console.log(grunt.template.process('<%= filenames.js %>'));
-    next(err, src);
-    /*
-    var s = new stream.Readable();
-    s._read = function noop() {};
-    s.push(src);
-    s.push(null);
-    s.pipe(exorcist(mapfile).on('finish', function() {
-      next(err, src);
-    }));*/
-  };
 
   // Configuration for the grunt tasks
   var config = {
@@ -72,9 +54,6 @@ module.exports = function(grunt) {
             expand:     true,
             src:        [
               '**',                                 // Copy everything
-              // We might want to allow node_modules/ so that sourceMaps will
-              // work
-              //'!node_modules/**', '!node_modules',  // Exclude node_modules/
               '!build/**', '!build',                // Exclude build/
               '!package.json',                      // Exclude package.json
               '!Gruntfile.js',                      // Exclude Gruntfile.js
@@ -112,7 +91,7 @@ module.exports = function(grunt) {
     },
     jade: {
       options: {
-        pretty:     true
+        pretty:               true  // Pretty print HTML
       }
     },
     less: {
@@ -132,13 +111,15 @@ module.exports = function(grunt) {
     },
     watch: {
       options: {
-        spawn: false
+        spawn:                false,
+        debounceDelay:        250
       },
       assets: {
         files:  [
           '**',                                 // Copy everything
-          // We might want to allow node_modules/ so that sourceMaps will
-          // work
+          // We want to allow node_modules/ so that sourceMaps will
+          // work, but we can't reliably watch it as the system runs out of
+          // file descriptors
           '!node_modules/**', '!node_modules',  // Exclude node_modules/
           '!.git', '!.git/**', '!.git/*',       // Exclude .git/
           '!build/**', '!build',                // Exclude build/
@@ -165,26 +146,91 @@ module.exports = function(grunt) {
     clean: [
       "build/"
     ],
-    aws_s3: {
+    s3: {
       options: {
         // Get AWS credentials from environment
         accessKeyId:        process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey:    process.env.AWS_SECRET_ACCESS_KEY,
         bucket:             'taskcluster-tools',
         region:             'us-west-2',
-        maxRetries:         10,
         sslEnabled:         true,
-        uploadConcurrency:  5,
-        debug:              false,    // dry-run
-        gzip:               true
+        maxRetries:         10,
+        concurrency:        30,
+        overwrite:          true,
+        cacheTTL:           0,
+        gzip:               true,
+        dryRun:             false,
+        headers: {
+          CacheControl:     'public, must-revalidate, proxy-revalidate, max-age=0'
+        }
       },
-      production: {
-        files: [
-          {expand: true, cwd: 'build/', src: ['**'], dest: '/'}
-        ]
+      text: {
+        options: {
+          charset:          'utf-8',
+        },
+        cwd:                'build/',
+        src:                [
+          '**/*.html',    '**/*.jade',
+          '**/*.js',      '**/*.js.map',      '**/*.jsx',
+          '**/*.css',     '**/*.css.map',     '**/*.less',
+          '**/*.svg'
+        ],
+      },
+      binary: {
+        cwd:                'build/',
+        src:                [
+          '**',
+          '!**/*.html',   '!**/*.jade',
+          '!**/*.js',     '!**/*.js.map',     '!**/*.jsx',
+          '!**/*.css',    '!**/*.css.map',    '!**/*.less',
+          '!**/*.svg'
+        ],
+      }
+    },
+    concurrent: {
+      options: {
+        limit:                      999999 // We use concurrent to watch things
+      },
+      build: {
+        options: {
+          logConcurrentOutput:      false
+        },
+        tasks:    ['copy', 'jade', 'less']
+      },
+      develop: {
+        options: {
+          logConcurrentOutput:      true
+        },
+        tasks:    ['server', 'watch-browserify', 'watch']
       }
     }
   };
+  // Tasks used by concurrent to create a develop that is nicely concurrent
+  grunt.registerTask('server',            ['connect',    'keepalive']);
+  grunt.registerTask('watch-browserify',  ['browserify', 'keepalive']);
+
+  // Register tasks
+  grunt.registerTask('default', ['develop']);
+  grunt.registerTask(
+    'build',
+    "Build sources into the build/ folder",
+    ['copy', 'jade', 'less', 'browserify']
+  );
+  grunt.registerTask(
+    'develop',
+    "build, watch and serve on localhost:9000",
+    ['concurrent:build', 'concurrent:develop']
+  );
+  grunt.registerTask(
+    'publish',
+    "Build and upload to tools.taskcluster.net",
+    ['clean', 'build', 's3']
+  );
+  grunt.registerTask(
+    'develop-safe-mode',
+    "develop with single grunt process",
+    ['build', 'connect', 'watch']
+  );
 
   var files = require('./build-files');
 
@@ -202,7 +248,6 @@ module.exports = function(grunt) {
       }
     };
   });
-  // return console.log(JSON.stringify(config.browserify, null, 2));
 
   // Compile Jade files
   files
@@ -210,9 +255,20 @@ module.exports = function(grunt) {
      .map(path.relative.bind(path, __dirname))
      .forEach(function(file) {
     // Rule for compiling the file with jade
+    var relRoot = path.relative(path.dirname(file), '.');
     config.jade[file] = {
-      src:    file,
-      dest:   path.join('build', file.replace(/\.jade$/, '.html'))
+      options: {
+        data: {
+          relPath:  function(absPath) {
+            //
+            return path.relative(path.dirname(file), absPath);
+            // Return relative path for absolute path
+            //return path.join(relRoot, absPath);
+          }
+        }
+      },
+      src:        file,
+      dest:       path.join('build', file.replace(/\.jade$/, '.html'))
     };
   });
 
@@ -254,8 +310,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
-
-  // Register tasks
-  grunt.registerTask('default', ['build', 'connect', 'watch']);
-  grunt.registerTask('build',   ['copy', 'jade', 'less', 'browserify']);
+  grunt.loadNpmTasks('grunt-aws');
+  grunt.loadNpmTasks('grunt-keepalive');
+  grunt.loadNpmTasks('grunt-concurrent');
 };
