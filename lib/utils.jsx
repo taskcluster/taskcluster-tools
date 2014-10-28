@@ -224,8 +224,6 @@ var createTaskClusterMixin = function(options) {
     _createClients: function(credentials) {
       _.forIn(options.clients, function(Client, key) {
         this[key] = new Client({
-          // TODO: Fix this when deploying
-          baseUrl:            'http://localhost:60550/v1',
           credentials:        credentials
         });
       }, this);
