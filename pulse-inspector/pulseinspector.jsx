@@ -9,12 +9,96 @@ var JSONInspector   = require('react-json-inspector');
 var slugid          = require('slugid');
 
 
+/**
+ * Message row implemented to only re-render when strictly necessary
+ *
+ * Properties expected:
+ * - expanded
+ * - onClick
+ * - message
+ *
+ * Note, this relies on message._idForInspector to decide when to update.
+ * In general there is no reason to reuse these instances.
+ */
+var MessageRow = React.createClass({
+  /** Only update when strictly necessary */
+  shouldComponentUpdate: function(nextProps) {
+    // Just compare the _idForInspector
+    if (this.props.message._idForInspector !==
+        nextProps.message._idForInspector) {
+      return true;
+    }
+    if (this.props.expanded !== nextProps.expanded) {
+      return true;
+    }
+    return false;
+  },
+
+  /** Render a message row*/
+  render: function() {
+    var message         = this.props.message;
+    var hasCustomRoutes = (message.routes.length > 0);
+    if (!this.props.expanded) {
+      return (
+        <tr onClick={this.handleClick}
+            className="pulse-inspector-unexpanded-message">
+          <td><code>{message.exchange}</code></td>
+          <td><code>{message.routingKey}</code></td>
+        </tr>
+      );
+    }
+    return (
+      <tr>
+        <td colSpan={2} className="pulse-inspector-expanded-message">
+          <dl className="dl-horizontal">
+            <dt>Exchange</dt>
+            <dd><code>{message.exchange}</code></dd>
+            <dt>Routing Key</dt>
+            <dd><code>{message.routingKey}</code></dd>
+            {
+              hasCustomRoutes ?
+                <dt>Custom Routes</dt>
+              :
+                undefined
+            }
+            {
+              hasCustomRoutes ?
+                <dd>
+                  <ul>
+                    {
+                      message.routes.map(function(route, index) {
+                        return <li key={index}><code>{route}</code></li>;
+                      })
+                    }
+                  </ul>
+                </dd>
+              :
+                undefined
+            }
+          </dl>
+          <JSONInspector data={message.payload}/>
+          <br/>
+        </td>
+      </tr>
+    );
+  },
+
+  /** handleClick */
+  handleClick: function() {
+    // Do this indirectly so we don't have to render if the event handler
+    // changes
+    this.props.onClick();
+  }
+});
+
+
 var PulseInspector = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createWebListenerMixin({
       startOnMount:     false
-    }),
+    })
+    /*
     utils.createLocationHashMixin({
       save: function() {
         var bindings = this.state.bindings || [];
@@ -41,7 +125,7 @@ var PulseInspector = React.createClass({
           });
         this.setState({bindings: bindings});
       }
-    })
+    })*/
   ],
 
   getDefaultProps: function() {
@@ -226,13 +310,12 @@ var PulseInspector = React.createClass({
   /** Handle message from WebListener, sent by TaskClusterMixing */
   handleMessage: function(message) {
     message._idForInspector = slugid.v4();
-    var messages = _.cloneDeep(this.state.messages);
-    messages.unshift(message);
-    this.setState({messages: messages});
+    this.setState({messages: [message].concat(this.state.messages)});
   },
 
   /** Render table of messages */
   renderMessages: function() {
+    var expandedMsgId = this.state.expandedMessage;
     return (
       <bs.Table condensed hover>
         <thead>
@@ -243,22 +326,14 @@ var PulseInspector = React.createClass({
         </thead>
         <tbody>
           {
-            this.state.messages.map(function(message, index) {
-              if (message._idForInspector === this.state.expandedMessage) {
-                return (
-                  <tr key={index}>
-                    {this.renderMessage(message)}
-                  </tr>
-                );
-              }
-              return (
-                <tr key={index}
-                    onClick={this.expandMessage.bind(this, message)}
-                    className="pulse-inspector-unexpanded-message">
-                  <td><code>{message.exchange}</code></td>
-                  <td><code>{message.routingKey}</code></td>
-                </tr>
-              );
+            this.state.messages.map(function(message) {
+              var msgId       = message._idForInspector;
+              var expanded    = (msgId === expandedMsgId);
+              return <MessageRow
+                        key={msgId}
+                        expanded={expanded}
+                        message={message}
+                        onClick={this.expandMessage.bind(this, msgId)}/>
             }, this)
           }
         </tbody>
@@ -266,46 +341,9 @@ var PulseInspector = React.createClass({
     );
   },
 
-  /** Render an expanded message */
-  renderMessage: function(message) {
-    var hasCustomRoutes = (message.routes.length > 0);
-    return (
-      <td colSpan={2} className="pulse-inspector-expanded-message">
-        <dl className="dl-horizontal">
-          <dt>Exchange</dt>
-          <dd><code>{message.exchange}</code></dd>
-          <dt>Routing Key</dt>
-          <dd><code>{message.routingKey}</code></dd>
-          {
-            hasCustomRoutes ?
-              <dt>Custom Routes</dt>
-            :
-              undefined
-          }
-          {
-            hasCustomRoutes ?
-              <dd>
-                <ul>
-                  {
-                    message .routes.map(function(route, index) {
-                      return <li key={index}><code>{route}</code></li>;
-                    })
-                  }
-                </ul>
-              </dd>
-            :
-              undefined
-          }
-        </dl>
-        <JSONInspector data={message.payload}/>
-        <br/>
-      </td>
-    );
-  },
-
   /** Set expended message, note we rely on object reference comparison here */
-  expandMessage: function(message) {
-    this.setState({expandedMessage: message._idForInspector});
+  expandMessage: function(idForInspector) {
+    this.setState({expandedMessage: idForInspector});
   },
 
   /** Render a listening error */
