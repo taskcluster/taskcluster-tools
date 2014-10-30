@@ -28,7 +28,7 @@ var ClientManager = React.createClass({
   },
 
   /** Load state from auth (using TaskClusterMixin) */
-  load: function(props) {
+  load: function() {
     // Creates state properties:
     // - clientsLoaded
     // - clientsError

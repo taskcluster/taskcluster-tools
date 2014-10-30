@@ -46,9 +46,9 @@ var ClientEditor = React.createClass({
   },
 
   /** Load initial state */
-  load: function(props) {
+  load: function() {
     // If there is no currentClientId, we're creating a new client
-    if (!props.currentClientId) {
+    if (!this.props.currentClientId) {
       return {
         client: {
           clientId:       slugid.v4(),
@@ -65,7 +65,7 @@ var ClientEditor = React.createClass({
     } else {
       // Load currentClientId
       return {
-        client:           this.auth.client(props.currentClientId),
+        client:           this.auth.client(this.props.currentClientId),
         editing:          false,
         working:          false,
         error:            null

@@ -9,36 +9,38 @@ var awesome       = require('react-font-awesome');
 var taskcluster   = require('taskcluster-client');
 var debug         = require('debug')('lib:utils');
 var rison         = require('rison');
+var bs            = require('react-bootstrap');
+
 
 /**
  * Logic for loading state using taskcluster-client
  *
  * Implementors can provide:
- *   - `load(props)` returns a map from property to state,
- *     example: `{property: promise}`.
+ *   - `load()` returns a map from key to state,
+ *     example: `{key: promise}`.
  *
- * Implementors can also call `loadState({property: promise})` with a mapping
- * from property to promise.
+ * Implementors can also call `loadState({key: promise})` with a mapping
+ * from key to promise.
  *
  * When a promise is successful state will be set as follows:
  * {
- *   propertyLoaded:   true,
- *   propertyError:    undefined,
- *   property:         result from promise
+ *   keyLoaded:   true,
+ *   keyError:    undefined,
+ *   key:         result from promise
  * }
  *
  * If a promise is resolved unsuccessfully state will be set as follows:
  * {
- *   propertyLoaded:   true,
- *   propertyError:    Error Object,
- *   property:         undefined
+ *   keyLoaded:   true,
+ *   keyError:    Error Object,
+ *   key:         undefined
  * }
  *
  * While a promise is waiting to be resolved state will be set as follows:
  * {
- *   propertyLoaded:   false,
- *   propertyError:    undefined,
- *   property:         undefined
+ *   keyLoaded:   false,
+ *   keyError:    undefined,
+ *   key:         undefined
  * }
  *
  * When rendering `!propertyLoaded` will be true if it either haven't started
@@ -48,8 +50,13 @@ var createTaskClusterMixin = function(options) {
   // Set default options
   options = _.defaults({}, options, {
     clients:        {},
-    reloadOnProps:  false   // List of properties to reload on, or `true`
+    reloadOnProps:  [],  // List of properties to reload on
+    reloadOnKeys:   []   // List of state keys to reload on
   });
+  assert(options.reloadOnProps instanceof Array,
+         "reloadOnProps must be an array");
+  assert(options.reloadOnKeys instanceof Array,
+         "reloadOnKeys must be an array");
   return {
     /** Setup object and start listening for events */
     componentDidMount: function() {
@@ -67,22 +74,27 @@ var createTaskClusterMixin = function(options) {
       this.reload();
     },
 
-    /** Check if the new properties causes us to reload */
-    componentWillReceiveProps: function(nextProps) {
-      // reload if we reload on any property change
-      var shallReload = (options.reloadOnProps === true);
+    /** Check if the props or state changes causes us to reload */
+    componentDidUpdate: function(prevProps, prevState) {
+      var shallReload = false;
 
-      // If reloadOnProps is an array, we'll check if any of the properties
-      // defined in the list have changed
-      if (!shallReload && options.reloadOnProps instanceof Array) {
+      // Check if any of the properties defined in reloadOnProps have changed
+      if (!shallReload) {
         shallReload = _.some(options.reloadOnProps, function(property) {
-          return this.props[property] !== nextProps[property];
+          return !_.isEqual(this.props[property], prevProps[property]);
+        }, this);
+      }
+
+      // Check if any of state keys defined in reloadOnKeys have changed
+      if (!shallReload) {
+        shallReload = _.some(options.reloadOnKeys, function(key) {
+          return !_.isEqual(this.state[key], prevState[key]);
         }, this);
       }
 
       // Reload state if we have to
       if (shallReload) {
-        this.reload(nextProps);
+        this.reload();
       }
     },
 
@@ -170,19 +182,31 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** Reload state given properties to reload with */
-    reload: function(props) {
+    reload: function() {
       // If there is no `load` function then we're done
       if (!(this.load instanceof Function)) {
         return Promise.resolve(undefined);
       }
 
-      // If no properties are given we'll use current properties
-      if (props === undefined) {
-        props = this.props;
+      // Get promised state
+      var promisedState = this.load() || {};
+
+      // If changes to any of these properties is in reloadOnKeys we'll create
+      // an infinite loop, I hate those!
+      var conflictKeys = _.keys(promisedState).filter(function(key) {
+        return _.contains(options.reloadOnKeys, key) ||
+               _.contains(options.reloadOnKeys, key + 'Error') ||
+               _.contains(options.reloadOnKeys, key + 'Loaded');
+      });
+      if (conflictKeys.length > 0) {
+        debug("Keys that shouldn't be in reloadOnKeys or not returned",
+              " by load() are: %j", conflictKeys);
       }
+      assert(conflictKeys.length === 0, "You can't reload on keys that are " +
+             " returned by load(), this easily creates infinite loops");
 
       // Load state from promised state given by this.load()
-      return this.loadState(this.load(props) || {});
+      return this.loadState(promisedState);
     },
 
     /**
@@ -218,7 +242,27 @@ var createTaskClusterMixin = function(options) {
      * taskcluster-client
      */
     renderError: function(err) {
-      return <b>Error: {err.message}</b>;
+      var body = undefined;
+      if (err.body) {
+        body = (
+          <pre>
+            {JSON.stringify(err.body, null, 2)}
+          </pre>
+        );
+      }
+      var code = undefined;
+      if (err.statusCode) {
+        code = err.statusCode + ': ';
+      }
+      return (
+        <bs.Alert bsStyle="danger">
+          <strong>
+            {code}&nbsp;
+            {err.message || 'Unknown Error'}
+          </strong>
+          {body}
+        </bs.Alert>
+      );
     },
 
     /** Initialize client objects requested in options */
@@ -475,7 +519,6 @@ var createLocationHashMixin =  function(options) {
 
     /** Handle updates from hashEntry */
     handleStateHashChange: function(hashState) {
-      console.log("Load from: " + hashState);
       if (options.type === 'json') {
         if (hashState === '') {
           if (options.keys.length === 1) {
