@@ -705,6 +705,10 @@
           "from": "memoizejs@^0.1.1"
         }
       }
+    },
+    "rison": {
+      "version": "0.1.1",
+      "from": "rison@0.1.1"
     }
   }
 }

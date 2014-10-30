@@ -92,40 +92,17 @@ var MessageRow = React.createClass({
 });
 
 
+
 var PulseInspector = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createWebListenerMixin({
       startOnMount:     false
-    })
-    /*
+    }),
     utils.createLocationHashMixin({
-      save: function() {
-        var bindings = this.state.bindings || [];
-        return bindings.map(function(binding) {
-          return [
-            binding.exchange,
-            binding.routingKeyPattern
-          ].map(utils.escapeChar.bind(utils, ':')).join(':');
-        }).map(utils.escapeChar.bind(utils, ',')).join(',');
-      },
-      load: function(data) {
-        if (data === '') {
-          return this.setState({bindings: []});
-        }
-        var bindings = data
-          .split(',')
-          .map(utils.escapeChar.bind(utils, ','))
-          .map(function(entry) {
-            var parts = entry.split(':').map(utils.escapeChar.bind(utils, ':'));
-            return {
-              exchange:           parts[0],
-              routingKeyPattern:  parts[1]
-            }
-          });
-        this.setState({bindings: bindings});
-      }
-    })*/
+      keys:       ['bindings'],
+      type:       'json'
+    })
   ],
 
   getDefaultProps: function() {

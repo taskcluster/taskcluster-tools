@@ -8,6 +8,7 @@ var assert        = require('assert');
 var awesome       = require('react-font-awesome');
 var taskcluster   = require('taskcluster-client');
 var debug         = require('debug')('lib:utils');
+var rison         = require('rison');
 
 /**
  * Logic for loading state using taskcluster-client
@@ -395,56 +396,108 @@ var encodeFragment = function(string) {
 // Export encodeFragment
 exports.encodeFragment = encodeFragment;
 
+
+/**
+ * Create a LocationHashMixin instance with given options.
+ *
+ * options:
+ * {
+ *   keys:    ['taskId'],     // Keys from this.state to persist to hashEntry
+ *   type:    'string'        // 'json' or 'string', string only works if
+ *                            // there is only one key and it's a string.
+ * }
+ *
+ * Components implementing this will the state keys from `options.keys`
+ * persisted in the HashEntry assigned to their `hashEntry` property.
+ * If a subcomponent of a component implements this mixin, the component should
+ * pass `this.props.hashEntry.next()` as `hashEntry` property on the
+ * subcomponent. But do check if `this.props.hashEntry` is defined.
+ *
+ * Note, only one subcomponent can persist it's state.
+ */
 var createLocationHashMixin =  function(options) {
-  assert((options.save instanceof Function &&
-          options.load instanceof Function) ||
-         options.key, "save/load or key must given");
-  // Provide default options
-  options = _.defaults({}, options, {
-    defaultValue:     '',
-    save: function() {
-      return this.state[options.key] || options.defaultValue;
-    },
-    load: function(data) {
-      var state = {};
-      state[options.key] = data || options.defaultValue;
-      if (this.state[options.key] !== state[options.key]) {
-        this.setState(state);
-      }
-    }
-  });
+  assert(options,                       "options is required");
+  assert(options.keys instanceof Array, "keys must be given");
+  assert(options.keys.length > 0,       "at least one key must be given");
+  assert(options.type === 'string' || options.type === 'json',
+         "type must be either 'string' or 'json'");
+  assert(options.keys.length <= 1 || options.type === 'json',
+         "when encoding multiple keys type must be 'json'");
   return {
+    /** Get state from with hashEntry */
     componentWillMount: function() {
-      this.__previousHashFragment = undefined;
-      this.handleHashChange();
-    },
-
-    componentDidMount: function() {
-      window.addEventListener('hashchange', this.handleHashChange, false);
-    },
-
-    componentWillUnmount: function() {
-      window.removeEventListener('hashchange', this.handleHashChange, false);
-    },
-
-    componentDidUpdate: function() {
-      var hash          = decodeURIComponent(window.location.hash.substr(1));
-      var fragments     = hash.split('/');
-      var oldFragment   = fragments[this.props.hashIndex] || '';
-      var newFragment   = escapeChar('/', options.save.call(this) || '');
-      if (oldFragment !== newFragment) {
-        fragments[this.props.hashIndex] = newFragment;
-        window.location.hash = '#' + encodeFragment(fragments.join('/'));
+      // Add new manager
+      if (this.props.hashEntry) {
+        this.props.hashEntry.add(this.handleStateHashChange);
       }
     },
 
-    handleHashChange: function() {
-      var hash      = decodeURIComponent(window.location.hash.substr(1));
-      var fragments = hash.split('/');
-      var fragment  = fragments[this.props.hashIndex] || '';
-      if (this.__previousHashFragment !== fragment) {
-        this.__previousHashFragment = fragment;
-        options.load.call(this, unescapeChar('/', fragment));
+    /** Get state if new hashEntry is given */
+    componentWillReceiveProps: function(nextProps) {
+      // Remove existing manager
+      if (this.props.hashEntry) {
+        this.props.hashEntry.remove(this.handleStateHashChange);
+      }
+      // Add new manager
+      if (nextProps.hashEntry) {
+        nextProps.hashEntry.add(this.handleStateHashChange);
+      }
+    },
+
+    /** Remove from hashEntry */
+    componentWillUnmount: function() {
+      if (this.props.hashEntry) {
+        this.props.hashEntry.remove(this.handleStateHashChange);
+      }
+    },
+
+    /** Provide hashEntry with new state */
+    componentDidUpdate: function() {
+      if (this.props.hashEntry) {
+        var hashState = undefined;
+        // Find state
+        if (options.keys.length === 1) {
+          hashState = this.state[options.keys[0]];
+        } else {
+          hashState = _.pick(this.state, options.keys);
+        }
+        if (options.type === 'json') {
+          hashState = rison.encode(hashState);
+        } else {
+          hashState = hashState || '';
+        }
+        assert(typeof(hashState) === 'string',
+               "encoded hashState must be a string, " +
+               "if you're using type 'string' this your fault!");
+        this.props.hashEntry.setHashState(hashState);
+      }
+    },
+
+    /** Handle updates from hashEntry */
+    handleStateHashChange: function(hashState) {
+      console.log("Load from: " + hashState);
+      if (options.type === 'json') {
+        if (hashState === '') {
+          if (options.keys.length === 1) {
+            hashState = this.getInitialState()[options.keys[0]];
+          } else {
+            hashState = _.pick(this.getInitialState(), options.keys);
+          }
+        } else {
+          hashState = rison.decode(hashState);
+        }
+      } else {
+        assert(options.keys.length === 1);
+        if (hashState === '') {
+          hashState = this.getInitialState()[options.keys[0]];
+        }
+      }
+      if (options.keys.length === 1) {
+        var state = {};
+        state[options.keys[0]] = hashState;
+        this.setState(state);
+      } else {
+        this.setState(hashState);
       }
     }
   };
@@ -452,3 +505,157 @@ var createLocationHashMixin =  function(options) {
 
 // Export createLocationHashMixin
 exports.createLocationHashMixin = createLocationHashMixin;
+
+
+
+
+/**
+ * HashManager, handles persistence of state to location.hash
+ *
+ * This is exposed through createHashManager, do not export it by other means!
+ * It's supposed to be a singleton, but only the first caller is supposed to get
+ * a reference.
+ *
+ * The idea is that you get the first HashEntry from the manager, using
+ * hashManager.root(), then whenever you want to add additional state under
+ * a HashEntry you call hashEntry.next() to get the next HashEntry.
+ * Each HashEntry can only be given to one component at any given time.
+ * Components that implements the LocationHashMixin can be assigned the
+ * hashEntry property.
+ */
+var HashManager = function(options) {
+  this._options       = _.defaults({}, options, {
+    separator:          '/'
+  });
+  assert(options.separator.length === 1, "Separator must have length 1");
+  this._entries       = [];
+  this._states        = [];     // Initial state for new HashEntry instances
+  this._lastFragment  = undefined;
+  // Listen for changes
+  window.addEventListener(
+    'hashchange',
+    this.handleHashChange.bind(this),
+    false
+  );
+  this.handleHashChange();
+};
+
+/** Handle hashchange events */
+HashManager.prototype.handleHashChange = function() {
+  var fragment = decodeURIComponent(window.location.hash.substr(1));
+  // Skip data that we've seen before
+  if (this._lastFragment === fragment) {
+    return;
+  }
+  this._lastFragment = fragment;
+
+  // Split by separator and unescape separator
+  this._states = fragment
+    .split(this._options.separator)
+    .map(unescapeChar.bind(null, this._options.separator));
+
+  this._states.forEach(function(hashState, index) {
+    var entry = this._entries[index];
+    // If there is an entry and hashState has changed, set it and call handler
+    if (entry && !_.isEqual(entry._hashState, hashState)) {
+      entry._hashState = hashState;
+      if (entry._handler instanceof Function) {
+        entry._handler(hashState);
+      }
+    }
+  }, this);
+};
+
+/**
+ * Update location.hash after changes to states in entries.
+ * Used by HashEntry instances, don't call directly.
+ */
+HashManager.prototype.update = function() {
+  var states = this._entries.map(function(entry) {
+    return entry._hashState;
+  });
+
+  // Escape separator and join by separator
+  var fragment = states
+    .map(escapeChar.bind(null, this._options.separator))
+    .join(this._options.separator);
+
+  if (this._lastFragment === fragment) {
+    return;
+  }
+  this._lastFragment = fragment;
+  window.location.hash = '#' + encodeFragment(fragment);
+};
+
+/** Get root entry */
+HashManager.prototype.root = function() {
+  if (!this._entries[0]) {
+    this._entries[0] = new HashEntry(0, this._states[0], this);
+  }
+  return this._entries[0];
+};
+
+/** Create HashEntry */
+var HashEntry = function(index, hashState, manager) {
+  this._index       = index;
+  this._hashState   = hashState;
+  this._handler     = null;
+  this.manager      = manager;
+};
+
+/** Add handler and give HashState if not undefined */
+HashEntry.prototype.add = function(handler) {
+  assert(this._handler === null, "Cannot overwrite HashEntry hander!");
+  this._handler = handler;
+  if (this._hashState !== undefined) {
+    this._handler(this._hashState);
+  }
+};
+
+/** Remove handler and reset HashState */
+HashEntry.prototype.remove = function(handler) {
+  this._handler = null;
+  this.setHashState(undefined);
+};
+
+/** Set current HashState */
+HashEntry.prototype.setHashState = function(hashState) {
+  if (this._hashState !== hashState) {
+    this._hashState = hashState;
+    this.manager.update();
+  }
+};
+
+/** Get next HashEntry for the next index */
+HashEntry.prototype.next = function() {
+  var index = this._index + 1;
+  if (!this.manager._entries[index]) {
+    var entry = new HashEntry(index, this.manager._states[index], this.manager);
+    this._entries[index] = entry;
+  }
+  return this._entries[index];
+};
+
+
+
+/**
+ * Create a HashManager
+ *
+ * options:
+ * {
+ *    separator:          '/' // Separator character
+ * }
+ *
+ * You can only create one HashManager per page. Use `hashManager.root()` to
+ * get the root hashEntry.
+ */
+var _createdHashManager = false;
+var createHashManager = function(options) {
+  assert(_createdHashManager === false, "Only one HashManager can be created!");
+  _createdHashManager = true;
+  return new HashManager(options);
+};
+
+
+// Export createHashManager
+exports.createHashManager = createHashManager;
