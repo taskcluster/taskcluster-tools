@@ -50,8 +50,9 @@ var createTaskClusterMixin = function(options) {
   // Set default options
   options = _.defaults({}, options, {
     clients:        {},
-    reloadOnProps:  [],  // List of properties to reload on
-    reloadOnKeys:   []   // List of state keys to reload on
+    reloadOnProps:  [],   // List of properties to reload on
+    reloadOnKeys:   [],   // List of state keys to reload on
+    reloadOnLogin:  true  // Reload when credentials are changed
   });
   assert(options.reloadOnProps instanceof Array,
          "reloadOnProps must be an array");
@@ -103,8 +104,10 @@ var createTaskClusterMixin = function(options) {
       // Update clients with new credentials
       this._createClients(e.detail);
 
-      // Reload state now that we have new credentials
-      this.reload();
+      if (options.reloadOnLogin) {
+        // Reload state now that we have new credentials
+        this.reload();
+      }
     },
 
     /** Stop listening for events */
@@ -297,7 +300,7 @@ exports.createTaskClusterMixin = createTaskClusterMixin;
  */
 var createWebListenerMixin = function(options) {
   // Set default options
-  options = _.defaults({}, options, {
+  options = _.defaults({}, options || {}, {
     bindings:     [] // initial bindings
   });
   return {
@@ -702,3 +705,53 @@ var createHashManager = function(options) {
 
 // Export createHashManager
 exports.createHashManager = createHashManager;
+
+
+/**
+ * Watch for state changes.
+ *
+ * options:
+ * {
+ *   method:     ['key1', 'key2']
+ * }
+ *
+ * In the example above, `this.method()` will be called if, `state.key1` or
+ * `state.key2` is modified.
+ *
+ * Be careful with this mixin and watch out for infinite loops. Never modify
+ * a state property that triggers a method in a handler.
+ */
+var createWatchStateMixin = function(options) {
+  _.forIn(options, function(value, key) {
+    assert(value instanceof Array, "'" + key + "' must map to an array");
+  });
+  return {
+    /** Perform sanity check to ensure that handlers are available */
+    componentWillMount: function() {
+      _.keys(options).forEach(function(method) {
+        assert(this[method] instanceof Function,
+               "Handler '" + method + "' is missing");
+      }, this);
+    },
+
+    /** Handle state changes */
+    componentDidUpdate: function(prevProps, prevState) {
+      // for each method
+      _.forIn(options, function(triggers, method) {
+        // Check if any of the triggers causes an invocation
+        var invoke = triggers.some(function(key) {
+          return !_.isEqual(this.state[key], prevState[key]);
+        }, this);
+
+        // If so, we invoke the method
+        if (invoke) {
+          this[method]();
+        }
+      }, this);
+    }
+  };
+};
+
+
+// Export createWatchStateMixin
+exports.createWatchStateMixin = createWatchStateMixin;
