@@ -3,6 +3,16 @@
 // Note, only entries with a description will be show on the landing page.
 module.exports = [
   {
+    title:          "Task Inspector",
+    link:           '/task-inspector/',
+    icon:           'cube',
+    description: [
+      "The task inspector lets you load, monitor and inspect the state, runs,",
+      "artifacts, definition and logs of a task in as it is evaluated. You can",
+      "also use this tool download private artifacts."
+    ].join('\n')
+  },
+  {
     title:          "Authentication Manager",
     link:           '/auth/',
     icon:           'users',

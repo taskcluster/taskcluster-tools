@@ -16,8 +16,8 @@ var COMMON_MODULES = [
   'lodash',
   'marked',
   'moment',
-  'spin.js',
   'react-font-awesome',
+  'rison',
   // global modules too
   'url',
   'querystring',

@@ -30,7 +30,12 @@ module.exports = [
   // Pulse Inspector
   'pulse-inspector/index.jade',
   'pulse-inspector/app.jsx',
-  'pulse-inspector/app.less'
+  'pulse-inspector/app.less',
+
+  // Task Inspector
+  'task-inspector/index.jade',
+  'task-inspector/app.jsx',
+  'task-inspector/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });

@@ -5,6 +5,7 @@ var assert        = require('assert');
 var marked        = require('marked');
 var bs            = require('react-bootstrap');
 var moment        = require('moment');
+var hljs          = require('highlight.js');
 
 /** Render Markdown and handle all the particularities */
 var Markdown = React.createClass({
@@ -97,3 +98,36 @@ var DateView = React.createClass({
 // Export DateView
 exports.DateView = DateView;
 
+
+/** Highlight code */
+var Code = React.createClass({
+  // Validate properties
+  propTypes: {
+    children:   React.PropTypes.string.isRequired,
+    language:   function(props, propName) {
+      var language = props[propName];
+      if (!hljs.getLanguage(language)) {
+        return new Error("Language '" + language + "' not supported " +
+                         "by highlight.js");
+      }
+    }
+  },
+
+  // Render code
+  render: function() {
+    var code = hljs.highlight(this.props.language, this.props.children, true);
+    /*var html = Prism.highlight(
+      this.props.children,
+      Prism.languages[this.props.language],
+      this.props.language
+    );*/
+    return (
+      <pre className="language-{this.props.language}">
+        <code dangerouslySetInnerHTML={{__html: code.value}}></code>
+      </pre>
+    );
+  }
+});
+
+// Export Code
+exports.Code = Code;

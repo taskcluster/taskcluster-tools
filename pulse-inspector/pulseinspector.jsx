@@ -97,11 +97,11 @@ var PulseInspector = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createWebListenerMixin({
-      startOnMount:     false
+      reloadOnKeys:   ['bindings', 'doListen']
     }),
     utils.createLocationHashMixin({
-      keys:       ['bindings'],
-      type:       'json'
+      keys:           ['bindings'],
+      type:           'json'
     })
   ],
 
@@ -114,6 +114,7 @@ var PulseInspector = React.createClass({
   /** Create initial state */
   getInitialState: function() {
     return {
+      doListen:         false,    // Do start listening
       bindings:         [],       // List of bindings
       messages:         [],       // List of messages received
       expandedMessage:  null,     // _idForInspector of current message
@@ -175,8 +176,6 @@ var PulseInspector = React.createClass({
   },
 
   createDownload: function() {
-    console.log(this.refs.downloadLink.getDOMNode());
-    console.log(this.refs.downloadLink.getDOMNode().href);
     var downloadUrl = "data:application/json;base64," + btoa(JSON.stringify(
       this.state.messages.map(function(message) {
         // We shouldn't expose _idForInspector as it's made up here!
@@ -190,8 +189,7 @@ var PulseInspector = React.createClass({
 
   /** Clear all bindings */
   clearBindings: function() {
-    this.setState({bindings: []});
-    this.stopListening();
+    this.setState({bindings: [], doListen: false});
   },
 
   /** Render list of bindings */
@@ -245,13 +243,13 @@ var PulseInspector = React.createClass({
               {
                 this.state.listening ? (
                   <bs.Button bsStyle="danger"
-                             onClick={this.stopListening}>
+                             onClick={this.dontListen}>
                     <bs.Glyphicon glyph="stop"/>&nbsp;
                     Stop Listening
                   </bs.Button>
                 ) : (
                   <bs.Button bsStyle="success"
-                             onClick={this.setupListener}
+                             onClick={this.doListen}
                              disabled={this.state.listening === null}>
                     <bs.Glyphicon glyph="play"/>&nbsp;
                     Start Listening
@@ -267,22 +265,29 @@ var PulseInspector = React.createClass({
 
   /** Add binding to list of bindings */
   addBinding: function() {
-    var bindings = _.cloneDeep(this.state.bindings);
     var binding = {
       exchange:           this.refs.exchange.getValue(),
       routingKeyPattern:  this.refs.routingKeyPattern.getValue()
     };
-    bindings.push(binding);
-    this.setState({bindings: bindings});
-    if (this.state.listening) {
-      this.startListening([binding]);
-    }
+    this.setState({bindings: this.state.bindings.concat([binding])});
   },
 
-  /** Setup listener */
-  setupListener: function() {
-    this.startListening(this.state.bindings);
+  dontListen: function() {
+    this.setState({doListen: false});
   },
+
+  doListen: function() {
+    this.setState({doListen: true});
+  },
+
+  /** return bindings for WebListenerMixin */
+  bindings: function() {
+    if (!this.state.doListen) {
+      return [];
+    }
+    return this.state.bindings;
+  },
+
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
   handleMessage: function(message) {
@@ -336,6 +341,9 @@ var PulseInspector = React.createClass({
   /** Dismiss a listening error, basically reset error state */
   dismissListeningError: function() {
     this.setState({listeningError: undefined});
+    if (!this.state.listening) {
+      this.setState({doListen: false});
+    }
   }
 });
 

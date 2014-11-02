@@ -13,6 +13,51 @@ var bs            = require('react-bootstrap');
 
 
 /**
+ * Given a JSON object `obj` and a path: ['key1', 'key2'] return
+ * `obj.key1.key2` or undefined if the value doesn't exist
+ */
+var valueAtPath = function(path, obj, index) {
+  index = index || 0;
+  if (path.length === index) {
+    return obj;
+  }
+  if (typeof(obj) !== 'object') {
+    return undefined;
+  }
+  return valueAtPath(path, obj[path[index]], index + 1);
+};
+
+/**
+ * Given a list of strings on the form ['key1.key2', 'key3'] return a list of
+ * parsed keys where non-arrays are split by '.'
+ */
+var parsePaths = function(paths) {
+  return paths.map(function(path) {
+    if (path instanceof Array) {
+      return path;
+    }
+    return path.split('.');
+  });
+};
+
+/**
+ * Check if values at `paths` has changed between `obj1` and `obj2`.
+ *
+ * In this case `paths` is an array of paths on form:
+ * `[['key1', 'key2'], ['key3']]` and `obj1` and `obj2` are objects, or really
+ * anything they want to be.
+ *
+ * Note, the comparison will do a deep equals of the values found.
+ */
+var hasChanged = function(paths, obj1, obj2) {
+  assert(paths instanceof Array, "paths must be an array");
+  return paths.some(function(path) {
+    return !_.isEqual(valueAtPath(path, obj1), valueAtPath(path, obj2));
+  });
+};
+
+
+/**
  * Logic for loading state using taskcluster-client
  *
  * Implementors can provide:
@@ -58,7 +103,15 @@ var createTaskClusterMixin = function(options) {
          "reloadOnProps must be an array");
   assert(options.reloadOnKeys instanceof Array,
          "reloadOnKeys must be an array");
+  options.reloadOnProps = parsePaths(options.reloadOnProps);
+  options.reloadOnKeys = parsePaths(options.reloadOnKeys);
   return {
+    componentWillMount: function() {
+      // Create clients with current credentials
+      this._createClients(auth.loadCredentials());
+    },
+
+
     /** Setup object and start listening for events */
     componentDidMount: function() {
       // Create clients with current credentials
@@ -77,24 +130,9 @@ var createTaskClusterMixin = function(options) {
 
     /** Check if the props or state changes causes us to reload */
     componentDidUpdate: function(prevProps, prevState) {
-      var shallReload = false;
-
-      // Check if any of the properties defined in reloadOnProps have changed
-      if (!shallReload) {
-        shallReload = _.some(options.reloadOnProps, function(property) {
-          return !_.isEqual(this.props[property], prevProps[property]);
-        }, this);
-      }
-
-      // Check if any of state keys defined in reloadOnKeys have changed
-      if (!shallReload) {
-        shallReload = _.some(options.reloadOnKeys, function(key) {
-          return !_.isEqual(this.state[key], prevState[key]);
-        }, this);
-      }
-
       // Reload state if we have to
-      if (shallReload) {
+      if (hasChanged(options.reloadOnProps, this.props, prevProps) ||
+          hasChanged(options.reloadOnKeys, this.state, prevState)) {
         this.reload();
       }
     },
@@ -196,10 +234,11 @@ var createTaskClusterMixin = function(options) {
 
       // If changes to any of these properties is in reloadOnKeys we'll create
       // an infinite loop, I hate those!
+      var firstKeys = options.reloadOnKeys.map(_.first.bind(_));
       var conflictKeys = _.keys(promisedState).filter(function(key) {
-        return _.contains(options.reloadOnKeys, key) ||
-               _.contains(options.reloadOnKeys, key + 'Error') ||
-               _.contains(options.reloadOnKeys, key + 'Loaded');
+        return _.contains(firstKeys, key) ||
+               _.contains(firstKeys, key + 'Error') ||
+               _.contains(firstKeys, key + 'Loaded');
       });
       if (conflictKeys.length > 0) {
         debug("Keys that shouldn't be in reloadOnKeys or not returned",
@@ -285,37 +324,112 @@ exports.createTaskClusterMixin = createTaskClusterMixin;
 /**
  * Logic for listening to Pulse exchanges using WebListener
  *
- * This mixin offers method:
+ * To use this mixin you must implement the method
+ * `this.handleMessage(message)`, you can additionally opt to implement
+ * `this.bindings()` which returns a list of bindings to bind to.
+ *
+ * options:
+ * {
+ *   reloadOnProps:     [], // Properties to reload bindings on
+ *   reloadOnKeys:      []  // State keys to reload bindings on
+ * }
+ *
+ * If `this.bindings()` is implemented it'll be called after mount and we will
+ * bind to the bindings returned. In addition whenever a property or state key
+ * specified in `reloadOnProps` and `reloadOnKeys`, respectively, is changed
+ * bindings will be reconfigured based on `this.bindings()`, assuming it's
+ * implemented.
+ *
+ * You can also use this mixin manually with the following methods:
  *  - `startListening(bindings)`
  *  - `stopListening()`
  *
  * You can call `startListening(bindings)` repeatedly to listen to additional
- * bindings.
+ * bindings. Calling `stopListening()` will clear all bindings and stop
+ * listening. But if you  are implementing `this.bindings()` you should beware
+ * that it'll will overwrite `startListening(bindings)`.
  *
  * This mixin adds the state property `listening` to state as follows:
- *
  * {
  *    listening:    true || false || null // null when connecting
  * }
+ * And calls `this.handleMessage(message)` when a message arrives.
  */
 var createWebListenerMixin = function(options) {
   // Set default options
   options = _.defaults({}, options || {}, {
-    bindings:     [] // initial bindings
+    reloadOnProps:        [],   // List of properties to reload on
+    reloadOnKeys:         []    // List of state keys to reload on
   });
+  assert(options.reloadOnProps instanceof Array,
+         "reloadOnProps must be an array");
+  assert(options.reloadOnKeys instanceof Array,
+         "reloadOnKeys must be an array");
+  options.reloadOnProps = parsePaths(options.reloadOnProps);
+  options.reloadOnKeys  = parsePaths(options.reloadOnKeys);
   return {
+    /** Perform some sanity checks */
+    componentWillMount: function() {
+      assert(this.handleMessage instanceof Function,
+             "components with this mixin must implement 'handleMessage'");
+    },
+
     /** Start listening if bindings are configured */
     componentDidMount: function() {
       this.__listener = null;
+      this.__bindings = [];
 
-      if (options.bindings.length > 0) {
-        this.startListening(options.bindings.length);
+      if (this.bindings instanceof Function) {
+        this.startListening(this.bindings());
       }
     },
 
     /** Stop listening */
     componentWillUnmount: function() {
       this.stopListening();
+    },
+
+    /** Reload listener if bindings changed */
+    componentDidUpdate: function(prevProps, prevState) {
+      // No need to check state if this.bindings() isn't implemented
+      if (!(this.bindings instanceof Function)) {
+        return;
+      }
+
+      // Decide if we should reload listener
+      if(!hasChanged(options.reloadOnProps, this.props, prevProps) &&
+         !hasChanged(options.reloadOnKeys, this.state, prevState)) {
+        return;
+      }
+
+      // Get new bindings
+      var bindings = this.bindings();
+
+      // Find bindings removed
+      var bindingsRemoved = this.__bindings.filter(function(currentBinding) {
+        return !bindings.some(function(binding) {
+          return currentBinding.exchange === binding.exchange &&
+                 currentBinding.routingKeyPattern === binding.routingKeyPattern;
+        });
+      });
+
+      // Find bindings added
+      var bindingsAdded = bindings.filter(function(binding) {
+        return !this.__bindings.some(function(currentBinding) {
+          return currentBinding.exchange === binding.exchange &&
+                 currentBinding.routingKeyPattern === binding.routingKeyPattern;
+        });
+      }, this);
+
+      // bind to bindings
+      if (bindingsRemoved.length > 0) {
+        // At the moment weblistener can't unbind, so we have to create a new
+        // listener... ie. stop/start listening
+        this.stopListening();
+        this.startListening(bindings);
+      } else {
+        this.startListening(bindingsAdded);
+      }
     },
 
     /** Start listening */
@@ -327,6 +441,8 @@ var createWebListenerMixin = function(options) {
 
       // If not listening start listening
       if (!this.__listener) {
+        assert(this.__bindings.length === 0, "Hmm... check stopListening");
+        // Create listener
         this.__listener = new taskcluster.WebListener();
         this.__listener.on('message', this.handleMessage);
         this.__listener.on('error', function(err) {
@@ -340,6 +456,7 @@ var createWebListenerMixin = function(options) {
 
         // Bind to bindings
         var bound = bindings.map(function(binding) {
+          this.__bindings.push(binding);
           return this.__listener.bind(binding);
         }, this);
 
@@ -371,6 +488,7 @@ var createWebListenerMixin = function(options) {
         listeningError:   undefined
       });
       return Promise.all(bindings.map(function(binding) {
+        this.__bindings.push(binding);
         return this.__listener.bind(binding);
       }, this)).then(function() {
         this.setState({
@@ -393,6 +511,7 @@ var createWebListenerMixin = function(options) {
       if (this.__listener) {
         var closed = this.__listener.close();
         this.__listener = null;
+        this.__bindings = [];
         return closed;
       }
       return Promise.resolve(undefined);
@@ -481,13 +600,16 @@ var createLocationHashMixin =  function(options) {
 
     /** Get state if new hashEntry is given */
     componentWillReceiveProps: function(nextProps) {
-      // Remove existing manager
-      if (this.props.hashEntry) {
-        this.props.hashEntry.remove(this.handleStateHashChange);
-      }
-      // Add new manager
-      if (nextProps.hashEntry) {
-        nextProps.hashEntry.add(this.handleStateHashChange);
+      // Only add remove if the hashEntry actually changed
+      if (this.props.hashEntry !== nextProps.hashEntry) {
+        // Remove existing manager
+        if (this.props.hashEntry) {
+          this.props.hashEntry.remove(this.handleStateHashChange);
+        }
+        // Add new manager
+        if (nextProps.hashEntry) {
+          nextProps.hashEntry.add(this.handleStateHashChange);
+        }
       }
     },
 
@@ -511,7 +633,10 @@ var createLocationHashMixin =  function(options) {
         if (options.type === 'json') {
           hashState = rison.encode(hashState);
         } else {
-          hashState = hashState || '';
+          if (hashState === null || hashState === undefined) {
+            hashState = '';
+          }
+          hashState = hashState.toString();
         }
         assert(typeof(hashState) === 'string',
                "encoded hashState must be a string, " +
@@ -545,6 +670,14 @@ var createLocationHashMixin =  function(options) {
       } else {
         this.setState(hashState);
       }
+    },
+
+    /** Return next hashEntry if one is available */
+    nextHashEntry: function() {
+      if (this.props.hashEntry) {
+        return this.props.hashEntry.next();
+      }
+      return undefined;
     }
   };
 };
@@ -570,10 +703,10 @@ exports.createLocationHashMixin = createLocationHashMixin;
  * hashEntry property.
  */
 var HashManager = function(options) {
-  this._options       = _.defaults({}, options, {
+  this._options       = _.defaults({}, options || {}, {
     separator:          '/'
   });
-  assert(options.separator.length === 1, "Separator must have length 1");
+  assert(this._options.separator.length === 1, "Separator must have length 1");
   this._entries       = [];
   this._states        = [];     // Initial state for new HashEntry instances
   this._lastFragment  = undefined;
@@ -666,6 +799,9 @@ HashEntry.prototype.remove = function(handler) {
 
 /** Set current HashState */
 HashEntry.prototype.setHashState = function(hashState) {
+  if (hashState === undefined || hashState === null) {
+    hashState = '';
+  }
   if (this._hashState !== hashState) {
     this._hashState = hashState;
     this.manager.update();
@@ -677,9 +813,9 @@ HashEntry.prototype.next = function() {
   var index = this._index + 1;
   if (!this.manager._entries[index]) {
     var entry = new HashEntry(index, this.manager._states[index], this.manager);
-    this._entries[index] = entry;
+    this.manager._entries[index] = entry;
   }
-  return this._entries[index];
+  return this.manager._entries[index];
 };
 
 
@@ -712,41 +848,97 @@ exports.createHashManager = createHashManager;
  *
  * options:
  * {
- *   method:     ['key1', 'key2']
+ *   onProps: {
+ *     handler:     ['prop1.prop2', 'prop3']
+ *   },
+ *   onKeys: {
+ *     handler:     ['k1.k2', 'k3']
+ *   }
  * }
  *
- * In the example above, `this.method()` will be called if, `state.key1` or
- * `state.key2` is modified.
+ * In the example above, `this.handler()` will be called if, `state.k1.k2` or
+ * `state.k3` is modified. And similarly if `this.props.prop1.prop2` or
+ * `this.props.prop3` is changed.
  *
  * Be careful with this mixin and watch out for infinite loops. Never modify
  * a state property that triggers a method in a handler.
  */
 var createWatchStateMixin = function(options) {
-  _.forIn(options, function(value, key) {
-    assert(value instanceof Array, "'" + key + "' must map to an array");
+  options = _.defaults({}, options || {}, {
+    onProps:              {},
+    onKeys:               {},
+    triggerAfterMount:    true
+  });
+  _.forIn(options.onProps, function(paths, key) {
+    assert(paths instanceof Array, "'" + key + "' must map to an array");
+    options.onProps[key] = parsePaths(paths);
+  });
+  _.forIn(options.onKeys, function(paths, key) {
+    assert(paths instanceof Array, "'" + key + "' must map to an array");
+    options.onKeys[key] = parsePaths(paths);
   });
   return {
     /** Perform sanity check to ensure that handlers are available */
     componentWillMount: function() {
-      _.keys(options).forEach(function(method) {
+      _.forIn(options.onKeys, function(paths, method) {
+        assert(this[method] instanceof Function,
+               "Handler '" + method + "' is missing");
+      }, this);
+      _.forIn(options.inProps, function(paths, method) {
         assert(this[method] instanceof Function,
                "Handler '" + method + "' is missing");
       }, this);
     },
 
+    /** Check if any keys that we're watching changed since launch */
+    componentDidMount: function() {
+      // Don't trigger on DidMount of options don't allow it
+      if (!options.triggerAfterMount) {
+        return;
+      }
+      // Construct default props
+      var prevProps = undefined;
+      if (this.getDefaultProps instanceof Function) {
+        prevProps = this.getDefaultProps();
+      }
+      // Construct initial state
+      var prevState = undefined;
+      if (this.getInitialState instanceof Function) {
+        prevState = this.getInitialState();
+      }
+      // Trigger handlers if watched things changed
+      this.triggerWatchHandler(prevProps, prevState);
+    },
+
     /** Handle state changes */
     componentDidUpdate: function(prevProps, prevState) {
-      // for each method
-      _.forIn(options, function(triggers, method) {
-        // Check if any of the triggers causes an invocation
-        var invoke = triggers.some(function(key) {
-          return !_.isEqual(this.state[key], prevState[key]);
-        }, this);
+      this.triggerWatchHandler(prevProps, prevState)
+    },
 
-        // If so, we invoke the method
-        if (invoke) {
-          this[method]();
+    /** Check if handlers needs to be triggered */
+    triggerWatchHandler: function(prevProps, prevState) {
+      // Build a list of handlers to call
+      var handlers = [];
+
+      // Find handlers triggered by state changes
+      _.forIn(options.onKeys, function(paths, method) {
+        if (!_.contains(handlers, method) &&
+            hasChanged(paths, this.state, prevState)) {
+          handlers.push(method);
         }
+      }, this);
+
+      // Find handlers triggered by property changes
+      _.forIn(options.onProps, function(paths, method) {
+        if (!_.contains(handlers, method) &&
+            hasChanged(paths, this.props, prevProps)) {
+          handlers.push(method);
+        }
+      }, this);
+
+      // Call handlers that needs to be invoked
+      _.uniq(handlers).forEach(function(handler) {
+        this[handler]();
       }, this);
     }
   };
