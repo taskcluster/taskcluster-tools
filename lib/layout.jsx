@@ -71,16 +71,22 @@ var Navigation = React.createClass({
     }, this)[0] || {title: "Unknown Page"};
     // Remove title on landing page
     if (window.location.pathname === '/') {
-      activeEntry = {title: ""};
+      activeEntry = null;
     }
 
     // Construct the navbar
     return (
       <bs.Navbar fluid={true} inverse={true} staticTop={true} brand={branding}>
         <div className="navbar-text">
-          <awesome.Icon type={activeEntry.icon || 'wrench'} fixedWidth/>
-          &nbsp;&nbsp;
-          {activeEntry.title}
+          {
+            activeEntry ? (
+              <span>
+                <awesome.Icon type={activeEntry.icon || 'wrench'} fixedWidth/>
+                &nbsp;&nbsp;
+                {activeEntry.title}
+              </span>
+            ): undefined
+          }
         </div>
         <bs.Nav className="navbar-right">
           <bs.DropdownButton key={3} title="Tools">
