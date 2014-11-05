@@ -25,7 +25,9 @@
     "highlight.js":                     "8.3.0",
     "term.js":                          "0.0.4",
     "superagent-promise":               "0.2.0",
-    "superagent":                       "0.20.0"
+    "superagent":                       "0.20.0",
+    "react-code-mirror":                "2.1.0",
+    "codemirror":                       "4.7.0"
   },
   "devDependencies": {
     "grunt":                            "0.4.5",

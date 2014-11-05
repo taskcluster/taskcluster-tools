@@ -23,6 +23,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Task Creator",
+    link:           '/task-creator/',
+    icon:           'pencil-square-o',
+    description: [
+      "Create and submit tasks from the task creator. Created tasks will be",
+      "persistent in `localStorage` so you can try again with new parameters"
+    ].join('\n')
+  },
+  {
     title:          "Authentication Manager",
     link:           '/auth/',
     icon:           'users',

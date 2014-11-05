@@ -40,7 +40,12 @@ module.exports = [
   // Task-Graph Inspector
   'task-graph-inspector/index.jade',
   'task-graph-inspector/app.jsx',
-  'task-graph-inspector/app.less'
+  'task-graph-inspector/app.less',
+
+  // Task Creator
+  'task-creator/index.jade',
+  'task-creator/app.jsx',
+  'task-creator/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });
