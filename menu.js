@@ -37,8 +37,8 @@ module.exports = [
     icon:           'users',
     description: [
       "Manage clients on `auth.taskcluser.net`. This tool allows you to",
-      "create, modify and delete client. You can manage which scopes a",
-      "client has and reset the `accessToken` for a client if compromised."
+      "create, modify and delete client. You can also manage scopes and",
+      "reset `accessToken`."
     ].join('\n')
   },
   {

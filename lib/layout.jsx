@@ -78,6 +78,8 @@ var Navigation = React.createClass({
     return (
       <bs.Navbar fluid={true} inverse={true} staticTop={true} brand={branding}>
         <div className="navbar-text">
+          <awesome.Icon type={activeEntry.icon || 'wrench'} fixedWidth/>
+          &nbsp;&nbsp;
           {activeEntry.title}
         </div>
         <bs.Nav className="navbar-right">

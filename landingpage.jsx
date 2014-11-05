@@ -40,10 +40,10 @@ $(function() {
         <bs.Row>
           <bs.Col md={12}>
             <bs.Well className="landingpage-well">
-              <img src="/lib/assets/taskcluster-180.png"
+              <img src="/lib/assets/taskcluster-120.png"
                    className="landingpage-image"/>
               <h2>Welcome to TaskCluster Tools,</h2>
-              a collection of tools for TaskCluster components and elements in
+              A collection of tools for TaskCluster components and elements in
               the TaskCluster eco-system. Here you'll find tools to manage
               TaskCluster as well as run, debug, inspect and view tasks,
               task-graphs, and other TaskCluster related entities.
