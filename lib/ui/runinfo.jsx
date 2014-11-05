@@ -50,6 +50,41 @@ var RunInfo = React.createClass({
     };
   },
 
+  /** Handle artifact created messages, provided by parents */
+  handleArtifactCreatedMessage: function(message) {
+    // Check that taskId and runId matches this run
+    if (message.payload.status.taskId !== this.props.status.taskId ||
+        message.payload.runId !== this.props.run.runId) {
+      return;
+    }
+
+    // If artifacts haven't been loaded, we return
+    if (!this.state.artifactsLoaded || !this.state.artifacts) {
+      return;
+    }
+
+    // Find index of artifact, assuming we already have the artifact
+    // This in case we overwrite an artifact, only possible for reference
+    // artifacts, but a use-case...
+    var index = _.findIndex(this.state.artifacts, {
+      name:           message.payload.artifact.name
+    });
+
+    // If not present in the list, we index to length, as this equals appending
+    if (index === -1) {
+      index = this.state.artifacts.length;
+    }
+
+    // Shallow clone should do fine
+    var artifacts = this.state.artifacts.slice();
+
+    // Insert/update artifact
+    artifacts[index] = message.payload.artifact;
+
+    // Update state
+    this.setState({artifacts: artifacts});
+  },
+
   // Render run
   render: function() {
     var run             = this.props.run;

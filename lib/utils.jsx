@@ -563,130 +563,6 @@ var encodeFragment = function(string) {
 exports.encodeFragment = encodeFragment;
 
 
-/**
- * Create a LocationHashMixin instance with given options.
- *
- * options:
- * {
- *   keys:    ['taskId'],     // Keys from this.state to persist to hashEntry
- *   type:    'string'        // 'json' or 'string', string only works if
- *                            // there is only one key and it's a string.
- * }
- *
- * Components implementing this will the state keys from `options.keys`
- * persisted in the HashEntry assigned to their `hashEntry` property.
- * If a subcomponent of a component implements this mixin, the component should
- * pass `this.props.hashEntry.next()` as `hashEntry` property on the
- * subcomponent. But do check if `this.props.hashEntry` is defined.
- *
- * Note, only one subcomponent can persist it's state.
- */
-var createLocationHashMixin =  function(options) {
-  assert(options,                       "options is required");
-  assert(options.keys instanceof Array, "keys must be given");
-  assert(options.keys.length > 0,       "at least one key must be given");
-  assert(options.type === 'string' || options.type === 'json',
-         "type must be either 'string' or 'json'");
-  assert(options.keys.length <= 1 || options.type === 'json',
-         "when encoding multiple keys type must be 'json'");
-  return {
-    /** Get state from with hashEntry */
-    componentWillMount: function() {
-      // Add new manager
-      if (this.props.hashEntry) {
-        this.props.hashEntry.add(this.handleStateHashChange);
-      }
-    },
-
-    /** Get state if new hashEntry is given */
-    componentWillReceiveProps: function(nextProps) {
-      // Only add remove if the hashEntry actually changed
-      if (this.props.hashEntry !== nextProps.hashEntry) {
-        // Remove existing manager
-        if (this.props.hashEntry) {
-          this.props.hashEntry.remove(this.handleStateHashChange);
-        }
-        // Add new manager
-        if (nextProps.hashEntry) {
-          nextProps.hashEntry.add(this.handleStateHashChange);
-        }
-      }
-    },
-
-    /** Remove from hashEntry */
-    componentWillUnmount: function() {
-      if (this.props.hashEntry) {
-        this.props.hashEntry.remove(this.handleStateHashChange);
-      }
-    },
-
-    /** Provide hashEntry with new state */
-    componentDidUpdate: function() {
-      if (this.props.hashEntry) {
-        var hashState = undefined;
-        // Find state
-        if (options.keys.length === 1) {
-          hashState = this.state[options.keys[0]];
-        } else {
-          hashState = _.pick(this.state, options.keys);
-        }
-        if (options.type === 'json') {
-          hashState = rison.encode(hashState);
-        } else {
-          if (hashState === null || hashState === undefined) {
-            hashState = '';
-          }
-          hashState = hashState.toString();
-        }
-        assert(typeof(hashState) === 'string',
-               "encoded hashState must be a string, " +
-               "if you're using type 'string' this your fault!");
-        this.props.hashEntry.setHashState(hashState);
-      }
-    },
-
-    /** Handle updates from hashEntry */
-    handleStateHashChange: function(hashState) {
-      if (options.type === 'json') {
-        if (hashState === '') {
-          if (options.keys.length === 1) {
-            hashState = this.getInitialState()[options.keys[0]];
-          } else {
-            hashState = _.pick(this.getInitialState(), options.keys);
-          }
-        } else {
-          hashState = rison.decode(hashState);
-        }
-      } else {
-        assert(options.keys.length === 1);
-        if (hashState === '') {
-          hashState = this.getInitialState()[options.keys[0]];
-        }
-      }
-      if (options.keys.length === 1) {
-        var state = {};
-        state[options.keys[0]] = hashState;
-        this.setState(state);
-      } else {
-        this.setState(hashState);
-      }
-    },
-
-    /** Return next hashEntry if one is available */
-    nextHashEntry: function() {
-      if (this.props.hashEntry) {
-        return this.props.hashEntry.next();
-      }
-      return undefined;
-    }
-  };
-};
-
-// Export createLocationHashMixin
-exports.createLocationHashMixin = createLocationHashMixin;
-
-
-
 
 /**
  * HashManager, handles persistence of state to location.hash
@@ -736,8 +612,8 @@ HashManager.prototype.handleHashChange = function() {
   this._states.forEach(function(hashState, index) {
     var entry = this._entries[index];
     // If there is an entry and hashState has changed, set it and call handler
-    if (entry && !_.isEqual(entry._hashState, hashState)) {
-      entry._hashState = hashState;
+    if (entry && !_.isEqual(entry.hashState, hashState)) {
+      entry.hashState = hashState;
       if (entry._handler instanceof Function) {
         entry._handler(hashState);
       }
@@ -751,7 +627,7 @@ HashManager.prototype.handleHashChange = function() {
  */
 HashManager.prototype.update = function() {
   var states = this._entries.map(function(entry) {
-    return entry._hashState;
+    return entry.hashState;
   });
 
   // Escape separator and join by separator
@@ -777,7 +653,7 @@ HashManager.prototype.root = function() {
 /** Create HashEntry */
 var HashEntry = function(index, hashState, manager) {
   this._index       = index;
-  this._hashState   = hashState;
+  this.hashState    = hashState;
   this._handler     = null;
   this.manager      = manager;
 };
@@ -786,24 +662,16 @@ var HashEntry = function(index, hashState, manager) {
 HashEntry.prototype.add = function(handler) {
   assert(this._handler === null, "Cannot overwrite HashEntry hander!");
   this._handler = handler;
-  if (this._hashState !== undefined) {
-    this._handler(this._hashState);
+  if (this.hashState !== undefined) {
+    this._handler(this.hashState);
   }
 };
 
 /** Remove handler and reset HashState */
-HashEntry.prototype.remove = function(handler) {
+HashEntry.prototype.remove = function() {
   this._handler = null;
-  this.setHashState(undefined);
-};
-
-/** Set current HashState */
-HashEntry.prototype.setHashState = function(hashState) {
-  if (hashState === undefined || hashState === null) {
-    hashState = '';
-  }
-  if (this._hashState !== hashState) {
-    this._hashState = hashState;
+  if (this.hashState !== '') {
+    this.hashState = '';
     this.manager.update();
   }
 };
@@ -817,7 +685,6 @@ HashEntry.prototype.next = function() {
   }
   return this.manager._entries[index];
 };
-
 
 
 /**
@@ -838,9 +705,161 @@ var createHashManager = function(options) {
   return new HashManager(options);
 };
 
-
 // Export createHashManager
 exports.createHashManager = createHashManager;
+
+
+/**
+ * Create a LocationHashMixin instance with given options.
+ *
+ * options:
+ * {
+ *   keys:    ['taskId'],     // Paths from this.state to persist to hashEntry
+ *   type:    'string'        // 'json' or 'string'
+ * }
+ *
+ * Components implementing this will the state keys from `options.keys`
+ * persisted in the HashEntry assigned to their `hashEntry` property.
+ * If a subcomponent of a component implements this mixin, the component should
+ * pass `this.nextHashEntry()` as `hashEntry` property on the subcomponent.
+ *
+ * Note, only one subcomponent can persist it's state.
+ */
+var createLocationHashMixin =  function(options) {
+  options = _.defaults({}, options || {}, {
+    type:                 'string'
+  });
+  assert(options.keys instanceof Array, "keys must be given");
+  assert(options.keys.length > 0,       "at least one key must be given");
+  assert(options.type === 'string' || options.type === 'json',
+         "type must be either 'string' or 'json'");
+  options.keys = parsePaths(options.keys);
+  return {
+    /** Get state from with hashEntry */
+    componentWillMount: function() {
+      // Add new manager
+      if (this.props.hashEntry) {
+        // Create a hashEntry for key that needs to be stored
+        this.__hashEntries = [this.props.hashEntry];
+        var prevEntry = this.props.hashEntry;
+        for(var i = 1; i < options.keys.length; i++) {
+          prevEntry = this.__hashEntries[i] = prevEntry.next();
+        }
+        // Add handlers
+        this.__hashEntries.forEach(function(hashEntry, index) {
+          hashEntry.add(this.handleStateHashChange.bind(this, index));
+        }, this);
+      }
+    },
+
+    /** Get state if new hashEntry is given */
+    componentWillReceiveProps: function(nextProps) {
+      // Only add remove if the hashEntry actually changed
+      if (this.props.hashEntry !== nextProps.hashEntry) {
+        // Remove existing hashEntry
+        if (this.props.hashEntry && this.__hashEntries.length > 0) {
+          this.__hashEntries.forEach(function(hashEntry) {
+            hashEntry.remove();
+          });
+          this.__hashEntries = [];
+        }
+        // Add new hashEntry
+        if (nextProps.hashEntry) {
+          // Create a hashEntry for key that needs to be stored
+          this.__hashEntries = [this.props.hashEntry];
+          var prevEntry = this.props.hashEntry;
+          for(var i = 1; i < options.keys.length; i++) {
+            prevEntry = this.__hashEntries[i] = prevEntry.next();
+          }
+          // Add handlers
+          this.__hashEntries.forEach(function(hashEntry, index) {
+            hashEntry.add(this.handleStateHashChange.bind(this, index));
+          }, this);
+        }
+      }
+    },
+
+    /** Remove from hashEntry */
+    componentWillUnmount: function() {
+      // Remove hashEntry
+      if (this.props.hashEntry && this.__hashEntries.length > 0) {
+        this.__hashEntries.forEach(function(hashEntry) {
+          hashEntry.remove();
+        });
+        this.__hashEntries = [];
+      }
+    },
+
+    /** Provide hashEntry with new state */
+    componentDidUpdate: function() {
+      if (this.props.hashEntry && this.__hashEntries.length > 0) {
+        assert(this.__hashEntries.length === options.keys.length);
+
+        // Track if we should update
+        var doUpdate = false;
+
+        // For each key/hashEntry that we have
+        options.keys.forEach(function(key, index) {
+          // Find hashState for key
+          var hashState = valueAtPath(key, this.state);
+          if (options.type === 'json') {
+            hashState = rison.encode(hashState);
+          } else {
+            if (hashState === undefined || hashState === null) {
+              hashState = '';
+            }
+            hashState = '' + hashState; // ensure that it's a string
+          }
+          // Find hashEntry
+          var hashEntry = this.__hashEntries[index];
+          if (hashEntry.hashState !== hashState) {
+            hashEntry.hashState = hashState;
+            doUpdate = true;
+          }
+        }, this);
+
+        // Update if necessary
+        if (doUpdate) {
+          this.props.hashEntry.manager.update();
+        }
+      }
+    },
+
+    /** Handle updates from hashEntry */
+    handleStateHashChange: function(index, hashState) {
+      // decode json if necessary
+      if (options.type === 'json') {
+        // If empty string we'll load initial state
+        if (hashState === '') {
+          hashState = this.getInitialState()[options.keys[index]];
+        } else {
+          hashState = rison.decode(hashState);
+        }
+      }
+
+      // Update state
+      var state = {};
+      state[options.keys[index]] = hashState;
+      this.setState(state);
+    },
+
+    /** Return next hashEntry if one is available */
+    nextHashEntry: function() {
+      if (this.props.hashEntry) {
+        // Make sure next() follows the number we need to hold keys that we store
+        var lastHashEntry = this.props.hashEntry;
+        for(var i = 1; i < options.keys.length; i++) {
+          lastHashEntry = lastHashEntry.next();
+        }
+        return lastHashEntry.next();
+      }
+      return undefined;
+    }
+  };
+};
+
+// Export createLocationHashMixin
+exports.createLocationHashMixin = createLocationHashMixin;
 
 
 /**

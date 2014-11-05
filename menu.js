@@ -13,6 +13,16 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Task-Graph Inspector",
+    link:           '/task-graph-inspector/',
+    icon:           'cubes',
+    description: [
+      "Inspect task-graphs, monitor progress, view dependencies, states and",
+      "inspect the individual tasks that makes up the task-graph, using the",
+      "embedded task-inspector."
+    ].join('\n')
+  },
+  {
     title:          "Authentication Manager",
     link:           '/auth/',
     icon:           'users',

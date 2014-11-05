@@ -35,7 +35,12 @@ module.exports = [
   // Task Inspector
   'task-inspector/index.jade',
   'task-inspector/app.jsx',
-  'task-inspector/app.less'
+  'task-inspector/app.less',
+
+  // Task-Graph Inspector
+  'task-graph-inspector/index.jade',
+  'task-graph-inspector/app.jsx',
+  'task-graph-inspector/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });

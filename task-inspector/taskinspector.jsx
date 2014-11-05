@@ -103,14 +103,13 @@ var TaskInspector = React.createClass({
 
   /** When taskId changed we should update the input */
   updateTaskIdInput: function() {
-    this.setState({taskIdInput: this.state.taskId})
+    this.setState({taskIdInput: this.state.taskId});
   },
 
   // Render a task-inspector
   render: function() {
-    var display;
     // Render
-    var invalidInput  = !/^[a-zA-Z0-9_-]{22}$/.test(this.state.taskIdInput);
+    var invalidInput = !/^[a-zA-Z0-9_-]{22}$/.test(this.state.taskIdInput);
     return (
       <span>
       <h1>Task Inspector</h1>
