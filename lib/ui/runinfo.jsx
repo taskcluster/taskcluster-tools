@@ -94,7 +94,8 @@ var RunInfo = React.createClass({
       pending:    'info',
       running:    'primary',
       completed:  'success',
-      failed:     'danger'
+      failed:     'danger',
+      exception:  'warning'
     };
     return (
       <span>
@@ -107,23 +108,9 @@ var RunInfo = React.createClass({
           </dd>
           <dt>Reason Created</dt>
           <dd><code>{run.reasonCreated}</code></dd>
-        </dl>
-        <dl className="dl-horizontal">
           <dt>Reason Resolved</dt>
           <dd>
             {run.reasonResolved ? <code>{run.reasonResolved}</code> : '-'}
-          </dd>
-          <dt>Successful</dt>
-          <dd>
-            {
-              run.success === undefined || run.success === null
-              ? '-'
-              : (
-                  run.success
-                  ? <span className="label label-primary">yes</span>
-                  : <span className="label label-primary">no</span>
-                )
-            }
           </dd>
         </dl>
         <dl className="dl-horizontal">

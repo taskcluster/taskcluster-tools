@@ -80,8 +80,9 @@ var TaskInspector = React.createClass({
       this.queueEvents.taskPending(routingKey),
       this.queueEvents.taskRunning(routingKey),
       this.queueEvents.artifactCreated(routingKey),
-      this.queueEvents.taskFailed(routingKey),
       this.queueEvents.taskCompleted(routingKey),
+      this.queueEvents.taskFailed(routingKey),
+      this.queueEvents.taskException(routingKey)
     ];
   },
 

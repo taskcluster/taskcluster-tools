@@ -54,7 +54,8 @@ var TaskInfo = React.createClass({
       pending:          'label label-info',
       running:          'label label-primary',
       completed:        'label label-success',
-      failed:           'label label-danger'
+      failed:           'label label-danger',
+      exception:        'label label-warning'
     };
 
     return this.renderWaitFor('task') || (

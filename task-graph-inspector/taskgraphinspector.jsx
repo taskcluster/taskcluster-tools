@@ -112,8 +112,9 @@ var TaskGraphInspector = React.createClass({
       this.queueEvents.taskPending(qkey),
       this.queueEvents.taskRunning(qkey),
       this.queueEvents.artifactCreated(qkey),
-      this.queueEvents.taskFailed(qkey),
       this.queueEvents.taskCompleted(qkey),
+      this.queueEvents.taskFailed(qkey),
+      this.queueEvents.taskException(qkey),
       this.schedulerEvents.taskGraphRunning(skey),
       this.schedulerEvents.taskGraphExtended(skey),
       this.schedulerEvents.taskGraphBlocked(skey),
@@ -129,8 +130,9 @@ var TaskGraphInspector = React.createClass({
       this.queueEvents.taskPending().exchange,
       this.queueEvents.taskRunning().exchange,
       this.queueEvents.artifactCreated().exchange,
+      this.queueEvents.taskCompleted().exchange,
       this.queueEvents.taskFailed().exchange,
-      this.queueEvents.taskCompleted().exchange
+      this.queueEvents.taskException().exchange
     ];
 
     // Dispatch to handleQueueMessage or handleSchedulerMessage
@@ -337,10 +339,12 @@ var TaskGraphInspector = React.createClass({
   renderTaskTable: function() {
     var taskStateLabel = {
       unscheduled:      'label label-default',
+      scheduled:        'label label-info',
       pending:          'label label-info',
       running:          'label label-primary',
       completed:        'label label-success',
-      failed:           'label label-danger'
+      failed:           'label label-danger',
+      exception:        'label label-warning'
     };
 
     var requiredTasks = [];
