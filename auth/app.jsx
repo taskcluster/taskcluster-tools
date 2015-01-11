@@ -5,7 +5,7 @@ var $                   = require('jquery');
 
 // Render component
 $(function() {
-  React.renderComponent(
+  React.render(
     <ClientManager/>,
     $('#container')[0]
   );

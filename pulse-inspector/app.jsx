@@ -11,7 +11,7 @@ var hashManager = utils.createHashManager({
 
 // Render component
 $(function() {
-  React.renderComponent(
+  React.render(
     (
       <PulseInspector hashEntry={hashManager.root()}/>
     ),

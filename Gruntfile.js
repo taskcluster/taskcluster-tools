@@ -16,7 +16,6 @@ var COMMON_MODULES = [
   'lodash',
   'marked',
   'moment',
-  'react-font-awesome',
   'rison',
   // global modules too
   'url',
@@ -66,7 +65,10 @@ module.exports = function(grunt) {
     },
     browserify: {
       options: {
-        transform:  [reactify],   // Process JSX files with reactify
+        transform:  [
+          // Process JSX files with reactify
+          [reactify, {es6: true}]
+        ],
         watch:      true,         // Use watchify (caching modules)
         keepAlive:  false,
         external:   COMMON_MODULES,
@@ -74,7 +76,7 @@ module.exports = function(grunt) {
           debug:      true,
           externalRequireName: 'require',
           fullPaths:    false,    // Set this false for newer versions
-          extensions:   ['.jsx']  // Makes require() look for .jsx files
+          extensions:   ['.jsx', '.js']  // Makes require() look for .jsx files
         }
       },
       common: {

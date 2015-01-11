@@ -11,7 +11,7 @@ var hashManager = utils.createHashManager({
 
 // Render component
 $(function() {
-  React.renderComponent(
+  React.render(
     (
       <bs.Row style={{marginBottom: 50}}>
         <bs.Col md={10} mdOffset={1}>
