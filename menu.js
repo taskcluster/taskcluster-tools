@@ -52,6 +52,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Index Browser",
+    link:           '/index/',
+    icon:           'sitemap',
+    description: [
+      "The generic index browser let's you browse through the hierarchy of",
+      "namespaces in the index, and discover indexed tasks."
+    ].join('\n')
+  },
+  {
     type:           'divider'
   },
   {

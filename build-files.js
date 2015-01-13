@@ -45,7 +45,12 @@ module.exports = [
   // Task Creator
   'task-creator/index.jade',
   'task-creator/app.jsx',
-  'task-creator/app.less'
+  'task-creator/app.less',
+
+  // Index Browser
+  'index/index.jade',
+  'index/app.jsx',
+  'index/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });
