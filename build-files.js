@@ -50,7 +50,12 @@ module.exports = [
   // Index Browser
   'index/index.jade',
   'index/app.jsx',
-  'index/app.less'
+  'index/app.less',
+
+  // Indexed Artifact Browser
+  'index/artifacts/index.jade',
+  'index/artifacts/app.jsx',
+  'index/artifacts/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });

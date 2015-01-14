@@ -61,6 +61,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Indexed Artifact Browser",
+    link:           '/index/artifacts/',
+    icon:           'folder-open',
+    description: [
+      "The indexed artifact browser, let's you easily view the artifacts",
+      "from the latest run of an indexed task."
+    ].join('\n')
+  },
+  {
     type:           'divider'
   },
   {
