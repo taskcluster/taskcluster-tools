@@ -2,7 +2,6 @@
 var React                   = require('react');
 var $                       = require('jquery');
 var bs                      = require('react-bootstrap');
-var awesome                 = require('react-font-awesome');
 var menu                    = require('./menu');
 var format                  = require('./lib/format');
 
@@ -24,7 +23,7 @@ $(function() {
       <bs.Col md={4} sm={6} key={index}>
         <a href={entry.link} className="landingpage-entry">
           <h4>{entry.title}</h4>
-          <awesome.Icon type={entry.icon || 'wrench'}
+          <format.Icon  name={entry.icon || 'wrench'}
                         size="3x"
                         className="pull-left"
                         style={{padding: '.2em .25em .15em'}}/>
@@ -34,7 +33,7 @@ $(function() {
     );
   });
 
-  React.renderComponent(
+  React.render(
     (
       <div className="landingpage-entries">
         <bs.Row>

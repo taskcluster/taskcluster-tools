@@ -3,7 +3,7 @@ var React           = require('react');
 var _               = require('lodash');
 var taskcluster     = require('taskcluster-client');
 var utils           = require('../utils');
-var DropDownlist    = require('react-widgets').DropDownlist;
+var DropdownList    = require('react-widgets').DropdownList;
 var TerminalView    = require('./terminalview');
 
 /** Render a terminal and a dropdown menu to select logs from */
@@ -61,7 +61,7 @@ var LogView = React.createClass({
         <dd>
           <div className="log-view-log-chooser">
             <div className="log-view-dropdown-wrapper">
-              <DropDownlist
+              <DropdownList
                 data={this.props.logs}
                 value={this.state.name}
                 onChange={this.handleLogChanged}

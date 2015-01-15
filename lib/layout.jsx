@@ -4,7 +4,7 @@ var React       = require('react');
 var $           = require('jquery');
 var menu        = require('../menu');
 var auth        = require('./auth');
-var awesome     = require('react-font-awesome');
+var format      = require('./format');
 
 
 /** Navigation bar for layout.jade */
@@ -81,7 +81,7 @@ var Navigation = React.createClass({
           {
             activeEntry ? (
               <span>
-                <awesome.Icon type={activeEntry.icon || 'wrench'} fixedWidth/>
+                <format.Icon name={activeEntry.icon || 'wrench'} fixedWidth/>
                 &nbsp;&nbsp;
                 {activeEntry.title}
               </span>
@@ -97,8 +97,8 @@ var Navigation = React.createClass({
                 }
                 return (
                   <bs.MenuItem key={index} href={entry.link}>
-                    <awesome.Icon
-                      type={entry.icon || 'wrench'}
+                    <format.Icon
+                      name={entry.icon || 'wrench'}
                       fixedWidth/>&nbsp;&nbsp;
                     {entry.title}
                   </bs.MenuItem>
@@ -128,7 +128,7 @@ var Navigation = React.createClass({
 
 /** Render Navigation */
 $(function() {
-  React.renderComponent(
+  React.render(
     <Navigation/>,
     $('#navbar')[0]
   );

@@ -5,7 +5,7 @@ var auth          = require('./auth');
 var Promise       = require('promise');
 var debug         = require('debug')('lib:utils');
 var assert        = require('assert');
-var awesome       = require('react-font-awesome');
+var format        = require('./format');
 var taskcluster   = require('taskcluster-client');
 var debug         = require('debug')('lib:utils');
 var rison         = require('rison');
@@ -274,7 +274,7 @@ var createTaskClusterMixin = function(options) {
     renderSpinner: function() {
       return (
         <div style={{textAlign: 'center', margin: 20}}>
-          <awesome.Icon type="spinner" size="2x" spin/>
+          <format.Icon name="spinner" size="2x" spin/>
         </div>
       );
     },

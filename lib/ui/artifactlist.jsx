@@ -114,7 +114,7 @@ var ArtifactList = React.createClass({
     runId:      React.PropTypes.oneOfType([
                   React.PropTypes.string,
                   React.PropTypes.number
-                ]).isRequired
+                ])  // If not provided, latestArtifact is used
   },
 
   /** Get initial state */
@@ -131,22 +131,38 @@ var ArtifactList = React.createClass({
     var artifacts = this.props.artifacts.map(function(artifact) {
       var url, icon;
       if (/^public\//.test(artifact.name)) {
-        url = this.queue.buildUrl(
-          this.queue.getArtifact,
-          this.props.taskId,
-          this.props.runId,
-          artifact.name
-        );
-        icon = getIconFromMime(artifact.contentType);
-      } else {
-        // If we have credentials we create a signed URL
-        if (auth.hasCredentials()) {
-          url = this.queue.buildSignedUrl(
+        if (this.props.runId) {
+          url = this.queue.buildUrl(
             this.queue.getArtifact,
             this.props.taskId,
             this.props.runId,
             artifact.name
           );
+        } else {
+          url = this.queue.buildUrl(
+            this.queue.getLatestArtifact,
+            this.props.taskId,
+            artifact.name
+          );
+        }
+        icon = getIconFromMime(artifact.contentType);
+      } else {
+        // If we have credentials we create a signed URL
+        if (auth.hasCredentials()) {
+          if (this.props.runId) {
+            url = this.queue.buildSignedUrl(
+              this.queue.getArtifact,
+              this.props.taskId,
+              this.props.runId,
+              artifact.name
+            );
+          } else {
+            url = this.queue.buildSignedUrl(
+              this.queue.getLatestArtifact,
+              this.props.taskId,
+              artifact.name
+            );
+          }
           icon = getIconFromMime(artifact.contentType)
         } else {
           // If don't have credentials we don't provide a URL and set icon

@@ -158,9 +158,9 @@ var TaskInspector = React.createClass({
   },
 
   /** Handle form submission */
-  handleSubmit: function() {
+  handleSubmit: function(e) {
+    e.preventDefault();
     this.setState({taskId: this.state.taskIdInput});
-    return false;
   }
 });
 

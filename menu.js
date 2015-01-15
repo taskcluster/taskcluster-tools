@@ -52,6 +52,24 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Index Browser",
+    link:           '/index/',
+    icon:           'sitemap',
+    description: [
+      "The generic index browser let's you browse through the hierarchy of",
+      "namespaces in the index, and discover indexed tasks."
+    ].join('\n')
+  },
+  {
+    title:          "Indexed Artifact Browser",
+    link:           '/index/artifacts/',
+    icon:           'folder-open',
+    description: [
+      "The indexed artifact browser, let's you easily view the artifacts",
+      "from the latest run of an indexed task."
+    ].join('\n')
+  },
+  {
     type:           'divider'
   },
   {

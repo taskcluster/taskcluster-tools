@@ -25,7 +25,7 @@ var initialTask = {
 
 // Render component
 $(function() {
-  React.renderComponent(
+  React.render(
     (
       <bs.Row style={{marginBottom: 50}}>
         <TaskCreator
