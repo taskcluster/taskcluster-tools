@@ -87,6 +87,7 @@
                 "source-map": {
                   "version": "0.1.31",
                   "from": "source-map@0.1.31",
+                  "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.1.31.tgz",
                   "dependencies": {
                     "amdefine": {
                       "version": "0.1.0",
@@ -121,7 +122,8 @@
           "dependencies": {
             "date-now": {
               "version": "1.0.1",
-              "from": "date-now@1.0.1"
+              "from": "date-now@1.0.1",
+              "resolved": "https://registry.npmjs.org/date-now/-/date-now-1.0.1.tgz"
             }
           }
         },
@@ -159,6 +161,7 @@
     "slugid": {
       "version": "1.0.3",
       "from": "slugid@1.0.3",
+      "resolved": "https://registry.npmjs.org/slugid/-/slugid-1.0.3.tgz",
       "dependencies": {
         "uuid": {
           "version": "1.4.1",
@@ -184,7 +187,7 @@
         },
         "mime": {
           "version": "1.2.11",
-          "from": "mime@1.2.11",
+          "from": "mime@~1.2.11",
           "resolved": "https://registry.npmjs.org/mime/-/mime-1.2.11.tgz"
         },
         "component-emitter": {
@@ -274,12 +277,13 @@
     },
     "superagent-promise": {
       "version": "0.2.0",
-      "from": "superagent-promise@0.2.0"
+      "from": "superagent-promise@0.2.0",
+      "resolved": "https://registry.npmjs.org/superagent-promise/-/superagent-promise-0.2.0.tgz"
     },
     "taskcluster-client": {
-      "version": "0.19.1",
-      "from": "taskcluster-client@0.19.1",
-      "resolved": "https://registry.npmjs.org/taskcluster-client/-/taskcluster-client-0.19.1.tgz",
+      "version": "0.19.3",
+      "from": "taskcluster-client@0.19.3",
+      "resolved": "https://registry.npmjs.org/taskcluster-client/-/taskcluster-client-0.19.3.tgz",
       "dependencies": {
         "debug": {
           "version": "2.1.0",
@@ -556,8 +560,9 @@
                   "resolved": "https://registry.npmjs.org/request/-/request-2.51.0.tgz",
                   "dependencies": {
                     "bl": {
-                      "version": "0.9.3",
+                      "version": "0.9.4",
                       "from": "bl@~0.9.0",
+                      "resolved": "https://registry.npmjs.org/bl/-/bl-0.9.4.tgz",
                       "dependencies": {
                         "readable-stream": {
                           "version": "1.0.33",
