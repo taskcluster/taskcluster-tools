@@ -15,7 +15,7 @@ var IndexBrowser = React.createClass({
         index:          taskcluster.Index
       },
       // Reload when state.namespace changes, ignore credentials changes
-      reloadOnKeys:           ['namespace', 'namespaceInput', 'tasksToken'],
+      reloadOnKeys:           ['namespace', 'namespaceToken', 'tasksToken'],
       reloadOnLogin:          false
     }),
     // Called handler when state.namespace changes
@@ -150,6 +150,15 @@ var IndexBrowser = React.createClass({
         </tbody>
       </bs.Table>
       {
+        this.state.namespaceToken != undefined ? (
+          <bs.Button bsStyle="primary" onClick={this.clearNamespaceToken}
+                     className="pull-left">
+            <bs.Glyphicon glyph="arrow-left"/>&nbsp;
+            Back to start
+          </bs.Button>
+        ) : undefined
+      }
+      {
         this.state.namespaces.continuationToken ? (
           <bs.Button bsStyle="primary" onClick={this.nextNamespaces}
                      className="pull-right">
@@ -183,6 +192,15 @@ var IndexBrowser = React.createClass({
           }
         </tbody>
       </bs.Table>
+      {
+        this.state.tasksToken ? (
+          <bs.Button bsStyle="primary" onClick={this.clearTasksToken}
+                     className="pull-left">
+            <bs.Glyphicon glyph="arrow-left"/>&nbsp;
+            Back to start
+          </bs.Button>
+        ) : undefined
+      }
       {
         this.state.tasks.continuationToken ? (
           <bs.Button bsStyle="primary" onClick={this.nextTasks}
@@ -251,6 +269,18 @@ var IndexBrowser = React.createClass({
     this.setState({
       tasksToken:     undefined,
       namespaceToken: undefined
+    });
+  },
+
+  clearNamespaceToken: function() {
+    this.setState({
+      namespaceToken: undefined
+    });
+  },
+
+  clearTasksToken: function() {
+    this.setState({
+      tasksToken:     undefined
     });
   }
 });
