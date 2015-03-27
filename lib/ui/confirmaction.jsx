@@ -50,16 +50,24 @@ var ConfirmAction = React.createClass({
     return (
       <bs.Modal bsStyle="primary" title={this.props.label}>
         <div className="modal-body">
+          <span>{this.props.children}</span>
           {
             this.state.executing ? (
-              this.renderWaitFor('result') || this.props.success
-            ) : this.props.children
+              <span>
+                <hr/>
+                <h4>Status</h4>
+                <span>
+                  {this.renderWaitFor('result') || this.props.success}
+                </span>
+              </span>
+            ) : undefined
           }
         </div>
         <div className="modal-footer">
-          <bs.Button onClick={this.executeAction}
-                     bsStyle={this.props.buttonStyle}
-                     disabled={this.state.executing}>
+          <bs.Button
+              onClick={this.executeAction}
+              bsStyle={this.props.buttonStyle}
+              disabled={this.state.executing && !this.state.resultLoaded}>
             <bs.Glyphicon glyph={this.props.glyph}/>&nbsp;
             <span>{this.props.label}</span>
           </bs.Button>

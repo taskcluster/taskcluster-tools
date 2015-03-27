@@ -40,65 +40,43 @@ var TaskView = React.createClass({
   render: function() {
     return (
       <div className="task-view">
-        <ul className="nav nav-tabs" role="tablist">
-          <li className={this.state.currentTab === '' ? 'active' : ''}>
-            <a className="tab"
-               onClick={this.setCurrentTab.bind(this, '')}>Task</a>
-          </li>
-          {this.renderTabs()}
-          {this.renderDropDown()}
-        </ul>
+        <bs.Nav bsStyle="tabs"
+                activeKey={'' + this.state.currentTab}
+                onSelect={this.setCurrentTab}>
+          <bs.NavItem eventKey={''} key={''}>Task</bs.NavItem>
+          {
+            this.props.status.runs.slice(0, 6).map(function(run) {
+              return (
+                <bs.NavItem eventKey={'' + run.runId} key={'' + run.runId}>
+                  Run {run.runId}
+                </bs.NavItem>
+              );
+            })
+          }
+          {
+            this.props.status.runs.slice(6).length > 0 ? (
+              <bs.DropdownButton eventKey={'extra'}
+                                 title="More Runs" key={'extra'}
+                                 navItem={true}>
+                {
+                  this.props.status.runs.slice(6).map(function(run) {
+                    return (
+                      <bs.NavItem eventKey={'' + run.runId} key={'' + run.runId}>
+                        Run {run.runId}
+                      </bs.NavItem>
+                    );
+                  })
+                }
+              </bs.DropdownButton>
+            ) : undefined
+          }
+        </bs.Nav>
         <div className="tab-content">
           <div className="tab-pane active">
             {this.renderCurrentTab()}
           </div>
         </div>
       </div>
-    );
-  },
-
-  /** Render tabs */
-  renderTabs: function() {
-    // Show tabs for the first 6 runs
-    var currentTab = this.state.currentTab;
-    return this.props.status.runs.slice(0, 6).map(function(run, index) {
-      return (
-        <li key={index}
-            className={currentTab + '' === run.runId + '' ? 'active' : ''}>
-          <a className="tab"
-             onClick={this.setCurrentTab.bind(this, run.runId)}>
-             Run {run.runId}
-          </a>
-        </li>
-      );
-    }, this);
-  },
-
-  /** Render drop down box for 7th+ runs */
-  renderDropDown: function() {
-    // Show a dropdown menu for the remaining runs
-    if (this.props.status.runs.slice(6).length === 0) {
-      return undefined;
-    }
-    return (
-      <li className="dropdown">
-        <a className="dropdown-toggle" data-toggle="dropdown">
-          More runs <span className="caret"></span>
-        </a>
-        <ul className="dropdown-menu" role="menu">
-          {
-            this.props.status.runs.slice(6).map(function(run, index) {
-              return (
-                <li key={index}>
-                  <a onClick={this.setCurrentTab.bind(this, run.runId)}>
-                     Run {run.runId}
-                  </a>
-                </li>
-              );
-            }, this)
-          }
-        </ul>
-      </li>
     );
   },
 

@@ -40,7 +40,7 @@ var TaskInfo = React.createClass({
   /** Load task definition */
   load: function() {
     return {
-      task:         this.queue.getTask(this.props.status.taskId)
+      task:         this.queue.task(this.props.status.taskId)
     };
   },
 
@@ -107,7 +107,7 @@ var TaskInfo = React.createClass({
         <dd>
           <ConfirmAction buttonSize="xsmall"
                          buttonStyle="primary"
-                         disabled={status.state === 'unscheduled'}
+                         disabled={status.state !== 'unscheduled'}
                          glyph="play"
                          label="Schedule Task"
                          action={this.scheduleTask}
