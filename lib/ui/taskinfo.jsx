@@ -5,7 +5,7 @@ var utils           = require('../utils');
 var format          = require('../format');
 var _               = require('lodash');
 var taskcluster     = require('taskcluster-client');
-
+var ConfirmAction   = require('./confirmaction');
 
 /** Displays information about a task in a tab page */
 var TaskInfo = React.createClass({
@@ -58,6 +58,12 @@ var TaskInfo = React.createClass({
       exception:        'label label-warning'
     };
 
+    var isResolved = [
+      'completed',
+      'failed',
+      'exception'
+    ].indexOf(status.state) !== -1;
+
     return this.renderWaitFor('task') || (
       <span>
       <dl className="dl-horizontal">
@@ -97,6 +103,46 @@ var TaskInfo = React.createClass({
         </dd>
         <dt>Retries Left</dt>
         <dd>{status.retriesLeft} of {task.retries}</dd>
+        <dt>Actions</dt>
+        <dd>
+          <ConfirmAction buttonSize="xsmall"
+                         buttonStyle="primary"
+                         disabled={status.state === 'unscheduled'}
+                         glyph="play"
+                         label="Schedule Task"
+                         action={this.scheduleTask}
+                         success="Successfully scheduled task!">
+            Are you wish to schedule the task?
+            This will <b>overwrite any scheduling process</b> taking place,
+            if this task is part of a continous integration process scheduling
+            this task may cause your code to land with broken tests.
+          </ConfirmAction>&nbsp;
+          <ConfirmAction buttonSize="xsmall"
+                         buttonStyle="success"
+                         disabled={!isResolved}
+                         glyph="repeat"
+                         label="Rerun Task"
+                         action={this.rerunTask}
+                         success="Successfully scheduled task rerun!">
+            Are you sure you wish to rerun this task?
+            This will cause a new run of the task to be created. It will only
+            succeed if the task hasn't passed it's deadline. Notice that this
+            may interfere with listeners who only expects this tasks to be
+            resolved once.
+          </ConfirmAction>&nbsp;
+          <ConfirmAction buttonSize="xsmall"
+                         buttonStyle="danger"
+                         disabled={isResolved}
+                         glyph="stop"
+                         label="Cancel Task"
+                         action={this.cancelTask}
+                         success="Successfully canceled task!">
+            Are you sure you wish to cancel this task?
+            Notice that another process or developer may still be able to
+            schedule a rerun. But all existing runs will be aborted and any
+            scheduling process will not be able to schedule the task.
+          </ConfirmAction>&nbsp;
+        </dd>
       </dl>
       <dl className="dl-horizontal">
         <dt>Created</dt>
@@ -173,6 +219,16 @@ var TaskInfo = React.createClass({
       </dl>
       </span>
     );
+  },
+
+  scheduleTask: function() {
+    return this.queue.scheduleTask(this.props.status.taskId);
+  },
+  rerunTask: function() {
+    return this.queue.rerunTask(this.props.status.taskId);
+  },
+  cancelTask: function() {
+    return this.queue.cancelTask(this.props.status.taskId);
   }
 });
 
