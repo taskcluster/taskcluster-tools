@@ -7,14 +7,14 @@ var _               = require('lodash');
 var format          = require('../lib/format');
 
 // Should this be allowed to be set by user?
-var provisionerId = 'aws-provisioner2-dev';
+var provisionerId = 'aws-provisioner2';
 
 /** BEGIN SUPER HACK */
 var request = new XMLHttpRequest();
-//request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
 console.log('ignore this deprecation... once the API is in the upstream client we wont need '+
             'to do this anymore');
-request.open('GET', 'http://localhost:5556/v1/api-reference', false);
+request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
+//request.open('GET', 'http://localhost:5556/v1/api-reference', false);
 request.send(null);
 if (request.status === 200) {
   var reftxt = request.responseText;
@@ -27,6 +27,12 @@ if (request.status === 200) {
   }
 } else {
   alert('Uh-oh, failed to load API reference');
+}
+//console.log('HIHIHIHH' + reference.baseUrl);
+if (reference.baseUrl[4] !== 's') {
+  console.log(reference.baseUrl);
+  reference.baseUrl = 'https://' + reference.baseUrl.slice(7);
+  console.log(reference.baseUrl);
 }
 var AwsProvisionerClient = taskcluster.createClient(reference);
 /** END SUPER HACK */
