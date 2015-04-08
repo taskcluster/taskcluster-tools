@@ -62,17 +62,28 @@ var WorkerTypeTable = React.createClass({
   },
   
   render: function() {
+    // TODO: Should write a note somewhere explaining what all these terms mean
     return (
       <bs.Table striped bordered condensed hover>
         <thead>
           <tr>
             <th>Worker Type Name</th>
+            <th>Running Capacity</th>
+            <th>Pending Capacity</th>
+            <th>Requested Capacity</th>
+            <th>Pending Tasks</th>
           </tr>
         </thead>
         <tbody>
         {
           this.renderWaitFor('workerTypes') || this.state.workerTypes.map(function(name) {
-            return (<tr><td>{name}</td></tr>);
+            return (<tr key={name}>
+              <td>{name}</td>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>);
           })
         }
         </tbody>
