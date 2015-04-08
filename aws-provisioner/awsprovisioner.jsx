@@ -9,14 +9,11 @@ var format          = require('../lib/format');
 // Should this be allowed to be set by user?
 var provisionerId = 'aws-provisioner2-dev';
 
-/** 
- * We are doing this without the mixin for now because the client needs
- * to be created in a non-standard way.  This shouldn't be done this way
- * in production...
- */
 /** BEGIN SUPER HACK */
 var request = new XMLHttpRequest();
 //request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
+console.log('ignore this deprecation... once the API is in the upstream client we wont need '+
+            'to do this anymore');
 request.open('GET', 'http://localhost:5556/v1/api-reference', false);
 request.send(null);
 if (request.status === 200) {
@@ -31,7 +28,6 @@ if (request.status === 200) {
 } else {
   alert('Uh-oh, failed to load API reference');
 }
-
 var AwsProvisionerClient = taskcluster.createClient(reference);
 /** END SUPER HACK */
 
@@ -75,7 +71,7 @@ var WorkerTypeTable = React.createClass({
             <th>Pending Capacity</th>
             <th>Requested Capacity</th>
             <th>Pending Tasks</th>
-            <th>Details/Edit</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -122,7 +118,6 @@ var WorkerTypeRow = React.createClass({
   },
 
   load: function() {
-    console.log('loading');
     return {
       awsState: Promise.resolve({
         runningCapacity: 1,
@@ -143,15 +138,19 @@ var WorkerTypeRow = React.createClass({
       <td>{this.state.awsState.requestedCapacity}</td>
       <td>{this.state.pendingTasks.pendingTasks}</td>
       <td>
-        <bs.Button bsStyle='primary' bsSize='xsmall' onClick={this.handleButton}>
-        Edit</bs.Button>
+        <bs.ButtonToolbar>
+        <bs.Button bsStyle='primary' bsSize='xsmall' onClick={this.handleDetails}>Details</bs.Button>
+        {/* Hmm, should I allow deleting from here or should that only be under details...*/}
+        {/*<bs.Button bsStyle='danger' bsSize='xsmall' onClick={this.handleDelete}>Delete</bs.Button>*/}
+        </bs.ButtonToolbar>
       </td>
     </tr>);  
   },
 
-  handleButton: function() {
-    alert('Pity da fool');
+  handleDetails: function() {
+    alert('details ' + this.props.workerType);
   },
+
 });
 
 var AwsProvisioner = React.createClass({
@@ -159,7 +158,7 @@ var AwsProvisioner = React.createClass({
     // Calls load()
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner:          taskcluster.Index
+        awsProvisioner: taskcluster.Index
       },
     }),
   ],
