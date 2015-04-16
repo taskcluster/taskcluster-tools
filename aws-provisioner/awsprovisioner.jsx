@@ -13,8 +13,8 @@ var provisionerId = 'aws-provisioner-v1';
 var request = new XMLHttpRequest();
 console.log('ignore this deprecation... once the API is in the upstream client we wont need '+
             'to do this anymore');
-//request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
-request.open('GET', 'http://localhost:5557/v1/api-reference', false);
+request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
+//request.open('GET', 'http://localhost:5557/v1/api-reference', false);
 request.send(null);
 if (request.status === 200) {
   var reftxt = request.responseText;
@@ -29,13 +29,11 @@ if (request.status === 200) {
   alert('Uh-oh, failed to load API reference');
 }
 //console.log('HIHIHIHH' + reference.baseUrl);
-/* NOT FOR LOCALHOST
 if (reference.baseUrl[4] !== 's') {
   console.log(reference.baseUrl);
   reference.baseUrl = 'https://' + reference.baseUrl.slice(7);
   console.log(reference.baseUrl);
 }
-*/
 var AwsProvisionerClient = taskcluster.createClient(reference);
 /** END SUPER HACK */
 
@@ -66,7 +64,6 @@ var WorkerTypeTable = React.createClass({
   },
 
   load: function() {
-    this.awsProvisioner.awsState().then(console.log).catch(console.log);
     return {
       workerTypes: this.awsProvisioner.listWorkerTypes(),
       awsState: this.awsProvisioner.awsState(),
@@ -91,12 +88,29 @@ var WorkerTypeTable = React.createClass({
         <tbody>
         {
           this.renderWaitFor('workerTypes') || this.renderWaitFor('awsState') || this.state.workerTypes.map(function(name) {
-            return <WorkerTypeRow key={name} awsState={that.state.awsState[name]} workerType={name} />;
+            var realState;
+            if (that.state.awsState[name]) {
+              realState = that.state.awsState[name];
+            } else {
+              realState = {
+                running: [],
+                pending: [],
+                spotReq: [],
+              };
+            }
+            return <WorkerTypeRow key={name} awsState={realState} workerType={name} removeWorkerFromTable={that.removeWorkerFromTable}/>;
           })
         }
         </tbody>
       </bs.Table>
     );
+  },
+  removeWorkerFromTable: function(name) {
+    this.setState({
+      workerTypes: this.state.workerTypes.filter(function(x) {
+        return x !== name;
+      })
+    });
   },
 });
 
@@ -105,6 +119,7 @@ var WorkerTypeRow = React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         queue: taskcluster.Queue,
+        awsProvisioner: AwsProvisionerClient,
       },
     }),
   ],
@@ -125,17 +140,22 @@ var WorkerTypeRow = React.createClass({
       },
       pendingTasksLoaded: true,
       pendingTasksError: undefined,
+      workerType: 'loading',
+      workerTypeLoaded: true,
+      workerTypeError: undefined,
     };
   },
 
   load: function() {
     return {
       pendingTasks: this.queue.pendingTasks(provisionerId, this.props.workerType),
+      workerType: this.awsProvisioner.workerType(this.props.workerType),
     };
   },
 
   render: function() {
     return this.renderWaitFor('pendingTasks') ||
+           this.renderWaitFor('workerType') ||
     (<tr>
       <td>{this.props.workerType}</td>
       <td>{this.props.awsState.running.length}</td>
@@ -144,7 +164,10 @@ var WorkerTypeRow = React.createClass({
       <td>{this.state.pendingTasks.pendingTasks}</td>
       <td>
         <bs.ButtonToolbar>
-        <bs.Button bsStyle='primary' bsSize='xsmall' onClick={this.handleDetails}>Details</bs.Button>
+        <bs.ModalTrigger modal={<WorkerTypeDetail name={this.props.workerType} worker={this.state.workerType} />}>
+          <bs.Button bsStyle='primary' bsSize='xsmall'>View</bs.Button>
+        </bs.ModalTrigger>
+        <bs.Button bsStyle='danger' bsSize='xsmall' onClick={this.removeWorkerType}>Remove</bs.Button>
         {/* Hmm, should I allow deleting from here or should that only be under details...*/}
         {/*<bs.Button bsStyle='danger' bsSize='xsmall' onClick={this.handleDelete}>Delete</bs.Button>*/}
         </bs.ButtonToolbar>
@@ -152,10 +175,40 @@ var WorkerTypeRow = React.createClass({
     </tr>);  
   },
 
-  handleDetails: function() {
-    alert('details ' + this.props.workerType);
-  },
+  removeWorkerType: function() {
+    var that = this;
+    console.log('Deleting %s', this.props.workerType);
+    var p = this.awsProvisioner.removeWorkerType(this.props.workerType);
 
+    p.then(function() {
+      console.log('Deleted ' + that.props.workerType);
+      that.props.removeWorkerFromTable(that.props.workerType);
+    });
+
+    p.catch(function(err) {
+      console.error(err);
+      if (err.stack) console.log(err.stack);
+      alert('Failed to delete ' + that.props.workerType);
+    });
+
+    p.done();
+  },
+});
+
+var WorkerTypeDetail = React.createClass({
+  render: function() {
+    return (
+      <bs.Modal {...this.props} bsStyle='primary' title={this.props.name + " details"}>
+        <div className='modal-body'>
+        <pre>{JSON.stringify(this.props.worker, undefined, 2)}</pre>
+        </div>
+
+        <div className='modal-footer'>
+          <bs.Button onClick={this.props.onRequestHide}>Close</bs.Button>
+        </div>
+      </bs.Modal>
+    );
+  },
 });
 
 var AwsProvisioner = React.createClass({
