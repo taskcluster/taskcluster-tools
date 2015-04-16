@@ -7,14 +7,14 @@ var _               = require('lodash');
 var format          = require('../lib/format');
 
 // Should this be allowed to be set by user?
-var provisionerId = 'aws-provisioner2';
+var provisionerId = 'aws-provisioner-v1';
 
 /** BEGIN SUPER HACK */
 var request = new XMLHttpRequest();
 console.log('ignore this deprecation... once the API is in the upstream client we wont need '+
             'to do this anymore');
-request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
-//request.open('GET', 'http://localhost:5556/v1/api-reference', false);
+//request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
+request.open('GET', 'http://localhost:5557/v1/api-reference', false);
 request.send(null);
 if (request.status === 200) {
   var reftxt = request.responseText;
@@ -29,11 +29,13 @@ if (request.status === 200) {
   alert('Uh-oh, failed to load API reference');
 }
 //console.log('HIHIHIHH' + reference.baseUrl);
+/* NOT FOR LOCALHOST
 if (reference.baseUrl[4] !== 's') {
   console.log(reference.baseUrl);
   reference.baseUrl = 'https://' + reference.baseUrl.slice(7);
   console.log(reference.baseUrl);
 }
+*/
 var AwsProvisionerClient = taskcluster.createClient(reference);
 /** END SUPER HACK */
 
@@ -56,18 +58,24 @@ var WorkerTypeTable = React.createClass({
       workerTypes: [],
       workerTypesLoaded: true,
       workerTypesError: undefined,
+      awsState: {},
+      awsStateLoaded: true,
+      awsStateError: undefined,
       current: '',
     };
   },
 
   load: function() {
+    this.awsProvisioner.awsState().then(console.log).catch(console.log);
     return {
       workerTypes: this.awsProvisioner.listWorkerTypes(),
+      awsState: this.awsProvisioner.awsState(),
     };
   },
   
   render: function() {
     // TODO: Should write a note somewhere explaining what all these terms mean
+    var that = this;
     return (
       <bs.Table striped bordered condensed hover>
         <thead>
@@ -82,8 +90,8 @@ var WorkerTypeTable = React.createClass({
         </thead>
         <tbody>
         {
-          this.renderWaitFor('workerTypes') || this.state.workerTypes.map(function(name) {
-            return <WorkerTypeRow key={name} workerType={name} />;
+          this.renderWaitFor('workerTypes') || this.renderWaitFor('awsState') || this.state.workerTypes.map(function(name) {
+            return <WorkerTypeRow key={name} awsState={that.state.awsState[name]} workerType={name} />;
           })
         }
         </tbody>
@@ -96,7 +104,6 @@ var WorkerTypeRow = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: AwsProvisionerClient,
         queue: taskcluster.Queue,
       },
     }),
@@ -104,17 +111,15 @@ var WorkerTypeRow = React.createClass({
 
   propTypes: {
     workerType: React.PropTypes.string.isRequired,
+    awsState: React.PropTypes.shape({
+      running: React.PropTypes.arrayOf(React.PropTypes.object),
+      pending: React.PropTypes.arrayOf(React.PropTypes.object),
+      spotReq: React.PropTypes.arrayOf(React.PropTypes.object),
+    }).isRequired,
   },
 
   getInitialState: function() {
     return {
-      awsState: {
-        runningCapacity: 'loading',
-        pendingCapacity: 'loading',
-        requestedCapacity: 'loading',
-      },
-      awsStateLoaded: true,
-      awsStateError: undefined,
       pendingTasks: {
         pendingTasks: 'loading',  
       },
@@ -125,23 +130,17 @@ var WorkerTypeRow = React.createClass({
 
   load: function() {
     return {
-      awsState: Promise.resolve({
-        runningCapacity: 1,
-        pendingCapacity: 2,
-        requestedCapacity: 3
-      }),
       pendingTasks: this.queue.pendingTasks(provisionerId, this.props.workerType),
     };
   },
 
   render: function() {
     return this.renderWaitFor('pendingTasks') ||
-           this.renderWaitFor('awsState') ||
     (<tr>
       <td>{this.props.workerType}</td>
-      <td>{this.state.awsState.runningCapacity}</td>
-      <td>{this.state.awsState.pendingCapacity}</td>
-      <td>{this.state.awsState.requestedCapacity}</td>
+      <td>{this.props.awsState.running.length}</td>
+      <td>{this.props.awsState.pending.length}</td>
+      <td>{this.props.awsState.spotReq.length}</td>
       <td>{this.state.pendingTasks.pendingTasks}</td>
       <td>
         <bs.ButtonToolbar>
