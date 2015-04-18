@@ -157,6 +157,40 @@ var WorkerTypeRow = React.createClass({
     var runningCapacity = 0;
     var pendingCapacity = 0;
     var spotReqCapacity = 0;
+
+    if (this.state.workerType) {
+      console.log('Rendering a row with a loaded workerType');
+      var s = this.props.awsState;
+      var w = this.state.workerType;
+      
+      s.running.forEach(function(node) {
+        w.instanceTypes.forEach(function(itd) {
+          if (itd.instanceType === node.InstanceType) {
+            console.log('Adding ' + itd.capacity + ' to running capacity');
+            runningCapacity += itd.capacity;
+          }
+        });
+      });
+
+      s.pending.forEach(function(node) {
+        w.instanceTypes.forEach(function(itd) {
+          if (itd.instanceType === node.InstanceType) {
+            console.log('Adding ' + itd.capacity + ' to pending capacity');
+            runningCapacity += itd.capacity;
+          }
+        });
+      });
+
+      s.pending.forEach(function(node) {
+        w.instanceTypes.forEach(function(itd) {
+          if (itd.instanceType === node.LaunchSpecification.InstanceType) {
+            console.log('Adding ' + itd.capacity + ' to requested capacity');
+            runningCapacity += itd.capacity;
+          }
+        });
+      });
+
+    }
     
     return this.renderWaitFor('pendingTasks') || this.renderWaitFor('workerType') || (<tr>
       <td>{this.props.workerType}</td>
