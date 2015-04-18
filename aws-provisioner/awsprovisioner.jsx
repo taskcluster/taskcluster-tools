@@ -66,6 +66,7 @@ var WorkerTypeTable = React.createClass({
   load: function() {
     return {
       workerTypes: this.awsProvisioner.listWorkerTypes(),
+      //awsState: this.awsProvisioner.updateAwsState(),
       awsState: this.awsProvisioner.awsState(),
     };
   },
@@ -135,12 +136,10 @@ var WorkerTypeRow = React.createClass({
 
   getInitialState: function() {
     return {
-      pendingTasks: {
-        pendingTasks: 'loading',  
-      },
+      pendingTasks: {},
       pendingTasksLoaded: true,
       pendingTasksError: undefined,
-      workerType: 'loading',
+      workerType: undefined,
       workerTypeLoaded: true,
       workerTypeError: undefined,
     };
@@ -154,13 +153,16 @@ var WorkerTypeRow = React.createClass({
   },
 
   render: function() {
-    return this.renderWaitFor('pendingTasks') ||
-           this.renderWaitFor('workerType') ||
-    (<tr>
+    var that = this;
+    var runningCapacity = 0;
+    var pendingCapacity = 0;
+    var spotReqCapacity = 0;
+    
+    return this.renderWaitFor('pendingTasks') || this.renderWaitFor('workerType') || (<tr>
       <td>{this.props.workerType}</td>
-      <td>{this.props.awsState.running.length}</td>
-      <td>{this.props.awsState.pending.length}</td>
-      <td>{this.props.awsState.spotReq.length}</td>
+      <td>{runningCapacity} ({this.props.awsState.running.length})</td>
+      <td>{pendingCapacity} ({this.props.awsState.pending.length})</td>
+      <td>{spotReqCapacity} ({this.props.awsState.spotReq.length})</td>
       <td>{this.state.pendingTasks.pendingTasks}</td>
       <td>
         <bs.ButtonToolbar>
@@ -188,7 +190,12 @@ var WorkerTypeRow = React.createClass({
     p.catch(function(err) {
       console.error(err);
       if (err.stack) console.log(err.stack);
-      alert('Failed to delete ' + that.props.workerType);
+      if (err.statusCode === 404) {
+        console.log('Tried to delete ' + that.props.workerType + ' but it does not exist.');
+        console.log('Maybe you already clicked this button!');
+      } else {
+        alert('Failed to delete ' + that.props.workerType);
+      }
     });
 
     p.done();
