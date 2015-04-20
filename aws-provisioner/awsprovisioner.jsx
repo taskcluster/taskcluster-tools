@@ -190,13 +190,57 @@ var WorkerTypeRow = React.createClass({
       });
     }
 
-    var percentRunning = runningCapacity / maxCapacity * 100;
-    var percentPending = pendingCapacity / maxCapacity * 100;
-    var requestedCapacity = spotReqCapacity / maxCapacity * 100;
+    console.log(this.props.workerType + 'running: ' + runningCapacity +
+                ' pending: ' + pendingCapacity + ' requested: ' + spotReqCapacity);
+    var percentRunning;
+    var percentPending;
+    var percentRequested;
+
+    var runningBar;
+    var pendingBar;
+    var requestedBar;
+    var excessBar;
+
+    // This is the difference to subtract from the largest... maybe
+    var offset = 0;
+
+    var key = 1;
+    if (runningCapacity > 0) {
+      percentRunning = runningCapacity / maxCapacity * 100;
+      if (percentRunning > 0 && percentRunning < 5) {
+        var diff = 5 - percentRunning;
+        percentRunning = 5;
+        offset += diff;
+      }
+      runningBar = <bs.ProgressBar bsStyle='success' now={percentRunning} key={key++} label={runningCapacity} />
+    }
+    if (pendingCapacity > 0) {
+      percentPending = pendingCapacity / maxCapacity * 100;
+      if (percentPending > 0 && percentPending < 5) {
+        var diff = 5 - percentPending;
+        percentPending = 5;
+        offset += diff;
+      }
+      pendingBar = <bs.ProgressBar bsStyle='info' now={percentPending} key={key++} label={pendingCapacity} />
+    }
+    if (spotReqCapacity > 0) {
+      percentRequested = spotReqCapacity / maxCapacity * 100;
+      if (percentRequested > 0 && percentRequested < 5) {
+        var diff = 5 - percentRequested;
+        percentRequested = 5;
+        offset += diff;
+      }
+      requestedBar = <bs.ProgressBar bsStyle='warning' now={percentRequested} key={key++} label={spotReqCapacity} />
+    }
+
+    // TODO Figure out a way to show this as a class danger probably
+    var excess = (runningCapacity + pendingCapacity + spotReqCapacity) - maxCapacity;
+    console.log(excess);
+
     var progressBar = (<bs.ProgressBar>
-      <bs.ProgressBar bsStyle='success' now={percentRunning} key={1} label={runningCapacity} />
-      <bs.ProgressBar bsStyle='info' now={percentPending} key={2} label={pendingCapacity} />
-      <bs.ProgressBar bsStyle='warning' now={requestedCapacity} key={3} label={spotReqCapacity} />
+        {runningBar ? runningBar : ''}
+        {pendingBar ? pendingBar: ''}
+        {requestedBar ? requestedBar : ''}
     </bs.ProgressBar>);
 
     
