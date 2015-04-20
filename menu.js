@@ -32,6 +32,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "AWS Provisioner",
+    link:           '/aws-provisioner/',
+    icon:           'wrench',
+    description: [
+      "Manage workertypes known to the AWS Provisioner and check on the status",
+      "of AWS Nodes",
+    ].join('\n')
+  },
+  {
     title:          "Authentication Manager",
     link:           '/auth/',
     icon:           'users',

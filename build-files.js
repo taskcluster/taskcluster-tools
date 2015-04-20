@@ -47,6 +47,11 @@ module.exports = [
   'task-creator/app.jsx',
   'task-creator/app.less',
 
+  // Aws Provisioner
+  'aws-provisioner/index.jade',
+  'aws-provisioner/app.jsx',
+  'aws-provisioner/app.less',
+
   // Index Browser
   'index/index.jade',
   'index/app.jsx',
