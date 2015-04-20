@@ -66,8 +66,8 @@ var WorkerTypeTable = React.createClass({
   load: function() {
     return {
       workerTypes: this.awsProvisioner.listWorkerTypes(),
-      //awsState: this.awsProvisioner.updateAwsState(),
-      awsState: this.awsProvisioner.awsState(),
+      awsState: this.awsProvisioner.updateAwsState(),
+      //awsState: this.awsProvisioner.awsState(),
     };
   },
   
@@ -180,7 +180,7 @@ var WorkerTypeRow = React.createClass({
         });
       });
 
-      s.pending.forEach(function(node) {
+      s.spotReq.forEach(function(node) {
         w.instanceTypes.forEach(function(itd) {
           if (itd.instanceType === node.LaunchSpecification.InstanceType) {
             console.log('Adding ' + itd.capacity + ' to requested capacity');
