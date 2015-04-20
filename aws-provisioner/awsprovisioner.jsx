@@ -79,9 +79,7 @@ var WorkerTypeTable = React.createClass({
         <thead>
           <tr>
             <th>Worker Type Name</th>
-            <th>Running Capacity</th>
-            <th>Pending Capacity</th>
-            <th>Requested Capacity</th>
+            <th className='col-md-6'>Capacity</th>
             <th>Pending Tasks</th>
             <th>Actions</th>
           </tr>
@@ -157,11 +155,12 @@ var WorkerTypeRow = React.createClass({
     var runningCapacity = 0;
     var pendingCapacity = 0;
     var spotReqCapacity = 0;
+    var maxCapacity = 0;
 
     if (this.state.workerType) {
-      console.log('Rendering a row with a loaded workerType');
       var s = this.props.awsState;
       var w = this.state.workerType;
+      maxCapacity = w.maxCapacity;
       
       s.running.forEach(function(node) {
         w.instanceTypes.forEach(function(itd) {
@@ -176,7 +175,7 @@ var WorkerTypeRow = React.createClass({
         w.instanceTypes.forEach(function(itd) {
           if (itd.instanceType === node.InstanceType) {
             console.log('Adding ' + itd.capacity + ' to pending capacity');
-            runningCapacity += itd.capacity;
+            pendingCapacity += itd.capacity;
           }
         });
       });
@@ -185,22 +184,43 @@ var WorkerTypeRow = React.createClass({
         w.instanceTypes.forEach(function(itd) {
           if (itd.instanceType === node.LaunchSpecification.InstanceType) {
             console.log('Adding ' + itd.capacity + ' to requested capacity');
-            runningCapacity += itd.capacity;
+            spotReqCapacity += itd.capacity;
           }
         });
       });
-
     }
+
+    var percentRunning = runningCapacity / maxCapacity * 100;
+    var percentPending = pendingCapacity / maxCapacity * 100;
+    var requestedCapacity = spotReqCapacity / maxCapacity * 100;
+    var progressBar = (<bs.ProgressBar>
+      <bs.ProgressBar bsStyle='success' now={percentRunning} key={1} label={runningCapacity} />
+      <bs.ProgressBar bsStyle='info' now={percentPending} key={2} label={pendingCapacity} />
+      <bs.ProgressBar bsStyle='warning' now={requestedCapacity} key={3} label={spotReqCapacity} />
+    </bs.ProgressBar>);
+
     
     return this.renderWaitFor('pendingTasks') || this.renderWaitFor('workerType') || (<tr>
       <td>{this.props.workerType}</td>
-      <td>{runningCapacity} ({this.props.awsState.running.length})</td>
+      {/*<td>{runningCapacity} ({this.props.awsState.running.length})</td>
       <td>{pendingCapacity} ({this.props.awsState.pending.length})</td>
-      <td>{spotReqCapacity} ({this.props.awsState.spotReq.length})</td>
+      <td>{spotReqCapacity} ({this.props.awsState.spotReq.length})</td>*/}
+      <td>
+        {progressBar}
+      </td>
       <td>{this.state.pendingTasks.pendingTasks}</td>
       <td>
         <bs.ButtonToolbar>
-        <bs.ModalTrigger modal={<WorkerTypeDetail name={this.props.workerType} worker={this.state.workerType} />}>
+        <bs.ModalTrigger 
+            modal={<WorkerTypeDetail 
+                      name={this.props.workerType} 
+                      worker={this.state.workerType}
+                      awsState={this.props.awsState}
+                      runningCapacity={runningCapacity}
+                      pendingCapacity={pendingCapacity}
+                      spotReqCapacity={spotReqCapacity}
+                      progressBar={progressBar}
+            />}>
           <bs.Button bsStyle='primary' bsSize='xsmall'>View</bs.Button>
         </bs.ModalTrigger>
         <bs.Button bsStyle='danger' bsSize='xsmall' onClick={this.removeWorkerType}>Remove</bs.Button>
@@ -237,13 +257,33 @@ var WorkerTypeRow = React.createClass({
 });
 
 var WorkerTypeDetail = React.createClass({
+  renderNodeTable: function(stateInfo, isSpot) {
+    // StateInfo is one of the state lists, e.g. running,pending
+    stateInfo.forEach(function(node) {
+      var instanceType;
+      var region;
+      var az;
+
+      if (isSpot) {
+        
+      } else {
+
+      }
+    });
+  },
   render: function() {
     return (
       <bs.Modal {...this.props} bsStyle='primary' title={this.props.name + " details"}>
         <div className='modal-body'>
+        {this.props.progressBar}
+        Detailed Capacity Information:
+        <ul>
+          <li>Running: {this.props.runningCapacity} capacity units, {this.props.awsState.running.length} instances</li>
+          <li>Pending: {this.props.pendingCapacity} capacity units, {this.props.awsState.pending.length} instances</li>
+          <li>Requested: {this.props.spotReqCapacity} capacity units, {this.props.awsState.spotReq.length} instances</li>
+        </ul>
         <pre>{JSON.stringify(this.props.worker, undefined, 2)}</pre>
         </div>
-
         <div className='modal-footer'>
           <bs.Button onClick={this.props.onRequestHide}>Close</bs.Button>
         </div>
