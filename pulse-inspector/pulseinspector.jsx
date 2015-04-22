@@ -130,8 +130,8 @@ var PulseInspector = React.createClass({
         <bs.Col md={12}>
           <h1>Pulse Inspector</h1>
           <p>
-            This tool let's you listen to Pulse messages from any exchange and
-            routing key, when messages are received you can inspect the
+            This tool lets you listen to Pulse messages from any exchange and
+            routing key.  When messages are received you can inspect the
             messages. This is useful for debugging and development when
             consuming from undocumented exchanges. A list of Pulse exchanges is
             maintained on the project Wiki, see&nbsp;
