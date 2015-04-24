@@ -1,3 +1,4 @@
+'use strict';
 /** @jsx React.DOM */
 var React           = require('react');
 var bs              = require('react-bootstrap');
@@ -5,6 +6,7 @@ var utils           = require('../lib/utils');
 var taskcluster     = require('taskcluster-client');
 var _               = require('lodash');
 var format          = require('../lib/format');
+var ConfirmAction   = require('../lib/ui/confirmaction');
 
 // Should this be allowed to be set by user?
 var provisionerId = 'aws-provisioner-v1';
@@ -38,9 +40,8 @@ var AwsProvisionerClient = taskcluster.createClient(reference);
 /** END SUPER HACK */
 
 // Questions:
-//  1. Should I create a client for each react class or share the parent classes?
-//  2. Why does the aws-provisioner not allow cross-origin requests?
-
+//  1. Should I create a client for each react class or 
+//     share the parent classes?
 
 var WorkerTypeTable = React.createClass({
   mixins: [
@@ -72,10 +73,12 @@ var WorkerTypeTable = React.createClass({
   },
   
   render: function() {
-    // TODO: Should write a note somewhere explaining what all these terms mean
+    // TODO: Should write a note somewhere explaining what all these terms
+    //       mean
     var that = this;
-    return (
-      <bs.Table striped bordered condensed hover>
+    return this.renderWaitFor('workerTypes') ||
+           this.renderWaitFor('awsState') || 
+      (<bs.Table striped bordered condensed hover>
         <thead>
           <tr>
             <th>Worker Type Name</th>
@@ -86,7 +89,8 @@ var WorkerTypeTable = React.createClass({
         </thead>
         <tbody>
         {
-          this.renderWaitFor('workerTypes') || this.renderWaitFor('awsState') || this.state.workerTypes.map(function(name) {
+          
+          this.state.workerTypes.map(function(name) {
             var realState;
             if (that.state.awsState[name]) {
               realState = that.state.awsState[name];
@@ -97,19 +101,17 @@ var WorkerTypeTable = React.createClass({
                 spotReq: [],
               };
             }
-            return <WorkerTypeRow key={name} awsState={realState} workerType={name} removeWorkerFromTable={that.removeWorkerFromTable}/>;
+            return <WorkerTypeRow 
+                      key={name} 
+                      awsState={realState}
+                      workerType={name}
+                      selectWorkerType={that.props.selectWorkerType}
+                      reload={that.reload} />;
           })
         }
         </tbody>
       </bs.Table>
     );
-  },
-  removeWorkerFromTable: function(name) {
-    this.setState({
-      workerTypes: this.state.workerTypes.filter(function(x) {
-        return x !== name;
-      })
-    });
   },
 });
 
@@ -145,7 +147,8 @@ var WorkerTypeRow = React.createClass({
 
   load: function() {
     return {
-      pendingTasks: this.queue.pendingTasks(provisionerId, this.props.workerType),
+      pendingTasks:
+        this.queue.pendingTasks(provisionerId, this.props.workerType),
       workerType: this.awsProvisioner.workerType(this.props.workerType),
     };
   },
@@ -165,7 +168,6 @@ var WorkerTypeRow = React.createClass({
       s.running.forEach(function(node) {
         w.instanceTypes.forEach(function(itd) {
           if (itd.instanceType === node.InstanceType) {
-            console.log('Adding ' + itd.capacity + ' to running capacity');
             runningCapacity += itd.capacity;
           }
         });
@@ -174,7 +176,6 @@ var WorkerTypeRow = React.createClass({
       s.pending.forEach(function(node) {
         w.instanceTypes.forEach(function(itd) {
           if (itd.instanceType === node.InstanceType) {
-            console.log('Adding ' + itd.capacity + ' to pending capacity');
             pendingCapacity += itd.capacity;
           }
         });
@@ -183,15 +184,19 @@ var WorkerTypeRow = React.createClass({
       s.spotReq.forEach(function(node) {
         w.instanceTypes.forEach(function(itd) {
           if (itd.instanceType === node.LaunchSpecification.InstanceType) {
-            console.log('Adding ' + itd.capacity + ' to requested capacity');
             spotReqCapacity += itd.capacity;
           }
         });
       });
     }
 
-    console.log(this.props.workerType + 'running: ' + runningCapacity +
-                ' pending: ' + pendingCapacity + ' requested: ' + spotReqCapacity);
+    console.log(this.props.workerType +
+                'running: ' +
+                runningCapacity +
+                ' pending: ' +
+                pendingCapacity +
+                ' requested: ' +
+                spotReqCapacity);
     var percentRunning;
     var percentPending;
     var percentRequested;
@@ -212,7 +217,11 @@ var WorkerTypeRow = React.createClass({
         percentRunning = 5;
         offset += diff;
       }
-      runningBar = <bs.ProgressBar bsStyle='success' now={percentRunning} key={key++} label={runningCapacity} />
+      runningBar = <bs.ProgressBar
+                      bsStyle='success'
+                      now={percentRunning}
+                      key={key++}
+                      label={runningCapacity} />
     }
     if (pendingCapacity > 0) {
       percentPending = pendingCapacity / maxCapacity * 100;
@@ -221,7 +230,11 @@ var WorkerTypeRow = React.createClass({
         percentPending = 5;
         offset += diff;
       }
-      pendingBar = <bs.ProgressBar bsStyle='info' now={percentPending} key={key++} label={pendingCapacity} />
+      pendingBar = <bs.ProgressBar
+                      bsStyle='info'
+                      now={percentPending}
+                      key={key++}
+                      label={pendingCapacity} />
     }
     if (spotReqCapacity > 0) {
       percentRequested = spotReqCapacity / maxCapacity * 100;
@@ -230,12 +243,18 @@ var WorkerTypeRow = React.createClass({
         percentRequested = 5;
         offset += diff;
       }
-      requestedBar = <bs.ProgressBar bsStyle='warning' now={percentRequested} key={key++} label={spotReqCapacity} />
+      requestedBar = <bs.ProgressBar
+                        bsStyle='warning'
+                        now={percentRequested}
+                        key={key++}
+                        label={spotReqCapacity} />
     }
 
     // TODO Figure out a way to show this as a class danger probably
-    var excess = (runningCapacity + pendingCapacity + spotReqCapacity) - maxCapacity;
-    console.log(excess);
+    var excess = (runningCapacity +
+                  pendingCapacity +
+                  spotReqCapacity) - maxCapacity;
+    console.log('Excess: ' + excess);
 
     var progressBar = (<bs.ProgressBar>
         {runningBar ? runningBar : ''}
@@ -243,8 +262,22 @@ var WorkerTypeRow = React.createClass({
         {requestedBar ? requestedBar : ''}
     </bs.ProgressBar>);
 
+
+    function viewHandler() {
+      that.props.selectWorkerType(
+          that.props.workerType,
+          that.state.workerType,
+          that.props.awsState,
+          {
+            running: runningCapacity,
+            pending: pendingCapacity,
+            spotReq: spotReqCapacity,
+          },
+          progressBar);
+    }
     
-    return this.renderWaitFor('pendingTasks') || this.renderWaitFor('workerType') || (<tr>
+    return this.renderWaitFor('pendingTasks') ||
+      this.renderWaitFor('workerType') || (<tr>
       <td>{this.props.workerType}</td>
       {/*<td>{runningCapacity} ({this.props.awsState.running.length})</td>
       <td>{pendingCapacity} ({this.props.awsState.pending.length})</td>
@@ -255,114 +288,166 @@ var WorkerTypeRow = React.createClass({
       <td>{this.state.pendingTasks.pendingTasks}</td>
       <td>
         <bs.ButtonToolbar>
-        <bs.ModalTrigger 
-            modal={<WorkerTypeDetail 
-                      name={this.props.workerType} 
-                      worker={this.state.workerType}
-                      awsState={this.props.awsState}
-                      runningCapacity={runningCapacity}
-                      pendingCapacity={pendingCapacity}
-                      spotReqCapacity={spotReqCapacity}
-                      progressBar={progressBar}
-            />}>
-          <bs.Button bsStyle='primary' bsSize='xsmall'>View</bs.Button>
-        </bs.ModalTrigger>
-        <bs.Button bsStyle='danger' bsSize='xsmall' onClick={this.removeWorkerType}>Remove</bs.Button>
-        {/* Hmm, should I allow deleting from here or should that only be under details...*/}
-        {/*<bs.Button bsStyle='danger' bsSize='xsmall' onClick={this.handleDelete}>Delete</bs.Button>*/}
+          <bs.Button
+            bsStyle='primary'
+            bsSize='xsmall'
+            onClick={viewHandler}
+          >
+          View
+          </bs.Button>
+
+          <ConfirmAction 
+            buttonSize='xsmall'
+            buttonStyle='danger'
+            glyph='remove'
+            label='Delete'
+            disabled={false}
+            action={this.removeWorkerType}
+            success='Deleted WorkerType'>
+              Are you sure that you wish to remove the workerType?
+              This will terminate <b>all</b> instances of this worker
+              type unconditionally
+          </ConfirmAction>
         </bs.ButtonToolbar>
       </td>
     </tr>);  
   },
 
   removeWorkerType: function() {
+    return this.awsProvisioner.removeWorkerType(this.props.workerType);
+  },
+});
+
+
+/** 
+TODO:
+  - List capacity for each instance/sr
+  - Display spot bid and 'true price'
+*/
+var StatsTable = React.createClass({
+  render: function() {
     var that = this;
-    console.log('Deleting %s', this.props.workerType);
-    var p = this.awsProvisioner.removeWorkerType(this.props.workerType);
-
-    p.then(function() {
-      console.log('Deleted ' + that.props.workerType);
-      that.props.removeWorkerFromTable(that.props.workerType);
-    });
-
-    p.catch(function(err) {
-      console.error(err);
-      if (err.stack) console.log(err.stack);
-      if (err.statusCode === 404) {
-        console.log('Tried to delete ' + that.props.workerType + ' but it does not exist.');
-        console.log('Maybe you already clicked this button!');
-      } else {
-        alert('Failed to delete ' + that.props.workerType);
-      }
-    });
-
-    p.done();
+    var header;
+    if (this.props.isSpot) {
+      header = (<tr>
+        <th>Spot Request Id</th>
+        <th>Instance Type</th>
+        <th>Region</th>
+        <th>AZ</th>
+        <th>AMI</th>
+        <th>Create Time</th>
+      </tr>);
+    } else {
+      header = (<tr>
+        <th>Instance Id</th>
+        <th>Spot Request Id</th>
+        <th>Instance Type</th>
+        <th>Region</th>
+        <th>AZ</th>
+        <th>AMI</th>
+        <th>Launch Time</th>
+      </tr>);
+    }
+    return (
+        <bs.Table striped bordered condensed hover>
+          <thead>
+          {header}
+          </thead>
+          {
+            this.props.states.map(function(state) {
+              console.log(state);
+              if (that.props.isSpot) {
+                return (<tr>
+                  <td><b>{state.SpotInstanceRequestId}</b></td>
+                  <td>{state.LaunchSpecification.InstanceType}</td>
+                  <td>{state.Region}</td>
+                  <td>{state.LaunchSpecification.Placement.AvailabilityZone}</td>
+                  <td>{state.LaunchSpecification.ImageId}</td>
+                  <td>{state.CreateTime}</td>
+                </tr>);
+              } else {
+                return (<tr>
+                  <td><b>{state.InstanceId}</b></td>
+                  <td>{state.SpotInstanceRequestId}</td>
+                  <td>{state.InstanceType}</td>
+                  <td>{state.Region}</td>
+                  <td>{state.Placement.AvailabilityZone}</td>
+                  <td>{state.ImageId}</td> 
+                  <td>{state.LaunchTime}</td>
+                </tr>);
+              }
+            })
+          }
+        </bs.Table>
+    );
   },
 });
 
 var WorkerTypeDetail = React.createClass({
-  renderNodeTable: function(stateInfo, isSpot) {
-    // StateInfo is one of the state lists, e.g. running,pending
-    stateInfo.forEach(function(node) {
-      var instanceType;
-      var region;
-      var az;
-
-      if (isSpot) {
-        
-      } else {
-
-      }
-    });
-  },
   render: function() {
+    console.log(this.state);
+    console.log(this.props);
     return (
-      <bs.Modal {...this.props} bsStyle='primary' title={this.props.name + " details"}>
-        <div className='modal-body'>
+        <div>
+        <h1>{this.props.name}</h1>
+        <h2>Capacity Information</h2>
         {this.props.progressBar}
-        Detailed Capacity Information:
-        <ul>
-          <li>Running: {this.props.runningCapacity} capacity units, {this.props.awsState.running.length} instances</li>
-          <li>Pending: {this.props.pendingCapacity} capacity units, {this.props.awsState.pending.length} instances</li>
-          <li>Requested: {this.props.spotReqCapacity} capacity units, {this.props.awsState.spotReq.length} instances</li>
-        </ul>
-        <pre>{JSON.stringify(this.props.worker, undefined, 2)}</pre>
+
+        <h3>Running</h3>
+          <p>{this.props.capacityInfo.running} capacity ({this.props.awsState.running.length} instances)</p>
+          <StatsTable isSpot={false} states={this.props.awsState.running} />
+
+        <h3>Pending</h3>
+          <p>{this.props.capacityInfo.pending} capacity ({this.props.awsState.pending.length} instances)</p>
+          <StatsTable isSpot={false} states={this.props.awsState.pending} />
+
+        <h3>Requested</h3>
+          <p>{this.props.capacityInfo.spotReq} capacity ({this.props.awsState.spotReq.length} instances)</p>
+          <StatsTable isSpot={true} states={this.props.awsState.spotReq} />
+
+        <h2>Worker Type Definition</h2>
+        <pre>
+        {JSON.stringify(this.props.definition, null, 2)}
+        </pre>
         </div>
-        <div className='modal-footer'>
-          <bs.Button onClick={this.props.onRequestHide}>Close</bs.Button>
-        </div>
-      </bs.Modal>
     );
   },
 });
 
 var AwsProvisioner = React.createClass({
-  mixins: [
-    // Calls load()
-    utils.createTaskClusterMixin({
-      clients: {
-        awsProvisioner: taskcluster.Index
-      },
-    }),
-  ],
-
-  propTypes: {
-  },
-
   getInitialState: function() {
     return {
-      workerType: "",
+      selectedWorkerType: '',
+      selectedWorkerTypeDefinition: {},
     };
   },
 
-  load: function() {
-    return {
-    };
+  selectWorkerType: function(name, definition, awsState, capacityInfo, progressBar) {
+    this.setState({
+      selectedWorkerTypeName: name,
+      selectedWorkerTypeDefinition: definition,
+      selectedWorkerTypeAwsState: awsState,
+      selectedWorkerTypeCapacityInfo: capacityInfo,
+      selectedWorkerTypeProgressBar: progressBar,
+    });
   },
 
   render: function() {
+    var workerTypeDetail;
+    if (this.state.selectedWorkerTypeName) {
+      workerTypeDetail = <WorkerTypeDetail
+                            name={this.state.selectedWorkerTypeName}
+                            definition={this.state.selectedWorkerTypeDefinition}
+                            awsState={this.state.selectedWorkerTypeAwsState}
+                            capacityInfo={this.state.selectedWorkerTypeCapacityInfo}
+                            progressBar={this.state.selectedWorkerTypeProgressBar}
+                         />
+    }
     return (
-        <WorkerTypeTable />
+        <div>
+        <WorkerTypeTable selectWorkerType={this.selectWorkerType} />
+        { workerTypeDetail ? workerTypeDetail : '' }
+        </div>
     );
   },
 
