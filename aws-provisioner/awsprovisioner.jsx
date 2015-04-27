@@ -1,13 +1,14 @@
 'use strict';
 /** @jsx React.DOM */
-var React           = require('react');
-var bs              = require('react-bootstrap');
-var utils           = require('../lib/utils');
-var taskcluster     = require('taskcluster-client');
-var _               = require('lodash');
-var format          = require('../lib/format');
-var ConfirmAction   = require('../lib/ui/confirmaction');
-var WorkerTypeEdit  = require('./workertypeedit');
+var React             = require('react');
+var bs                = require('react-bootstrap');
+var utils             = require('../lib/utils');
+var taskcluster       = require('taskcluster-client');
+var _                 = require('lodash');
+var format            = require('../lib/format');
+var ConfirmAction     = require('../lib/ui/confirmaction');
+var WorkerTypeEdit    = require('./workertypeedit');
+var WorkerTypeDetail  = require('./workerdetail');
 
 // Should this be allowed to be set by user?
 var provisionerId = 'aws-provisioner-v1';
@@ -311,99 +312,6 @@ var WorkerTypeRow = React.createClass({
     return this.awsProvisioner.removeWorkerType(this.props.workerType).then(function() {
       return that.props.reload();
     });
-  },
-});
-
-
-/** 
-TODO:
-  - List capacity for each instance/sr
-  - Display spot bid and 'true price'
-*/
-var StatsTable = React.createClass({
-  render: function() {
-    var that = this;
-    var header;
-    if (this.props.isSpot) {
-      header = (<tr>
-        <th>Spot Request Id</th>
-        <th>Instance Type</th>
-        <th>Region</th>
-        <th>AZ</th>
-        <th>AMI</th>
-        <th>Create Time</th>
-      </tr>);
-    } else {
-      header = (<tr>
-        <th>Instance Id</th>
-        <th>Spot Request Id</th>
-        <th>Instance Type</th>
-        <th>Region</th>
-        <th>AZ</th>
-        <th>AMI</th>
-        <th>Launch Time</th>
-      </tr>);
-    }
-    return (
-        <bs.Table striped bordered condensed hover>
-          <thead>
-          {header}
-          </thead>
-          {
-            this.props.states.map(function(state) {
-              if (that.props.isSpot) {
-                return (<tr key={state.SpotInstanceRequestId}>
-                  <td><b>{state.SpotInstanceRequestId}</b></td>
-                  <td>{state.LaunchSpecification.InstanceType}</td>
-                  <td>{state.Region}</td>
-                  <td>{state.LaunchSpecification.Placement.AvailabilityZone}</td>
-                  <td>{state.LaunchSpecification.ImageId}</td>
-                  <td>{state.CreateTime}</td>
-                </tr>);
-              } else {
-                return (<tr key={state.InstanceId}>
-                  <td><b>{state.InstanceId}</b></td>
-                  <td>{state.SpotInstanceRequestId}</td>
-                  <td>{state.InstanceType}</td>
-                  <td>{state.Region}</td>
-                  <td>{state.Placement.AvailabilityZone}</td>
-                  <td>{state.ImageId}</td> 
-                  <td>{state.LaunchTime}</td>
-                </tr>);
-              }
-            })
-          }
-        </bs.Table>
-    );
-  },
-});
-
-var WorkerTypeDetail = React.createClass({
-  render: function() {
-    return (
-        <div>
-        <h1>{this.props.name}</h1>
-
-        <h2>Worker Type Definition</h2>
-        <WorkerTypeEdit value={this.props.definition} reload={this.props.reload} />
-
-        <h2>Capacity Information</h2>
-        {this.props.progressBar}
-
-        <h3>Running</h3>
-          <p>{this.props.capacityInfo.running} capacity ({this.props.awsState.running.length} instances)</p>
-          <StatsTable isSpot={false} states={this.props.awsState.running} />
-
-        <h3>Pending</h3>
-          <p>{this.props.capacityInfo.pending} capacity ({this.props.awsState.pending.length} instances)</p>
-          <StatsTable isSpot={false} states={this.props.awsState.pending} />
-
-        <h3>Requested</h3>
-          <p>{this.props.capacityInfo.spotReq} capacity ({this.props.awsState.spotReq.length} instances)</p>
-          <StatsTable isSpot={true} states={this.props.awsState.spotReq} />
-
-        </div>
-    );
   },
 });
 
