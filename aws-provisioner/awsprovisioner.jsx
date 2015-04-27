@@ -7,6 +7,7 @@ var taskcluster     = require('taskcluster-client');
 var _               = require('lodash');
 var format          = require('../lib/format');
 var ConfirmAction   = require('../lib/ui/confirmaction');
+var WorkerTypeEdit  = require('./workertypeedit');
 
 // Should this be allowed to be set by user?
 var provisionerId = 'aws-provisioner-v1';
@@ -22,7 +23,6 @@ if (request.status === 200) {
   var reftxt = request.responseText;
   try {
     var reference = JSON.parse(reftxt);
-    console.dir(reference);
   } catch(e) {
     console.log(e, e.stack);
     alert('Uh-oh, error: ' + e);
@@ -30,11 +30,8 @@ if (request.status === 200) {
 } else {
   alert('Uh-oh, failed to load API reference');
 }
-//console.log('HIHIHIHH' + reference.baseUrl);
 if (reference.baseUrl[4] !== 's') {
-  console.log(reference.baseUrl);
   reference.baseUrl = 'https://' + reference.baseUrl.slice(7);
-  console.log(reference.baseUrl);
 }
 var AwsProvisionerClient = taskcluster.createClient(reference);
 /** END SUPER HACK */
@@ -48,9 +45,13 @@ var WorkerTypeTable = React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         awsProvisioner: AwsProvisionerClient,
-      }
+      },
     }),
   ],
+
+  propTypes: {
+    selectWorkerType: React.PropTypes.func.isRequired,
+  },
 
   getInitialState: function() {
     return {
@@ -67,8 +68,8 @@ var WorkerTypeTable = React.createClass({
   load: function() {
     return {
       workerTypes: this.awsProvisioner.listWorkerTypes(),
-      awsState: this.awsProvisioner.updateAwsState(),
-      //awsState: this.awsProvisioner.awsState(),
+      //awsState: this.awsProvisioner.updateAwsState(),
+      awsState: this.awsProvisioner.awsState(),
     };
   },
   
@@ -106,7 +107,7 @@ var WorkerTypeTable = React.createClass({
                       awsState={realState}
                       workerType={name}
                       selectWorkerType={that.props.selectWorkerType}
-                      reload={that.reload} />;
+                      reload={that.reload.bind(that)} />;
           })
         }
         </tbody>
@@ -190,13 +191,6 @@ var WorkerTypeRow = React.createClass({
       });
     }
 
-    console.log(this.props.workerType +
-                'running: ' +
-                runningCapacity +
-                ' pending: ' +
-                pendingCapacity +
-                ' requested: ' +
-                spotReqCapacity);
     var percentRunning;
     var percentPending;
     var percentRequested;
@@ -254,7 +248,6 @@ var WorkerTypeRow = React.createClass({
     var excess = (runningCapacity +
                   pendingCapacity +
                   spotReqCapacity) - maxCapacity;
-    console.log('Excess: ' + excess);
 
     var progressBar = (<bs.ProgressBar>
         {runningBar ? runningBar : ''}
@@ -314,7 +307,9 @@ var WorkerTypeRow = React.createClass({
   },
 
   removeWorkerType: function() {
-    return this.awsProvisioner.removeWorkerType(this.props.workerType);
+    return this.awsProvisioner.removeWorkerType(this.props.workerType).then(function() {
+      return this.props.reload();
+    });
   },
 });
 
@@ -355,9 +350,8 @@ var StatsTable = React.createClass({
           </thead>
           {
             this.props.states.map(function(state) {
-              console.log(state);
               if (that.props.isSpot) {
-                return (<tr>
+                return (<tr key={state.SpotInstanceRequestId}>
                   <td><b>{state.SpotInstanceRequestId}</b></td>
                   <td>{state.LaunchSpecification.InstanceType}</td>
                   <td>{state.Region}</td>
@@ -366,7 +360,7 @@ var StatsTable = React.createClass({
                   <td>{state.CreateTime}</td>
                 </tr>);
               } else {
-                return (<tr>
+                return (<tr key={state.InstanceId}>
                   <td><b>{state.InstanceId}</b></td>
                   <td>{state.SpotInstanceRequestId}</td>
                   <td>{state.InstanceType}</td>
@@ -385,11 +379,13 @@ var StatsTable = React.createClass({
 
 var WorkerTypeDetail = React.createClass({
   render: function() {
-    console.log(this.state);
-    console.log(this.props);
     return (
         <div>
         <h1>{this.props.name}</h1>
+
+        <h2>Worker Type Definition</h2>
+        <WorkerTypeEdit value={this.props.definition} />
+
         <h2>Capacity Information</h2>
         {this.props.progressBar}
 
@@ -405,10 +401,9 @@ var WorkerTypeDetail = React.createClass({
           <p>{this.props.capacityInfo.spotReq} capacity ({this.props.awsState.spotReq.length} instances)</p>
           <StatsTable isSpot={true} states={this.props.awsState.spotReq} />
 
-        <h2>Worker Type Definition</h2>
-        <pre>
+        {/*<pre>
         {JSON.stringify(this.props.definition, null, 2)}
-        </pre>
+        </pre>*/}
         </div>
     );
   },
