@@ -1,12 +1,14 @@
 'use strict';
 /** @jsx React.DOM */
-var React           = require('react');
-var bs              = require('react-bootstrap');
-var utils           = require('../lib/utils');
-var taskcluster     = require('taskcluster-client');
-var _               = require('lodash');
-var format          = require('../lib/format');
-var ConfirmAction   = require('../lib/ui/confirmaction');
+var React             = require('react');
+var bs                = require('react-bootstrap');
+var utils             = require('../lib/utils');
+var taskcluster       = require('taskcluster-client');
+var _                 = require('lodash');
+var format            = require('../lib/format');
+var ConfirmAction     = require('../lib/ui/confirmaction');
+var WorkerTypeEdit    = require('./workertypeedit');
+var WorkerTypeDetail  = require('./workerdetail');
 
 // Should this be allowed to be set by user?
 var provisionerId = 'aws-provisioner-v1';
@@ -22,7 +24,6 @@ if (request.status === 200) {
   var reftxt = request.responseText;
   try {
     var reference = JSON.parse(reftxt);
-    console.dir(reference);
   } catch(e) {
     console.log(e, e.stack);
     alert('Uh-oh, error: ' + e);
@@ -30,11 +31,8 @@ if (request.status === 200) {
 } else {
   alert('Uh-oh, failed to load API reference');
 }
-//console.log('HIHIHIHH' + reference.baseUrl);
 if (reference.baseUrl[4] !== 's') {
-  console.log(reference.baseUrl);
   reference.baseUrl = 'https://' + reference.baseUrl.slice(7);
-  console.log(reference.baseUrl);
 }
 var AwsProvisionerClient = taskcluster.createClient(reference);
 /** END SUPER HACK */
@@ -48,9 +46,13 @@ var WorkerTypeTable = React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         awsProvisioner: AwsProvisionerClient,
-      }
+      },
     }),
   ],
+
+  propTypes: {
+    selectWorkerType: React.PropTypes.func.isRequired,
+  },
 
   getInitialState: function() {
     return {
@@ -67,8 +69,8 @@ var WorkerTypeTable = React.createClass({
   load: function() {
     return {
       workerTypes: this.awsProvisioner.listWorkerTypes(),
-      awsState: this.awsProvisioner.updateAwsState(),
-      //awsState: this.awsProvisioner.awsState(),
+      //awsState: this.awsProvisioner.updateAwsState(),
+      awsState: this.awsProvisioner.awsState(),
     };
   },
   
@@ -106,7 +108,7 @@ var WorkerTypeTable = React.createClass({
                       awsState={realState}
                       workerType={name}
                       selectWorkerType={that.props.selectWorkerType}
-                      reload={that.reload} />;
+                      reload={that.reload.bind(that)} />;
           })
         }
         </tbody>
@@ -190,13 +192,6 @@ var WorkerTypeRow = React.createClass({
       });
     }
 
-    console.log(this.props.workerType +
-                'running: ' +
-                runningCapacity +
-                ' pending: ' +
-                pendingCapacity +
-                ' requested: ' +
-                spotReqCapacity);
     var percentRunning;
     var percentPending;
     var percentRequested;
@@ -254,7 +249,6 @@ var WorkerTypeRow = React.createClass({
     var excess = (runningCapacity +
                   pendingCapacity +
                   spotReqCapacity) - maxCapacity;
-    console.log('Excess: ' + excess);
 
     var progressBar = (<bs.ProgressBar>
         {runningBar ? runningBar : ''}
@@ -314,104 +308,42 @@ var WorkerTypeRow = React.createClass({
   },
 
   removeWorkerType: function() {
-    return this.awsProvisioner.removeWorkerType(this.props.workerType);
-  },
-});
-
-
-/** 
-TODO:
-  - List capacity for each instance/sr
-  - Display spot bid and 'true price'
-*/
-var StatsTable = React.createClass({
-  render: function() {
     var that = this;
-    var header;
-    if (this.props.isSpot) {
-      header = (<tr>
-        <th>Spot Request Id</th>
-        <th>Instance Type</th>
-        <th>Region</th>
-        <th>AZ</th>
-        <th>AMI</th>
-        <th>Create Time</th>
-      </tr>);
-    } else {
-      header = (<tr>
-        <th>Instance Id</th>
-        <th>Spot Request Id</th>
-        <th>Instance Type</th>
-        <th>Region</th>
-        <th>AZ</th>
-        <th>AMI</th>
-        <th>Launch Time</th>
-      </tr>);
-    }
-    return (
-        <bs.Table striped bordered condensed hover>
-          <thead>
-          {header}
-          </thead>
-          {
-            this.props.states.map(function(state) {
-              console.log(state);
-              if (that.props.isSpot) {
-                return (<tr>
-                  <td><b>{state.SpotInstanceRequestId}</b></td>
-                  <td>{state.LaunchSpecification.InstanceType}</td>
-                  <td>{state.Region}</td>
-                  <td>{state.LaunchSpecification.Placement.AvailabilityZone}</td>
-                  <td>{state.LaunchSpecification.ImageId}</td>
-                  <td>{state.CreateTime}</td>
-                </tr>);
-              } else {
-                return (<tr>
-                  <td><b>{state.InstanceId}</b></td>
-                  <td>{state.SpotInstanceRequestId}</td>
-                  <td>{state.InstanceType}</td>
-                  <td>{state.Region}</td>
-                  <td>{state.Placement.AvailabilityZone}</td>
-                  <td>{state.ImageId}</td> 
-                  <td>{state.LaunchTime}</td>
-                </tr>);
-              }
-            })
-          }
-        </bs.Table>
-    );
+    return this.awsProvisioner.removeWorkerType(this.props.workerType).then(function() {
+      return that.props.reload();
+    });
   },
 });
 
-var WorkerTypeDetail = React.createClass({
-  render: function() {
-    console.log(this.state);
-    console.log(this.props);
+var WorkerTypeCreator = React.createClass({
+  getInitialState() {
+    return {
+      alertVisible: false
+    };
+  },
+
+  render() {
+    if (this.state.alertVisible) {
+      return (
+        <bs.Alert bsStyle='default' onDismiss={this.handleAlertDismiss}>
+          <WorkerTypeEdit />
+          <bs.Button bsSize='xsmall' onClick={this.handleAlertDismiss}>Dismiss</bs.Button>
+        </bs.Alert>
+      );
+    }
+
     return (
-        <div>
-        <h1>{this.props.name}</h1>
-        <h2>Capacity Information</h2>
-        {this.props.progressBar}
-
-        <h3>Running</h3>
-          <p>{this.props.capacityInfo.running} capacity ({this.props.awsState.running.length} instances)</p>
-          <StatsTable isSpot={false} states={this.props.awsState.running} />
-
-        <h3>Pending</h3>
-          <p>{this.props.capacityInfo.pending} capacity ({this.props.awsState.pending.length} instances)</p>
-          <StatsTable isSpot={false} states={this.props.awsState.pending} />
-
-        <h3>Requested</h3>
-          <p>{this.props.capacityInfo.spotReq} capacity ({this.props.awsState.spotReq.length} instances)</p>
-          <StatsTable isSpot={true} states={this.props.awsState.spotReq} />
-
-        <h2>Worker Type Definition</h2>
-        <pre>
-        {JSON.stringify(this.props.definition, null, 2)}
-        </pre>
-        </div>
+      <bs.Button onClick={this.handleAlertShow}>Create Worker Type</bs.Button>
     );
   },
+
+  handleAlertDismiss() {
+    this.setState({alertVisible: false});
+  },
+
+  handleAlertShow() {
+    this.setState({alertVisible: true});
+  }
 });
 
 var AwsProvisioner = React.createClass({
@@ -445,6 +377,7 @@ var AwsProvisioner = React.createClass({
     }
     return (
         <div>
+        <WorkerTypeCreator />
         <WorkerTypeTable selectWorkerType={this.selectWorkerType} />
         { workerTypeDetail ? workerTypeDetail : '' }
         </div>
