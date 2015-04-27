@@ -307,8 +307,9 @@ var WorkerTypeRow = React.createClass({
   },
 
   removeWorkerType: function() {
+    var that = this;
     return this.awsProvisioner.removeWorkerType(this.props.workerType).then(function() {
-      return this.props.reload();
+      return that.props.reload();
     });
   },
 });
@@ -384,7 +385,7 @@ var WorkerTypeDetail = React.createClass({
         <h1>{this.props.name}</h1>
 
         <h2>Worker Type Definition</h2>
-        <WorkerTypeEdit value={this.props.definition} />
+        <WorkerTypeEdit value={this.props.definition} reload={this.props.reload} />
 
         <h2>Capacity Information</h2>
         {this.props.progressBar}
@@ -401,12 +402,40 @@ var WorkerTypeDetail = React.createClass({
           <p>{this.props.capacityInfo.spotReq} capacity ({this.props.awsState.spotReq.length} instances)</p>
           <StatsTable isSpot={true} states={this.props.awsState.spotReq} />
 
-        {/*<pre>
-        {JSON.stringify(this.props.definition, null, 2)}
-        </pre>*/}
         </div>
     );
   },
+});
+
+var WorkerTypeCreator = React.createClass({
+  getInitialState() {
+    return {
+      alertVisible: false
+    };
+  },
+
+  render() {
+    if (this.state.alertVisible) {
+      return (
+        <bs.Alert bsStyle='default' onDismiss={this.handleAlertDismiss}>
+          <WorkerTypeEdit />
+          <bs.Button bsSize='xsmall' onClick={this.handleAlertDismiss}>Dismiss</bs.Button>
+        </bs.Alert>
+      );
+    }
+
+    return (
+      <bs.Button onClick={this.handleAlertShow}>Create Worker Type</bs.Button>
+    );
+  },
+
+  handleAlertDismiss() {
+    this.setState({alertVisible: false});
+  },
+
+  handleAlertShow() {
+    this.setState({alertVisible: true});
+  }
 });
 
 var AwsProvisioner = React.createClass({
@@ -440,6 +469,7 @@ var AwsProvisioner = React.createClass({
     }
     return (
         <div>
+        <WorkerTypeCreator />
         <WorkerTypeTable selectWorkerType={this.selectWorkerType} />
         { workerTypeDetail ? workerTypeDetail : '' }
         </div>
