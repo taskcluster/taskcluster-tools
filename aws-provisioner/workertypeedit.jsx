@@ -9,30 +9,6 @@ var taskcluster     = require('taskcluster-client');
 require('codemirror/mode/javascript/javascript');
 
 
-/** BEGIN SUPER HACK */
-var request = new XMLHttpRequest();
-console.log('ignore this deprecation... once the API is in the upstream client we wont need '+
-            'to do this anymore');
-request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
-//request.open('GET', 'http://localhost:5557/v1/api-reference', false);
-request.send(null);
-if (request.status === 200) {
-  var reftxt = request.responseText;
-  try {
-    var reference = JSON.parse(reftxt);
-  } catch(e) {
-    console.log(e, e.stack);
-    alert('Uh-oh, error: ' + e);
-  }
-} else {
-  alert('Uh-oh, failed to load API reference');
-}
-if (reference.baseUrl[4] !== 's') {
-  reference.baseUrl = 'https://' + reference.baseUrl.slice(7);
-}
-var AwsProvisionerClient = taskcluster.createClient(reference);
-/** END SUPER HACK */
-
 var defaultWorkerType = {
   "workerType": "boilerplate",
   "launchSpecification": {
@@ -68,8 +44,13 @@ var WorkerTypeEdit = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: AwsProvisionerClient,
+        awsProvisioner: taskcluster.AwsProvisioner,
       },
+      clientOpts: {
+        awsProvisioner: {
+          baseUrl:      'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
+        }
+      }
     }),
   ],
   getInitialState: function() {
@@ -81,6 +62,19 @@ var WorkerTypeEdit = React.createClass({
   getDefaultProps: function() {
     return {
       value: undefined,
+    }
+  },
+  /** Update state if value property is changed */
+  componentWillReceiveProps(nextProps) {
+    if (this.props.value !== nextProps) {
+      var workerType = JSON.stringify(
+        nextProps.value || defaultWorkerType,
+        null, 2
+      );
+      this.setState({
+        workerType: workerType,
+        invalidWorkerType: false
+      });
     }
   },
   handleChange: function(e) {

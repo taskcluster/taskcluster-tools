@@ -8,43 +8,20 @@ var ConfirmAction     = require('../lib/ui/confirmaction');
 var WorkerTypeEdit    = require('./workertypeedit');
 var WorkerTypeDetail  = require('./workerdetail');
 
-// Should this be allowed to be set by user?
-var provisionerId = 'aws-provisioner-v1';
+const PROVISIONER_ID = 'aws-provisioner-v1';
 
-/** BEGIN SUPER HACK */
-var request = new XMLHttpRequest();
-console.log('ignore this deprecation... once the API is in the upstream client we wont need '+
-            'to do this anymore');
-request.open('GET', 'https://taskcluster-aws-provisioner2.herokuapp.com/v1/api-reference', false);
-//request.open('GET', 'http://localhost:5557/v1/api-reference', false);
-request.send(null);
-if (request.status === 200) {
-  var reftxt = request.responseText;
-  try {
-    var reference = JSON.parse(reftxt);
-  } catch(e) {
-    console.log(e, e.stack);
-    alert('Uh-oh, error: ' + e);
-  }
-} else {
-  alert('Uh-oh, failed to load API reference');
-}
-if (reference.baseUrl[4] !== 's') {
-  reference.baseUrl = 'https://' + reference.baseUrl.slice(7);
-}
-var AwsProvisionerClient = taskcluster.createClient(reference);
-/** END SUPER HACK */
-
-// Questions:
-//  1. Should I create a client for each react class or 
-//     share the parent classes?
-
+/** Table of workerTypes */
 var WorkerTypeTable = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: AwsProvisionerClient,
+        awsProvisioner: taskcluster.AwsProvisioner,
       },
+      clientOpts: {
+        awsProvisioner: {
+          baseUrl:      'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
+        }
+      }
     }),
   ],
 
@@ -106,7 +83,7 @@ var WorkerTypeTable = React.createClass({
                       awsState={realState}
                       workerType={name}
                       selectWorkerType={that.props.selectWorkerType}
-                      reload={that.reload.bind(that)} />;
+                      reload={that.reload} />;
           })
         }
         </tbody>
@@ -119,9 +96,14 @@ var WorkerTypeRow = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        queue: taskcluster.Queue,
-        awsProvisioner: AwsProvisionerClient,
+        queue:          taskcluster.Queue,
+        awsProvisioner: taskcluster.AwsProvisioner
       },
+      clientOpts: {
+        awsProvisioner: {
+          baseUrl:      'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
+        }
+      }
     }),
   ],
 
@@ -148,7 +130,7 @@ var WorkerTypeRow = React.createClass({
   load: function() {
     return {
       pendingTasks:
-        this.queue.pendingTasks(provisionerId, this.props.workerType),
+        this.queue.pendingTasks(PROVISIONER_ID, this.props.workerType),
       workerType: this.awsProvisioner.workerType(this.props.workerType),
     };
   },

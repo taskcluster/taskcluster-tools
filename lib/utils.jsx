@@ -93,7 +93,8 @@ var hasChanged = function(paths, obj1, obj2) {
 var createTaskClusterMixin = function(options) {
   // Set default options
   options = _.defaults({}, options, {
-    clients:        {},
+    clients:        {},   // Mapping from name to clientClass
+    clientOpts:     {},   // Mapping from name to client options
     reloadOnProps:  [],   // List of properties to reload on
     reloadOnKeys:   [],   // List of state keys to reload on
     reloadOnLogin:  true  // Reload when credentials are changed
@@ -309,9 +310,9 @@ var createTaskClusterMixin = function(options) {
     /** Initialize client objects requested in options */
     _createClients: function(credentials) {
       _.forIn(options.clients, function(Client, key) {
-        this[key] = new Client({
+        this[key] = new Client(_.defaults(options.clientOpts[key] || {}, {
           credentials:        credentials
-        });
+        }));
       }, this);
     },
   };
