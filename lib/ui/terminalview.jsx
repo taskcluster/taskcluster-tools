@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var React           = require('react');
 var Terminal        = require('term.js/src/term');
 var utils           = require('../utils');

@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var React               = require('react');
 var ClientManager       = require('./clientmanager');
 var $                   = require('jquery');

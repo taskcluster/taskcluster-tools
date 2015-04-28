@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var React         = require('react');
 var debug         = require('debug')('lib:utils');
 var assert        = require('assert');

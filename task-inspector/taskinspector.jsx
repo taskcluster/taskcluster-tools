@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var React           = require('react');
 var bs              = require('react-bootstrap');
 var utils           = require('../lib/utils');

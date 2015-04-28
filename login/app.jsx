@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var $           = require('jquery');
 var querystring = require('querystring');
 var auth        = require('../lib/auth');

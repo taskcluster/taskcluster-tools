@@ -1,5 +1,5 @@
 var path      = require('path');
-var reactify  = require('reactify');
+var babelify  = require('babelify');
 var stream    = require('stream');
 var exorcist  = require('exorcist');
 var concat    = require('concat-stream')
@@ -66,8 +66,8 @@ module.exports = function(grunt) {
     browserify: {
       options: {
         transform:  [
-          // Process JSX files with reactify
-          [reactify, {es6: true}]
+          // Process JSX files with babelify
+          [babelify, {stage: 1}]
         ],
         watch:      true,         // Use watchify (caching modules)
         keepAlive:  false,

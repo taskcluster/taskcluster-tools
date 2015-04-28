@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var bs          = require('react-bootstrap');
 var React       = require('react');
 var $           = require('jquery');

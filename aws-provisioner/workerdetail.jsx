@@ -1,5 +1,3 @@
-'use strict';
-/** @jsx React.DOM */
 var React           = require('react');
 var WorkerTypeEdit  = require('./workertypeedit');
 var StatsTable      = require('./statstable');

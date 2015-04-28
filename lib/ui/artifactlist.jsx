@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var React           = require('react');
 var utils           = require('../utils');
 var taskcluster     = require('taskcluster-client');

@@ -15,7 +15,7 @@ Code Organization
 -----------------
   - lib/    (code intended for reuse)
   - <app>/  (application specific-code, can be reused)
-  - `*.jsx` (file containing JSX, starts with `/** @jsx React.DOM */`)
+  - `*.jsx` (file containing JSX)
   - `*.js`  (file with pure Javascript, no JSX syntax or header)
 
 
