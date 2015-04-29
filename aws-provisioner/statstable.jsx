@@ -35,6 +35,7 @@ var StatsTable = React.createClass({
           <thead>
           {header}
           </thead>
+          <tbody>
           {
             this.props.states.map(function(state) {
               if (that.props.isSpot) {
@@ -59,6 +60,7 @@ var StatsTable = React.createClass({
               }
             })
           }
+          </tbody>
         </bs.Table>
     );
   },
