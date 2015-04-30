@@ -54,8 +54,32 @@ var WorkerTypeEdit = React.createClass({
     }),
   ],
   getInitialState: function() {
+    var worker = this.props.value || defaultWorkerType;
+    console.log(worker);
+
+    function decodeUD(str) {
+      return JSON.parse(new Buffer(str, 'base64').toString());
+    }
+
+    if (worker.launchSpecification.UserData) {
+      worker.launchSpecification.UserData = decodeUD(worker.launchSpecification.UserData);
+    }
+    
+    worker.regions.forEach(function(regionObj) {
+      if (regionObj.overwrites.UserData) { 
+        regionObj.overwrites.UserData = decodeUD(regionObj.overwrites.UserData);
+      }
+    });
+
+    worker.instanceTypes.forEach(function(typeObj) {
+      if (typeObj.overwrites.UserData) {
+        typeObj.overwrites.UserData = decodeUD(typeObj.overwrites.UserData);
+      }
+    });
+
+
     return {
-      workerType: JSON.stringify(this.props.value || defaultWorkerType, null, 2),
+      workerType: JSON.stringify(worker, null, 2),
       invalidWorkerType: false,
     };
   },
@@ -80,18 +104,40 @@ var WorkerTypeEdit = React.createClass({
   handleChange: function(e) {
     var invalid = false;
     try {
-      JSON.parse(e.target.value);
+      var worker = JSON.parse(e.target.value);
+      function encodeUD(obj) {
+        return new Buffer(JSON.stringify(obj)).toString('base64');
+      }
+
+      if (worker.launchSpecification.UserData) {
+        worker.launchSpecification.UserData = encodeUD(worker.launchSpecification.UserData);
+      }
+      
+      worker.regions.forEach(function(regionObj) {
+        if (regionObj.overwrites.UserData) { 
+          regionObj.overwrites.UserData = encodeUD(regionObj.overwrites.UserData);
+        }
+      });
+
+      worker.instanceTypes.forEach(function(typeObj) {
+        if (typeObj.overwrites.UserData) {
+          typeObj.overwrites.UserData = encodeUD(typeObj.overwrites.UserData);
+        }
+      });
+
     } catch(err) {
       invalid = true;
+      console.error(err);
+      if (err.stack) console.log(err.stack);
     }
     this.setState({
-      workerType: e.target.value,
+      workerType: worker,
       invalidWorkerType: invalid,
     });
   },
   saveWorkerType: function() {
     try {
-      var worker = JSON.parse(this.state.workerType);
+      var worker = this.state.workerType;
       var wName = worker.workerType;
       // Remember that we specify the name of the workerType
       // to create or update as part of the URL path.  We
@@ -99,16 +145,16 @@ var WorkerTypeEdit = React.createClass({
       // to make sure that the path element and the json
       // property agree in every case
       delete worker.workerType;
+      
+      var that = this;
       if (this.props.value) {
-        return this.awsProvisioner.updateWorkerType(wName, worker).then(function() {
-          return this.props.reload();
-        });
+        return this.awsProvisioner.updateWorkerType(wName, worker);
       } else {
-        return this.awsProvisioner.createWorkerType(wName, worker).then(function() {
-          return this.props.reload();
-        });
+        return this.awsProvisioner.createWorkerType(wName, worker);
       }
     } catch (err) {
+      console.error(err);
+      if (err.stack) console.log(err.stack);
       return Promise.reject('Worker Type is not valid JSON');
     }
   },
