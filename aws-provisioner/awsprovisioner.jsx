@@ -10,7 +10,6 @@ var WorkerTypeDetail  = require('./workerdetail');
 
 const PROVISIONER_ID = 'aws-provisioner-v1';
 
-/** Table of workerTypes */
 var WorkerTypeTable = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
@@ -19,7 +18,7 @@ var WorkerTypeTable = React.createClass({
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
+          baseUrl: 'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
         }
       }
     }),
@@ -44,14 +43,11 @@ var WorkerTypeTable = React.createClass({
   load: function() {
     return {
       workerTypes: this.awsProvisioner.listWorkerTypes(),
-      //awsState: this.awsProvisioner.updateAwsState(),
       awsState: this.awsProvisioner.awsState(),
     };
   },
   
   render: function() {
-    // TODO: Should write a note somewhere explaining what all these terms
-    //       mean
     var that = this;
     return this.renderWaitFor('workerTypes') ||
            this.renderWaitFor('awsState') || 
@@ -96,12 +92,12 @@ var WorkerTypeRow = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        queue:          taskcluster.Queue,
+        queue: taskcluster.Queue,
         awsProvisioner: taskcluster.AwsProvisioner
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
+          baseUrl: 'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
         }
       }
     }),
@@ -137,6 +133,10 @@ var WorkerTypeRow = React.createClass({
 
   render: function() {
     var that = this;
+
+    // We need to count the capacity.  This is a reimplementation
+    // of the logic in the provisioner proper to avoid needing
+    // to import all of that stuff.
     var runningCapacity = 0;
     var pendingCapacity = 0;
     var spotReqCapacity = 0;
@@ -181,7 +181,6 @@ var WorkerTypeRow = React.createClass({
     var requestedBar;
     var excessBar;
 
-    // This is the difference to subtract from the largest... maybe
     var offset = 0;
 
     var key = 1;
@@ -253,9 +252,6 @@ var WorkerTypeRow = React.createClass({
     return this.renderWaitFor('pendingTasks') ||
       this.renderWaitFor('workerType') || (<tr>
       <td>{this.props.workerType}</td>
-      {/*<td>{runningCapacity} ({this.props.awsState.running.length})</td>
-      <td>{pendingCapacity} ({this.props.awsState.pending.length})</td>
-      <td>{spotReqCapacity} ({this.props.awsState.spotReq.length})</td>*/}
       <td>
         {progressBar}
       </td>

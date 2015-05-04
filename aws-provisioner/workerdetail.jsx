@@ -3,6 +3,21 @@ var WorkerTypeEdit  = require('./workertypeedit');
 var StatsTable      = require('./statstable');
 
 var WorkerTypeDetail = React.createClass({
+  propTypes: {
+    name: React.PropTypes.string.isRequired,
+    definition: React.PropTypes.object.isRequired,
+    //reload: React.PropTypes.func.isRequired,
+    capacityInfo: React.PropTypes.shape({
+      running: React.PropTypes.number.isRequired,
+      pending: React.PropTypes.number.isRequired,
+      spotReq: React.PropTypes.number.isRequired,
+    }).isRequired,
+    awsState: React.PropTypes.shape({
+      running: React.PropTypes.arrayOf(React.PropTypes.object),
+      pending: React.PropTypes.arrayOf(React.PropTypes.object),
+      spotReq: React.PropTypes.arrayOf(React.PropTypes.object),
+    }).isRequired,
+  },
   render: function() {
     return (
         <div>
