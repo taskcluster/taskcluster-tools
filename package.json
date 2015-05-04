@@ -27,6 +27,7 @@
     "term.js":                          "0.0.4",
     "react-code-mirror":                "3.0.3",
     "codemirror":                       "4.11.0",
+    "grunt-cli":                        "0.1.13",
     "grunt":                            "0.4.5",
     "grunt-browserify":                 "jonasfj/grunt-browserify",
     "babelify":                         "6.0.2",
