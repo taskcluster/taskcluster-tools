@@ -5,4 +5,4 @@ deployment:
   production:
     branch: master
     commands:
-      - npm scripts deploy
+      - npm run-script deploy
