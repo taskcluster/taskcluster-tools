@@ -87,7 +87,7 @@ module.exports = function(grunt) {
                             path.join('build', 'common.bundle.js.map')
                           )
         },
-        src:    [],
+        src:    [require.resolve('babelify/polyfill')],
         dest:   path.join('build', 'common.bundle.js')
       }
     },

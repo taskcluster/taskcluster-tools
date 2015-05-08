@@ -11,7 +11,7 @@ var ConfirmAction = React.createClass({
 
   propTypes: {
     // Button size, style, glyph and disabled
-    buttonSize:     React.PropTypes.string.isRequired,
+    buttonSize:     React.PropTypes.string,
     buttonStyle:    React.PropTypes.string.isRequired,
     disabled:       React.PropTypes.bool.isRequired,
     glyph:          React.PropTypes.string.isRequired,
@@ -23,7 +23,13 @@ var ConfirmAction = React.createClass({
     action:         React.PropTypes.func.isRequired
   },
 
-  getInitialState: function() {
+  getDefaultProps() {
+    return {
+      disabled: false
+    };
+  },
+
+  getInitialState() {
     return {
       executing:        false,
       resultLoaded:     false,
@@ -32,7 +38,7 @@ var ConfirmAction = React.createClass({
     };
   },
 
-  render: function() {
+  render() {
     return (
       <bs.ModalTrigger modal={this.renderDialog()} ref="modalTrigger">
         <bs.Button bsSize={this.props.buttonSize}
@@ -45,7 +51,7 @@ var ConfirmAction = React.createClass({
     );
   },
 
-  renderDialog: function() {
+  renderDialog() {
     return (
       <bs.Modal bsStyle="primary" title={this.props.label}>
         <div className="modal-body">
@@ -79,12 +85,12 @@ var ConfirmAction = React.createClass({
     );
   },
 
-  closeDialog: function() {
+  closeDialog() {
     this.refs.modalTrigger.hide();
   },
 
   /** Execute asynchronous action */
-  executeAction: function() {
+  executeAction() {
     this.loadState({
       executing:    true,
       result:       this.props.action()
