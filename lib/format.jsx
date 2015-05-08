@@ -167,7 +167,7 @@ var Code = React.createClass({
       this.props.language
     );*/
     return (
-      <pre className="language-{this.props.language}">
+      <pre className={'language-' + this.props.language}>
         <code dangerouslySetInnerHTML={{__html: code.value}}></code>
       </pre>
     );

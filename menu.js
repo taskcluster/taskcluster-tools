@@ -34,7 +34,7 @@ module.exports = [
   {
     title:          "AWS Provisioner",
     link:           '/aws-provisioner/',
-    icon:           'wrench',
+    icon:           'server',
     description: [
       "Manage workertypes known to the AWS Provisioner and check on the status",
       "of AWS Nodes",
