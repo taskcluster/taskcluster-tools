@@ -6,6 +6,8 @@ var DateTimePicker  = require('react-widgets').DateTimePicker;
 var utils           = require('../lib/utils');
 var format          = require('../lib/format');
 var _               = require('lodash');
+var ConfirmAction   = require('../lib/ui/confirmaction');
+var Promise         = require('promise');
 
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({
@@ -197,7 +199,7 @@ var ClientEditor = React.createClass({
   },
 
   /** Render editing toolbar */
-  renderEditingToolbar: function() {
+  renderEditingToolbar() {
     return (
       <bs.ButtonToolbar>
         <bs.Button bsStyle="success"
@@ -205,11 +207,16 @@ var ClientEditor = React.createClass({
                    disabled={this.state.working}>
           <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
         </bs.Button>
-        <bs.Button bsStyle="danger"
-                   onClick={this.deleteClient}
-                   disabled={this.state.working}>
-          <bs.Glyphicon glyph="trash"/>&nbsp;Delete Client
-        </bs.Button>
+        <ConfirmAction
+          buttonStyle='danger'
+          glyph='trash'
+          disabled={this.state.working}
+          label="Delete Client"
+          action={this.deleteClient}
+          success="Client deleted">
+          Are you sure you want to delete credentials with clientId&nbsp;
+          <code>{this.state.client.clientId}</code>?
+        </ConfirmAction>
       </bs.ButtonToolbar>
     );
   },
@@ -374,7 +381,7 @@ var ClientEditor = React.createClass({
   },
 
   /** Save current client */
-  saveClient: function() {
+  saveClient() {
     this.loadState({
       client:     this.auth.modifyClient(this.state.client.clientId, {
         scopes:       this.state.client.scopes,
@@ -387,21 +394,13 @@ var ClientEditor = React.createClass({
   },
 
   /** Delete current client */
-  deleteClient: function() {
-    this.setState({working: true});
-    this.auth.removeClient(this.state.client.clientId).then(function() {
-      this.props.refreshClientList();
-      this.reload();
-    }.bind(this), function(err) {
-      this.setState({
-        working:  false,
-        error:    err
-      });
-    }.bind(this));
+  async deleteClient() {
+    await this.auth.removeClient(this.state.client.clientId);
+    await Promise.all([this.props.refreshClientList(), this.reload()]);
   },
 
   /** Reset error state from operation*/
-  dismissError: function() {
+  dismissError() {
     this.setState({
       working:      false,
       error:        null
