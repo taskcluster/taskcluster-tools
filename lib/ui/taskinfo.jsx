@@ -254,14 +254,14 @@ var TaskInfo = React.createClass({
       return "# Failed to infer task payload format";
     }
     var cmds = [];
-    cmds.push("#!/bin/bash");
+    cmds.push("#!/bin/bash -e");
     cmds.push("# WARNING: this is experimental mileage may vary!");
     cmds.push("");
     cmds.push("# Fetch docker image");
     cmds.push("docker pull " + payload.image);
     cmds.push("");
     cmds.push("# Find a unique container name");
-    cmds.push("export $NAME='task-" + taskId + "-container';");
+    cmds.push("export NAME='task-" + taskId + "-container';");
     cmds.push("");
     cmds.push("# Run docker command");
     cmds.push("docker run -ti \\");
