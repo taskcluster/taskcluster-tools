@@ -130,7 +130,7 @@ var ArtifactList = React.createClass({
     var artifacts = this.props.artifacts.map(function(artifact) {
       var url, icon;
       if (/^public\//.test(artifact.name)) {
-        if (this.props.runId) {
+        if (this.props.runId !== undefined) {
           url = this.queue.buildUrl(
             this.queue.getArtifact,
             this.props.taskId,
@@ -148,7 +148,7 @@ var ArtifactList = React.createClass({
       } else {
         // If we have credentials we create a signed URL
         if (auth.hasCredentials()) {
-          if (this.props.runId) {
+          if (this.props.runId !== undefined) {
             url = this.queue.buildSignedUrl(
               this.queue.getArtifact,
               this.props.taskId,
