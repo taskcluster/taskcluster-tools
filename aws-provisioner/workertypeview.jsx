@@ -401,25 +401,29 @@ var WorkerTypeView = React.createClass({
 
   renderDefinition() {
     var def = _.cloneDeep(this.state.workerType);
-    if (def.launchSpecification.Userdata) {
-      def.launchSpecification.Userdata = JSON.parse(
-        new Buffer(def.launchSpecification.Userdata, 'base64')
-      );
-    }
-    def.instanceTypes.forEach(instTypeDef => {
-      if (instTypeDef.overwrites && instTypeDef.overwrites.UserData) {
-        instTypeDef.overwrites.UserData = JSON.parse(
-          new Buffer(instTypeDef.overwrites.UserData, 'base64')
+    /*** LEGACY NOTICE: This stuff is here because of the schema
+         changes for making secrets work ***/
+    if (def.launchSpecification) {
+      if (def.launchSpecification.Userdata) {
+        def.launchSpecification.Userdata = JSON.parse(
+          new Buffer(def.launchSpecification.Userdata, 'base64')
         );
       }
-    });
-    def.regions.forEach(regionDef => {
-      if (regionDef.overwrites && regionDef.overwrites.UserData) {
-        regionDef.overwrites.UserData = JSON.parse(
-          new Buffer(regionDef.overwrites.UserData, 'base64')
-        );
-      }
-    });
+      def.instanceTypes.forEach(instTypeDef => {
+        if (instTypeDef.overwrites && instTypeDef.overwrites.UserData) {
+          instTypeDef.overwrites.UserData = JSON.parse(
+            new Buffer(instTypeDef.overwrites.UserData, 'base64')
+          );
+        }
+      });
+      def.regions.forEach(regionDef => {
+        if (regionDef.overwrites && regionDef.overwrites.UserData) {
+          regionDef.overwrites.UserData = JSON.parse(
+            new Buffer(regionDef.overwrites.UserData, 'base64')
+          );
+        }
+      });
+    } // END LEGACY 
     return (
       <span>
         <br/>
