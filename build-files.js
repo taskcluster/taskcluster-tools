@@ -28,39 +28,39 @@ module.exports = [
   'preferences/app.jsx',
 
   // Pulse Inspector
-  // 'pulse-inspector/index.jade',
-  // 'pulse-inspector/app.jsx',
-  // 'pulse-inspector/app.less',
+  'pulse-inspector/index.jade',
+  'pulse-inspector/app.jsx',
+  'pulse-inspector/app.less',
 
   // Task Inspector
-  // 'task-inspector/index.jade',
-  // 'task-inspector/app.jsx',
-  // 'task-inspector/app.less',
+  'task-inspector/index.jade',
+  'task-inspector/app.jsx',
+  'task-inspector/app.less',
 
   // Task-Graph Inspector
-  // 'task-graph-inspector/index.jade',
-  // 'task-graph-inspector/app.jsx',
-  // 'task-graph-inspector/app.less',
+  'task-graph-inspector/index.jade',
+  'task-graph-inspector/app.jsx',
+  'task-graph-inspector/app.less',
 
   // Task Creator
-  // 'task-creator/index.jade',
-  // 'task-creator/app.jsx',
-  // 'task-creator/app.less',
+  'task-creator/index.jade',
+  'task-creator/app.jsx',
+  'task-creator/app.less',
 
   // Aws Provisioner
-  // 'aws-provisioner/index.jade',
-  // 'aws-provisioner/app.jsx',
-  // 'aws-provisioner/app.less',
+  'aws-provisioner/index.jade',
+  'aws-provisioner/app.jsx',
+  'aws-provisioner/app.less',
 
   // Index Browser
-  // 'index/index.jade',
-  // 'index/app.jsx',
-  // 'index/app.less',
+  'index/index.jade',
+  'index/app.jsx',
+  'index/app.less',
 
   // Indexed Artifact Browser
-  // 'index/artifacts/index.jade',
-  // 'index/artifacts/app.jsx',
-  // 'index/artifacts/app.less',
+  'index/artifacts/index.jade',
+  'index/artifacts/app.jsx',
+  'index/artifacts/app.less',
 
   // Interactive
   'interactive/index.jade',

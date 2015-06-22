@@ -1,21 +1,12 @@
 var $ = require('jquery');
 var Terminal = require('term.js').Terminal;
-// var React = require('react');
 var url = require('url');
 var qs = require('querystring');
 var DockerExecClient = require('docker-exec-websocket-server').DockerExecClient;
 
-/*var InteractiveTerminal = React.createClass({
-  render: function () {
-    return(
-      //something goes here
-    );
-  }
-});*/
-
 $(function () {
   window.myDebug = require('debug');
-  // React.render(<InteractiveTerminal />, $('#container')[0]);
+
   var term = new Terminal({
     cols: 80,
     rows: 24,
@@ -26,8 +17,6 @@ $(function () {
 
   var args = qs.parse(url.parse(window.location.href).query);
 
-  console.log('connecting to ' + args.socketUrl);
-  
   var client = new DockerExecClient({
     url: args.socketUrl,
     tty: true,
