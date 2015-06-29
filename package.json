@@ -43,7 +43,8 @@
     "exorcist":                         "0.1.6",
     "concat-stream":                    "1.4.6",
     "grunt-keepalive":                  "0.0.1",
-    "grunt-concurrent":                 "1.0.0"
+    "grunt-concurrent":                 "1.0.0",
+    "durable-json-lint":                "0.0.1"
   },
   "engines": {
     "node":                             "0.12.x"
