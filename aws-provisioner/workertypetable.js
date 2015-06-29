@@ -157,33 +157,40 @@ var WorkerTypeRow = React.createClass({
 });
 
 const defaultWorkerType = {
-  "launchSpecification": {
-  },
   "minCapacity": 0,
-  "maxCapacity": 1,
+  "maxCapacity": 5,
   "scalingRatio": 0,
   "minPrice": 0,
-  "maxPrice": 0.1,
+  "maxPrice": 0.6,
   "canUseOndemand": false,
   "canUseSpot": true,
   "instanceTypes": [
     {
-      "instanceType": "c3.small",
+      "instanceType": "c3.xlarge",
       "capacity": 1,
       "utility": 1,
-      "overwrites": {
-        "UserData": "e30="
-      }
-    }
+      "secrets": {},
+      "scopes": [],
+      "userData": {},
+      "launchSpec": {}
+    },
   ],
   "regions": [
     {
       "region": "us-west-2",
-      "overwrites": {
-        "ImageId": "ami-abcdefg"
+      "secrets": {},
+      "scopes": [],
+      "userData": {},
+      "launchSpec": {
+        "ImageId": "ami-xx"
       }
     }
-  ]
+  ],
+  "userData": {},
+  "launchSpec": {
+  },
+  "secrets": {},
+  "scopes": []
 };
 
 

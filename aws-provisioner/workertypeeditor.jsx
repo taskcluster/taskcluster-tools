@@ -151,18 +151,32 @@ var WorkerTypeEditor = React.createClass({
 
   async save() {
     var def = JSON.parse(this.state.definition);
-    encodeUserData(def.launchSpecification);
-    def.regions.map(_.property('overwrites')).forEach(encodeUserData);
-    def.instanceTypes.map(_.property('overwrites')).forEach(encodeUserData);
+    /*** LEGACY NOTICE: This check and the actions it does are
+         leftovers.  We'll soon be able to delete the check,
+         the actions and the functions ***/
+    if (def.launchSpecification) {
+      encodeUserData(def.launchSpecification);
+      def.regions.map(_.property('overwrites')).forEach(encodeUserData);
+      def.instanceTypes.map(_.property('overwrites')).forEach(encodeUserData);
+    } /* END LEGACY */ else {
+      delete def.lastModified; // Remember that the provisioner api sets this
+    }
     await this.awsProvisioner.updateWorkerType(this.state.workerType, def);
     await this.props.updated(this.state.workerType);
   },
 
   async create() {
     var def = JSON.parse(this.state.definition);
-    encodeUserData(def.launchSpecification);
-    def.regions.map(_.property('overwrites')).forEach(encodeUserData);
-    def.instanceTypes.map(_.property('overwrites')).forEach(encodeUserData);
+    /*** LEGACY NOTICE: This check and the actions it does are
+         leftovers.  We'll soon be able to delete the check,
+         the actions and the functions ***/
+    if (def.launchSpecification) {
+      encodeUserData(def.launchSpecification);
+      def.regions.map(_.property('overwrites')).forEach(encodeUserData);
+      def.instanceTypes.map(_.property('overwrites')).forEach(encodeUserData);
+    } /* END LEGACY */ else {
+      delete def.lastModified; // Remember that the provisioner api sets this
+    }
     await this.awsProvisioner.createWorkerType(this.state.workerType, def);
     await this.props.updated(this.state.workerType);
   },
