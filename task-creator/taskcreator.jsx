@@ -152,6 +152,9 @@ var TaskCreator = React.createClass({
           Reset Editor
         </bs.Button>
       </bs.ButtonToolbar>
+      <span hidden={!this.state.invalidTask}>
+        {this.state.invalidTaskError}
+      </span>
       </span>
     );
   },
@@ -160,15 +163,19 @@ var TaskCreator = React.createClass({
   handleTaskChange: function(e) {
     // Attempt to parse task input
     var invalidTask = false;
+    var invalidTaskError = '';
     try {
       JSON.parse(e.target.value);
     }
     catch (err) {
       invalidTask = true;
+      invalidTaskError = err.message;
+      console.log("err", invalidTaskError);
     }
     this.setState({
-      task:           e.target.value,
-      invalidTask:    invalidTask
+      task:             e.target.value,
+      invalidTask:      invalidTask,
+      invalidTaskError: invalidTaskError
     });
   },
 
