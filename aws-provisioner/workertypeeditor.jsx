@@ -7,6 +7,7 @@ var CodeMirror        = require('react-code-mirror');
 var ConfirmAction     = require('../lib/ui/confirmaction');
 
 require('codemirror/mode/javascript/javascript');
+require('../lib/codemirror/json-lint');
 
 /** Encode/decode UserData property of object */
 var encodeUserData = (obj) => {
@@ -84,6 +85,8 @@ var WorkerTypeEditor = React.createClass({
           onChange={this.handleChange}
           indentWithTabs={true}
           tabSize={2}
+          lint={true}
+          gutters={["CodeMirror-lint-markers"]}
           theme="ambiance"/>
         <br/>
         <bs.ButtonToolbar>
