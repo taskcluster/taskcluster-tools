@@ -7,8 +7,10 @@ var debug                   = require('debug')('taskcreator');
 var _                       = require('lodash');
 var slugid                  = require('slugid');
 
+
 // Load javascript mode for CodeMirror
 require('codemirror/mode/javascript/javascript');
+require('../lib/codemirror/json-lint');
 
 /** Create a task-creator */
 var TaskCreator = React.createClass({
@@ -20,14 +22,14 @@ var TaskCreator = React.createClass({
     })
   ],
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       localStorageKey:      undefined,
       initialTaskValue:     "{}"
     };
   },
 
-  getInitialState: function() {
+  getInitialState() {
     // Get initial task value
     var task = this.props.initialTaskValue;
     if (this.props.localStorageKey) {
@@ -51,7 +53,7 @@ var TaskCreator = React.createClass({
   },
 
   /** Parameterize a task, return state after parameterization attempt */
-  parameterizeTask: function(task) {
+  parameterizeTask(task) {
     // Assume the is valid JSON
     var invalidTask = false;
 
@@ -77,7 +79,7 @@ var TaskCreator = React.createClass({
     };
   },
 
-  render: function() {
+  render() {
     // If loaded, then either redirect to task-inspector
     // we'll show errors later if there are errors
     if (this.state.createdTaskIdLoaded) {
@@ -104,7 +106,7 @@ var TaskCreator = React.createClass({
           Write and submit a task to TaskCluster. For details on what you can
           write refer to the&nbsp;
           <a href="http://docs.taskcluster.net">documentation</a>.
-          When you submit a task here, you'll be taken to the inspector, and the
+          When you submit a task here, you will be taken to the inspector, and the
           task will be stored in <code>localStorage</code>, so you can always
           come back and easily try a new variation.
         </p>
@@ -125,7 +127,7 @@ var TaskCreator = React.createClass({
   },
 
   /** Render task editor */
-  renderEditor: function() {
+  renderEditor() {
     return (
       <span>
       <CodeMirror
@@ -138,6 +140,8 @@ var TaskCreator = React.createClass({
         onChange={this.handleTaskChange}
         indentWithTabs={true}
         tabSize={2}
+        lint={true}
+        gutters={["CodeMirror-lint-markers"]}
         theme="ambiance"/>
       <br/>
       <bs.ButtonToolbar>
@@ -157,7 +161,7 @@ var TaskCreator = React.createClass({
   },
 
   /** Update state when task is modified */
-  handleTaskChange: function(e) {
+  handleTaskChange(e) {
     // Attempt to parse task input
     var invalidTask = false;
     try {
@@ -173,7 +177,7 @@ var TaskCreator = React.createClass({
   },
 
   /** Create task and redirect */
-  handleCreateTask: function() {
+  handleCreateTask() {
     // Create task and get taskId of created task
     var taskCreated = Promise.resolve(this.state.task).then(function(task) {
       var taskId  = slugid.v4();

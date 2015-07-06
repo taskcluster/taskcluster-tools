@@ -44,7 +44,7 @@
     "concat-stream":                    "1.4.6",
     "grunt-keepalive":                  "0.0.1",
     "grunt-concurrent":                 "1.0.0",
-    "term.js":                          "chjj/term.js.git",
+    "durable-json-lint":                "0.0.1",
     "docker-exec-websocket-server":     "^1.0.12"
   },
   "engines": {
