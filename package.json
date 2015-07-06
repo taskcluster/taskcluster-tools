@@ -45,7 +45,7 @@
     "grunt-keepalive":                  "0.0.1",
     "grunt-concurrent":                 "1.0.0",
     "term.js":                          "chjj/term.js.git",
-    "docker-exec-websocket-server":     "1.0.7"
+    "docker-exec-websocket-server":     "^1.0.12"
   },
   "engines": {
     "node":                             "0.12.x"
