@@ -89,7 +89,7 @@ var WorkerTypeRow = React.createClass({
   runningCapacity() {
     return _.sum(this.props.awsState.running.map(instance => {
       return _.find(this.state.workerType.instanceTypes, {
-        instanceType:     instance.InstanceType
+        instanceType:     instance.type
       });
     }), 'capacity');
   },
@@ -97,7 +97,7 @@ var WorkerTypeRow = React.createClass({
   pendingCapacity() {
     return _.sum(this.props.awsState.pending.map(instance => {
       return _.find(this.state.workerType.instanceTypes, {
-        instanceType:     instance.InstanceType
+        instanceType:     instance.type
       });
     }), 'capacity');
   },
@@ -105,7 +105,7 @@ var WorkerTypeRow = React.createClass({
   spotReqCapacity() {
     return _.sum(this.props.awsState.spotReq.map(spotReq => {
       return _.find(this.state.workerType.instanceTypes, {
-        instanceType:     spotReq.LaunchSpecification.InstanceType
+        instanceType:     spotReq.type
       });
     }), 'capacity');
   },

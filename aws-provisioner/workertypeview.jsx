@@ -88,26 +88,26 @@ var WorkerTypeResources = React.createClass({
 
   renderInstanceRow(instance, index) {
     var instanceLink = 'https://console.aws.amazon.com/ec2/v2/home?region=' +
-                        instance.Region + '#Instances:instanceId=' +
-                        instance.InstanceId + ';sort=Name';
+                        instance.region + '#Instances:instanceId=' +
+                        instance.id + ';sort=Name';
     return (
       <tr key={index}>
         <td>
-          {this.renderInstanceIdLink(instance.InstanceId, instance.Region)}
+          {this.renderInstanceIdLink(instance.id, instance.region)}
         </td>
         <td>
           {
             this.renderSpotRequestLink(
-              instance.SpotInstanceRequestId,
-              instance.Region
+              instance.srId,
+              instance.region
             )
           }
         </td>
-        <td><code>{instance.InstanceType}</code></td>
-        <td><code>{instance.Placement.AvailabilityZone}</code></td>
-        <td>{this.renderImageIdLink(instance.ImageId, instance.Region)}</td>
+        <td><code>{instance.type}</code></td>
+        <td><code>{instance.zone}</code></td>
+        <td>{this.renderImageIdLink(instance.ami, instance.region)}</td>
         <td>
-          <format.DateView date={new Date(instance.LaunchTime)}/>
+          <format.DateView date={new Date(instance.launch)}/>
         </td>
       </tr>
     );
@@ -119,26 +119,26 @@ var WorkerTypeResources = React.createClass({
         <td>
           {
             this.renderSpotRequestLink(
-              spotReq.SpotInstanceRequestId,
-              spotReq.Region
+              spotReq.id,
+              spotReq.region,
             )
           }
         </td>
-        <td><code>{spotReq.LaunchSpecification.InstanceType}</code></td>
+        <td><code>{spotReq.type}</code></td>
         <td>
-          <code>{spotReq.LaunchSpecification.Placement.AvailabilityZone}</code>
+          <code>{spotReq.zone}</code>
         </td>
-        <td><code>{spotReq.LaunchSpecification.ImageId}</code></td>
+        <td><code>{spotReq.ami}</code></td>
         <td>
           {
             this.renderImageIdLink(
-              spotReq.LaunchSpecification.ImageId,
-              spotReq.Region
+              spotReq.ami,
+              spotReq.region
             )
           }
         </td>
         <td>
-          <format.DateView date={new Date(spotReq.CreateTime)}/>
+          <format.DateView date={new Date(spotReq.time)}/>
         </td>
       </tr>
     );
@@ -186,7 +186,7 @@ var WorkerTypeResources = React.createClass({
   runningCapacity() {
     return _.sum(this.props.awsState.running.map(instance => {
       return _.find(this.props.workerType.instanceTypes, {
-        instanceType:     instance.InstanceType
+        instanceType:     instance.type
       });
     }), 'capacity');
   },
@@ -194,7 +194,7 @@ var WorkerTypeResources = React.createClass({
   pendingCapacity() {
     return _.sum(this.props.awsState.pending.map(instance => {
       return _.find(this.props.workerType.instanceTypes, {
-        instanceType:     instance.InstanceType
+        instanceType:     instance.type
       });
     }), 'capacity');
   },
@@ -202,7 +202,7 @@ var WorkerTypeResources = React.createClass({
   spotReqCapacity() {
     return _.sum(this.props.awsState.spotReq.map(spotReq => {
       return _.find(this.props.workerType.instanceTypes, {
-        instanceType:     spotReq.LaunchSpecification.InstanceType
+        instanceType:     spotReq.type
       });
     }), 'capacity');
   },
@@ -221,11 +221,9 @@ var WorkerTypeStatus = React.createClass({
   render() {
     // Find availability zones
     var availabilityZones = _.union(
-      this.props.awsState.running.map(_.property('Placement.AvailabilityZone')),
-      this.props.awsState.pending.map(_.property('Placement.AvailabilityZone')),
-      this.props.awsState.spotReq.map(_.property(
-        'LaunchSpecification.Placement.AvailabilityZone'
-      ))
+      this.props.awsState.running.map(_.property('zone')),
+      this.props.awsState.pending.map(_.property('zone')),
+      this.props.awsState.spotReq.map(_.property('zone'))
     );
     return (
       <bs.Table>
@@ -256,17 +254,16 @@ var WorkerTypeStatus = React.createClass({
   renderRow(instTypeDef, availabilityZone) {
     // Find number of running, pending and spotRequests
     var running = this.props.awsState.running.filter(inst => {
-      return inst.InstanceType === instTypeDef.instanceType &&
-             inst.Placement.AvailabilityZone === availabilityZone;
+      return inst.type === instTypeDef.instanceType &&
+             inst.zone === availabilityZone;
     }).length;
     var pending = this.props.awsState.pending.filter(inst => {
-      return inst.InstanceType === instTypeDef.instanceType &&
-             inst.Placement.AvailabilityZone === availabilityZone;
+      return inst.type === instTypeDef.instanceType &&
+             inst.zone === availabilityZone;
     }).length;
     var spotReq = this.props.awsState.spotReq.filter(spotReq => {
-      var spec = spotReq.LaunchSpecification;
-      return spec.InstanceType === instTypeDef.instanceType &&
-             spec.Placement.AvailabilityZone === availabilityZone;
+      return spotReq.type === instTypeDef.instanceType &&
+             spotReq.zone === availabilityZone;
     }).length;
     if (running + pending + spotReq === 0) {
       return undefined;
@@ -401,29 +398,6 @@ var WorkerTypeView = React.createClass({
 
   renderDefinition() {
     var def = _.cloneDeep(this.state.workerType);
-    /*** LEGACY NOTICE: This stuff is here because of the schema
-         changes for making secrets work ***/
-    if (def.launchSpecification) {
-      if (def.launchSpecification.Userdata) {
-        def.launchSpecification.Userdata = JSON.parse(
-          new Buffer(def.launchSpecification.Userdata, 'base64')
-        );
-      }
-      def.instanceTypes.forEach(instTypeDef => {
-        if (instTypeDef.overwrites && instTypeDef.overwrites.UserData) {
-          instTypeDef.overwrites.UserData = JSON.parse(
-            new Buffer(instTypeDef.overwrites.UserData, 'base64')
-          );
-        }
-      });
-      def.regions.forEach(regionDef => {
-        if (regionDef.overwrites && regionDef.overwrites.UserData) {
-          regionDef.overwrites.UserData = JSON.parse(
-            new Buffer(regionDef.overwrites.UserData, 'base64')
-          );
-        }
-      });
-    } // END LEGACY 
     return (
       <span>
         <br/>
