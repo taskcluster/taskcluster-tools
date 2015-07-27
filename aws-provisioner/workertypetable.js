@@ -16,7 +16,7 @@ var WorkerTypeRow = React.createClass({
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
+          baseUrl:      'https://aws-provisioner.taskcluster.net/v1'
         }
       },
       reloadOnProps: [
@@ -203,7 +203,7 @@ var WorkerTypeTable = React.createClass({
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://taskcluster-aws-provisioner2.herokuapp.com/v1'
+          baseUrl:      'https://aws-provisioner.taskcluster.net/v1'
         }
       },
       reloadOnProps: [
