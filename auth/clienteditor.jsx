@@ -59,6 +59,7 @@ var ClientEditor = React.createClass({
           name:           "",
           description:    ""
         },
+        newAccessToken:   '',
         editing:          true,
         working:          false,
         error:            null
@@ -67,6 +68,7 @@ var ClientEditor = React.createClass({
       // Load currentClientId
       return {
         client:           this.auth.client(this.props.currentClientId),
+        newAccessToken:   '',
         editing:          false,
         working:          false,
         error:            null
@@ -84,9 +86,10 @@ var ClientEditor = React.createClass({
         </bs.Alert>
       );
     }
-    var isCreating = this.props.currentClientId === undefined;
-    var isEditing  = (isCreating || this.state.editing);
-    var title      = "Create New Client";
+    var isCreating          = this.props.currentClientId === undefined;
+    var isEditing           = (isCreating || this.state.editing);
+    var haveNewAccessToken  = this.state.newAccessToken != '';
+    var title               = "Create New Client";
     if (!isCreating) {
       title = (isEditing ? "Edit Client" : "View Client");
     }
@@ -106,22 +109,34 @@ var ClientEditor = React.createClass({
           <div className="form-group">
             <label className="control-label col-md-3">AccessToken</label>
             <div className="col-md-9">
-              <div className="form-control-static">
-                <code className="client-editor-access-token">
-                  {this.state.client.accessToken}
-                </code>
-                {
-                  isEditing && !isCreating ?
-                  <bs.Button
-                    bsStyle="warning"
-                    bsSize="xsmall"
-                    onClick={this.resetAccessToken}
-                    disabled={this.state.working}>
-                    <bs.Glyphicon glyph="fire"/>&nbsp;Reset
-                  </bs.Button>
-                  : undefined
-                }
-              </div>
+              {
+                isEditing && !isCreating ?
+                <bs.Button
+                  bsStyle="warning"
+                  bsSize="xsmall"
+                  onClick={this.resetAccessToken}
+                  disabled={this.state.working}>
+                  <bs.Glyphicon glyph="fire"/>&nbsp;Reset
+                </bs.Button>
+                : haveNewAccessToken ?
+                <div className="alert alert-danger alert-dismissible fade in"
+                     role="alert">
+                   <bs.Button className="close" aria-label="Close"
+                           onClick={this.dismissAccessKey}>
+                     <span aria-hidden="true">
+                       ×
+                     </span>
+                   </bs.Button>
+
+                   <code>
+                     {this.state.newAccessToken}
+                   </code>
+                </div>
+                :
+                <span className="text-muted">
+                  (hidden)
+                </span>
+              }
             </div>
           </div>
           <div className="form-group">
@@ -349,11 +364,25 @@ var ClientEditor = React.createClass({
 
   /** Reset accessToken for current client */
   resetAccessToken: function() {
-    // resetCredentials returns exactly what client() returns, so this will work
-    this.loadState({
-      client:     this.auth.resetCredentials(this.state.client.clientId),
-      editing:    false
-    });
+    this.auth.resetCredentials(this.state.client.clientId)
+    .then(function(client) {
+      this.loadState({
+        client:         client,
+        newAccessToken: client.accessToken,
+        editing:        false,
+        working:        false
+      });
+    }.bind(this), function(err) {
+      this.setState({
+        working:  false,
+        error:    err
+      });
+    }.bind(this));
+  },
+
+  /** dismiss the visible access key */
+  dismissAccessKey: function() {
+    this.setState({newAccessToken: ''});
   },
 
   /** Start editing */
@@ -369,9 +398,16 @@ var ClientEditor = React.createClass({
       name:         this.state.client.name,
       description:  this.state.client.description,
       expires:      this.state.client.expires,
-    }).then(function() {
+    }).then(function(client) {
+      this.setState({
+        client:         client,
+        newAccessToken: client.accessToken,
+        editing:        false,
+        working:        false,
+        error:          null
+      });
       this.props.refreshClientList();
-      this.reload();
+      //this.reload();
     }.bind(this), function(err) {
       this.setState({
         working:  false,
