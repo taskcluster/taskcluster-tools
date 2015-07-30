@@ -64,7 +64,11 @@ module.exports = [
 
   // Interactive
   'interactive/index.jade',
-  'interactive/app.jsx'
+  'interactive/app.jsx',
+
+  // Efficiency
+  'efficiency/index.jade',
+  'efficiency/app.jsx'
 ].map(function(file) {
   return path.join(__dirname, file);
 });
