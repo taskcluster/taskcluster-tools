@@ -45,7 +45,7 @@ module.exports = [
     link:           '/auth/',
     icon:           'users',
     description: [
-      "Manage clients on `auth.taskcluser.net`. This tool allows you to",
+      "Manage clients on `auth.taskcluster.net`. This tool allows you to",
       "create, modify and delete client. You can also manage scopes and",
       "reset `accessToken`."
     ].join('\n')
