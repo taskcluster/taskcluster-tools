@@ -5,12 +5,13 @@ let qs = require('querystring');
 var React = require('react');
 let request = require('superagent-promise');
 
-async function update(start, end) {
+async function update(start, end, user, pass, workerType) {
   let url = 'https://goldiewilson-onepointtwentyone-1.c.influxdb.com:8087/db/docker-worker/series';
   let res = await request.get(url).query({
-    u: 'efficiency',
-    p: 'uit8cx',
-    q: 'select * from capacity_over_time where time > ' + start + ' and time < ' + end
+    u: user,
+    p: pass,
+    q: 'select * from capacity_over_time where time > ' + start + ' and time < ' + end +
+    (workerType !== '' ? ' and workerType = \'' + workerType + '\'' : '')
   }).end();
   console.log(res.status);
   let queryResult = JSON.parse(res.text)[0];
@@ -19,6 +20,7 @@ async function update(start, end) {
   let total = 0;
   let idleMachineTime = 0;
   let totalMachineTime = 0;
+  let totalDuration = 0;
 
   let columns = queryResult.columns;
   let runningIndex = columns.indexOf('runningTasks');
@@ -33,12 +35,14 @@ async function update(start, end) {
     if (point[idleIndex] === point[totalIndex]) {
       idleMachineTime += point[durationIndex];
     }
+    totalDuration += point[durationIndex];
   }
   document.getElementById('result').innerHTML =
     (utilized / total * 100).toFixed(2) +
     '% of total capacity is being used over the time period, ie efficiency<br>' +
     ((1 - idleMachineTime / totalMachineTime) * 100).toFixed(2) + 
-    '% of workers are doing something over the time period';
+    '% of workers are doing something over the time period<br>' +
+    (totalDuration / 1000 / 3600).toFixed(2) + ' hours of total worker time was spent';
 }
 
 var Efficiency = React.createClass({
@@ -51,6 +55,18 @@ var Efficiency = React.createClass({
       <form className="form-horizontal" onSubmit={this.handleSubmit} id="form">
         <bs.Input
           type="text"
+          ref="user"
+          placeholder="influxDB username"
+          labelClassName="col-sm-2"
+          wrapperClassName="col-sm-10"/>
+        <bs.Input
+          type="text"
+          ref="pass"
+          placeholder="influxDB password"
+          labelClassName="col-sm-2"
+          wrapperClassName="col-sm-10"/>
+        <bs.Input
+          type="text"
           ref="start"
           placeholder="start time"
           defaultValue="now() - 1d"
@@ -61,6 +77,13 @@ var Efficiency = React.createClass({
           ref="end"
           placeholder="end time"
           defaultValue="now()"
+          labelClassName="col-sm-2"
+          wrapperClassName="col-sm-10"/>
+        <bs.Input
+          type="text"
+          ref="workerType"
+          placeholder="workerType, if a specific workerType is desired"
+          defaultValue=""
           labelClassName="col-sm-2"
           wrapperClassName="col-sm-10"/>
         <div className="form-group">
@@ -83,7 +106,11 @@ var Efficiency = React.createClass({
     //this.setState({taskId: this.state.taskIdInput});
     // console.log(document.getElementById("form").elements[0].value);
     // console.log(document.getElementById("form").elements[1].value);
-    update(document.getElementById("form").elements[0].value, document.getElementById("form").elements[1].value);
+    update(this.refs.start.getValue(),
+      this.refs.end.getValue(),
+      this.refs.user.getValue(),
+      this.refs.pass.getValue(),
+      this.refs.workerType.getValue());
   }
 });
 
