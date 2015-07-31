@@ -9,7 +9,7 @@ async function update(start, end) {
   let url = 'https://goldiewilson-onepointtwentyone-1.c.influxdb.com:8087/db/docker-worker/series';
   let res = await request.get(url).query({
     u: 'efficiency',
-    p: 'uit8cx',
+    p: '',
     q: 'select * from capacity_over_time where time > ' + start + ' and time < ' + end
   }).end();
   console.log(res.status);
