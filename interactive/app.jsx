@@ -7,15 +7,18 @@ var DockerExecClient = require('docker-exec-websocket-server').DockerExecClient;
 $(function () {
   window.myDebug = require('debug');
 
+  var args = qs.parse(url.parse(window.location.href).query);
+
+  var height = args.h || 36;
+  var width = args.w || 160;
+
   var term = new Terminal({
-    cols: 80,
-    rows: 24,
+    cols: width,
+    rows: height,
     useStyle: true,
     screenKeys: true,
-    cursorBlink: false
+    cursorBlink: true
   });
-
-  var args = qs.parse(url.parse(window.location.href).query);
 
   var client = new DockerExecClient({
     url: args.socketUrl,
@@ -47,5 +50,7 @@ $(function () {
     client.on('resumed', function () {
       term.write('\x1b[31mReady\x1b[m\r\n');
     });
+
+    client.resize(height, width);
   });
 });
