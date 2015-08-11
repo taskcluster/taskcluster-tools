@@ -101,11 +101,11 @@ module.exports = [
     ].join('\n')
   },
   {
-    title:          "Bugzilla Component",
-    link:           'https://bugzilla.mozilla.org/buglist.cgi?component=TaskCluster&product=Testing&bug_status=__open__',
+    title:          "Bugzilla Product",
+    link:           'https://bugzilla.mozilla.org/buglist.cgi?product=Taskcluster&bug_status=__open__',
     icon:           'bug',
     description: [
-      "Visit the TaskCluster Bugzilla component to view open bugs, participate",
+      "Visit the TaskCluster Bugzilla product to view open bugs, participate",
       "in discussions or report new bugs in TaskCluster."
     ].join('\n')
   },
