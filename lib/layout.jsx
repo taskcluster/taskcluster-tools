@@ -90,7 +90,7 @@ var Navigation = React.createClass({
         <bs.Nav className="navbar-right">
           <bs.DropdownButton key={3} title="Tools">
             {
-              menu.map(function(entry, index) {
+              menu.filter(entry => entry.display).map((entry, index) => {
                 if (entry.type === 'divider') {
                   return <bs.MenuItem key={index} divider/>;
                 }

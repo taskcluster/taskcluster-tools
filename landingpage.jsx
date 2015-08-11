@@ -16,7 +16,7 @@ var chunks = function(array, size) {
 // Render component
 $(function() {
   var entries = menu.filter(function(entry) {
-    return entry.type !== 'divider' && entry.description;
+    return entry.type !== 'divider' && entry.display;
   }).map(function(entry, index) {
     return (
       <bs.Col md={4} sm={6} key={index}>
