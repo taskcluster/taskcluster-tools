@@ -45,7 +45,8 @@
     "grunt-keepalive":                  "0.0.1",
     "grunt-concurrent":                 "1.0.0",
     "durable-json-lint":                "0.0.1",
-    "docker-exec-websocket-server":     "^1.0.14"
+    "docker-exec-websocket-server":     "^1.0.0",
+    "hterm-umd":                        "^1.0.0"
   },
   "engines": {
     "node":                             "0.12.x"

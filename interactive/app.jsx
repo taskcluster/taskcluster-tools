@@ -1,56 +1,78 @@
-var $ = require('jquery');
-var Terminal = require('term.js').Terminal;
-var url = require('url');
-var qs = require('querystring');
-var DockerExecClient = require('docker-exec-websocket-server').DockerExecClient;
+var $                   = require('jquery');
+var {hterm, lib}        = require('hterm-umd');
+var url                 = require('url');
+var qs                  = require('querystring');
+var {DockerExecClient}  = require('docker-exec-websocket-server');
+var _                   = require('lodash');
+
+// Set default storage engine for hterm
+hterm.defaultStorage = new lib.Storage.Local();
 
 $(function () {
-  window.myDebug = require('debug');
-
   var args = qs.parse(url.parse(window.location.href).query);
 
-  var height = args.h || 36;
-  var width = args.w || 160;
+  $('#container').append(
+    "<div id='terminal' style='position: absolute;left: 0px;right: 0px;bottom: 0px;top: 51px;'></div>"
+  );
 
-  var term = new Terminal({
-    cols: width,
-    rows: height,
-    useStyle: true,
-    screenKeys: true,
-    cursorBlink: true
-  });
+  var term = new hterm.Terminal('interactive');
+  term.onTerminalReady = async () => {
+    var io = term.io.push();
 
-  var client = new DockerExecClient({
-    url: args.socketUrl,
-    tty: true,
-    command: '/bin/bash'
-  });
-
-  client.execute().then(function () {
-    term.on('data', function(data) {
-      client.stdin.write(data);
+    var client = new DockerExecClient({
+      url: args.socketUrl,
+      tty: true,
+      command: [
+        'sh', '-c', [
+          'if [ -z "$TERM" ]; then export TERM=xterm; fi;',
+          'if [ -z "$HOME" ]; then export HOME=/root; fi;',
+          'if [ -z "$USER" ]; then export USER=root; fi;',
+          'if [ -z "$LOGNAME" ]; then export LOGNAME=root; fi;',
+          'if [ -z `which "$SHELL"` ]; then export SHELL=bash; fi;',
+          'if [ -z `which "$SHELL"` ]; then export SHELL=sh; fi;',
+          'if [ -z `which "$SHELL"` ]; then export SHELL="/.taskclusterutils/busybox sh"; fi;',
+          'SPAWN="$SHELL";',
+          'if [ "$SHELL" = "bash" ]; then SPAWN="bash -li"; fi;',
+          'exec $SPAWN;'
+        ].join('')
+      ]
     });
 
-    term.on('title', function(title) {
-      document.title = title;
+    io.onVTKeystroke = io.sendString = d => {
+      client.stdin.write(d);
+    };
+    io.onTerminalResize = () => undefined;
+
+    term.setCursorPosition(0, 0);
+    term.setCursorVisible(true);
+    term.setScrollbarVisible(false);
+    term.prefs_.set('ctrl-c-copy', true);
+    term.prefs_.set('ctrl-v-paste', true);
+    term.prefs_.set('use-default-window-copy', true);
+
+    await client.execute();
+    term.installKeyboard();
+    io.writeUTF8('Connected to remote shell for taskId: ' +
+                 args.taskId + '\r\n');
+
+    client.on('exit', code => {
+      io.writeUTF8('\r\nRemote shell exited: ' + code + '\r\n');
+      term.uninstallKeyboard();
+      term.setCursorVisible(false);
     });
 
-    term.open($('#container')[0]);
+    client.resize(term.screenSize.height, term.screenSize.width);
 
-    client.stdout.on('data', function (data) {
-      term.write(String.fromCharCode.apply(null, data));
+    io.onTerminalResize = (c, r) => {
+      client.resize(r, c);
+    };
+    client.stdout.on('data', data => {
+      io.writeUTF8(data.toString('utf8'));
     });
-    client.stderr.on('data', function (data) {
-      term.write(String.fromCharCode.apply(null, data));
+    client.stderr.on('data', data => {
+      io.writeUTF8(data.toString('utf8'));
     });
+  };
 
-    client.on('exit', function (code) {
-      term.write('\r\nProcess exited with code ' + code + '\r\n');
-    });
-    client.on('resumed', function () {
-      term.write('\x1b[31mReady\x1b[m\r\n');
-    });
-
-    client.resize(height, width);
-  });
+  term.decorate($('#terminal')[0]);
 });
