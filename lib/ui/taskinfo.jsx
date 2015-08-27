@@ -164,7 +164,11 @@ var TaskInfo = React.createClass({
         <dt>SchedulerId</dt>
         <dd><code>{task.schedulerId}</code></dd>
         <dt>TaskGroupId</dt>
-        <dd><code>{task.taskGroupId}</code></dd>
+        <dd>
+          <a href={'../task-graph-inspector/#' + task.taskGroupId}>
+            {task.taskGroupId}
+          </a>
+        </dd>
       </dl>
       <dl className="dl-horizontal">
         <dt>Scopes</dt>
@@ -258,14 +262,14 @@ var TaskInfo = React.createClass({
     cmds.push("# WARNING: this is experimental mileage may vary!");
     cmds.push("");
     cmds.push("# Fetch docker image");
-    cmds.push("docker pull " + payload.image);
+    cmds.push("docker pull '" + payload.image + "'");
     cmds.push("");
     cmds.push("# Find a unique container name");
-    cmds.push("export NAME='task-" + taskId + "-container';");
+    cmds.push("export NAME='task-" + taskId + "-container'");
     cmds.push("");
     cmds.push("# Run docker command");
     cmds.push("docker run -ti \\");
-    cmds.push("  --name $NAME \\");
+    cmds.push("  --name \"${NAME}\" \\");
     if (payload.capabilities && payload.capabilities.privileged) {
       cmds.push("  --privileged \\");
     }
@@ -294,7 +298,6 @@ var TaskInfo = React.createClass({
       }).join(' ');
       cmds.push("  " + command + " \\");
     }
-    cmds.push("  ;");
     cmds.push("");
     if (payload.artifacts) {
       cmds.push("# Extract Artifacts");
@@ -304,13 +307,13 @@ var TaskInfo = React.createClass({
         if (payload.artifacts[name].type === 'file') {
           folder = path.dirname(name);
         }
-        cmds.push("mkdir -p " + folder + ";");
-        cmds.push("docker cp $NAME:" + src + " " + name + ";");
+        cmds.push("mkdir -p '" + folder + "'");
+        cmds.push("docker cp \"$NAME:" + src + "\" '" + name + "'");
       });
+      cmds.push("");
     }
-    cmds.push("");
     cmds.push("# Delete docker container");
-    cmds.push("docker rm -v $NAME;");
+    cmds.push("docker rm -v \"${NAME}\"");
     return cmds.join('\n');
   }
 });
