@@ -308,7 +308,7 @@ var TaskInfo = React.createClass({
           folder = path.dirname(name);
         }
         cmds.push("mkdir -p '" + folder + "'");
-        cmds.push("docker cp \"$NAME:" + src + "\" '" + name + "'");
+        cmds.push("docker cp \"${NAME}:" + src + "\" '" + name + "'");
       });
       cmds.push("");
     }
