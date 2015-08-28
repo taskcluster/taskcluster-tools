@@ -164,11 +164,17 @@ var TaskInfo = React.createClass({
         <dt>SchedulerId</dt>
         <dd><code>{task.schedulerId}</code></dd>
         <dt>TaskGroupId</dt>
-        <dd>
-          <a href={'../task-graph-inspector/#' + task.taskGroupId}>
-            {task.taskGroupId}
-          </a>
-        </dd>
+        {
+          task.schedulerId === 'task-graph-scheduler' ? (
+            <dd>
+              <a href={'../task-graph-inspector/#' + task.taskGroupId}>
+                {task.taskGroupId}
+              </a>
+            </dd>
+          ) : (
+            <dd><code>{task.taskGroupId}</code></dd>
+          )
+        }
       </dl>
       <dl className="dl-horizontal">
         <dt>Scopes</dt>
