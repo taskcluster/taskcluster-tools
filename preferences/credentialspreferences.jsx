@@ -77,7 +77,7 @@ var CredentialsPreferences = React.createClass({
 
   /** handle changes to credentials */
   handleCredentialsChanged: function(e) {
-    creds = e.detail || {};
+    var creds = e.detail || {};
     // Update clients with new credentials
     var certificate = JSON.stringify(
       creds.certificate || {},
