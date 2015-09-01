@@ -67,6 +67,11 @@ module.exports = [
   'index/artifacts/app.jsx',
   'index/artifacts/app.less',
 
+  // Hooks Manager
+  'hooks/index.jade',
+  'hooks/app.jsx',
+  'hooks/app.less',
+
   // Interactive
   'interactive/index.jade',
   'interactive/app.jsx'

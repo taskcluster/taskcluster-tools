@@ -98,6 +98,16 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Hooks Manager",
+    link:           '/hooks/',
+    icon:           'repeat',
+    display:        true,
+    description: [
+      "The hooks manager, lets you manage and inspect the hooks that have",
+      "been created."
+    ].join('\n')
+  },
+  {
     type:           'divider',
     display:        false
   },
