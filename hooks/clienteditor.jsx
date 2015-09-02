@@ -8,16 +8,36 @@ var format          = require('../lib/format');
 var _               = require('lodash');
 var ConfirmAction   = require('../lib/ui/confirmaction');
 var Promise         = require('promise');
+var TaskEditor      = require('./taskeditor');
 
+var initialTask = {
+  provisionerId:      'aws-provisioner-v1',
+  workerType:         'b2gtest',
+  created:            null, // later
+  deadline:           null, // later
+  payload: {
+    image:            'ubuntu:13.10',
+    command:          ['/bin/bash', '-c', 'echo "hello World"'],
+    maxRunTime:       60 * 10
+  },
+  metadata: {
+    name:             "Example Task",
+    description:      "Markdown description of **what** this task does",
+    owner:            "name@example.com",
+    source:           "http://tools.taskcluster.net/task-creator/"
+  }
+};
+
+var reference = require('./reference');
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth:       taskcluster.Auth
+        hooks:       taskcluster.createClient(reference)
       },
-      reloadOnProps: ['currentClientId']
+      reloadOnProps: ['currentHookId', 'currentGroupId']
     })
   ],
 
@@ -28,7 +48,8 @@ var ClientEditor = React.createClass({
 
   getDefaultProps: function() {
     return {
-      currentClientId:  undefined     // undefined implies. "Create Client"
+      currentHookId:  undefined,     // undefined implies. "Create Client"
+      currentGroupId: undefined
     };
   },
 
@@ -49,17 +70,19 @@ var ClientEditor = React.createClass({
   /** Load initial state */
   load: function() {
     // If there is no currentClientId, we're creating a new client
-    if (!this.props.currentClientId) {
+    if (!this.props.currentHookId || !this.props.currentGroupId) {
       return {
         client: {
-          clientId:       slugid.v4(),
-          accessToken:    '-',
-          scopes:         [],
-          expires:        new Date(3015, 1, 1),
-          name:           "",
-          description:    ""
+          groupId:        "",
+          hookId:         "",
+          expires:        "",
+          schedule:       "",
+          metadata: {
+            name:           "",
+            description:    ""
+          },
+          task:           ""
         },
-        newAccessToken:   '',
         editing:          true,
         working:          false,
         error:            null
@@ -67,8 +90,7 @@ var ClientEditor = React.createClass({
     } else {
       // Load currentClientId
       return {
-        client:           this.auth.client(this.props.currentClientId),
-        newAccessToken:   '',
+        client:           this.hooks.hook(this.props.currentGroupId, this.props.currentHookId),
         editing:          false,
         working:          false,
         error:            null
@@ -86,12 +108,12 @@ var ClientEditor = React.createClass({
         </bs.Alert>
       );
     }
-    var isCreating          = this.props.currentClientId === undefined;
+    var isCreating          = (this.props.currentClientId === undefined ||
+                               this.props.currentGroupId  === undefined);
     var isEditing           = (isCreating || this.state.editing);
-    var haveNewAccessToken  = this.state.newAccessToken != '';
-    var title               = "Create New Client";
+    var title               = "Create New Hook";
     if (!isCreating) {
-      title = (isEditing ? "Edit Client" : "View Client");
+      title = (isEditing ? "Edit Hook" : "View Hook");
     }
     return this.renderWaitFor('client') || (
       <span className="client-editor">
@@ -99,44 +121,39 @@ var ClientEditor = React.createClass({
         <hr style={{marginBottom: 10}}/>
         <div className="form-horizontal">
           <div className="form-group">
-            <label className="control-label col-md-3">ClientId</label>
+            <label className="control-label col-md-3">GroupId</label>
             <div className="col-md-9">
-              <div className="form-control-static">
-                <code>{this.state.client.clientId}</code>
-              </div>
+                {
+                  isEditing ?
+                    <input type="text"
+                      className="form-control"
+                      ref="groupId"
+                      value={this.state.client.groupId}
+                      onChange={this.onChange}
+                      placeholder="groupId"/>
+                  :
+                    <div className="form-control-static">
+                      {this.state.client.groupId}
+                    </div>
+                }
             </div>
           </div>
           <div className="form-group">
-            <label className="control-label col-md-3">AccessToken</label>
+            <label className="control-label col-md-3">HookId</label>
             <div className="col-md-9">
-              {
-                isEditing && !isCreating ?
-                <bs.Button
-                  bsStyle="warning"
-                  bsSize="xsmall"
-                  onClick={this.resetAccessToken}
-                  disabled={this.state.working}>
-                  <bs.Glyphicon glyph="fire"/>&nbsp;Reset
-                </bs.Button>
-                : haveNewAccessToken ?
-                <div className="alert alert-danger alert-dismissible fade in"
-                     role="alert">
-                   <bs.Button className="close" aria-label="Close"
-                           onClick={this.dismissAccessKey}>
-                     <span aria-hidden="true">
-                       ×
-                     </span>
-                   </bs.Button>
-
-                   <code>
-                     {this.state.newAccessToken}
-                   </code>
-                </div>
-                :
-                <span className="text-muted">
-                  (hidden)
-                </span>
-              }
+                {
+                  isEditing ?
+                    <input type="text"
+                      className="form-control"
+                      ref="hookId"
+                      value={this.state.client.hookId}
+                      onChange={this.onChange}
+                      placeholder="hookId"/>
+                  :
+                    <div className="form-control-static">
+                      {this.state.client.hookId}
+                    </div>
+                }
             </div>
           </div>
           <div className="form-group">
@@ -147,12 +164,12 @@ var ClientEditor = React.createClass({
                     <input type="text"
                       className="form-control"
                       ref="name"
-                      value={this.state.client.name}
+                      value={this.state.client.metadata.name}
                       onChange={this.onChange}
                       placeholder="Name"/>
                   :
                     <div className="form-control-static">
-                      {this.state.client.name}
+                      {this.state.client.metadata.name}
                     </div>
                 }
             </div>
@@ -161,6 +178,15 @@ var ClientEditor = React.createClass({
             <label className="control-label col-md-3">Description</label>
             <div className="col-md-9">
               {isEditing ? this.renderDescEditor() : this.renderDesc()}
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="control-label col-md-3">Task</label>
+            <div className="col-md-9">
+              <TaskEditor
+                localStorageKey="hooks-manager/task"
+                initialTaskValue={JSON.stringify(initialTask, null, '\t')}
+                task={this.state.client.task}/>
             </div>
           </div>
           <div className="form-group">
@@ -179,73 +205,8 @@ var ClientEditor = React.createClass({
               </div>
             </div>
           </div>
-          <div className="form-group">
-            <label className="control-label col-md-3">Scopes</label>
-            <div className="col-md-9">
-              {isEditing ? this.renderScopeEditor() : this.renderScopes()}
-            </div>
-          </div>
-          <hr/>
-          <div className="form-group">
-            <div className="col-md-9 col-md-offset-3">
-              <div className="form-control-static">
-                {
-                  isEditing ?
-                    (isCreating ?
-                        this.renderCreatingToolbar()
-                      :
-                        this.renderEditingToolbar()
-                    )
-                  :
-                    <bs.ButtonToolbar>
-                      <bs.Button bsStyle="success"
-                                 onClick={this.startEditing}
-                                 disabled={this.state.working}>
-                        <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Client
-                      </bs.Button>
-                    </bs.ButtonToolbar>
-                }
-              </div>
-            </div>
-          </div>
         </div>
       </span>
-    );
-  },
-
-  /** Render editing toolbar */
-  renderEditingToolbar() {
-    return (
-      <bs.ButtonToolbar>
-        <bs.Button bsStyle="success"
-                   onClick={this.saveClient}
-                   disabled={this.state.working}>
-          <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
-        </bs.Button>
-        <ConfirmAction
-          buttonStyle='danger'
-          glyph='trash'
-          disabled={this.state.working}
-          label="Delete Client"
-          action={this.deleteClient}
-          success="Client deleted">
-          Are you sure you want to delete credentials with clientId&nbsp;
-          <code>{this.state.client.clientId}</code>?
-        </ConfirmAction>
-      </bs.ButtonToolbar>
-    );
-  },
-
-  /** Render creation toolbar */
-  renderCreatingToolbar: function() {
-    return (
-      <bs.ButtonToolbar>
-        <bs.Button bsStyle="primary"
-                   onClick={this.createClient}
-                   disabled={this.state.working}>
-          <bs.Glyphicon glyph="plus"/>&nbsp;Create Client
-        </bs.Button>
-      </bs.ButtonToolbar>
     );
   },
 
@@ -254,7 +215,7 @@ var ClientEditor = React.createClass({
     return (
       <textarea className="form-control"
                 ref="description"
-                value={this.state.client.description}
+                value={this.state.client.metadata.description}
                 onChange={this.onChange}
                 rows={8}
                 placeholder="Description in markdown...">
@@ -266,7 +227,7 @@ var ClientEditor = React.createClass({
   renderDesc: function() {
     return (
       <div className="form-control-static">
-        <format.Markdown>{this.state.client.description}</format.Markdown>
+        <format.Markdown>{this.state.client.metadata.description}</format.Markdown>
       </div>
     );
   },
@@ -286,103 +247,6 @@ var ClientEditor = React.createClass({
       state.client.expires = date.toJSON();
       this.setState(state);
     }
-  },
-
-  /** Render scopes and associated editor */
-  renderScopeEditor: function() {
-    return (
-      <div className="form-control-static">
-        <ul style={{paddingLeft: 20}}>
-          {
-            this.state.client.scopes.map(function(scope, index) {
-              return (
-                <li key={index}>
-                  <code>{scope}</code>
-                  &nbsp;
-                  <bs.Button
-                    className="client-editor-remove-scope-btn"
-                    bsStyle="danger"
-                    bsSize="xsmall"
-                    onClick={this.removeScope.bind(this, index)}>
-                    <bs.Glyphicon glyph="trash"/>
-                  </bs.Button>
-                </li>
-              );
-            }, this)
-          }
-        </ul>
-        <div className="input-group">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="new-scope:for-something:*"
-            ref="newScope"/>
-          <span className="input-group-btn">
-            <button className="btn btn-success"
-                    type="button" onClick={this.addScope}>
-              <bs.Glyphicon glyph="plus"/>
-              &nbsp;
-              Add
-            </button>
-          </span>
-        </div>
-      </div>
-    );
-  },
-
-  /** Add scope to state */
-  addScope: function() {
-    var scope = this.refs.newScope.getDOMNode().value;
-    // Let's skip empty strings
-    if (scope) {
-      var state = _.cloneDeep(this.state);
-      state.client.scopes.push(scope);
-      this.refs.newScope.getDOMNode().value = "";
-      this.setState(state);
-    }
-  },
-
-  /** Remove a scope from state */
-  removeScope: function(index) {
-    var state = _.cloneDeep(this.state);
-    state.client.scopes.splice(index, 1);
-    this.setState(state);
-  },
-
-  /** Render a list of scopes */
-  renderScopes: function() {
-    return (
-      <ul className="form-control-static" style={{paddingLeft: 20}}>
-        {
-          this.state.client.scopes.map(function(scope, index) {
-            return <li key={index}><code>{scope}</code></li>;
-          })
-        }
-      </ul>
-    );
-  },
-
-  /** Reset accessToken for current client */
-  resetAccessToken: function() {
-    this.auth.resetCredentials(this.state.client.clientId)
-    .then(function(client) {
-      this.loadState({
-        client:         client,
-        newAccessToken: client.accessToken,
-        editing:        false,
-        working:        false
-      });
-    }.bind(this), function(err) {
-      this.setState({
-        working:  false,
-        error:    err
-      });
-    }.bind(this));
-  },
-
-  /** dismiss the visible access key */
-  dismissAccessKey: function() {
-    this.setState({newAccessToken: ''});
   },
 
   /** Start editing */
