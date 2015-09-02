@@ -7,8 +7,8 @@ var format          = require('../lib/format');
 
 var reference = require('./reference');
 
-/** Create client manager */
-var ClientManager = React.createClass({
+/** Create hook manager */
+var HookManager = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
@@ -92,7 +92,7 @@ var ClientManager = React.createClass({
   renderGroups: function () {
     return (
       <span>
-        <bs.Table condensed hover className="group-table">
+        <bs.Table condensed hover className="hook-table">
           <tbody>
             {
               this.state.groups.groups.map(function(group, index) {
@@ -121,5 +121,5 @@ var ClientManager = React.createClass({
 
 });
 
-// Export ClientManager
-module.exports = ClientManager;
+// Export HookManager
+module.exports = HookManager;
