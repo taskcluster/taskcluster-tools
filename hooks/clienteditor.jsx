@@ -73,15 +73,18 @@ var ClientEditor = React.createClass({
     if (!this.props.currentHookId || !this.props.currentGroupId) {
       return {
         client: {
-          groupId:        "",
-          hookId:         "",
+          groupId:        this.props.currentGroupId ? this.props.currentGroupId : "",
+          hookId:         this.props.currentHookId ? this.props.currentHookId : "",
+          deadline:       "",
           expires:        "",
           schedule:       "",
           metadata: {
             name:           "",
-            description:    ""
+            description:    "",
+            owner:          "",
+            emailOnError:   true
           },
-          task:           ""
+          task:           {}
         },
         editing:          true,
         working:          false,
@@ -192,17 +195,19 @@ var ClientEditor = React.createClass({
           <div className="form-group">
             <label className="control-label col-md-3">Expires</label>
             <div className="col-md-9">
-              <div className="form-control-static">
                 {
                   isEditing ?
-                    <DateTimePicker
-                      format='dd, MMM yyyy HH:mm'
-                      value={new Date(this.state.client.expires)}
-                      onChange={this.onExpiresChange}/>
+                    <input type="text"
+                      className="form-control"
+                      ref="expires"
+                      value={this.state.client.expires}
+                      onChange={this.onChange}
+                      placeholder="Name"/>
                   :
-                    <format.DateView date={this.state.client.expires}/>
+                    <div className="form-control-static">
+                      {this.state.client.expires}
+                    </div>
                 }
-              </div>
             </div>
           </div>
         </div>
@@ -235,8 +240,11 @@ var ClientEditor = React.createClass({
   /** Handle changes in the editor */
   onChange: function() {
     var state = _.cloneDeep(this.state);
-    state.client.description  = this.refs.description.getDOMNode().value;
-    state.client.name         = this.refs.name.getDOMNode().value;
+    state.client.groupId               = this.refs.groupId.getDOMNode().value;
+    state.client.hookId                = this.refs.hookId.getDOMNode().value;
+    state.client.metadata.description  = this.refs.description.getDOMNode().value;
+    state.client.metadata.name         = this.refs.name.getDOMNode().value;
+    state.client.expires               = this.refs.expires.getDOMNode().value;
     this.setState(state);
   },
 
@@ -257,18 +265,17 @@ var ClientEditor = React.createClass({
   /** Create new client */
   createClient: function() {
     this.setState({working: true});
-    this.auth.createClient(this.state.client.clientId, {
-      scopes:       this.state.client.scopes,
-      name:         this.state.client.name,
-      description:  this.state.client.description,
-      expires:      this.state.client.expires,
-    }).then(function(client) {
+    this.hooks.createHook(this.state.client.groupId, this.state.client.hookId, {
+      metadata: this.state.client.metadata,
+      task:     this.state.client.task,
+      deadline: this.state.client.expires,
+      expires:  this.state.client.expires,
+    }).then(function(hook) {
       this.setState({
-        client:         client,
-        newAccessToken: client.accessToken,
-        editing:        false,
-        working:        false,
-        error:          null
+        client: hook,
+        editing: false,
+        working: false,
+        error: null
       });
       this.props.refreshClientList();
       //this.reload();
@@ -283,19 +290,19 @@ var ClientEditor = React.createClass({
   /** Save current client */
   saveClient() {
     this.loadState({
-      client:     this.auth.modifyClient(this.state.client.clientId, {
-        scopes:       this.state.client.scopes,
-        name:         this.state.client.name,
-        description:  this.state.client.description,
-        expires:      this.state.client.expires,
+      client: this.hooks.updateHook(this.state.client.groupId, this.state.client.hookId, {
+        metadata: this.state.client.metadata,
+        task:     this.state.client.task,
+        deadline: this.state.client.expires,
+        expires:  this.state.client.expires,
       }),
-      editing:    false
+      editing: false
     });
   },
 
   /** Delete current client */
   async deleteClient() {
-    await this.auth.removeClient(this.state.client.clientId);
+    await this.auth.removeHook(this.state.client.groupId, this.state.client.hookId);
     await Promise.all([this.props.refreshClientList(), this.reload()]);
   },
 
