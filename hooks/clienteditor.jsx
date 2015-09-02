@@ -1,14 +1,15 @@
-var React           = require('react');
+var _               = require('lodash');
 var bs              = require('react-bootstrap');
+var CodeMirror      = require('react-code-mirror');
+var ConfirmAction   = require('../lib/ui/confirmaction');
+var DateTimePicker  = require('react-widgets').DateTimePicker;
+var debug           = require('debug')('hookeditor');
+var format          = require('../lib/format');
+var Promise         = require('promise');
+var React           = require('react');
 var slugid          = require('slugid');
 var taskcluster     = require('taskcluster-client');
-var DateTimePicker  = require('react-widgets').DateTimePicker;
 var utils           = require('../lib/utils');
-var format          = require('../lib/format');
-var _               = require('lodash');
-var ConfirmAction   = require('../lib/ui/confirmaction');
-var Promise         = require('promise');
-var TaskEditor      = require('./taskeditor');
 
 var initialTask = {
   provisionerId:      'aws-provisioner-v1',
@@ -49,12 +50,28 @@ var ClientEditor = React.createClass({
   getDefaultProps: function() {
     return {
       currentHookId:  undefined,     // undefined implies. "Create Client"
-      currentGroupId: undefined
+      currentGroupId: undefined,
+      localStorageKey: undefined,
+      initialTaskValue: JSON.stringify(initialTask, null, '\t')
     };
   },
 
   getInitialState: function() {
-    return {
+    // Load from localStorage, otherwise initial task value
+    var task = this.props.initialTaskValue;
+    if (this.props.localStorageKey) {
+      if (localStorage.getItem(this.props.localStorageKey)) {
+        task = localStorage.getItem(this.props.localStorageKey);
+        // Check if it'll parse
+        try {
+          JSON.parse(task);
+        }
+        catch(err) {
+          task = this.props.initialTaskValue;
+        }
+      }
+    }
+    return _.defaults(this.parameterizeTask(task), {
       // Loading client or loaded client
       clientLoaded:     false,
       clientError:      undefined,
@@ -64,6 +81,33 @@ var ClientEditor = React.createClass({
       // Operation details, if currently doing anything
       working:          false,
       error:            null
+    });
+  },
+
+  /** Parameterize a task, return state after parameterization attempt */
+  parameterizeTask(task) {
+    // Assume the is valid JSON
+    var invalidTask = false;
+
+    // Parameterize with new deadline and created time
+    try {
+      var data      = JSON.parse(task);
+      var deadline  = new Date();
+      deadline.setMinutes(deadline.getMinutes() + 60);
+      data.created  = new Date().toJSON();
+      data.deadline = deadline.toJSON();
+      task          = JSON.stringify(data, null, '\t');
+    }
+    catch (err) {
+      debug("Failed to parameterize initial task, err: %s, %j",
+            err, err, err.stack);
+      invalidTask = true;
+    }
+
+    // Set task, and serialize to string after parameterization
+    return {
+      task:         task,
+      invalidTask:  invalidTask
     };
   },
 
@@ -72,28 +116,31 @@ var ClientEditor = React.createClass({
     // If there is no currentClientId, we're creating a new client
     if (!this.props.currentHookId || !this.props.currentGroupId) {
       return {
-        client: {
-          groupId:        this.props.currentGroupId ? this.props.currentGroupId : "",
-          hookId:         this.props.currentHookId ? this.props.currentHookId : "",
-          deadline:       "",
-          expires:        "",
-          schedule:       "",
-          metadata: {
-            name:           "",
-            description:    "",
-            owner:          "",
-            emailOnError:   true
+        client:            {
+          groupId:         this.props.currentGroupId ? this.props.currentGroupId :  "",
+          hookId:          this.props.currentHookId ? this.props.currentHookId :    "",
+          deadline:        "",
+          expires:         "",
+          schedule:        "",
+          metadata:        {
+            name:          "",
+            description:   "",
+            owner:         "",
+            emailOnError:  true
           },
-          task:           {}
+          task:            initialTask
         },
-        editing:          true,
-        working:          false,
-        error:            null
+        editing:           true,
+        working:           false,
+        error:             null
       };
     } else {
       // Load currentClientId
+      var hookDef = this.hooks.hook(this.props.currentGroupId, this.props.currentHookId);
       return {
-        client:           this.hooks.hook(this.props.currentGroupId, this.props.currentHookId),
+        client:           hookDef,
+        task:             JSON.stringify(hookDef.task, null, '\t'),
+        invalidTask:      false,
         editing:          false,
         working:          false,
         error:            null
@@ -186,32 +233,87 @@ var ClientEditor = React.createClass({
           <div className="form-group">
             <label className="control-label col-md-3">Task</label>
             <div className="col-md-9">
-              <TaskEditor
-                localStorageKey="hooks-manager/task"
-                initialTaskValue={JSON.stringify(initialTask, null, '\t')}
-                task={this.state.client.task}/>
+              { this.renderEditor() }
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-3">Expires</label>
             <div className="col-md-9">
-                {
-                  isEditing ?
-                    <input type="text"
-                      className="form-control"
-                      ref="expires"
-                      value={this.state.client.expires}
-                      onChange={this.onChange}
-                      placeholder="Name"/>
+              {
+                isEditing ?
+                  <input type="text"
+                    className="form-control"
+                    ref="expires"
+                    value={this.state.client.expires}
+                    onChange={this.onChange}
+                    placeholder="Name"/>
                   :
                     <div className="form-control-static">
                       {this.state.client.expires}
                     </div>
                 }
+              </div>
             </div>
-          </div>
-        </div>
-      </span>
+            <div className="form-group">
+              <div className="col-md-9 col-md-offset-3">
+                <div className="form-control-static">
+                  {
+                    isEditing ?
+                      (isCreating ?
+                        this.renderCreatingToolbar()
+                      :
+                        this.renderEditingToolbar()
+                      )
+                    :
+                      <bs.ButtonToolbar>
+                        <bs.Button bsStyle="success"
+                          onClick={this.startEditing}
+                          disabled={this.state.working}>
+                          <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Client
+                        </bs.Button>
+                      </bs.ButtonToolbar>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </span>
+    );
+  },
+
+ /** Render editing toolbar */
+  renderEditingToolbar() {
+    return (
+      <bs.ButtonToolbar>
+        <bs.Button bsStyle="success"
+                   onClick={this.saveClient}
+                   disabled={this.state.working || this.state.invalidTask}>
+          <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
+        </bs.Button>
+        <ConfirmAction
+          buttonStyle='danger'
+          glyph='trash'
+          disabled={this.state.working}
+          label="Delete Client"
+          action={this.deleteClient}
+          success="Client deleted">
+          Are you sure you want to delete credentials with clientId&nbsp;
+          <code>{this.state.client.clientId}</code>?
+        </ConfirmAction>
+      </bs.ButtonToolbar>
+    );
+  },
+
+  /** Render creation toolbar */
+  renderCreatingToolbar: function() {
+    return (
+      <bs.ButtonToolbar>
+        <bs.Button bsStyle="primary"
+                   onClick={this.createClient}
+                   disabled={this.state.working || this.state.invalidTask}>
+          <bs.Glyphicon glyph="plus"/>&nbsp;Create Client
+        </bs.Button>
+      </bs.ButtonToolbar>
     );
   },
 
@@ -235,6 +337,40 @@ var ClientEditor = React.createClass({
         <format.Markdown>{this.state.client.metadata.description}</format.Markdown>
       </div>
     );
+  },
+
+  /** Render task editor */
+  renderEditor() {
+    return (
+      <span>
+      <CodeMirror
+        ref="editor"
+        lineNumbers={true}
+        mode="application/json"
+        textAreaClassName={'form-control'}
+        value={this.state.task}
+        onChange={this.onTaskChange}
+        indentWithTabs={true}
+        tabSize={2}
+        lint={true}
+        gutters={["CodeMirror-lint-markers"]}
+        theme="neat"/>
+    </span>
+    );
+  },
+
+  onTaskChange: function(e) {
+    var invalidTask = false;
+    try {
+      JSON.parse(e.target.value);
+    }
+    catch(err) {
+      invalidTask = true;
+    }
+    this.setState({
+      task:         e.target.value,
+      invalidTask:  invalidTask
+    });
   },
 
   /** Handle changes in the editor */
@@ -262,15 +398,24 @@ var ClientEditor = React.createClass({
     this.setState({editing: true});
   },
 
+  /** Create the hook definition */
+  createDefinition() {
+    return {
+      metadata: this.state.client.metadata,
+      task:     JSON.parse(this.state.task),
+      deadline: this.state.client.expires,
+      expires:  this.state.client.expires,
+    };
+  },
+
   /** Create new client */
   createClient: function() {
     this.setState({working: true});
-    this.hooks.createHook(this.state.client.groupId, this.state.client.hookId, {
-      metadata: this.state.client.metadata,
-      task:     this.state.client.task,
-      deadline: this.state.client.expires,
-      expires:  this.state.client.expires,
-    }).then(function(hook) {
+    this.hooks.createHook(
+      this.state.client.groupId,
+      this.state.client.hookId,
+      this.createDefinition()
+    ).then(function(hook) {
       this.setState({
         client: hook,
         editing: false,
@@ -290,19 +435,18 @@ var ClientEditor = React.createClass({
   /** Save current client */
   saveClient() {
     this.loadState({
-      client: this.hooks.updateHook(this.state.client.groupId, this.state.client.hookId, {
-        metadata: this.state.client.metadata,
-        task:     this.state.client.task,
-        deadline: this.state.client.expires,
-        expires:  this.state.client.expires,
-      }),
+      client: this.hooks.updateHook(
+        this.state.client.groupId,
+        this.state.client.hookId,
+        this.createDefinition()
+      ),
       editing: false
     });
   },
 
   /** Delete current client */
   async deleteClient() {
-    await this.auth.removeHook(this.state.client.groupId, this.state.client.hookId);
+    await this.hooks.removeHook(this.state.client.groupId, this.state.client.hookId);
     await Promise.all([this.props.refreshClientList(), this.reload()]);
   },
 
