@@ -1,6 +1,6 @@
 var React           = require('react');
 var bs              = require('react-bootstrap');
-var ClientEditor    = require('./clienteditor');
+var HookEditor      = require('./hookeditor');
 var utils           = require('../lib/utils');
 var taskcluster     = require('taskcluster-client');
 var format          = require('../lib/format');
@@ -48,9 +48,9 @@ var ClientManager = React.createClass({
           {this.renderButtonToolbar()}
         </bs.Col>
         <bs.Col md={6}>
-          <ClientEditor currentHookId={this.state.currentHookId}
-                        currentGroupId={this.state.currentGroupId}
-                        refreshClientList={this.reload}/>
+          <HookEditor currentHookId={this.state.currentHookId}
+                      currentGroupId={this.state.currentGroupId}
+                      refreshHookList={this.reload}/>
         </bs.Col>
       </bs.Row>
     );

@@ -2,12 +2,10 @@ var _               = require('lodash');
 var bs              = require('react-bootstrap');
 var CodeMirror      = require('react-code-mirror');
 var ConfirmAction   = require('../lib/ui/confirmaction');
-var DateTimePicker  = require('react-widgets').DateTimePicker;
 var debug           = require('debug')('hookeditor');
 var format          = require('../lib/format');
 var Promise         = require('promise');
 var React           = require('react');
-var slugid          = require('slugid');
 var taskcluster     = require('taskcluster-client');
 var utils           = require('../lib/utils');
 
@@ -30,8 +28,8 @@ var initialTask = {
 };
 
 var reference = require('./reference');
-/** Create client editor/viewer (same thing) */
-var ClientEditor = React.createClass({
+/** Create hook editor/viewer (same thing) */
+var HookEditor = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
@@ -43,8 +41,8 @@ var ClientEditor = React.createClass({
   ],
 
   propTypes: {
-    // Method to refresh client list
-    refreshClientList:  React.PropTypes.func.isRequired
+    // Method to refresh hook list
+    refreshHookList:  React.PropTypes.func.isRequired
   },
 
   getDefaultProps: function() {
@@ -72,10 +70,9 @@ var ClientEditor = React.createClass({
       }
     }
     return _.defaults(this.parameterizeTask(task), {
-      // Loading client or loaded client
-      clientLoaded:     false,
-      clientError:      undefined,
-      client:           undefined,
+      hookLoaded:     false,
+      hookError:      undefined,
+      hook:           undefined,
       // Edit or viewing current state
       editing:          true,
       // Operation details, if currently doing anything
@@ -113,10 +110,10 @@ var ClientEditor = React.createClass({
 
   /** Load initial state */
   load: function() {
-    // If there is no currentClientId, we're creating a new client
+    // Create a new hook if we don't have the groupId and hookId
     if (!this.props.currentHookId || !this.props.currentGroupId) {
       return {
-        client:            {
+        hook:            {
           groupId:         this.props.currentGroupId ? this.props.currentGroupId :  "",
           hookId:          this.props.currentHookId ? this.props.currentHookId :    "",
           deadline:        "",
@@ -138,7 +135,7 @@ var ClientEditor = React.createClass({
       // Load currentClientId
       var hookDef = this.hooks.hook(this.props.currentGroupId, this.props.currentHookId);
       return {
-        client:           hookDef,
+        hook:           hookDef,
         task:             JSON.stringify(hookDef.task, null, '\t'),
         invalidTask:      false,
         editing:          false,
@@ -165,8 +162,8 @@ var ClientEditor = React.createClass({
     if (!isCreating) {
       title = (isEditing ? "Edit Hook" : "View Hook");
     }
-    return this.renderWaitFor('client') || (
-      <span className="client-editor">
+    return this.renderWaitFor('hook') || (
+      <span className="hook-editor">
         <h3>{title}</h3>
         <hr style={{marginBottom: 10}}/>
         <div className="form-horizontal">
@@ -178,12 +175,12 @@ var ClientEditor = React.createClass({
                     <input type="text"
                       className="form-control"
                       ref="groupId"
-                      value={this.state.client.groupId}
+                      value={this.state.hook.groupId}
                       onChange={this.onChange}
                       placeholder="groupId"/>
                   :
                     <div className="form-control-static">
-                      {this.state.client.groupId}
+                      {this.state.hook.groupId}
                     </div>
                 }
             </div>
@@ -196,12 +193,12 @@ var ClientEditor = React.createClass({
                     <input type="text"
                       className="form-control"
                       ref="hookId"
-                      value={this.state.client.hookId}
+                      value={this.state.hook.hookId}
                       onChange={this.onChange}
                       placeholder="hookId"/>
                   :
                     <div className="form-control-static">
-                      {this.state.client.hookId}
+                      {this.state.hook.hookId}
                     </div>
                 }
             </div>
@@ -214,12 +211,12 @@ var ClientEditor = React.createClass({
                     <input type="text"
                       className="form-control"
                       ref="name"
-                      value={this.state.client.metadata.name}
+                      value={this.state.hook.metadata.name}
                       onChange={this.onChange}
                       placeholder="Name"/>
                   :
                     <div className="form-control-static">
-                      {this.state.client.metadata.name}
+                      {this.state.hook.metadata.name}
                     </div>
                 }
             </div>
@@ -244,12 +241,12 @@ var ClientEditor = React.createClass({
                   <input type="text"
                     className="form-control"
                     ref="expires"
-                    value={this.state.client.expires}
+                    value={this.state.hook.expires}
                     onChange={this.onChange}
                     placeholder="Name"/>
                   :
                     <div className="form-control-static">
-                      {this.state.client.expires}
+                      {this.state.hook.expires}
                     </div>
                 }
               </div>
@@ -286,7 +283,7 @@ var ClientEditor = React.createClass({
     return (
       <bs.ButtonToolbar>
         <bs.Button bsStyle="success"
-                   onClick={this.saveClient}
+                   onClick={this.saveHook}
                    disabled={this.state.working || this.state.invalidTask}>
           <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
         </bs.Button>
@@ -295,10 +292,10 @@ var ClientEditor = React.createClass({
           glyph='trash'
           disabled={this.state.working}
           label="Delete Client"
-          action={this.deleteClient}
+          action={this.deleteHook}
           success="Client deleted">
-          Are you sure you want to delete credentials with clientId&nbsp;
-          <code>{this.state.client.clientId}</code>?
+          Are you sure you want to delete hook under&nbsp;
+          <code>{this.state.groupId + '/' + this.state.hookId}</code>?
         </ConfirmAction>
       </bs.ButtonToolbar>
     );
@@ -309,7 +306,7 @@ var ClientEditor = React.createClass({
     return (
       <bs.ButtonToolbar>
         <bs.Button bsStyle="primary"
-                   onClick={this.createClient}
+                   onClick={this.createHook}
                    disabled={this.state.working || this.state.invalidTask}>
           <bs.Glyphicon glyph="plus"/>&nbsp;Create Client
         </bs.Button>
@@ -322,7 +319,7 @@ var ClientEditor = React.createClass({
     return (
       <textarea className="form-control"
                 ref="description"
-                value={this.state.client.metadata.description}
+                value={this.state.hook.metadata.description}
                 onChange={this.onChange}
                 rows={8}
                 placeholder="Description in markdown...">
@@ -334,7 +331,7 @@ var ClientEditor = React.createClass({
   renderDesc: function() {
     return (
       <div className="form-control-static">
-        <format.Markdown>{this.state.client.metadata.description}</format.Markdown>
+        <format.Markdown>{this.state.hook.metadata.description}</format.Markdown>
       </div>
     );
   },
@@ -376,11 +373,11 @@ var ClientEditor = React.createClass({
   /** Handle changes in the editor */
   onChange: function() {
     var state = _.cloneDeep(this.state);
-    state.client.groupId               = this.refs.groupId.getDOMNode().value;
-    state.client.hookId                = this.refs.hookId.getDOMNode().value;
-    state.client.metadata.description  = this.refs.description.getDOMNode().value;
-    state.client.metadata.name         = this.refs.name.getDOMNode().value;
-    state.client.expires               = this.refs.expires.getDOMNode().value;
+    state.hook.groupId               = this.refs.groupId.getDOMNode().value;
+    state.hook.hookId                = this.refs.hookId.getDOMNode().value;
+    state.hook.metadata.description  = this.refs.description.getDOMNode().value;
+    state.hook.metadata.name         = this.refs.name.getDOMNode().value;
+    state.hook.expires               = this.refs.expires.getDOMNode().value;
     this.setState(state);
   },
 
@@ -388,7 +385,7 @@ var ClientEditor = React.createClass({
   onExpiresChange: function(date) {
     if (date instanceof Date) {
       var state = _.cloneDeep(this.state);
-      state.client.expires = date.toJSON();
+      state.hook.expires = date.toJSON();
       this.setState(state);
     }
   },
@@ -401,28 +398,28 @@ var ClientEditor = React.createClass({
   /** Create the hook definition */
   createDefinition() {
     return {
-      metadata: this.state.client.metadata,
+      metadata: this.state.hook.metadata,
       task:     JSON.parse(this.state.task),
-      deadline: this.state.client.expires,
-      expires:  this.state.client.expires,
+      deadline: this.state.hook.expires,
+      expires:  this.state.hook.expires,
     };
   },
 
-  /** Create new client */
-  createClient: function() {
+  /** Create new hook */
+  createHook: function() {
     this.setState({working: true});
     this.hooks.createHook(
-      this.state.client.groupId,
-      this.state.client.hookId,
+      this.state.hook.groupId,
+      this.state.hook.hookId,
       this.createDefinition()
     ).then(function(hook) {
       this.setState({
-        client: hook,
+        hook: hook,
         editing: false,
         working: false,
         error: null
       });
-      this.props.refreshClientList();
+      this.props.refreshHookList();
       //this.reload();
     }.bind(this), function(err) {
       this.setState({
@@ -432,22 +429,22 @@ var ClientEditor = React.createClass({
     }.bind(this));
   },
 
-  /** Save current client */
-  saveClient() {
+  /** Save current hook */
+  saveHook() {
     this.loadState({
-      client: this.hooks.updateHook(
-        this.state.client.groupId,
-        this.state.client.hookId,
+      hook: this.hooks.updateHook(
+        this.state.hook.groupId,
+        this.state.hook.hookId,
         this.createDefinition()
       ),
       editing: false
     });
   },
 
-  /** Delete current client */
-  async deleteClient() {
-    await this.hooks.removeHook(this.state.client.groupId, this.state.client.hookId);
-    await Promise.all([this.props.refreshClientList(), this.reload()]);
+  /** Delete current hook */
+  async deleteHook() {
+    await this.hooks.removeHook(this.state.hook.groupId, this.state.hook.hookId);
+    await Promise.all([this.props.refreshHookList(), this.reload()]);
   },
 
   /** Reset error state from operation*/
@@ -459,5 +456,4 @@ var ClientEditor = React.createClass({
   }
 });
 
-// Export ClientEditor
-module.exports = ClientEditor;
+module.exports = HookEditor;
