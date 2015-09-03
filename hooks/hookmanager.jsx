@@ -4,6 +4,7 @@ var HookEditor      = require('./hookeditor');
 var utils           = require('../lib/utils');
 var taskcluster     = require('taskcluster-client');
 var format          = require('../lib/format');
+var _               = require('lodash');
 
 var reference = require('./reference');
 
@@ -35,8 +36,7 @@ var HookManager = React.createClass({
 
   load: function () {
     return {
-      groups: this.hooks.listHookGroups(),
-      hooks: []
+      groups: this.hooks.listHookGroups()
     };
   },
 
@@ -115,6 +115,23 @@ var HookManager = React.createClass({
   },
 
   renderHooks: function () {
+    return (
+      <span>
+        <bs.Table condensed hover className="hook-table">
+          <tbody>
+            {
+              this.state.hooks.hooks.map(function(hook, index) {
+                return(
+                  <tr key={index}>
+                    <td>{hook.hookId}</td>
+                  </tr>
+                );
+              }, this)
+            }
+           </tbody>
+        </bs.Table>
+      </span>
+    );
   },
 
   setTabKey(key) {
@@ -122,13 +139,19 @@ var HookManager = React.createClass({
   },
 
   browseGroup: function (groupId, key) {
-    this.setState({
+    var state = {
       currentGroupId:  groupId,
       currentHookId:   undefined,
-      tabKey:          key
-    });
+      tabKey:          key,
+      hooks:           {hooks: []}
+    };
+    if (groupId) {
+      this.hooks.listHooks(groupId).then(function(hooks) {
+        state.hooks.hooks = _.map(hooks.hooks, _.clone);
+      });
+    }
+    this.setState(state);
   }
-
 });
 
 // Export HookManager
