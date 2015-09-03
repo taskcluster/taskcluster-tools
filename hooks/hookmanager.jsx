@@ -28,7 +28,8 @@ var HookManager = React.createClass({
       groupsError:   undefined,
       hooks:         {hooks: []},
       hooksLoaded:   true,
-      hooksError:    undefined
+      hooksError:    undefined,
+      tabKey:        1
     };
   },
 
@@ -61,7 +62,7 @@ var HookManager = React.createClass({
     return (
       <bs.ButtonToolbar>
         <bs.Button bsStyle="primary"
-          onClick={this.browse.bind(this, undefined, undefined)}>
+          onClick={this.browseGroup.bind(this, undefined, 1)}>
           <bs.Glyphicon glyph="plus"/>
           &nbsp;
           Add Hook
@@ -78,11 +79,15 @@ var HookManager = React.createClass({
 
   renderHooksBrowser: function() {
     return (
-      <bs.TabbedArea defaultActiveKey={1}>
-        <bs.TabPane eventKey={1} tab="Groups">
+      <bs.TabbedArea activeKey={this.state.tabKey} onSelect={this.setTabKey}>
+        <bs.TabPane eventKey={1}
+                    tab="Groups"
+                    active={(this.state.tabKey === 1) ? "active" : ""}>
           {this.renderWaitFor('groups') || this.renderGroups()}
         </bs.TabPane>
-        <bs.TabPane eventKey={2} tab="Hooks">
+        <bs.TabPane eventKey={2}
+                    tab="Hooks"
+                    active={(this.state.tabKey === 2) ? "active" : ""}>
           {this.renderWaitFor('hooks') || this.renderHooks()}
         </bs.TabPane>
       </bs.TabbedArea>
@@ -98,7 +103,7 @@ var HookManager = React.createClass({
               this.state.groups.groups.map(function(group, index) {
                 return (
                   <tr key={index}>
-                    <td onClick={this.browse.bind(this, group, undefined)}>{group}</td>
+                    <td onClick={this.browseGroup.bind(this, group, 2)}>{group}</td>
                   </tr>
                   );
               }, this)
@@ -112,10 +117,15 @@ var HookManager = React.createClass({
   renderHooks: function () {
   },
 
-  browse: function (groupId, hookId) {
+  setTabKey(key) {
+    this.setState({tabKey: key});
+  },
+
+  browseGroup: function (groupId, key) {
     this.setState({
-      currentGroupId: groupId,
-      currentHookId: hookId
+      currentGroupId:  groupId,
+      currentHookId:   undefined,
+      tabKey:          key
     });
   }
 
