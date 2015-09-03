@@ -74,16 +74,81 @@ var WorkerTypeRow = React.createClass({
         <td><code>{this.props.workerType}</code></td>
         <td>
           <bs.OverlayTrigger placement='left' overlay={this.tooltip()}>
-            <bs.ProgressBar style={{marginBottom: 0}}>
-              {this.runningBar()}
-              {this.pendingBar()}
-              {this.spotReqBar()}
-            </bs.ProgressBar>
+          {this.renderCapacityBar()}
           </bs.OverlayTrigger>
         </td>
         <td>{this.state.pendingTasks.pendingTasks}</td>
       </tr>
     );
+  },
+
+  renderCapacityBar() {
+    // Without this try catch, we get no exception :(
+    try {
+      var p = this.doMath();
+    } catch (e) {
+      console.error(e);
+    }
+    //return <pre>{JSON.stringify(p, null, 2)}</pre>;
+
+    return <bs.ProgressBar style={{marginBottom: 0}}>
+      { p.r ?
+        <bs.ProgressBar bsStyle='success' key='running' now={p.r} label={p.rc}/>
+        : ''
+      }
+      { p.p ?
+        <bs.ProgressBar bsStyle='warning' key='pending' now={p.p} label={p.pc}/>
+        : ''
+      }
+      { p.s ?
+        <bs.ProgressBar bsStyle='info' key='spotReq' now={p.s} label={p.sc}/>
+        : ''
+      }
+    </bs.ProgressBar>
+  },
+
+  /* Return an object which has the fuzzed percentages to use for creating
+   * progress bars and the unfuzzed capacities.  If we have a state with 0%, we
+   * don't fuzz at all.  If we have 1-4%, we round to 5% and we don't fuzz
+   * above 5% for the running, pending and requested numbers */
+  doMath() {
+    // Actual capacities
+    var runningCap = this.runningCapacity();
+    var pendingCap = this.pendingCapacity();
+    var spotReqCap = this.spotReqCapacity();
+
+    var maxCap = this.state.workerType.maxCapacity;
+
+    // We want to make sure that if a bar is there that it's visible
+    var smallestCapUnit = maxCap * 0.05;
+
+    // Fuzz the percentages to make sure all bars are visible.  If we have a
+    // state with 0%, we don't fuzz at all.  If we have 1-4%, we round to 5%
+    // and we don't fuzz above 5%
+    var fuzzedRunning = runningCap ? Math.max(runningCap, smallestCapUnit) : 0;
+    var fuzzedPending = pendingCap ? Math.max(pendingCap, smallestCapUnit) : 0;
+    var fuzzedSpotReq = spotReqCap ? Math.max(spotReqCap, smallestCapUnit) : 0;
+
+    // Determine the number which we should use to figure out our percentages.
+    // When we have less than the max configured, we use that setting.  When we
+    // exceed that amount, we want to sum up all the capacity units
+    var count = fuzzedRunning + fuzzedPending + fuzzedSpotReq;
+    var divideBy = Math.max(maxCap, count);
+
+    // Calculate the percentages to use for the bars.  These numbers are
+    // invalid for other purposes
+    var runPer = fuzzedRunning / divideBy;
+    var pendPer = fuzzedPending / divideBy;
+    var spotPer = fuzzedSpotReq / divideBy;
+
+    return {
+      r: runPer * 100,
+      p: pendPer * 100,
+      s: spotPer * 100,
+      rc: runningCap,
+      pc: pendingCap,
+      sc: spotReqCap,
+    };
   },
 
   runningCapacity() {
@@ -108,39 +173,6 @@ var WorkerTypeRow = React.createClass({
         instanceType:     spotReq.type
       });
     }), 'capacity');
-  },
-
-  runningBar() {
-    var capacity = this.runningCapacity();
-    return capacity == 0 ? undefined : (
-      <bs.ProgressBar
-        bsStyle='success'
-        key='running'
-        now={Math.max(0.05, capacity / this.state.workerType.maxCapacity) * 100}
-        label={capacity}/>
-    );
-  },
-
-  pendingBar() {
-    var capacity = this.pendingCapacity();
-    return capacity == 0 ? undefined : (
-      <bs.ProgressBar
-        bsStyle='info'
-        key='pending'
-        now={Math.max(0.05, capacity / this.state.workerType.maxCapacity) * 100}
-        label={capacity}/>
-    );
-  },
-
-  spotReqBar() {
-    var capacity = this.spotReqCapacity();
-    return capacity == 0 ? undefined : (
-      <bs.ProgressBar
-        bsStyle='warning'
-        key='spot-requests'
-        now={Math.max(0.05, capacity / this.state.workerType.maxCapacity) * 100}
-        label={capacity}/>
-    );
   },
 
   tooltip() {
