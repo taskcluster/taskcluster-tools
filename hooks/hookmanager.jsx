@@ -15,7 +15,8 @@ var HookManager = React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         hooks:       taskcluster.createClient(reference)
-      }
+      },
+      reloadOnKeys: ['currentGroupId']
     })
   ],
 
@@ -28,7 +29,7 @@ var HookManager = React.createClass({
       groupsLoaded:  true,
       groupsError:   undefined,
       hooks:         {hooks: []},
-      hooksLoaded:   true,
+      hooksLoaded:   false,
       hooksError:    undefined,
       tabKey:        1
     };
@@ -36,7 +37,10 @@ var HookManager = React.createClass({
 
   load: function () {
     return {
-      groups: this.hooks.listHookGroups()
+      groups: this.hooks.listHookGroups(),
+      hooks: this.state.currentGroupId ?
+        this.hooks.listHooks(this.state.currentGroupId) :
+        {hooks: []}
     };
   },
 
@@ -127,7 +131,7 @@ var HookManager = React.createClass({
                   </tr>
                 );
               }, this)
-            }
+              }
            </tbody>
         </bs.Table>
       </span>
@@ -143,13 +147,7 @@ var HookManager = React.createClass({
       currentGroupId:  groupId,
       currentHookId:   undefined,
       tabKey:          key,
-      hooks:           {hooks: []}
     };
-    if (groupId) {
-      this.hooks.listHooks(groupId).then(function(hooks) {
-        state.hooks.hooks = _.map(hooks.hooks, _.clone);
-      });
-    }
     this.setState(state);
   }
 });
