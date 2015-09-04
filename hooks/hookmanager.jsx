@@ -157,6 +157,7 @@ var HookManager = React.createClass({
       currentGroupId:  groupId,
       currentHookId:   undefined,
       tabKey:          key,
+      hooksLoaded:     false
     };
     this.setState(state);
   }
