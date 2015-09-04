@@ -48,11 +48,11 @@ var HookManager = React.createClass({
   render: function () {
     return (
       <bs.Row>
-        <bs.Col md={6}>
+        <bs.Col md={4}>
           {this.renderHooksBrowser()}
           {this.renderButtonToolbar()}
         </bs.Col>
-        <bs.Col md={6}>
+        <bs.Col md={8}>
           <HookEditor currentHookId={this.state.currentHookId}
                       currentGroupId={this.state.currentGroupId}
                       refreshHookList={this.reload}/>
@@ -127,7 +127,9 @@ var HookManager = React.createClass({
               this.state.hooks.hooks.map(function(hook, index) {
                 return(
                   <tr key={index}>
-                    <td>{hook.hookId}</td>
+                    <td onClick={this.setCurrentHook.bind(this, hook.hookId)}>
+                      {hook.hookId} - {hook.metadata.name} - {hook.metadata.description}
+                    </td>
                   </tr>
                 );
               }, this)
@@ -139,7 +141,15 @@ var HookManager = React.createClass({
   },
 
   setTabKey(key) {
-    this.setState({tabKey: key});
+    this.setState({
+      tabKey: key
+    });
+  },
+
+  setCurrentHook(hook) {
+    this.setState({
+      currentHookId: hook
+    });
   },
 
   browseGroup: function (groupId, key) {

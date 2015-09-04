@@ -133,15 +133,16 @@ var HookEditor = React.createClass({
       };
     } else {
       // Load currentClientId
-      var hookDef = this.hooks.hook(this.props.currentGroupId, this.props.currentHookId);
-      return {
-        hook:           hookDef,
-        task:             JSON.stringify(hookDef.task, null, '\t'),
-        invalidTask:      false,
-        editing:          false,
-        working:          false,
-        error:            null
-      };
+      this.hooks.hook(this.props.currentGroupId,this.props.currentHookId).then(function(hook) {
+        return {
+          hook:             hook,
+          task:             JSON.stringify(hook.task, null, '\t'),
+          invalidTask:      false,
+          editing:          false,
+          working:          false,
+          error:            null
+        };
+      });
     }
   },
 
@@ -155,8 +156,8 @@ var HookEditor = React.createClass({
         </bs.Alert>
       );
     }
-    var isCreating          = (this.props.currentClientId === undefined ||
-                               this.props.currentGroupId  === undefined);
+    var isCreating          = (!this.props.currentHookId ||
+                               !this.props.currentGroupId);
     var isEditing           = (isCreating || this.state.editing);
     var title               = "Create New Hook";
     if (!isCreating) {
