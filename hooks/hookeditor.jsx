@@ -133,16 +133,14 @@ var HookEditor = React.createClass({
       };
     } else {
       // Load currentClientId
-      this.hooks.hook(this.props.currentGroupId,this.props.currentHookId).then(function(hook) {
-        return {
-          hook:             hook,
-          task:             JSON.stringify(hook.task, null, '\t'),
-          invalidTask:      false,
-          editing:          false,
-          working:          false,
-          error:            null
-        };
-      });
+      return {
+        hook:             this.hooks.hook(this.props.currentGroupId,this.props.currentHookId),
+        task:             "",
+        invalidTask:      false,
+        editing:          false,
+        working:          false,
+        error:            null
+      };
     }
   },
 
@@ -172,12 +170,12 @@ var HookEditor = React.createClass({
             <label className="control-label col-md-3">GroupId</label>
             <div className="col-md-9">
                 {
-                  isEditing ?
+                  isCreating ?
                     <input type="text"
                       className="form-control"
                       ref="groupId"
                       value={this.state.hook.groupId}
-                      onChange={this.onChange}
+                      onChange={this.onCreate}
                       placeholder="groupId"/>
                   :
                     <div className="form-control-static">
@@ -190,12 +188,12 @@ var HookEditor = React.createClass({
             <label className="control-label col-md-3">HookId</label>
             <div className="col-md-9">
                 {
-                  isEditing ?
+                  isCreating ?
                     <input type="text"
                       className="form-control"
                       ref="hookId"
                       value={this.state.hook.hookId}
-                      onChange={this.onChange}
+                      onChange={this.onCreate}
                       placeholder="hookId"/>
                   :
                     <div className="form-control-static">
@@ -229,12 +227,64 @@ var HookEditor = React.createClass({
             </div>
           </div>
           <div className="form-group">
-            <label className="control-label col-md-3">Task</label>
+            <label className="control-label col-md-3">Owner</label>
             <div className="col-md-9">
-              { this.renderEditor() }
+                {
+                  isEditing ?
+                    <input type="text"
+                      className="form-control"
+                      ref="owner"
+                      value={this.state.hook.metadata.owner}
+                      onChange={this.onChange}
+                      placeholder="nobody@example.com"/>
+                  :
+                    <div className="form-control-static">
+                      {this.state.hook.metadata.owner}
+                    </div>
+                }
             </div>
           </div>
           <div className="form-group">
+            <label className="control-label col-md-3">Email on Error</label>
+            <div className="col-md-9">
+                {
+                  isEditing ?
+                    <input type="checkbox"
+                      ref="emailOnError"
+                      value={this.state.hook.metadata.emailOnError ? "true" : "false"}
+                      onChange={this.onChange}/>
+                  :
+                    <input type="checkbox"
+                      checked={this.state.hook.metadata.emailOnError}
+                      disabled/>
+                }
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="control-label col-md-3">Task</label>
+            <div className="col-md-9">
+              {this.renderEditor()}
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="control-label col-md-3">Schedule</label>
+            <div className="col-md-9">
+              {
+                isEditing ?
+                  <input type="text"
+                    className="form-control"
+                    ref="schedule"
+                    value={this.state.hook.schedule}
+                    onChange={this.onChange}
+                    placeholder="Friday at 11:59pm"/>
+                  :
+                    <div className="form-control-static">
+                      {this.state.hook.schedule}
+                    </div>
+                }
+              </div>
+            </div>
+            <div className="form-group">
             <label className="control-label col-md-3">Expires</label>
             <div className="col-md-9">
               {
@@ -244,11 +294,29 @@ var HookEditor = React.createClass({
                     ref="expires"
                     value={this.state.hook.expires}
                     onChange={this.onChange}
-                    placeholder="Name"/>
+                    placeholder="2 weeks"/>
                   :
                     <div className="form-control-static">
                       {this.state.hook.expires}
                     </div>
+              }
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="control-label col-md-3">Deadline</label>
+            <div className="col-md-9">
+                {
+                  isEditing ?
+                    <input type="text"
+                      className="form-control"
+                      ref="deadline"
+                      value={this.state.hook.deadline}
+                      onChange={this.onChange}
+                      placeholder="3 days"/>
+                    :
+                      <div className="form-control-static">
+                        {this.state.hook.deadline}
+                      </div>
                 }
               </div>
             </div>
@@ -296,7 +364,7 @@ var HookEditor = React.createClass({
           action={this.deleteHook}
           success="Client deleted">
           Are you sure you want to delete hook under&nbsp;
-          <code>{this.state.groupId + '/' + this.state.hookId}</code>?
+          <code>{this.state.hook.groupId + '/' + this.state.hook.hookId}</code>?
         </ConfirmAction>
       </bs.ButtonToolbar>
     );
@@ -346,7 +414,7 @@ var HookEditor = React.createClass({
         lineNumbers={true}
         mode="application/json"
         textAreaClassName={'form-control'}
-        value={this.state.task}
+        value={this.state.task || JSON.stringify(this.state.hook.task, null, '\t')}
         onChange={this.onTaskChange}
         indentWithTabs={true}
         tabSize={2}
@@ -371,24 +439,25 @@ var HookEditor = React.createClass({
     });
   },
 
-  /** Handle changes in the editor */
-  onChange: function() {
+  /** Handle changes made to the editor only in create mode */
+  onCreate: function () {
     var state = _.cloneDeep(this.state);
     state.hook.groupId               = this.refs.groupId.getDOMNode().value;
     state.hook.hookId                = this.refs.hookId.getDOMNode().value;
-    state.hook.metadata.description  = this.refs.description.getDOMNode().value;
-    state.hook.metadata.name         = this.refs.name.getDOMNode().value;
-    state.hook.expires               = this.refs.expires.getDOMNode().value;
     this.setState(state);
   },
 
-  /** When expires exchanges in the editor */
-  onExpiresChange: function(date) {
-    if (date instanceof Date) {
-      var state = _.cloneDeep(this.state);
-      state.hook.expires = date.toJSON();
-      this.setState(state);
-    }
+  /** Handle changes in the editor */
+  onChange: function() {
+    var state = _.cloneDeep(this.state);
+    state.hook.metadata.description  = this.refs.description.getDOMNode().value;
+    state.hook.metadata.name         = this.refs.name.getDOMNode().value;
+    state.hook.metadata.owner        = this.refs.owner.getDOMNode().value;
+    state.hook.metadata.emailOnError = (this.refs.emailOnError.getDOMNode().value == "true");
+    state.hook.schedule              = this.refs.schedule.getDOMNode().value;
+    state.hook.expires               = this.refs.expires.getDOMNode().value;
+    state.hook.deadline              = this.refs.deadline.getDOMNode().value;
+    this.setState(state);
   },
 
   /** Start editing */
@@ -400,9 +469,10 @@ var HookEditor = React.createClass({
   createDefinition() {
     return {
       metadata: this.state.hook.metadata,
-      task:     JSON.parse(this.state.task),
-      deadline: this.state.hook.expires,
+      task:     this.state.task ? JSON.parse(this.state.task) : this.state.hook.task,
+      deadline: this.state.hook.deadline,
       expires:  this.state.hook.expires,
+      schedule: this.state.hook.schedule
     };
   },
 
@@ -421,7 +491,6 @@ var HookEditor = React.createClass({
         error: null
       });
       this.props.refreshHookList();
-      //this.reload();
     }.bind(this), function(err) {
       this.setState({
         working:  false,
