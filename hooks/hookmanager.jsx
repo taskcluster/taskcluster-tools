@@ -49,6 +49,7 @@ var HookManager = React.createClass({
     return (
       <bs.Row>
         <bs.Col md={4}>
+          {this.renderBreadcrumbs()}
           {this.renderHooksBrowser()}
           {this.renderButtonToolbar()}
         </bs.Col>
@@ -66,7 +67,7 @@ var HookManager = React.createClass({
     return (
       <bs.ButtonToolbar>
         <bs.Button bsStyle="primary"
-          onClick={this.browseGroup.bind(this, undefined, 1)}>
+          onClick={this.browse.bind(this, undefined, undefined, 1)}>
           <bs.Glyphicon glyph="plus"/>
           &nbsp;
           Add Hook
@@ -107,7 +108,7 @@ var HookManager = React.createClass({
               this.state.groups.groups.map(function(group, index) {
                 return (
                   <tr key={index}>
-                    <td onClick={this.browseGroup.bind(this, group, 2)}>{group}</td>
+                    <td onClick={this.browse.bind(this, group, undefined, 2)}>{group}</td>
                   </tr>
                   );
               }, this)
@@ -140,6 +141,34 @@ var HookManager = React.createClass({
     );
   },
 
+  renderBreadcrumbs: function () {
+    return (
+      <ol className="breadcrumb namespace-breadcrumbs">
+        <li key={-1}>
+          <a onClick={this.browse.bind(this, undefined, undefined, 1)}>
+            home
+          </a>
+        </li>
+        {
+          // Mark the current groupId
+          this.state.currentGroupId ?
+            (
+              <li key={0} className={(this.state.currentHookId == undefined) ? "active" : ""}>
+                <a onClick={this.browse.bind(this, this.state.currentGroupId, undefined, 2)}>
+                  {this.state.currentGroupId}
+                </a>
+              </li>
+            ) : undefined
+        }
+        {
+          this.state.currentHookId ?
+            (<li className="active" key={1}>{this.state.currentHookId}</li>) :
+            undefined
+        }
+      </ol>
+    );
+  },
+
   setTabKey(key) {
     this.setState({
       tabKey: key
@@ -152,12 +181,11 @@ var HookManager = React.createClass({
     });
   },
 
-  browseGroup: function (groupId, key) {
+  browse: function (groupId, hookId, key) {
     var state = {
       currentGroupId:  groupId,
-      currentHookId:   undefined,
+      currentHookId:   hookId,
       tabKey:          key,
-      hooksLoaded:     false
     };
     this.setState(state);
   }
