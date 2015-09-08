@@ -77,7 +77,11 @@ var HookEditor = React.createClass({
       editing:          true,
       // Operation details, if currently doing anything
       working:          false,
-      error:            null
+      error:            null,
+      // View the current trigger token
+      tokenLoaded:      false,
+      tokenError:       undefined,
+      token:            {token : ""}
     });
   },
 
@@ -134,7 +138,8 @@ var HookEditor = React.createClass({
     } else {
       // Load currentClientId
       return {
-        hook:             this.hooks.hook(this.props.currentGroupId,this.props.currentHookId),
+        hook:             this.hooks.hook(this.props.currentGroupId, this.props.currentHookId),
+        token:            this.hooks.getTriggerToken(this.props.currentGroupId, this.props.currentHookId),
         task:             "",
         invalidTask:      false,
         editing:          false,
@@ -332,10 +337,19 @@ var HookEditor = React.createClass({
                       )
                     :
                       <bs.ButtonToolbar>
+                        <bs.Button bsStyle="primary"
+                          onClick={this.triggerHook}>
+                          <bs.Glyphicon glyph="ok"/>&nbsp;Trigger Hook
+                        </bs.Button>
+                        <bs.ModalTrigger modal={this.renderTokenModal()} ref="tokenModalTrigger">
+                          <bs.Button bsStyle="info">
+                            Show Token
+                          </bs.Button>
+                        </bs.ModalTrigger>
                         <bs.Button bsStyle="success"
                           onClick={this.startEditing}
                           disabled={this.state.working}>
-                          <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Client
+                          <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Hook
                         </bs.Button>
                       </bs.ButtonToolbar>
                     }
@@ -356,6 +370,14 @@ var HookEditor = React.createClass({
                    disabled={this.state.working || this.state.invalidTask}>
           <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
         </bs.Button>
+        <ConfirmAction
+          buttonStyle='warning'
+          glyph='refresh'
+          label="Reset Token"
+          action={this.resetToken}
+          success="Token has been reset">
+          Are you sure you want to reset the token for this hook?
+        </ConfirmAction>
         <ConfirmAction
           buttonStyle='danger'
           glyph='trash'
@@ -402,6 +424,19 @@ var HookEditor = React.createClass({
       <div className="form-control-static">
         <format.Markdown>{this.state.hook.metadata.description}</format.Markdown>
       </div>
+    );
+  },
+
+  renderTokenModal() {
+    return (
+      <bs.Modal title="Trigger Token">
+        <div className="modal-body">
+          Token: <code>{this.state.token.token}</code>
+        </div>
+        <div className="modal-footer">
+          <bs.Button onClick={this.closeTokenModal}>Close</bs.Button>
+        </div>
+      </bs.Modal>
     );
   },
 
@@ -515,6 +550,17 @@ var HookEditor = React.createClass({
   async deleteHook() {
     await this.hooks.removeHook(this.state.hook.groupId, this.state.hook.hookId);
     await Promise.all([this.props.refreshHookList(), this.reload()]);
+  },
+
+  /** Reset the current trigger token */
+  async resetToken() {
+    let token = await this.hooks.resetTriggerToken(this.state.hook.groupId, this.state.hook.hookId);
+    this.setState({token: token});
+  },
+
+  /** Close the token modal */
+  closeTokenModal() {
+    this.refs.tokenModalTrigger.hide();
   },
 
   /** Reset error state from operation*/
