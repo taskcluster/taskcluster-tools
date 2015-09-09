@@ -70,18 +70,23 @@ var HookEditor = React.createClass({
       }
     }
     return _.defaults(this.parameterizeTask(task), {
-      hookLoaded:     false,
-      hookError:      undefined,
-      hook:           undefined,
-      // Edit or viewing current state
-      editing:          true,
-      // Operation details, if currently doing anything
-      working:          false,
-      error:            null,
+      // Currently loaded hook
+      hookLoaded:         false,
+      hookError:          undefined,
+      hook:               null,
       // View the current trigger token
-      tokenLoaded:      false,
-      tokenError:       undefined,
-      token:            {token : ""}
+      tokenLoaded:        false,
+      tokenError:         undefined,
+      token:              null,
+      // Submitted task
+      createdTaskLoaded:  false,
+      createdTaskError:   undefined,
+      createdTask:        null,
+      // Edit or viewing current state
+      editing:            true,
+      // Operation details, if currently doing anything
+      working:            false,
+      error:              null,
     });
   },
 
@@ -150,6 +155,23 @@ var HookEditor = React.createClass({
   },
 
   render: function() {
+    // Redirect if we've triggered a task
+    if (this.state.createdTaskLoaded) {
+      if (!this.state.createdTaskError && this.state.createdTask) {
+        var link = '/task-inspector/#' + this.state.createdTask.status.taskId + '/';
+        window.location = link;
+        return (
+          <bs.Col md={10} mdOffset={1}>
+            <a href={link}>
+              See&nbsp;
+              <code>{this.state.createdTask}</code>
+              &nbsp;in task inspector.
+            </a>
+          </bs.Col>
+        );
+      }
+    }
+
     // display errors from operations
     if (this.state.error) {
       return (
@@ -428,7 +450,7 @@ var HookEditor = React.createClass({
   },
 
   renderTokenModal() {
-    return (
+    return this.renderWaitFor('token') || (
       <bs.Modal title="Trigger Token">
         <div className="modal-body">
           Token: <code>{this.state.token.token}</code>
@@ -550,6 +572,13 @@ var HookEditor = React.createClass({
   async deleteHook() {
     await this.hooks.removeHook(this.state.hook.groupId, this.state.hook.hookId);
     await Promise.all([this.props.refreshHookList(), this.reload()]);
+  },
+
+  triggerHook() {
+    var status = this.hooks.triggerHook(this.state.hook.groupId, this.state.hook.hookId);
+    this.loadState({
+      createdTask: status,
+    });
   },
 
   /** Reset the current trigger token */
