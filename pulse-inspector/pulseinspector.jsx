@@ -290,7 +290,7 @@ var PulseInspector = React.createClass({
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
   handleMessage: function(message) {
-    message._idForInspector = slugid.v4();
+    message._idForInspector = slugid.nice();
     this.setState({messages: [message].concat(this.state.messages)});
   },
 

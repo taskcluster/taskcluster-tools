@@ -52,7 +52,7 @@ var ClientEditor = React.createClass({
     if (!this.props.currentClientId) {
       return {
         client: {
-          clientId:       slugid.v4(),
+          clientId:       slugid.nice(),
           accessToken:    '-',
           scopes:         [],
           expires:        new Date(3015, 1, 1),

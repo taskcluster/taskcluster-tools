@@ -109,7 +109,7 @@ var TaskInspector = React.createClass({
   // Render a task-inspector
   render: function() {
     // Render
-    var invalidInput = !/^[a-zA-Z0-9_-]{22}$/.test(this.state.taskIdInput);
+    var invalidInput = !/^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/.test(this.state.taskIdInput);
     return (
       <span>
       <h1>Task Inspector</h1>
