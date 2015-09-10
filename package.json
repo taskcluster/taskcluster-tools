@@ -14,7 +14,7 @@
     "promise":                          "6.0.1",
     "lodash":                           "3.8.0",
     "debug":                            "2.1.1",
-    "slugid":                           "1.0.3",
+    "slugid":                           "^1.1.0",
     "moment":                           "2.9.0",
     "marked":                           "0.3.2",
     "taskcluster-client":               "0.22.1",

@@ -180,7 +180,7 @@ var TaskCreator = React.createClass({
   handleCreateTask() {
     // Create task and get taskId of created task
     var taskCreated = Promise.resolve(this.state.task).then(function(task) {
-      var taskId  = slugid.v4();
+      var taskId  = slugid.nice();
       var payload = JSON.parse(task);
       return this.queue.createTask(taskId, payload).then(function() {
         // Save task definition to localStorage

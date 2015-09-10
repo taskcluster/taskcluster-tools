@@ -234,7 +234,7 @@ var TaskGraphInspector = React.createClass({
   // Render a task-graph-inspector
   render: function() {
     // Decide if input is a valid slugid
-    var invalidInput = !/^[a-zA-Z0-9_-]{22}$/.test(this.state.taskGraphIdInput);
+    var invalidInput = !/^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/.test(this.state.taskGraphIdInput);
     // Render some form input area
     return (
       <span>
