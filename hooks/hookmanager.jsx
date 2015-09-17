@@ -15,7 +15,7 @@ var HookManager = React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         hooks:       taskcluster.createClient(reference)
-      },
+      }
     })
   ],
 
@@ -36,7 +36,10 @@ var HookManager = React.createClass({
 
   load: function () {
     return {
-      groups: this.hooks.listHookGroups()
+      groups: this.hooks.listHookGroups(),
+      hooks:  this.state.currentGroupId ?
+        this.hooks.listHooks(this.state.currentGroupId) :
+        Promise.reject()
     };
   },
 
@@ -178,7 +181,7 @@ var HookManager = React.createClass({
   },
 
   browse: function (groupId, hookId, key) {
-    if (groupId !== this.state.currentGroupId) {
+    if (groupId && groupId !== this.state.currentGroupId) {
       this.loadState({
         hooks: this.hooks.listHooks(groupId)
       });

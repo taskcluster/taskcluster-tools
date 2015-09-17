@@ -69,7 +69,8 @@ var HookEditor = React.createClass({
   },
 
   getInitialState: function() {
-    return _.defaults({
+    return {
+      definition:        undefined,
       // Currently loaded hook
       hookLoaded:        false,
       hookError:         undefined,
@@ -87,7 +88,7 @@ var HookEditor = React.createClass({
       // Operation details, if currently doing anything
       working:           false,
       error:             null,
-    });
+    };
   },
 
   /** Load initial state */
@@ -102,11 +103,12 @@ var HookEditor = React.createClass({
       hook.task.created = new Date().toJSON();
 
       return {
-        hook:       hook,
-        groupId:    this.props.currentGroupId ? this.props.currentGroupId :  "",
-        hookId:     this.props.currentHookId ? this.props.currentHookId :    "",
-        definition: JSON.stringify(hook, null, '\t'),
+        hook:       _.defaults(hook, {
+          groupId:  this.props.currentGroupId ? this.props.currentGroupId :  "",
+          hookId:   this.props.currentHookId ? this.props.currentHookId :    "",
+        }),
         editing:    true,
+        definition: undefined,
         working:    false,
         error:      null
       };
@@ -114,10 +116,9 @@ var HookEditor = React.createClass({
       // Load currentClientId
       return {
         hook:    this.hooks.hook(this.props.currentGroupId, this.props.currentHookId),
-        groupId: this.props.currentGroupId,
-        hookId:  this.props.currentHookId,
         token:   this.hooks.getTriggerToken(this.props.currentGroupId, this.props.currentHookId),
         editing: false,
+        definition: undefined,
         working: false,
         error:   null
       };
@@ -167,16 +168,16 @@ var HookEditor = React.createClass({
             <label className="control-label col-md-1">GroupId</label>
             <div className="col-md-11">
               {
-                isEditing ?
+                isCreating ?
                   <input type="text"
                     className="form-control"
                     ref="groupId"
-                    value={this.state.groupId}
+                    value={this.state.hook.groupId}
                     onChange={this.onChange}
                     placeholder="Name"/>
                   :
                     <div className="form-control-static">
-                      {this.state.groupId}
+                      {this.state.hook.groupId}
                     </div>
               }
             </div>
@@ -185,16 +186,16 @@ var HookEditor = React.createClass({
             <label className="control-label col-md-1">HookId</label>
             <div className="col-md-11">
               {
-                isEditing ?
+                isCreating ?
                   <input type="text"
                     className="form-control"
                     ref="hookId"
-                    value={this.state.hookId}
+                    value={this.state.hook.hookId}
                     onChange={this.onChange}
                     placeholder="Name"/>
                   :
                     <div className="form-control-static">
-                      {this.state.hookId}
+                      {this.state.hook.hookId}
                     </div>
               }
             </div>
@@ -253,7 +254,7 @@ var HookEditor = React.createClass({
           action={this.deleteHook}
           success="Client deleted">
           Are you sure you want to delete hook under&nbsp;
-          <code>{this.state.groupId + '/' + this.state.hookId}</code>?
+          <code>{this.state.hook.groupId + '/' + this.state.hook.hookId}</code>?
         </ConfirmAction>
       </bs.ButtonToolbar>
     );
@@ -294,7 +295,7 @@ var HookEditor = React.createClass({
         lineNumbers={true}
         mode="application/json"
         textAreaClassName={'form-control'}
-        value={this.state.definition || JSON.stringify(this.state.hook, null, '\t')}
+        value={this.state.definition || this.editorHookJSON()}
         onChange={this.onHookChange}
         indentWithTabs={true}
         tabSize={2}
@@ -305,10 +306,20 @@ var HookEditor = React.createClass({
     );
   },
 
+  /** Create the visible JSON for the editor */
+  editorHookJSON: function() {
+    // Delete the group and hook fields since they arent part of the create payload
+    var hook = _.cloneDeep(this.state.hook);
+    delete hook.hookId;
+    delete hook.groupId;
+    this.state.definition = JSON.stringify(hook, null, '\t');
+    return this.state.definition;
+  },
+
   onChange: function() {
     var state = _.cloneDeep(this.state);
-    state.groupId = this.refs.groupId.getDOMNode().value;
-    state.hookId = this.refs.hookId.getDOMNode().value;
+    state.hook.groupId = this.refs.groupId.getDOMNode().value;
+    state.hook.hookId = this.refs.hookId.getDOMNode().value;
     this.setState(state);
   },
 
@@ -336,8 +347,8 @@ var HookEditor = React.createClass({
     this.setState({working: true});
     var payload = JSON.parse(this.state.definition);
     this.hooks.createHook(
-      this.state.groupId,
-      this.state.hookId,
+      this.state.hook.groupId,
+      this.state.hook.hookId,
       payload
     ).then(function(hook) {
       this.setState({
@@ -358,10 +369,24 @@ var HookEditor = React.createClass({
   /** Save current hook */
   saveHook() {
     var payload = JSON.parse(this.state.definition);
-    this.loadState({
-      hook:    this.hooks.updateHook(this.state.groupId, this.state.hookId, payload),
-      editing: false
-    });
+    this.hooks.updateHook(
+      this.state.hook.groupId,
+      this.state.hook.hookId,
+      payload
+    ).then(function(hook) {
+      this.setState({
+        hook:    hook,
+        editing: false,
+        working: false,
+        error:   null
+      });
+      this.props.refreshHookList();
+    }.bind(this), function(err) {
+      this.setState({
+        working: false,
+        error:   err
+      });
+    }.bind(this));
   },
 
   /** Delete current hook */
