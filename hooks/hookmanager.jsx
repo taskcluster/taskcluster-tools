@@ -16,7 +16,6 @@ var HookManager = React.createClass({
       clients: {
         hooks:       taskcluster.createClient(reference)
       },
-      reloadOnKeys: ['currentGroupId']
     })
   ],
 
@@ -37,10 +36,7 @@ var HookManager = React.createClass({
 
   load: function () {
     return {
-      groups: this.hooks.listHookGroups(),
-      hooks: this.state.currentGroupId ?
-        this.hooks.listHooks(this.state.currentGroupId) :
-        {hooks: []}
+      groups: this.hooks.listHookGroups()
     };
   },
 
@@ -182,6 +178,11 @@ var HookManager = React.createClass({
   },
 
   browse: function (groupId, hookId, key) {
+    if (groupId !== this.state.currentGroupId) {
+      this.loadState({
+        hooks: this.hooks.listHooks(groupId)
+      });
+    }
     var state = {
       currentGroupId:  groupId,
       currentHookId:   hookId,
