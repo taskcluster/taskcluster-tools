@@ -64,6 +64,10 @@ var IndexBrowser = React.createClass({
   },
 
   render: function() {
+    var taskInfo = null;
+    if (this.state.namespace) {
+      taskInfo = this.renderWaitFor('tasks') || this.renderTasks()
+    }
     return (
       <bs.Row>
         <bs.Col md={6} className="index-browser">
@@ -80,14 +84,8 @@ var IndexBrowser = React.createClass({
                 </bs.Button>
               }/>
           </form>
-          <bs.TabbedArea defaultActiveKey={1}>
-            <bs.TabPane eventKey={1} tab="Namespaces">
-              {this.renderWaitFor('namespaces') || this.renderNamespaces()}
-            </bs.TabPane>
-            <bs.TabPane eventKey={2} tab="Tasks">
-              {this.renderWaitFor('tasks') || this.renderTasks()}
-            </bs.TabPane>
-          </bs.TabbedArea>
+          {taskInfo}
+          {this.renderWaitFor('namespaces') || this.renderNamespaces()}
         </bs.Col>
         <bs.Col md={6}>
           <this.props.entryView
