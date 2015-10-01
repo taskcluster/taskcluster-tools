@@ -67,7 +67,7 @@ var TaskCreator = React.createClass({
       task          = JSON.stringify(data, null, '\t');
     }
     catch (err) {
-      debug("Failed to parameterize initial task, err: %s, %j",
+      debug("Failed to parameterize task, err: %s, %j",
             err, err, err.stack);
       invalidTask = true;
     }
@@ -151,6 +151,12 @@ var TaskCreator = React.createClass({
           <bs.Glyphicon glyph="ok"/>&nbsp;
           Create Task
         </bs.Button>
+        <bs.Button bsStyle="info"
+                   onClick={this.handleUpdateTimestamps}
+                   disabled={this.state.invalidTask}>
+          <bs.Glyphicon glyph="repeat"/>&nbsp;
+          Update Timestamps
+        </bs.Button>
         <bs.Button bsStyle="danger" onClick={this.handleReset}>
           <bs.Glyphicon glyph="remove"/>&nbsp;
           Reset Editor
@@ -197,6 +203,14 @@ var TaskCreator = React.createClass({
     });
   },
 
+  /** Reset timestamps in the task **/
+  handleUpdateTimestamps() {
+    // Create task and get taskId of created task
+    // Load state from promise (see TaskClusterMixin)
+    Promise.resolve(this.state.task).then(function(task) {
+        this.setState(this.parameterizeTask(task));
+    }.bind(this));
+  },
   /** Reset to initialTaskValue */
   handleReset: function() {
     this.setState(this.parameterizeTask(this.props.initialTaskValue));

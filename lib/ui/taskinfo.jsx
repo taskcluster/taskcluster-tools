@@ -226,6 +226,23 @@ var TaskInfo = React.createClass({
             {JSON.stringify(task.payload, undefined, 2)}
           </format.Code>
         </dd>
+        <dt>Edit in Task Creator</dt>
+        <dd>
+          <ConfirmAction buttonSize="xsmall"
+                         buttonStyle="danger"
+                         glyph="edit"
+                         label="Edit Task"
+                         action={this.editTask}
+                         success="Opening Task Creator">
+            Are you sure you wish to edit this task?
+            Note that the edited task will not be linked to other tasks or
+            have the same routes as other tasks, so this is not a way to "fix"
+            a failing task in a larger task graph.  Note that you may also
+            not have the scopes required to create the resulting task.
+          </ConfirmAction>&nbsp;
+        </dd>
+      </dl>
+      <dl className="dl-horizontal">
         <dt>Run Locally</dt>
         <dd>
           <format.Code language='bash'>
@@ -245,6 +262,34 @@ var TaskInfo = React.createClass({
   },
   cancelTask() {
     return this.queue.cancelTask(this.props.status.taskId);
+  },
+  editTask() {
+    var newTask = {
+      // filled in by task creator on load
+      created: null,
+      deadline: null,
+    };
+    // copy fields from the parent task, intentionally excluding some
+    // fields which might cause confusion if left unchanged
+    var exclude = [
+        'routes',
+        'taskGroupId',
+        'schedulerId',
+        'priority',
+        'created',
+        'deadline'
+    ];
+    _.keys(this.state.task).forEach(key => {
+      if (!_.includes(exclude, key)) {
+        newTask[key] = this.state.task[key];
+      }
+    });
+
+    // overwrite task-creator's local state with this new task
+    localStorage.setItem("task-creator/task", JSON.stringify(newTask));
+
+    // ..and go there
+    window.location.href = '../task-creator';
   },
 
   /** Render script illustrating how to run locally */
