@@ -69,13 +69,17 @@ var ConfirmAction = React.createClass({
           }
         </div>
         <div className="modal-footer">
-          <bs.Button
-              onClick={this.executeAction}
-              bsStyle={this.props.buttonStyle}
-              disabled={this.state.executing && !this.state.resultLoaded}>
-            <bs.Glyphicon glyph={this.props.glyph}/>&nbsp;
-            <span>{this.props.label}</span>
-          </bs.Button>
+          {
+            !(this.state.executing || this.state.result) ? (
+              <bs.Button
+                  onClick={this.executeAction}
+                  bsStyle={this.props.buttonStyle}
+                  hidden={this.state.result}>
+                <bs.Glyphicon glyph={this.props.glyph}/>&nbsp;
+                <span>{this.props.label}</span>
+              </bs.Button>
+            ) : undefined
+          }
           <bs.Button onClick={this.closeDialog} bsStyle="default">
             <bs.Glyphicon glyph="remove"/>&nbsp;
             Close
