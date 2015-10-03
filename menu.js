@@ -56,6 +56,28 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Client Manager ",
+    link:           '/auth/clients/',
+    icon:           'users',
+    display:        true,
+    description: [
+      "Manage clients on `auth.taskcluster.net`. This tool allows you to",
+      "create, modify and delete clients. You can also reset `accessToken`",
+      "and explore indirect scopes."
+    ].join('\n')
+  },
+  {
+    title:          "Role Manager",
+    link:           '/auth/roles/',
+    icon:           'shield',
+    display:        true,
+    description: [
+      "Manage roles on `auth.taskcluster.net`. This tool allows you to",
+      "create, modify and delete roles. You can also manage scopes and",
+      "and explore indirect scopes."
+    ].join('\n')
+  },
+  {
     title:          "Pulse Inspector",
     link:           '/pulse-inspector/',
     icon:           'wifi',

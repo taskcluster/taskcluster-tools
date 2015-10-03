@@ -14,10 +14,20 @@ module.exports = [
   'landingpage.jsx',
   'landingpage.less',
 
-  // Authentication Manager
+  // Authentication Manager (legacy)
   'auth/index.jade',
   'auth/app.less',
   'auth/app.jsx',
+
+  // Client Manager
+  'auth/clients/index.jade',
+  'auth/clients/app.less',
+  'auth/clients/app.jsx',
+
+  // Roles Manager
+  'auth/roles/index.jade',
+  'auth/roles/app.less',
+  'auth/roles/app.jsx',
 
   // Login
   'login/index.jade',
