@@ -1,13 +1,18 @@
-/*
 var React               = require('react');
-var ClientManager       = require('./clientmanager');
+var RoleManager         = require('./rolemanager');
 var $                   = require('jquery');
+
+var utils               = require('../../lib/utils');
+
+var hashManager = utils.createHashManager({
+  separator:            '/'
+});
 
 // Render component
 $(function() {
   React.render(
-    <ClientManager/>,
+    <RoleManager hashEntry={hashManager.root()}/>,
     $('#container')[0]
   );
 });
-*/
+

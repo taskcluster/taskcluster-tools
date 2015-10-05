@@ -23,7 +23,7 @@ var ClientEditor = React.createClass({
   ],
 
   propTypes: {
-    // Method to reload client in list
+    // Method to reload a client in the parent
     reloadClientId:  React.PropTypes.func.isRequired
   },
 
@@ -79,7 +79,7 @@ var ClientEditor = React.createClass({
     if (this.state.error) {
       return (
         <bs.Alert bsStyle="danger" onDismiss={this.dismissError}>
-          <strong>Error executing operation</strong>
+          <strong>Error executing operation</strong>&nbsp;
           {this.state.error.toString()}
         </bs.Alert>
       );
@@ -172,11 +172,11 @@ var ClientEditor = React.createClass({
           {
             _.map({
               created: "Created",
-              lastModified: "Last modified",
+              lastModified: "Last Modified",
               lastDateUsed: "Last Date Used",
               lastRotated: "Last Rotated",
             }, (label, prop) => {
-              if (!this.state.client.created) {
+              if (!this.state.client[prop]) {
                 return undefined;
               }
               return (

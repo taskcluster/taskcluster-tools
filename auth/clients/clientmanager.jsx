@@ -51,7 +51,7 @@ var ClientManager = React.createClass({
           {this.renderClientsTable()}
           <bs.ButtonToolbar>
             <bs.Button bsStyle="primary"
-                       onClick={this.selectClientId.bind(this, undefined)}
+                       onClick={this.selectClientId.bind(this, '')}
                        disabled={this.state.selectedClientId === ''}>
               <bs.Glyphicon glyph="plus"/>
               &nbsp;
