@@ -16,7 +16,7 @@ var ClientEditor = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth:       taskcluster.createClient(require('./ref'))
+        auth:       taskcluster.Auth
       },
       reloadOnProps: ['currentClientId']
     })

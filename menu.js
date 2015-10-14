@@ -45,17 +45,6 @@ module.exports = [
     ].join('\n')
   },
   {
-    title:          "Authentication Manager",
-    link:           '/auth/',
-    icon:           'users',
-    display:        true,
-    description: [
-      "Manage clients on `auth.taskcluster.net`. This tool allows you to",
-      "create, modify and delete client. You can also manage scopes and",
-      "reset `accessToken`."
-    ].join('\n')
-  },
-  {
     title:          "Client Manager ",
     link:           '/auth/clients/',
     icon:           'users',

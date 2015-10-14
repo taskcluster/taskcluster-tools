@@ -12,7 +12,7 @@ var ClientManager = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth:       taskcluster.createClient(require('./ref'))
+        auth:       taskcluster.Auth
       }
     }),
     // Serialize state.selectedClientId to location.hash as string

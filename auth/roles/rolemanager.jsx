@@ -12,7 +12,7 @@ var RoleManager = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth:       taskcluster.createClient(require('../clients/ref'))
+        auth:       taskcluster.Auth
       }
     }),
     // Serialize state.selectedRoleId to location.hash as string

@@ -15,7 +15,7 @@ var RoleEditor = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth:       taskcluster.createClient(require('../clients/ref'))
+        auth:       taskcluster.Auth
       },
       reloadOnProps: ['currentRoleId']
     })
