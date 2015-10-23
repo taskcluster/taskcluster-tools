@@ -14,7 +14,7 @@ var TerminalView = React.createClass({
     })
   ],
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       url:            undefined,  // No URL to display at this point
       options: {
@@ -37,12 +37,12 @@ var TerminalView = React.createClass({
   },
 
   // Refresh the currently displayed file
-  refresh: function() {
+  refresh() {
     this.open();
   },
 
   /** Open a URL in the terminal */
-  open: function() {
+  open() {
     // Destroy existing terminal if there is one
     if (this.term) {
       this.term.destroy();
@@ -83,45 +83,47 @@ var TerminalView = React.createClass({
     this.request.send();
   },
 
-  onData: function() {
-    // Write data to term if there is any data
-    if (this.request.responseText !== null ||
-        this.request.responseText !== undefined) {
-      // Check if we have new data
-      var length = this.request.responseText.length;
-      if (length > this.dataOffset) {
-        // Find new data
-        var data = this.request.responseText.slice(this.dataOffset, length);
-        // Update dataOffset
-        this.dataOffset = length;
-        // Write to term
-        this.term.write(data);
+  onData() {
+    window.requestAnimationFrame(() => {
+      // Write data to term if there is any data
+      if (this.request.responseText !== null ||
+          this.request.responseText !== undefined) {
+        // Check if we have new data
+        var length = this.request.responseText.length;
+        if (length > this.dataOffset) {
+          // Find new data
+          var data = this.request.responseText.slice(this.dataOffset, length);
+          // Update dataOffset
+          this.dataOffset = length;
+          // Write to term
+          this.term.write(data);
+        }
       }
-    }
-    // When request is done
-    if (this.request.readyState === this.request.DONE) {
-      // Stop cursor from blinking
-      this.term.cursorBlink = false;
-      if (this.term._blink) {
-        clearInterval(this.term._blink);
-      }
-      this.term.showCursor();
+      // When request is done
+      if (this.request.readyState === this.request.DONE) {
+        // Stop cursor from blinking
+        this.term.cursorBlink = false;
+        if (this.term._blink) {
+          clearInterval(this.term._blink);
+        }
+        this.term.showCursor();
 
-      // Write an error, if request failed
-      if (this.request.status !== 200) {
-        this.term.write("\r\n[task-inspector] Failed to fetch log!\r\n");
+        // Write an error, if request failed
+        if (this.request.status !== 200) {
+          this.term.write("\r\n[task-inspector] Failed to fetch log!\r\n");
+        }
       }
-    }
+    });
   },
 
-  abortRequest: function() {
+  abortRequest() {
     this.request.removeEventListener('progress', this.onData);
     this.request.removeEventListener('load', this.onData);
     this.request.abort();
     this.request = null;
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     if (this.request) {
       this.abortRequest();
     }
@@ -129,7 +131,7 @@ var TerminalView = React.createClass({
     this.term = null;
   },
 
-  render: function() {
+  render() {
     return <div className="terminal-view" ref="term"></div>;
   }
 });
