@@ -3,7 +3,7 @@ var _               = require('lodash');
 var taskcluster     = require('taskcluster-client');
 var utils           = require('../utils');
 var DropdownList    = require('react-widgets').DropdownList;
-var TerminalView    = require('./terminalview');
+var TerminalView    = require('./streamview');
 
 /** Render a terminal and a dropdown menu to select logs from */
 var LogView = React.createClass({

@@ -3,6 +3,7 @@ var babelify  = require('babelify');
 var stream    = require('stream');
 var exorcist  = require('exorcist');
 var concat    = require('concat-stream')
+var workerify = require('workerify');
 
 // Common modules to compiled into a single bundle
 var COMMON_MODULES = [
@@ -67,7 +68,8 @@ module.exports = function(grunt) {
       options: {
         transform:  [
           // Process JSX files with babelify
-          [babelify, {stage: 1}]
+          [babelify, {stage: 1}],
+          [workerify]
         ],
         watch:      true,         // Use watchify (caching modules)
         keepAlive:  false,
