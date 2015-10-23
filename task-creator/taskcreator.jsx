@@ -6,11 +6,20 @@ var CodeMirror              = require('react-code-mirror');
 var debug                   = require('debug')('taskcreator');
 var _                       = require('lodash');
 var slugid                  = require('slugid');
-
+var jsonlint                = require('durable-json-lint');
 
 // Load javascript mode for CodeMirror
 require('codemirror/mode/javascript/javascript');
 require('../lib/codemirror/json-lint');
+
+/** Parse json with jsonlint and accept corrections, and throw on error */
+let parseJSON = (text) => {
+  let {json, errors} = jsonlint(text);
+  if (errors.length > 0) {
+    throw new Error(errors[0].description || errors[0].message);
+  }
+  return JSON.parse(json);
+};
 
 /** Create a task-creator */
 var TaskCreator = React.createClass({
@@ -37,7 +46,7 @@ var TaskCreator = React.createClass({
         task = localStorage.getItem(this.props.localStorageKey);
         // Check that'll parse
         try {
-          JSON.parse(task);
+          parseJSON(task);
         }
         catch (err) {
           task = this.props.initialTaskValue;
@@ -59,7 +68,7 @@ var TaskCreator = React.createClass({
 
     // Parameterize with new deadline and created time
     try {
-      var data      = JSON.parse(task);
+      var data      = parseJSON(task);
       var deadline  = new Date();
       deadline.setMinutes(deadline.getMinutes() + 60);
       data.created  = new Date().toJSON();
@@ -171,7 +180,7 @@ var TaskCreator = React.createClass({
     // Attempt to parse task input
     var invalidTask = false;
     try {
-      JSON.parse(e.target.value);
+      parseJSON(e.target.value);
     }
     catch (err) {
       invalidTask = true;
@@ -187,7 +196,7 @@ var TaskCreator = React.createClass({
     // Create task and get taskId of created task
     var taskCreated = Promise.resolve(this.state.task).then(function(task) {
       var taskId  = slugid.nice();
-      var payload = JSON.parse(task);
+      var payload = parseJSON(task);
       return this.queue.createTask(taskId, payload).then(function() {
         // Save task definition to localStorage
         if (this.props.localStorageKey) {
