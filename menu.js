@@ -103,8 +103,7 @@ module.exports = [
     icon:           'repeat',
     display:        true,
     description: [
-      "The hooks manager, lets you manage and inspect the hooks that have",
-      "been created."
+      "Manage hooks: tasks that are created in response to events within TaskCluster."
     ].join('\n')
   },
   {

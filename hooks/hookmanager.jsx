@@ -14,6 +14,7 @@ var HookManager = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
+        // TODO: use taskcluster.Hooks when new version lands
         hooks:       taskcluster.createClient(reference)
       }
     })
@@ -22,23 +23,23 @@ var HookManager = React.createClass({
   /** Create an initial state */
   getInitialState: function () {
     return {
-      currentGroupId: undefined,
-      currentHookId:  undefined,
-      groups:        {groups: []},
-      groupsLoaded:  true,
-      groupsError:   undefined,
-      hooks:         {hooks: []},
-      hooksLoaded:   false,
-      hooksError:    undefined,
-      tabKey:        1
+      currentHookGroupId:   undefined,
+      currentHookId:        undefined,
+      groups:               {groups: []},
+      groupsLoaded:         true,
+      groupsError:          undefined,
+      hooks:                {hooks: []},
+      hooksLoaded:          false,
+      hooksError:           undefined,
+      tabKey:               1
     };
   },
 
   load: function () {
     return {
       groups: this.hooks.listHookGroups(),
-      hooks:  this.state.currentGroupId ?
-        this.hooks.listHooks(this.state.currentGroupId) :
+      hooks:  this.state.currentHookGroupId ?
+        this.hooks.listHooks(this.state.currentHookGroupId) :
         Promise.reject()
     };
   },
@@ -54,7 +55,7 @@ var HookManager = React.createClass({
         </bs.Col>
         <bs.Col md={8}>
           <HookEditor currentHookId={this.state.currentHookId}
-                      currentGroupId={this.state.currentGroupId}
+                      currentHookGroupId={this.state.currentHookGroupId}
                       refreshHookList={this.reload}/>
         </bs.Col>
       </bs.Row>
@@ -150,11 +151,13 @@ var HookManager = React.createClass({
         </li>
         {
           // Mark the current groupId
-          this.state.currentGroupId ?
+          this.state.currentHookGroupId ?
             (
-              <li key={0} className={(this.state.currentHookId == undefined) ? "active" : ""}>
-                <a onClick={this.browse.bind(this, this.state.currentGroupId, undefined, 2)}>
-                  {this.state.currentGroupId}
+              <li key={0}
+                  className={(this.state.currentHookId == undefined) ? "active" : ""}>
+                <a onClick={this.browse.bind(this,
+                                this.state.currentHookGroupId, undefined, 2)}>
+                  {this.state.currentHookGroupId}
                 </a>
               </li>
             ) : undefined
@@ -181,15 +184,15 @@ var HookManager = React.createClass({
   },
 
   browse: function (groupId, hookId, key) {
-    if (groupId && groupId !== this.state.currentGroupId) {
+    if (groupId && groupId !== this.state.currentHookGroupId) {
       this.loadState({
         hooks: this.hooks.listHooks(groupId)
       });
     }
     var state = {
-      currentGroupId:  groupId,
-      currentHookId:   hookId,
-      tabKey:          key,
+      currentHookGroupId:   groupId,
+      currentHookId:        hookId,
+      tabKey:               key,
     };
     this.setState(state);
   }

@@ -16,11 +16,7 @@ var initialHook = {
     owner: "name@example.com",
     emailOnError: true
   },
-  schedule: {
-    format: {
-      type: "none",
-    }
-  },
+  schedule: ['0 * * * * *'],
   expires: "3 days",
   deadline: "60 minutes",
   task: {
@@ -51,7 +47,7 @@ var HookEditor = React.createClass({
       clients: {
         hooks:       taskcluster.createClient(reference)
       },
-      reloadOnProps: ['currentHookId', 'currentGroupId']
+      reloadOnProps: ['currentHookId', 'currentHookGroupId']
     })
   ],
 
@@ -62,9 +58,9 @@ var HookEditor = React.createClass({
 
   getDefaultProps: function() {
     return {
-      currentHookId:    undefined,     // undefined implies. "Create Client"
-      currentGroupId:   undefined,
-      initialHookValue: JSON.stringify(initialHook, null, '\t')
+      currentHookId:        undefined,     // undefined implies. "Create Hook"
+      currentHookGroupId:   undefined,
+      initialHookValue:     JSON.stringify(initialHook, null, '\t')
     };
   },
 
@@ -75,10 +71,6 @@ var HookEditor = React.createClass({
       hookLoaded:        false,
       hookError:         undefined,
       hook:              null,
-      // View the current trigger token
-      tokenLoaded:       false,
-      tokenError:        undefined,
-      token:             null,
       // Submitted task
       createdTaskLoaded: false,
       createdTaskError:  undefined,
@@ -93,8 +85,8 @@ var HookEditor = React.createClass({
 
   /** Load initial state */
   load: function() {
-    // Create a new hook if we don't have the groupId and hookId
-    if (!this.props.currentHookId || !this.props.currentGroupId) {
+    // Create a new hook if we don't have the hookGroupId and hookId
+    if (!this.props.currentHookId || !this.props.currentHookGroupId) {
       // Parametrization of a few field, to satisfy the task field
       var hook     = JSON.parse(this.props.initialHookValue);
       var deadline = new Date();
@@ -103,10 +95,7 @@ var HookEditor = React.createClass({
       hook.task.created = new Date().toJSON();
 
       return {
-        hook:       _.defaults(hook, {
-          groupId:  this.props.currentGroupId ? this.props.currentGroupId :  "",
-          hookId:   this.props.currentHookId ? this.props.currentHookId :    "",
-        }),
+        hook:       hook,
         editing:    true,
         definition: undefined,
         working:    false,
@@ -114,35 +103,19 @@ var HookEditor = React.createClass({
       };
     } else {
       // Load currentClientId
+      hook = this.hooks.hook(this.props.currentHookGroupId, this.props.currentHookId).then(
+        h => { delete h.hookId; delete h.hookGroupId; return h });
       return {
-        hook:    this.hooks.hook(this.props.currentGroupId, this.props.currentHookId),
-        token:   this.hooks.getTriggerToken(this.props.currentGroupId, this.props.currentHookId),
-        editing: false,
+        hook:       hook,
+        editing:    false,
         definition: undefined,
-        working: false,
-        error:   null
+        working:    false,
+        error:      null
       };
     }
   },
 
   render: function() {
-    // Redirect if we've triggered a task
-    if (this.state.createdTaskLoaded) {
-      if (!this.state.createdTaskError && this.state.createdTask) {
-        var link = '/task-inspector/#' + this.state.createdTask.status.taskId + '/';
-        window.location = link;
-        return (
-          <bs.Col md={10} mdOffset={1}>
-            <a href={link}>
-              See&nbsp;
-              <code>{this.state.createdTask}</code>
-              &nbsp;in task inspector.
-            </a>
-          </bs.Col>
-        );
-      }
-    }
-
     // display errors from operations
     if (this.state.error) {
       return (
@@ -153,53 +126,53 @@ var HookEditor = React.createClass({
       );
     }
     var isCreating          = (!this.props.currentHookId ||
-                               !this.props.currentGroupId);
+                               !this.props.currentHookGroupId);
     var isEditing           = (isCreating || this.state.editing);
-    var title               = "Create New Hook";
-    if (!isCreating) {
-      title = (isEditing ? "Edit Hook" : "View Hook");
-    }
+    var title               = isCreating ? "Create Hook" :
+                              isEditing ? "Edit Hook" : "View Hook";
     return this.renderWaitFor('hook') || (
       <span className="hook-editor">
         <h3>{title}</h3>
         <hr style={{marginBottom: 10}}/>
         <div className="form-horizontal">
           <div className="form-group">
-            <label className="control-label col-md-1">GroupId</label>
-            <div className="col-md-11">
+            <label className="control-label col-md-2">hookGroupId</label>
+            <div className="col-md-10">
               {
                 isCreating ?
                   <input type="text"
                     className="form-control"
-                    ref="groupId"
-                    value={this.state.hook.groupId}
-                    onChange={this.onChange}
+                    ref="hookGroupId"
+                    value={this.props.currentHookGroupId}
+                    onChange={this.onNameChange}
                     placeholder="Name"/>
                   :
                     <div className="form-control-static">
-                      {this.state.hook.groupId}
+                      {this.props.currentHookGroupId}
                     </div>
               }
             </div>
           </div>
           <div className="form-group">
-            <label className="control-label col-md-1">HookId</label>
-            <div className="col-md-11">
+            <label className="control-label col-md-2">hookId</label>
+            <div className="col-md-10">
               {
                 isCreating ?
                   <input type="text"
                     className="form-control"
                     ref="hookId"
-                    value={this.state.hook.hookId}
-                    onChange={this.onChange}
+                    value={this.props.currentHookId}
+                    onChange={this.onNameChange}
                     placeholder="Name"/>
                   :
                     <div className="form-control-static">
-                      {this.state.hook.hookId}
+                      {this.props.currentHookId}
                     </div>
               }
             </div>
           </div>
+          <pre>currentHookGroupId: {this.props.currentHookGroupId}</pre>
+          <pre>currentHookId: {this.props.currentHookId}</pre>
         </div>
         {this.renderEditor()}
         {
@@ -209,15 +182,6 @@ var HookEditor = React.createClass({
               this.renderEditingToolbar()
           ) :
             <bs.ButtonToolbar>
-              <bs.Button bsStyle="primary"
-                onClick={this.triggerHook}>
-                <bs.Glyphicon glyph="ok"/>&nbsp;Trigger Hook
-              </bs.Button>
-              <bs.ModalTrigger modal={this.renderTokenModal()} ref="tokenModalTrigger">
-                <bs.Button bsStyle="info">
-                  Show Token
-                </bs.Button>
-              </bs.ModalTrigger>
               <bs.Button bsStyle="success"
                 onClick={this.startEditing}
                 disabled={this.state.working}>
@@ -239,22 +203,14 @@ var HookEditor = React.createClass({
           <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
         </bs.Button>
         <ConfirmAction
-          buttonStyle='warning'
-          glyph='refresh'
-          label="Reset Token"
-          action={this.resetToken}
-          success="Token has been reset">
-          Are you sure you want to reset the token for this hook?
-        </ConfirmAction>
-        <ConfirmAction
           buttonStyle='danger'
           glyph='trash'
           disabled={this.state.working}
-          label="Delete Client"
+          label="Delete Hook"
           action={this.deleteHook}
-          success="Client deleted">
+          success="Hook deleted">
           Are you sure you want to delete hook under&nbsp;
-          <code>{this.state.hook.groupId + '/' + this.state.hook.hookId}</code>?
+          <code>{this.props.currentHookGroupId + '/' + this.state.hook.hookId}</code>?
         </ConfirmAction>
       </bs.ButtonToolbar>
     );
@@ -267,22 +223,9 @@ var HookEditor = React.createClass({
         <bs.Button bsStyle="primary"
                    onClick={this.createHook}
                    disabled={this.state.working || this.state.invalidHook}>
-          <bs.Glyphicon glyph="plus"/>&nbsp;Create Client
+          <bs.Glyphicon glyph="plus"/>&nbsp;Create Hook
         </bs.Button>
       </bs.ButtonToolbar>
-    );
-  },
-
-  renderTokenModal() {
-    return this.renderWaitFor('token') || (
-      <bs.Modal title="Trigger Token">
-        <div className="modal-body">
-          Token: <code>{this.state.token.token}</code>
-        </div>
-        <div className="modal-footer">
-          <bs.Button onClick={this.closeTokenModal}>Close</bs.Button>
-        </div>
-      </bs.Modal>
     );
   },
 
@@ -308,19 +251,14 @@ var HookEditor = React.createClass({
 
   /** Create the visible JSON for the editor */
   editorHookJSON: function() {
-    // Delete the group and hook fields since they arent part of the create payload
-    var hook = _.cloneDeep(this.state.hook);
-    delete hook.hookId;
-    delete hook.groupId;
-    this.state.definition = JSON.stringify(hook, null, '\t');
+    this.state.definition = JSON.stringify(this.state.hook, null, '\t');
     return this.state.definition;
   },
 
-  onChange: function() {
-    var state = _.cloneDeep(this.state);
-    state.hook.groupId = this.refs.groupId.getDOMNode().value;
-    state.hook.hookId = this.refs.hookId.getDOMNode().value;
-    this.setState(state);
+  onNameChange: function(e) {
+    this.props.currentHookGroupId = this.refs.hookGroupId.getDOMNode().value;
+    this.props.currentHookId = this.refs.hookId.getDOMNode().value;
+    console.log("onc", this.props);
   },
 
   onHookChange: function(e) {
@@ -346,9 +284,16 @@ var HookEditor = React.createClass({
   createHook: function() {
     this.setState({working: true});
     var payload = JSON.parse(this.state.definition);
+
+    // add hookId and hookGroupId to the hook, since they are required
+    // by the schema
+    var hook = _.cloneDeep(this.state.hook);
+    hook.hookGroupId = this.refs.hookGroupId.getDOMNode().value;
+    hook.hookId = this.refs.hookId.getDOMNode().value;
+
     this.hooks.createHook(
-      this.state.hook.groupId,
-      this.state.hook.hookId,
+      hook.hookGroupId,
+      hook.hookId,
       payload
     ).then(function(hook) {
       this.setState({
@@ -370,7 +315,7 @@ var HookEditor = React.createClass({
   saveHook() {
     var payload = JSON.parse(this.state.definition);
     this.hooks.updateHook(
-      this.state.hook.groupId,
+      this.state.hook.hookGroupId,
       this.state.hook.hookId,
       payload
     ).then(function(hook) {
@@ -391,28 +336,8 @@ var HookEditor = React.createClass({
 
   /** Delete current hook */
   async deleteHook() {
-    await this.hooks.removeHook(this.props.currentGroupId, this.props.currentHookId);
+    await this.hooks.removeHook(this.props.currentHookGroupId, this.props.currentHookId);
     await Promise.all([this.props.refreshHookList(), this.reload()]);
-  },
-
-  triggerHook() {
-    var status = this.hooks.triggerHook(this.props.currentGroupId, this.props.currentHookId);
-    this.loadState({
-      createdTask: status,
-    });
-  },
-
-  /** Reset the current trigger token */
-  async resetToken() {
-    let token = await this.hooks.resetTriggerToken(this.props.currentGroupId, this.props.currentHookId);
-    this.setState({
-      token: token
-    });
-  },
-
-  /** Close the token modal */
-  closeTokenModal() {
-    this.refs.tokenModalTrigger.hide();
   },
 
   /** Reset error state from operation*/
