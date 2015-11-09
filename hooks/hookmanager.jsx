@@ -6,7 +6,6 @@ var taskcluster     = require('taskcluster-client');
 var format          = require('../lib/format');
 var _               = require('lodash');
 
-var reference = require('./reference');
 
 /** Create hook manager */
 var HookManager = React.createClass({
@@ -14,8 +13,7 @@ var HookManager = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        // TODO: use taskcluster.Hooks when new version lands
-        hooks:       taskcluster.createClient(reference)
+        hooks:       taskcluster.Hooks
       }
     })
   ],

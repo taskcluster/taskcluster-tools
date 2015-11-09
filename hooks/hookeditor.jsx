@@ -38,14 +38,13 @@ var initialHook = {
   }
 };
 
-var reference = require('./reference');
 /** Create hook editor/viewer (same thing) */
 var HookEditor = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        hooks:       taskcluster.createClient(reference)
+        hooks:       taskcluster.Hooks
       },
       reloadOnProps: ['currentHookId', 'currentHookGroupId']
     })
