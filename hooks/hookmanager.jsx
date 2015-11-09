@@ -5,9 +5,105 @@ var utils           = require('../lib/utils');
 var taskcluster     = require('taskcluster-client');
 var format          = require('../lib/format');
 var _               = require('lodash');
+var TreeView        = require('react-treeview');
 
 
-/** Create hook manager */
+var HookBrowser = React.createClass({
+  mixins: [
+    utils.createTaskClusterMixin({
+      clients: {
+        hooks:       taskcluster.Hooks
+      }
+    })
+  ],
+
+  propTypes: {
+    group: React.PropTypes.string.isRequired,
+  },
+
+  getInitialState: function() {
+    return {
+      hooks:        undefined,
+      hooksLoading: false,
+      hooksLoaded:  false,
+      hooksError:   undefined,
+    };
+  },
+
+  render: function() {
+    if (!this.state.hooksLoaded || this.state.hooksError) {
+      // using renderWaitFor here messes the vertical spacing of the elements
+      return <TreeView key={this.props.group} nodeLabel={this.props.group}
+                       defaultCollapsed={true} onClick={this.handleClick}>
+               {this.state.hooksError ? (
+                 this.renderError(this.state.hooksError)
+               ) : (
+                 <format.Icon name="spinner" spin/>
+               )}
+             </TreeView>
+    } else {
+      try {
+      return <TreeView key={this.props.group} nodeLabel={this.props.group}
+                       defaultCollapsed={false} onClick={this.handleClick}>
+               {this.state.hooks.hooks.map((h) => <div key={h.hookId}>{h.hookId}</div>)}
+             </TreeView>
+      } catch(e) { console.log(e); }
+    }
+  },
+
+  handleClick: function() {
+    if (!this.state.hooksLoading) {
+      this.setState({
+        hooksLoading: true,
+      });
+      this.loadState({
+        hooks: this.hooks.listHooks(this.props.group),
+      });
+    }
+  },
+});
+
+var HookGroupBrowser = React.createClass({
+  mixins: [
+    utils.createTaskClusterMixin({
+      clients: {
+        hooks:       taskcluster.Hooks
+      }
+    })
+  ],
+
+  getInitialState: function() {
+    return {
+      groups:       undefined,
+      groupsLoaded: false,
+      groupsError:  undefined,
+    };
+  },
+
+  load: function() {
+    return {
+      groups: this.hooks.listHookGroups()
+    };
+  },
+
+  render: function() {
+    var waitFor = this.renderWaitFor('groups');
+    if (waitFor) {
+      return waitFor;
+    } else {
+      try {
+      return <div>{
+        this.state.groups.groups.map((group) => {
+          return <HookBrowser key={group} group={group} />
+        })
+      }</div>;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  },
+});
+
 var HookManager = React.createClass({
   /** Initialize mixins */
   mixins: [
@@ -47,14 +143,14 @@ var HookManager = React.createClass({
     return (
       <bs.Row>
         <bs.Col md={4}>
-          {this.renderBreadcrumbs()}
-          {this.renderHooksBrowser()}
+          <HookGroupBrowser />
           {this.renderButtonToolbar()}
         </bs.Col>
         <bs.Col md={8}>
-          <HookEditor currentHookId={this.state.currentHookId}
+          {this.state.currentHookId} / {this.state.currentHookGroupId}
+          /*<HookEditor currentHookId={this.state.currentHookId}
                       currentHookGroupId={this.state.currentHookGroupId}
-                      refreshHookList={this.reload}/>
+                      refreshHookList={this.reload}/>*/
         </bs.Col>
       </bs.Row>
     );
@@ -136,36 +232,6 @@ var HookManager = React.createClass({
            </tbody>
         </bs.Table>
       </span>
-    );
-  },
-
-  renderBreadcrumbs: function () {
-    return (
-      <ol className="breadcrumb namespace-breadcrumbs">
-        <li key={-1}>
-          <a onClick={this.browse.bind(this, undefined, undefined, 1)}>
-            home
-          </a>
-        </li>
-        {
-          // Mark the current groupId
-          this.state.currentHookGroupId ?
-            (
-              <li key={0}
-                  className={(this.state.currentHookId == undefined) ? "active" : ""}>
-                <a onClick={this.browse.bind(this,
-                                this.state.currentHookGroupId, undefined, 2)}>
-                  {this.state.currentHookGroupId}
-                </a>
-              </li>
-            ) : undefined
-        }
-        {
-          this.state.currentHookId ?
-            (<li className="active" key={1}>{this.state.currentHookId}</li>) :
-            undefined
-        }
-      </ol>
     );
   },
 
