@@ -1,13 +1,17 @@
 var _               = require('lodash');
 var bs              = require('react-bootstrap');
-var CodeMirror      = require('react-code-mirror');
 var ConfirmAction   = require('../lib/ui/confirmaction');
+var CodeMirror      = require('react-code-mirror');
 var debug           = require('debug')('hookeditor');
 var format          = require('../lib/format');
 var Promise         = require('promise');
 var React           = require('react');
 var taskcluster     = require('taskcluster-client');
 var utils           = require('../lib/utils');
+
+// Load javascript mode for CodeMirror
+require('codemirror/mode/javascript/javascript');
+require('../lib/codemirror/json-lint');
 
 var initialHook = {
   metadata: {
@@ -16,7 +20,7 @@ var initialHook = {
     owner: "name@example.com",
     emailOnError: true
   },
-  schedule: ['0 * * * * *'],
+  schedule: [],
   expires: "3 days",
   deadline: "60 minutes",
   task: {
@@ -38,8 +42,243 @@ var initialHook = {
   }
 };
 
-/** Create hook editor/viewer (same thing) */
+// some of the API functions return hook descriptions containing hookId
+// and hookGroupId, but the create and update methods do not take these
+// properties.  This function strips the properties on input.
+var stripHookIds = function(hook) {
+    delete hook.hookId;
+    delete hook.hookGroupId;
+    return hook;
+}
+
+var HookDisplay = React.createClass({
+  propTypes: {
+    currentHookId:      React.PropTypes.string.isRequired,
+    currentHookGroupId: React.PropTypes.string.isRequired,
+    hook:               React.PropTypes.object.isRequired,
+    startEditing:       React.PropTypes.func.isRequired,
+  },
+
+  render: function() {
+    let hook = this.props.hook;
+    return <div>
+      <dl className="dl-horizontal">
+        <dt>HookGroupId</dt>
+        <dd><code>{this.props.currentHookGroupId}</code></dd>
+        <dt>HookId</dt>
+        <dd><code>{this.props.currentHookId}</code></dd>
+      </dl>
+      <dl className="dl-horizontal">
+        <dt>Name</dt>
+        <dd>{hook.metadata.name}</dd>
+        <dt>Description</dt>
+        <dd><format.Markdown>{hook.metadata.description}</format.Markdown></dd>
+        <dt>Owner</dt>
+        <dd>{hook.metadata.owner}</dd>
+        <dt>Email On Error?</dt>
+        <dd>{JSON.stringify(hook.metadata.emailOnError)}</dd>
+      </dl>
+      <dl className="dl-horizontal">
+        <dt>Schedule</dt>
+        <dd>
+          { (hook.schedule.length > 0) ?
+            <ul className="hookSchedule">
+              {hook.schedule.map((s, i) => { return <li key={i}>{s}</li>; })}
+            </ul>
+          :
+            <span>(no schedule)</span>
+          }
+        </dd>
+      </dl>
+      <dl className="dl-horizontal">
+        <dt>Task Expires</dt>
+        <dd>{hook.expires} after creation</dd>
+        <dt>Task Deadline</dt>
+        <dd>{hook.deadline} after creation</dd>
+        <dt>Task Definition</dt>
+      </dl>
+      <format.Code language="json">
+          {JSON.stringify(hook.task, undefined, 2)}
+      </format.Code>
+      <bs.ButtonToolbar>
+        <bs.Button bsStyle="success"
+          onClick={this.props.startEditing}>
+          <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Hook
+        </bs.Button>
+      </bs.ButtonToolbar>
+    </div>
+  }
+});
+
 var HookEditor = React.createClass({
+  propTypes: {
+    currentHookId:      React.PropTypes.string,
+    currentHookGroupId: React.PropTypes.string,
+    hook:               React.PropTypes.object,
+    isCreating:         React.PropTypes.bool,
+    createHook:         React.PropTypes.func.isRequired,
+    updateHook:         React.PropTypes.func.isRequired,
+    deleteHook:         React.PropTypes.func.isRequired,
+  },
+
+  getInitialState: function() {
+    var hook;
+    if (this.props.isCreating) {
+      hook = initialHook
+      // TODO: this stuff shouldn't be necessary, but the schema requires it
+      var deadline = new Date();
+      deadline.setMinutes(deadline.getMinutes() + 60);
+      hook.task.deadline = deadline.toJSON();
+      hook.task.created = new Date().toJSON();
+    } else {
+      hook = this.props.hook;
+    }
+    let definition = JSON.stringify(hook, null, "\t");
+    return {
+      hookGroupId:      this.props.currentHookGroupId,
+      hookId:           this.props.currentHookId,
+      definition:       definition,
+      invalidHook:      false
+    };
+  },
+
+  render: function() {
+    var isCreating = this.props.isCreating;
+
+    return <div className="form-horizontal">
+      <div className="form-group">
+        <label className="control-label col-md-2">hookGroupId</label>
+        <div className="col-md-10">
+          {
+            isCreating ?
+              <input type="text"
+                className="form-control"
+                onChange={this.onHookGroupIdChange}
+                placeholder="hookGroupId"/>
+              :
+                <div className="form-control-static">
+                  {this.props.currentHookGroupId}
+                </div>
+          }
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">hookId</label>
+        <div className="col-md-10">
+          {
+            isCreating ?
+              <input type="text"
+                className="form-control"
+                onChange={this.onHookIdChange}
+                placeholder="hookId"/>
+              :
+                <div className="form-control-static">
+                  {this.props.currentHookId}
+                </div>
+          }
+        </div>
+      </div>
+      {this.renderEditor()}
+      {this.renderButtonBar()}
+    </div>
+  },
+
+  renderEditor() {
+    return (
+      <span>
+      <CodeMirror
+        ref="editor"
+        lineNumbers={true}
+        mode="application/json"
+        textAreaClassName={'form-control'}
+        value={this.state.definition}
+        onChange={this.onHookChange}
+        indentWithTabs={true}
+        tabSize={2}
+        lint={true}
+        gutters={["CodeMirror-lint-markers"]}
+        theme="neat"/>
+    </span>
+    );
+  },
+
+  renderButtonBar() {
+    if (this.props.isCreating) {
+      return <bs.ButtonToolbar>
+        <bs.Button bsStyle="primary"
+                   onClick={this.createHook}
+                   disabled={!this.validHook()}>
+          <bs.Glyphicon glyph="plus"/>&nbsp;Create Hook
+        </bs.Button>
+      </bs.ButtonToolbar>
+    } else {
+      return <bs.ButtonToolbar>
+        <bs.Button bsStyle="success"
+                   onClick={this.updateHook}
+                   disabled={!this.validHook()}>
+          <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
+        </bs.Button>
+        <ConfirmAction
+          buttonStyle='danger'
+          glyph='trash'
+          label="Delete Hook"
+          action={this.props.deleteHook}
+          success="Hook deleted">
+          Are you sure you want to delete hook
+          <code>{this.props.currentHookGroupId + '/' + this.props.currentHookId}</code>?
+        </ConfirmAction>
+      </bs.ButtonToolbar>
+    }
+  },
+
+  validHook() {
+    if (this.state.invalidHook) {
+        return false;
+    }
+
+    if (!this.state.hookGroupId || !this.state.hookId) {
+        return false;
+    }
+
+    // TODO: parse against schema and show errors
+    try {
+      JSON.parse(this.state.definition);
+    }
+    catch(err) {
+      return false;
+    }
+
+    return true;
+  },
+
+  onHookGroupIdChange(e) {
+    this.setState({hookGroupId: e.target.value});
+  },
+
+  onHookIdChange(e) {
+    this.setState({hookId: e.target.value});
+  },
+
+  onHookChange(e) {
+    this.setState({definition: e.target.value});
+  },
+
+  createHook() {
+    // TODO: reflect these into state with onChange hooks
+    let hookGroupId = this.state.hookGroupId,
+        hookId = this.state.hookId,
+        hook = JSON.parse(this.state.definition);
+    this.props.createHook(hookGroupId, hookId, hook);
+  },
+
+  updateHook() {
+    let hook = JSON.parse(this.state.definition);
+    this.props.updateHook(hook);
+  },
+});
+
+/** Create hook editor/viewer (same thing) */
+var HookEditView = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
@@ -51,70 +290,50 @@ var HookEditor = React.createClass({
   ],
 
   propTypes: {
-    // Method to refresh hook list
-    refreshHookList:  React.PropTypes.func.isRequired
+    currentHookId:      React.PropTypes.string,
+    currentHookGroupId: React.PropTypes.string,
+    refreshHookList:    React.PropTypes.func.isRequired,
+    selectHook:         React.PropTypes.func.isRequired,
   },
 
-  getDefaultProps: function() {
+  getInitialState() {
     return {
-      currentHookId:        undefined,     // undefined implies. "Create Hook"
-      currentHookGroupId:   undefined,
-      initialHookValue:     JSON.stringify(initialHook, null, '\t')
-    };
-  },
-
-  getInitialState: function() {
-    return {
-      definition:        undefined,
       // Currently loaded hook
       hookLoaded:        false,
       hookError:         undefined,
       hook:              null,
-      // Submitted task
-      createdTaskLoaded: false,
-      createdTaskError:  undefined,
-      createdTask:       null,
-      // Edit or viewing current state
       editing:           true,
-      // Operation details, if currently doing anything
-      working:           false,
       error:             null,
     };
   },
 
   /** Load initial state */
-  load: function() {
+  load() {
     // Create a new hook if we don't have the hookGroupId and hookId
     if (!this.props.currentHookId || !this.props.currentHookGroupId) {
-      // Parametrization of a few field, to satisfy the task field
-      var hook     = JSON.parse(this.props.initialHookValue);
-      var deadline = new Date();
-      deadline.setMinutes(deadline.getMinutes() + 60);
-      hook.task.deadline = deadline.toJSON();
-      hook.task.created = new Date().toJSON();
-
       return {
-        hook:       hook,
+        hook:       undefined,
         editing:    true,
-        definition: undefined,
-        working:    false,
         error:      null
       };
     } else {
-      // Load currentClientId
-      hook = this.hooks.hook(this.props.currentHookGroupId, this.props.currentHookId).then(
-        h => { delete h.hookId; delete h.hookGroupId; return h });
+      let hook = this.hooks.hook(this.props.currentHookGroupId,
+                                 this.props.currentHookId).then(stripHookIds)
       return {
         hook:       hook,
         editing:    false,
-        definition: undefined,
-        working:    false,
         error:      null
       };
     }
   },
 
-  render: function() {
+  render() {
+    // React calls render before it's loaded the initial state, at which
+    // point we can't do anything...
+    if (this.state.editing === undefined) {
+        return <span />
+    }
+
     // display errors from operations
     if (this.state.error) {
       return (
@@ -124,228 +343,81 @@ var HookEditor = React.createClass({
         </bs.Alert>
       );
     }
+    var waitFor             = this.renderWaitFor("hook");
+    if (waitFor) {
+      return waitFor;
+    }
+
     var isCreating          = (!this.props.currentHookId ||
                                !this.props.currentHookGroupId);
-    var isEditing           = (isCreating || this.state.editing);
-    var title               = isCreating ? "Create Hook" :
-                              isEditing ? "Edit Hook" : "View Hook";
-    return this.renderWaitFor('hook') || (
-      <span className="hook-editor">
-        <h3>{title}</h3>
-        <hr style={{marginBottom: 10}}/>
-        <div className="form-horizontal">
-          <div className="form-group">
-            <label className="control-label col-md-2">hookGroupId</label>
-            <div className="col-md-10">
-              {
-                isCreating ?
-                  <input type="text"
-                    className="form-control"
-                    ref="hookGroupId"
-                    value={this.props.currentHookGroupId}
-                    onChange={this.onNameChange}
-                    placeholder="Name"/>
-                  :
-                    <div className="form-control-static">
-                      {this.props.currentHookGroupId}
-                    </div>
-              }
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="control-label col-md-2">hookId</label>
-            <div className="col-md-10">
-              {
-                isCreating ?
-                  <input type="text"
-                    className="form-control"
-                    ref="hookId"
-                    value={this.props.currentHookId}
-                    onChange={this.onNameChange}
-                    placeholder="Name"/>
-                  :
-                    <div className="form-control-static">
-                      {this.props.currentHookId}
-                    </div>
-              }
-            </div>
-          </div>
-          <pre>currentHookGroupId: {this.props.currentHookGroupId}</pre>
-          <pre>currentHookId: {this.props.currentHookId}</pre>
-        </div>
-        {this.renderEditor()}
-        {
-          isEditing ? (
-            isCreating ?
-              this.renderCreatingToolbar() :
-              this.renderEditingToolbar()
-          ) :
-            <bs.ButtonToolbar>
-              <bs.Button bsStyle="success"
-                onClick={this.startEditing}
-                disabled={this.state.working}>
-                <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Hook
-              </bs.Button>
-            </bs.ButtonToolbar>
-        }
-      </span>
-    );
-  },
 
- /** Render editing toolbar */
-  renderEditingToolbar() {
-    return (
-      <bs.ButtonToolbar>
-        <bs.Button bsStyle="success"
-                   onClick={this.saveHook}
-                   disabled={this.state.working || this.state.invalidHook}>
-          <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
-        </bs.Button>
-        <ConfirmAction
-          buttonStyle='danger'
-          glyph='trash'
-          disabled={this.state.working}
-          label="Delete Hook"
-          action={this.deleteHook}
-          success="Hook deleted">
-          Are you sure you want to delete hook under&nbsp;
-          <code>{this.props.currentHookGroupId + '/' + this.state.hook.hookId}</code>?
-        </ConfirmAction>
-      </bs.ButtonToolbar>
-    );
-  },
-
-  /** Render creation toolbar */
-  renderCreatingToolbar: function() {
-    return (
-      <bs.ButtonToolbar>
-        <bs.Button bsStyle="primary"
-                   onClick={this.createHook}
-                   disabled={this.state.working || this.state.invalidHook}>
-          <bs.Glyphicon glyph="plus"/>&nbsp;Create Hook
-        </bs.Button>
-      </bs.ButtonToolbar>
-    );
-  },
-
-  /** Render task editor */
-  renderEditor() {
-    return (
-      <span>
-      <CodeMirror
-        ref="editor"
-        lineNumbers={true}
-        mode="application/json"
-        textAreaClassName={'form-control'}
-        value={this.state.definition || this.editorHookJSON()}
-        onChange={this.onHookChange}
-        indentWithTabs={true}
-        tabSize={2}
-        lint={true}
-        gutters={["CodeMirror-lint-markers"]}
-        theme="neat"/>
-    </span>
-    );
-  },
-
-  /** Create the visible JSON for the editor */
-  editorHookJSON: function() {
-    this.state.definition = JSON.stringify(this.state.hook, null, '\t');
-    return this.state.definition;
-  },
-
-  onNameChange: function(e) {
-    this.props.currentHookGroupId = this.refs.hookGroupId.getDOMNode().value;
-    this.props.currentHookId = this.refs.hookId.getDOMNode().value;
-    console.log("onc", this.props);
-  },
-
-  onHookChange: function(e) {
-    var invalidHook = false;
-    try {
-      JSON.parse(e.target.value);
+    if (this.state.editing) {
+        return <HookEditor hook={this.state.hook}
+                    currentHookId={this.props.currentHookId}
+                    currentHookGroupId={this.props.currentHookGroupId}
+                    isCreating={isCreating}
+                    createHook={this.createHook}
+                    updateHook={this.updateHook}
+                    deleteHook={this.deleteHook} />
+    } else {
+        return <HookDisplay hook={this.state.hook}
+                    currentHookId={this.props.currentHookId}
+                    currentHookGroupId={this.props.currentHookGroupId}
+                    startEditing={this.startEditing} />
     }
-    catch(err) {
-      invalidHook = true;
-    }
-    this.setState({
-      definition:  e.target.value,
-      invalidHook: invalidHook
-    });
   },
 
-  /** Start editing */
-  startEditing: function() {
+  startEditing() {
     this.setState({editing: true});
   },
 
-  /** Create new hook */
-  createHook: function() {
-    this.setState({working: true});
-    var payload = JSON.parse(this.state.definition);
-
+  createHook(hookGroupId, hookId, hook) {
     // add hookId and hookGroupId to the hook, since they are required
     // by the schema
-    var hook = _.cloneDeep(this.state.hook);
-    hook.hookGroupId = this.refs.hookGroupId.getDOMNode().value;
-    hook.hookId = this.refs.hookId.getDOMNode().value;
-
     this.hooks.createHook(
-      hook.hookGroupId,
-      hook.hookId,
-      payload
+      hookGroupId,
+      hookId,
+      hook
     ).then(function(hook) {
-      this.setState({
-        hook:    hook,
-        editing: false,
-        working: false,
-        error:   null
-      });
+      this.props.selectHook(hook.hookGroupId, hook.hookId);
       this.props.refreshHookList();
     }.bind(this), function(err) {
       this.setState({
-        working: false,
         error:   err
       });
     }.bind(this));
   },
 
-  /** Save current hook */
-  saveHook() {
-    var payload = JSON.parse(this.state.definition);
+  updateHook(hook) {
     this.hooks.updateHook(
-      this.state.hook.hookGroupId,
-      this.state.hook.hookId,
-      payload
+      this.props.currentHookGroupId,
+      this.props.currentHookId,
+      hook
     ).then(function(hook) {
       this.setState({
-        hook:    hook,
+        hook:    stripHookIds(hook),
         editing: false,
-        working: false,
         error:   null
       });
-      this.props.refreshHookList();
     }.bind(this), function(err) {
       this.setState({
-        working: false,
         error:   err
       });
     }.bind(this));
   },
 
-  /** Delete current hook */
   async deleteHook() {
     await this.hooks.removeHook(this.props.currentHookGroupId, this.props.currentHookId);
-    await Promise.all([this.props.refreshHookList(), this.reload()]);
+    this.props.selectHook(undefined, undefined);
+    this.props.refreshHookList();
   },
 
   /** Reset error state from operation*/
   dismissError() {
     this.setState({
-      working:      false,
       error:        null
     });
   }
 });
 
-module.exports = HookEditor;
+module.exports = HookEditView;
