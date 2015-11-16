@@ -538,22 +538,21 @@ var HookEditView = React.createClass({
     }.bind(this));
   },
 
-  updateHook(hook) {
-    this.hooks.updateHook(
-      this.props.currentHookGroupId,
-      this.props.currentHookId,
-      hook
-    ).then(function(hook) {
+  async updateHook(hook) {
+    try {
+      await this.hooks.updateHook(
+        this.props.currentHookGroupId,
+        this.props.currentHookId,
+        hook
+      )
       this.setState({
         hook:    stripHookIds(hook),
         editing: false,
         error:   null
       });
-    }.bind(this), function(err) {
-      this.setState({
-        error:   err
-      });
-    }.bind(this));
+    } catch(err) {
+      this.setState({error: err});
+    }
   },
 
   async deleteHook() {
