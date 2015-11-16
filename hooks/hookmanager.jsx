@@ -12,6 +12,10 @@ var HookManager = React.createClass({
       clients: {
         hooks:       taskcluster.Hooks
       }
+    }),
+    utils.createLocationHashMixin({
+      keys:                   ['currentHookGroupId', 'currentHookId'],
+      type:                   'string'
     })
   ],
 
