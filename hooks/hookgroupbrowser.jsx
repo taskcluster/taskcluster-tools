@@ -10,7 +10,6 @@ var HookBrowser = React.createClass({
       clients: {
         hooks:       taskcluster.Hooks
       },
-      reloadOnProps: ['currentHookId', 'currentHookGroupId']
     })
   ],
 
@@ -77,7 +76,6 @@ var HookGroupBrowser = React.createClass({
       clients: {
         hooks:       taskcluster.Hooks
       },
-      reloadOnProps: ['currentHookId', 'currentHookGroupId']
     })
   ],
 
