@@ -98,6 +98,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Hooks Manager",
+    link:           '/hooks/',
+    icon:           'repeat',
+    display:        true,
+    description: [
+      "Manage hooks: tasks that are created in response to events within TaskCluster."
+    ].join('\n')
+  },
+  {
     type:           'divider',
     display:        false
   },
