@@ -15,29 +15,29 @@ require('../lib/codemirror/json-lint');
 
 var initialHook = {
   metadata: {
-    name: "Example Hook",
-    description: "Description of what this hook does",
-    owner: "name@example.com",
+    name: "",
+    description: "",
+    owner: "",
     emailOnError: true
   },
   schedule: [],
-  expires: "3 days",
-  deadline: "60 minutes",
+  expires: "3 months",
+  deadline: "6 hours",
   task: {
     provisionerId:      'aws-provisioner-v1',
     workerType:         'b2gtest',
     created:            null, // later
     deadline:           null, // later
     payload: {
-      image:            'ubuntu:13.10',
+      image:            'ubuntu:14.04',
       command:          ['/bin/bash', '-c', 'echo "hello World"'],
       maxRunTime:       60 * 10
     },
     metadata: {
-      name:             "Example Task",
-      description:      "Markdown description of **what** this task does",
+      name:             "Hook Task",
+      description:      "Task Description",
       owner:            "name@example.com",
-      source:           "http://tools.taskcluster.net/task-creator/"
+      source:           "http://tools.taskcluster.net/hooks/"
     }
   }
 };
@@ -133,21 +133,27 @@ var HookEditor = React.createClass({
     } else {
       hook = this.props.hook;
     }
-    let definition = JSON.stringify(hook, null, "\t");
+
     return {
       hookGroupId:      this.props.currentHookGroupId,
       hookId:           this.props.currentHookId,
-      definition:       definition,
-      invalidHook:      false
+      name:             hook.metadata.name,
+      description:      hook.metadata.description,
+      owner:            hook.metadata.owner,
+      schedule:         _.cloneDeep(hook.schedule),
+      expires:          hook.expires,
+      deadline:         hook.deadline,
+      task:             JSON.stringify(hook.task, null, "  "),
     };
   },
 
   render: function() {
     var isCreating = this.props.isCreating;
 
+    try {
     return <div className="form-horizontal">
       <div className="form-group">
-        <label className="control-label col-md-2">hookGroupId</label>
+        <label className="control-label col-md-2">HookGroupId</label>
         <div className="col-md-10">
           {
             isCreating ?
@@ -163,7 +169,7 @@ var HookEditor = React.createClass({
         </div>
       </div>
       <div className="form-group">
-        <label className="control-label col-md-2">hookId</label>
+        <label className="control-label col-md-2">HookId</label>
         <div className="col-md-10">
           {
             isCreating ?
@@ -178,28 +184,119 @@ var HookEditor = React.createClass({
           }
         </div>
       </div>
-      {this.renderEditor()}
+      <div className="form-group">
+        <label className="control-label col-md-2">Name</label>
+        <div className="col-md-10">
+           <input type="text"
+             className="form-control"
+             defaultValue={this.state.name}
+             onChange={this.onNameChange}
+             placeholder="Hook Name"/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">Description</label>
+        <div className="col-md-10">
+           <textarea className="form-control"
+             defaultValue={this.state.description}
+             onChange={this.onDescriptionChange}
+             rows={8}
+             placeholder="Hook Description (markdown)"/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">Owner</label>
+        <div className="col-md-10">
+           <input type="text"
+             className="form-control"
+             defaultValue={this.state.owner}
+             onChange={this.onOwnerChange}
+             placeholder="Owner email"/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">Schedule</label>
+        <div className="col-md-10">
+           <p className="text-info">See&nbsp;
+                <a href="https://www.npmjs.com/package/cron-parser">cron-parser</a>&nbsp;
+                for format information</p>
+           <ul style={{paddingLeft: 20}}>
+             {
+               this.state.schedule.map((sched, index) => {
+                 return (
+                   <li key={index}>
+                     <code>{sched}</code>
+                     &nbsp;
+                     <bs.Button
+                       bsStyle="danger"
+                       bsSize="xsmall"
+                       onClick={this.removeScheduleItem.bind(this, index)}>
+                       <bs.Glyphicon glyph="trash"/>
+                     </bs.Button>
+                   </li>
+                 );
+               }, this)
+             }
+           </ul>
+           <div className="input-group">
+             <input
+               type="text"
+               className="form-control"
+               placeholder="* * * * * *"
+               ref="newSch"/>
+             <span className="input-group-btn">
+               <button className="btn btn-success"
+                       type="button" onClick={this.onNewScheduleItem}>
+                 <bs.Glyphicon glyph="plus"/>
+                 &nbsp;
+                 Add
+               </button>
+             </span>
+           </div>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">Expires</label>
+        <div className="col-md-10">
+           <input type="text"
+             className="form-control"
+             defaultValue={this.state.expires}
+             onChange={this.onExpiresChange}
+             placeholder="Task expiration (relative)"/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">Deadline</label>
+        <div className="col-md-10">
+           <input type="text"
+             className="form-control"
+             defaultValue={this.state.deadline}
+             onChange={this.onDeadlineChange}
+             placeholder="Task deadline (relative)"/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">Task</label>
+        <div className="col-md-10">
+          <CodeMirror
+            ref="editor"
+            lineNumbers={true}
+            mode="application/json"
+            textAreaClassName={'form-control'}
+            value={this.state.task}
+            onChange={this.onTaskChange}
+            indentWithTabs={true}
+            tabSize={2}
+            lint={true}
+            gutters={["CodeMirror-lint-markers"]}
+            theme="neat"/>
+        </div>
+      </div>
       {this.renderButtonBar()}
     </div>
-  },
-
-  renderEditor() {
-    return (
-      <span>
-      <CodeMirror
-        ref="editor"
-        lineNumbers={true}
-        mode="application/json"
-        textAreaClassName={'form-control'}
-        value={this.state.definition}
-        onChange={this.onHookChange}
-        indentWithTabs={true}
-        tabSize={2}
-        lint={true}
-        gutters={["CodeMirror-lint-markers"]}
-        theme="neat"/>
-    </span>
-    );
+    } catch(e) {
+        console.log(e);
+    }
   },
 
   renderButtonBar() {
@@ -232,17 +329,15 @@ var HookEditor = React.createClass({
   },
 
   validHook() {
-    if (this.state.invalidHook) {
-        return false;
-    }
-
-    if (!this.state.hookGroupId || !this.state.hookId) {
-        return false;
+    if (![
+        "hookGroupId", "hookId", "name", "description", "owner", "deadline"
+      ].every(s => this.state[s])) {
+      return false;
     }
 
     // TODO: parse against schema and show errors
     try {
-      JSON.parse(this.state.definition);
+      JSON.parse(this.state.task);
     }
     catch(err) {
       return false;
@@ -259,20 +354,75 @@ var HookEditor = React.createClass({
     this.setState({hookId: e.target.value});
   },
 
-  onHookChange(e) {
-    this.setState({definition: e.target.value});
+  onNameChange(e) {
+    this.setState({name: e.target.value});
+  },
+
+  onDescriptionChange(e) {
+    this.setState({description: e.target.value});
+  },
+
+  onOwnerChange(e) {
+    this.setState({owner: e.target.value});
+  },
+
+  removeScheduleItem(i) {
+    let schedule = _.cloneDeep(this.state.schedule);
+    schedule.splice(i, 1)
+    this.setState({schedule: schedule});
+  },
+
+  onNewScheduleItem(e) {
+    var sch = this.refs.newSch.getDOMNode().value;
+    if (sch != "") {
+      let schedule = _.cloneDeep(this.state.schedule);
+      schedule.push(sch)
+      this.setState({schedule: schedule});
+    }
+    this.refs.newSch.getDOMNode().value = "";
+  },
+
+  onScheduleTextChange(e) {
+    this.setState({scheduleText: e.target.value});
+  },
+
+  onExpiresChange(e) {
+    this.setState({expires: e.target.value});
+  },
+
+  onDeadlineChange(e) {
+    this.setState({deadline: e.target.value});
+  },
+
+  onTaskChange(e) {
+    this.setState({task: e.target.value});
+  },
+
+  getHookDefinition() {
+    return {
+        metadata: {
+            name: this.state.name,
+            description: this.state.description,
+            owner: this.state.owner,
+            emailOnError: true,
+        },
+        schedule: this.state.schedule,
+        expires: this.state.expires,
+        deadline: this.state.deadline,
+        task: JSON.parse(this.state.task),
+    };
   },
 
   createHook() {
     // TODO: reflect these into state with onChange hooks
     let hookGroupId = this.state.hookGroupId,
         hookId = this.state.hookId,
-        hook = JSON.parse(this.state.definition);
+        hook = this.getHookDefinition();
     this.props.createHook(hookGroupId, hookId, hook);
   },
 
   updateHook() {
-    let hook = JSON.parse(this.state.definition);
+    let hook = this.getHookDefinition();
     this.props.updateHook(hook);
   },
 });
