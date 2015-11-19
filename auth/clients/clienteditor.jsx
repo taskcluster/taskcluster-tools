@@ -231,7 +231,7 @@ var ClientEditor = React.createClass({
 
   /** Determine if clientId is valid */
   validClientId() {
-    return /^[a-zA-Z0-9_-]{1,22}$/.test(this.state.client.clientId || '');
+    return /^[a-zA-Z0-9_-]+$/.test(this.state.client.clientId || '');
   },
 
   /** Render editing toolbar */
