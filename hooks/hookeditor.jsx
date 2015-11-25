@@ -140,6 +140,7 @@ var HookEditor = React.createClass({
       name:             hook.metadata.name,
       description:      hook.metadata.description,
       owner:            hook.metadata.owner,
+      emailOnError:     hook.metadata.emailOnError,
       schedule:         _.cloneDeep(hook.schedule),
       expires:          hook.expires,
       deadline:         hook.deadline,
@@ -212,6 +213,15 @@ var HookEditor = React.createClass({
              defaultValue={this.state.owner}
              onChange={this.onOwnerChange}
              placeholder="Owner email"/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-md-2">EmailOnError</label>
+        <div className="col-md-10">
+          <input type="checkbox"
+           checked={this.state.emailOnError}
+           onChange={this.onEmailOnErrorChange}/>
+          <span className="text-info">Email the owner when an error occurs while creating a task.</span>
         </div>
       </div>
       <div className="form-group">
@@ -366,6 +376,10 @@ var HookEditor = React.createClass({
     this.setState({owner: e.target.value});
   },
 
+  onEmailOnErrorChange(e) {
+    this.setState({emailOnError: !this.state.emailOnError});
+  },
+
   removeScheduleItem(i) {
     let schedule = _.cloneDeep(this.state.schedule);
     schedule.splice(i, 1)
@@ -404,7 +418,7 @@ var HookEditor = React.createClass({
             name: this.state.name,
             description: this.state.description,
             owner: this.state.owner,
-            emailOnError: true,
+            emailOnError: this.state.emailOnError,
         },
         schedule: this.state.schedule,
         expires: this.state.expires,
