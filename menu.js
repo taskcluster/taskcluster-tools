@@ -120,6 +120,24 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Interactive Shell",
+    link:           '/shell/',
+    icon:           'terminal',
+    display:        false,
+    description: [
+      "Open interactive shell within tasks."
+    ].join('\n')
+  },
+  {
+    title:          "Interactive Display",
+    link:           '/display/',
+    icon:           'television',
+    display:        false,
+    description: [
+      "Connect to an interactive display within tasks."
+    ].join('\n')
+  },
+  {
     type:           'divider',
     display:        true
   },
