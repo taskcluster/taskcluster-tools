@@ -1,0 +1,10 @@
+extends ../lib/layout.jade
+
+block title
+  title Interactive Terminal
+
+block append head
+  link(rel="stylesheet", href="app.css")
+  script(src='app.bundle.js')
+  style
+    | body { overflow: hidden; }

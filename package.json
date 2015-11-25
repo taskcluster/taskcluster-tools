@@ -46,7 +46,7 @@
     "grunt-concurrent":                 "1.0.0",
     "durable-json-lint":                "0.0.1",
     "docker-exec-websocket-server":     "^1.0.0",
-    "hterm-umd":                        "^1.0.0",
+    "hterm-umd":                        "^1.0.1",
     "react-treeview":                   "0.4.2"
   },
   "engines": {

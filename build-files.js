@@ -74,7 +74,16 @@ module.exports = [
 
   // Interactive
   'interactive/index.jade',
-  'interactive/app.jsx'
+  'interactive/app.jsx',
+
+  // Interactive shall
+  'shell/index.jade',
+  'shell/app.jsx',
+
+  // Interactive display
+  'display/index.jade',
+  'display/app.jsx',
+  'display/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });
