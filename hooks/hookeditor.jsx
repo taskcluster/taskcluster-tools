@@ -229,7 +229,7 @@ var HookEditor = React.createClass({
         <div className="col-md-10">
            <p className="text-info">See&nbsp;
                 <a href="https://www.npmjs.com/package/cron-parser">cron-parser</a>&nbsp;
-                for format information</p>
+                for format information.  Times are in UTC.</p>
            <ul style={{paddingLeft: 20}}>
              {
                this.state.schedule.map((sched, index) => {
