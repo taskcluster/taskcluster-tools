@@ -320,7 +320,7 @@ var TaskInfo = React.createClass({
     if (typeof payload.image === 'string') {
       imagePullCmds.push("# Image appears to be a Docker Hub Image. Fetch docker image");
       imagePullCmds.push('image_name=' + payload.image);
-      imagePullCmds.push('docker pull ' + payload.image + "'");
+      imagePullCmds.push("docker pull '" + payload.image + "'");
     } else if (typeof payload.image === 'object') {
       if (!payload.image.type || payload.image.type !== 'task-image') {
         return "# Failed to infer task payload format";
