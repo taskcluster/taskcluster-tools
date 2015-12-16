@@ -26,8 +26,6 @@ var initialHook = {
   task: {
     provisionerId:      'aws-provisioner-v1',
     workerType:         'b2gtest',
-    created:            null, // later
-    deadline:           null, // later
     payload: {
       image:            'ubuntu:14.04',
       command:          ['/bin/bash', '-c', 'echo "hello World"'],
@@ -502,7 +500,7 @@ var HookEditView = React.createClass({
     if (this.state.error) {
       return (
         <bs.Alert bsStyle="danger" onDismiss={this.dismissError}>
-          <strong>Error executing operation</strong>
+          <strong>Error executing operation</strong><br />
           {this.state.error.toString()}
         </bs.Alert>
       );
