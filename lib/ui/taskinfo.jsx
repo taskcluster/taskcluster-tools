@@ -305,29 +305,87 @@ var TaskInfo = React.createClass({
     //       (obviously we can provide the credentials)
     var taskId  = this.props.status.taskId;
     var payload = this.state.task.payload;
+    var cmds = [];
+    var imagePullCmds= [];
+    var deviceCmds = [];
+
     if (!payload.image) {
       return "# Failed to infer task payload format";
     }
-    var cmds = [];
+
     cmds.push("#!/bin/bash -e");
     cmds.push("# WARNING: this is experimental mileage may vary!");
     cmds.push("");
-    cmds.push("# Fetch docker image");
-    cmds.push("docker pull '" + payload.image + "'");
+
+    if (typeof payload.image === 'string') {
+      imagePullCmds.push("# Image appears to be a Docker Hub Image. Fetch docker image");
+      imagePullCmds.push('image_name=' + payload.image);
+      imagePullCmds.push('docker pull ' + payload.image + "'");
+    } else if (typeof payload.image === 'object') {
+      if (!payload.image.type || payload.image.type !== 'task-image') {
+        return "# Failed to infer task payload format";
+      }
+      var imagePath = payload.image.path;
+      var imageTaskId = payload.image.taskId;
+      imagePullCmds.push("# Image appears to be a task image");
+      imagePullCmds.push("# Download image tarball from task");
+      imagePullCmds.push("curl -L -o image.tar https://queue.taskcluster.net/v1/task/" + imageTaskId + "/artifacts/" + imagePath);
+      imagePullCmds.push("");
+      imagePullCmds.push("# Extract image name and tag from image tarball");
+      imagePullCmds.push("# Note: jq is required.  Download the package appropriate");
+      imagePullCmds.push("# for your OS at https://stedolan.github.io/jq/");
+      imagePullCmds.push("image=$(tar xf image.tar -O repositories | jq -r 'keys[0]')");
+      imagePullCmds.push("image_tag=$(tar xf image.tar -O repositories | jq -r '.[keys[0]] | keys[0]')");
+      imagePullCmds.push("image_name=$image:$image_tag");
+      imagePullCmds.push("");
+      imagePullCmds.push("# Load docker image from tarball");
+      imagePullCmds.push("docker load < image.tar");
+    } else {
+      return "# Failed to infer task payload format";
+    }
+
+    imagePullCmds.forEach(function(cmd) { cmds.push(cmd); })
+
+    // TODO Add devices other than loopback at some point
+    if (payload.devices) {
+      cmds.push("");
+      cmds.push("# Task uses the following devices :");
+      cmds.push("# " + Object.keys(payload.devices).join(', '));
+      cmds.push("# Either use the docker vagrant environment located");
+      cmds.push("# in the docker-worker repo or ensure local environment ");
+      cmds.push("# has the correct devices configured.");
+      cmds.push("# Consult the vagrant.sh file in the docker-worker repo ");
+      cmds.push("# for more information on how to install and configure ");
+      cmds.push("# the loopback devices. http://www.github.com/taskcluster/docker-worker");
+      cmds.push("# Warning: This is entirely dependent on local setup and ");
+      cmds.push("# availability of devices.");
+      if (payload.devices['loopbackVideo']) {
+        deviceCmds.push("  --device /dev/video0:/dev/video0 \\");
+      }
+      if (payload.devices['loopbackAudio']) {
+        deviceCmds.push("  --device /dev/snd/controlC0:/dev/snd/controlC0 \\");
+        deviceCmds.push("  --device /dev/snd/pcmC0D0c:/dev/snd/pcmC0D0c \\");
+        deviceCmds.push("  --device /dev/snd/pcmC0D0c:/dev/snd/pcmC0D0c \\");
+        deviceCmds.push("  --device /dev/snd/pcmC0D1c:/dev/snd/pcmC0D1c \\");
+        deviceCmds.push("  --device /dev/snd/pcmC0D1p:/dev/snd/pcmC0D0p \\");
+      }
+    }
+
     cmds.push("");
     cmds.push("# Find a unique container name");
-    cmds.push("export NAME='task-" + taskId + "-container'");
+    cmds.push("container_name='task-" + taskId + "-container'");
     cmds.push("");
     cmds.push("# Run docker command");
     cmds.push("docker run -ti \\");
-    cmds.push("  --name \"${NAME}\" \\");
+    cmds.push("  --name \"${container_name}\" \\");
     if (payload.capabilities && payload.capabilities.privileged) {
       cmds.push("  --privileged \\");
     }
     _.keys(payload.env || {}).forEach(key => {
       cmds.push("  -e " + key + "='" + payload.env[key] + "' \\");
     });
-    cmds.push("  " + payload.image + " \\");
+    deviceCmds.forEach(function (cmd) { cmds.push(cmd); });
+    cmds.push("  ${image_name} \\");
     if (payload.command) {
       var command = payload.command.map(cmd => {
         cmd = cmd.replace(/\\/g, "\\\\");
@@ -359,12 +417,12 @@ var TaskInfo = React.createClass({
           folder = path.dirname(name);
         }
         cmds.push("mkdir -p '" + folder + "'");
-        cmds.push("docker cp \"${NAME}:" + src + "\" '" + name + "'");
+        cmds.push("docker cp \"${container_name}:" + src + "\" '" + name + "'");
       });
       cmds.push("");
     }
     cmds.push("# Delete docker container");
-    cmds.push("docker rm -v \"${NAME}\"");
+    cmds.push("docker rm -v \"${container_name}\"");
     return cmds.join('\n');
   }
 });
