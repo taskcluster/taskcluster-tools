@@ -7,8 +7,8 @@
     "deploy":   "grunt publish -q"
   },
   "repository": {
-    "type":   "git",
-    "url":    "https://github.com/taskcluster/taskcluster-tools.git"
+    "type": "git",
+    "url": "https://github.com/taskcluster/taskcluster-tools.git"
   },
   "dependencies": {
     "font-awesome-svg-png":             "~1.1.5",
