@@ -123,11 +123,6 @@ var HookEditor = React.createClass({
     var hook;
     if (this.props.isCreating) {
       hook = initialHook
-      // TODO: this stuff shouldn't be necessary, but the schema requires it
-      var deadline = new Date();
-      deadline.setMinutes(deadline.getMinutes() + 60);
-      hook.task.deadline = deadline.toJSON();
-      hook.task.created = new Date().toJSON();
     } else {
       hook = this.props.hook;
     }
