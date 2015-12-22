@@ -329,6 +329,7 @@ var RoleEditor = React.createClass({
 
   /** Render a list of scopes */
   renderScopes(scopes) {
+    scopes.sort();
     return (
       <ul className="form-control-static" style={{paddingLeft: 20}}>
         {
