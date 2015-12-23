@@ -72,6 +72,11 @@ module.exports = [
   'hooks/app.jsx',
   'hooks/app.less',
 
+  // Secrets manager
+  'secrets/index.jade',
+  'secrets/app.jsx',
+  'secrets/app.less',
+
   // Interactive
   'interactive/index.jade',
   'interactive/app.jsx',

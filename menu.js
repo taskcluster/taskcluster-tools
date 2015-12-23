@@ -107,6 +107,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Secrets Manager",
+    link:           '/secrets/',
+    icon:           'user-secret',
+    display:        true,
+    description: [
+      "Manage secrets: values that can only be retrieved with the appropriate scopes."
+    ].join('\n')
+  },
+  {
     type:           'divider',
     display:        false
   },
