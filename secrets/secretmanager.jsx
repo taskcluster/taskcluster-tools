@@ -36,63 +36,59 @@ var SecretsManager = React.createClass({
     }
 
     return (
-      <bs.Row>
-        <bs.Col md={4}>
-          <h3>Secrets</h3>
-          <p>This is a very simple interface to the key/value secret store.  Listing secrets is currently not supported,
-          so you must enter the secret name here.</p>
-          <div className="form-horizontal">
-            <div className="form-group">
-              <label className="control-label col-md-2">Secret Name</label>
-              <div className="col-md-10">
-                <input type="text" className="form-control"
-                       ref="name" value={this.state.name}
-                       placeholder="garbage/<ircnick>/my-secret" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="control-label col-md-2">Secret Value</label>
-              <div className="col-md-10">
-                {
-                  // TODO: use the code editor
-                  this.state.editing ?
-                    <textarea rows="10" className="form-control" ref="value">{JSON.stringify(this.state.value, null, 2)}</textarea>
-                  : this.state.value !== undefined ?
-                    <pre>{JSON.stringify(this.state.value, null, 2)}</pre>
-                  : <em>none</em>
-                }
-              </div>
-            </div>
-          </div>
-          <bs.ButtonToolbar>
-            <bs.Button bsStyle="primary" onClick={this.getSecret}>
-              <bs.Glyphicon glyph="search"/>
-              &nbsp;
-              Get
-            </bs.Button>
-            <bs.Button bsStyle="primary" onClick={this.editSecret} disabled={this.state.editing}>
-              <bs.Glyphicon glyph="pencil"/>
-              &nbsp;
-              Edit
-            </bs.Button>
-            <bs.Button bsStyle="primary" onClick={this.setSecret} disabled={!this.state.editing}>
-              <bs.Glyphicon glyph="ok"/>
-              &nbsp;
-              Set
-            </bs.Button>
-            <bs.Button bsStyle="primary" onClick={this.updateSecret} disabled={!this.state.editing}>
-              <bs.Glyphicon glyph="ok"/>
-              &nbsp;
-              Update
-            </bs.Button>
-            <bs.Button bsStyle="primary" onClick={this.removeSecret}>
-              <bs.Glyphicon glyph="trash"/>
-              &nbsp;
-              Remove
-            </bs.Button>
-          </bs.ButtonToolbar>
-        </bs.Col>
-      </bs.Row>
+     <h3>Secrets</h3>
+     <p>This is a very simple interface to the key/value secret store.  Listing secrets is currently not supported,
+     so you must enter the secret name here.</p>
+     <div className="form-horizontal">
+       <div className="form-group">
+         <label className="control-label col-md-2">Secret Name</label>
+         <div className="col-md-10">
+           <input type="text" className="form-control"
+                  ref="name" value={this.state.name}
+                  placeholder="garbage/<ircnick>/my-secret" />
+         </div>
+       </div>
+       <div className="form-group">
+         <label className="control-label col-md-2">Secret Value</label>
+         <div className="col-md-10">
+           {
+             // TODO: use the code editor
+             this.state.editing ?
+               <textarea rows="10" className="form-control" ref="value">{JSON.stringify(this.state.value, null, 2)}</textarea>
+             : this.state.value !== undefined ?
+               <pre>{JSON.stringify(this.state.value, null, 2)}</pre>
+             : <em>none</em>
+           }
+         </div>
+       </div>
+     </div>
+     <bs.ButtonToolbar>
+       <bs.Button bsStyle="primary" onClick={this.getSecret}>
+         <bs.Glyphicon glyph="search"/>
+         &nbsp;
+         Get
+       </bs.Button>
+       <bs.Button bsStyle="primary" onClick={this.editSecret} disabled={this.state.editing}>
+         <bs.Glyphicon glyph="pencil"/>
+         &nbsp;
+         Edit
+       </bs.Button>
+       <bs.Button bsStyle="primary" onClick={this.setSecret} disabled={!this.state.editing}>
+         <bs.Glyphicon glyph="ok"/>
+         &nbsp;
+         Set
+       </bs.Button>
+       <bs.Button bsStyle="primary" onClick={this.updateSecret} disabled={!this.state.editing}>
+         <bs.Glyphicon glyph="ok"/>
+         &nbsp;
+         Update
+       </bs.Button>
+       <bs.Button bsStyle="primary" onClick={this.removeSecret}>
+         <bs.Glyphicon glyph="trash"/>
+         &nbsp;
+         Remove
+       </bs.Button>
+     </bs.ButtonToolbar>
     );
     } catch (e) {
         console.log(e);
