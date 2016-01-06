@@ -366,7 +366,6 @@ var TaskGraphInspector = React.createClass({
             <th>Name</th>
             <th>State</th>
             <th>Satisfied</th>
-            <th>Reruns</th>
             <th>Relation</th>
           </tr>
         </thead>
@@ -410,9 +409,6 @@ var TaskGraphInspector = React.createClass({
                       No
                       </span>
                   }
-                </td>
-                <td>
-                  {task.reruns - task.rerunsLeft} of {task.reruns}
                 </td>
                 <td>{relation}</td>
               </tr>

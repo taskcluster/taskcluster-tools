@@ -118,19 +118,6 @@ var TaskInfo = React.createClass({
             this task may cause your code to land with broken tests.
           </ConfirmAction>&nbsp;
           <ConfirmAction buttonSize="xsmall"
-                         buttonStyle="success"
-                         disabled={!isResolved}
-                         glyph="repeat"
-                         label="Rerun Task"
-                         action={this.rerunTask}
-                         success="Successfully scheduled task rerun!">
-            Are you sure you wish to rerun this task?
-            This will cause a new run of the task to be created. It will only
-            succeed if the task hasn't passed it's deadline. Notice that this
-            may interfere with listeners who only expects this tasks to be
-            resolved once.
-          </ConfirmAction>&nbsp;
-          <ConfirmAction buttonSize="xsmall"
                          buttonStyle="danger"
                          disabled={isResolved}
                          glyph="stop"
@@ -138,9 +125,8 @@ var TaskInfo = React.createClass({
                          action={this.cancelTask}
                          success="Successfully canceled task!">
             Are you sure you wish to cancel this task?
-            Notice that another process or developer may still be able to
-            schedule a rerun. But all existing runs will be aborted and any
-            scheduling process will not be able to schedule the task.
+            All existing runs will be aborted and no scheduling process
+            will be able to schedule the task.
           </ConfirmAction>&nbsp;
         </dd>
       </dl>
@@ -256,9 +242,6 @@ var TaskInfo = React.createClass({
 
   scheduleTask() {
     return this.queue.scheduleTask(this.props.status.taskId);
-  },
-  rerunTask() {
-    return this.queue.rerunTask(this.props.status.taskId);
   },
   cancelTask() {
     return this.queue.cancelTask(this.props.status.taskId);
