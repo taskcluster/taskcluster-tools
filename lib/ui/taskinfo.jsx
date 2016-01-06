@@ -347,10 +347,10 @@ var TaskInfo = React.createClass({
     imagePullCmds.forEach(function(cmd) { cmds.push(cmd); })
 
     // TODO Add devices other than loopback at some point
-    if (payload.devices) {
+    if (payload.capabilities && payload.capabilities.devices) {
       cmds.push("");
       cmds.push("# Task uses the following devices :");
-      cmds.push("# " + Object.keys(payload.devices).join(', '));
+      cmds.push("# " + Object.keys(payload.capabilities.devices).join(', '));
       cmds.push("# Either use the docker vagrant environment located");
       cmds.push("# in the docker-worker repo or ensure local environment ");
       cmds.push("# has the correct devices configured.");
@@ -359,10 +359,10 @@ var TaskInfo = React.createClass({
       cmds.push("# the loopback devices. http://www.github.com/taskcluster/docker-worker");
       cmds.push("# Warning: This is entirely dependent on local setup and ");
       cmds.push("# availability of devices.");
-      if (payload.devices['loopbackVideo']) {
+      if (payload.capabilities.devices['loopbackVideo']) {
         deviceCmds.push("  --device /dev/video0:/dev/video0 \\");
       }
-      if (payload.devices['loopbackAudio']) {
+      if (payload.capabilities.devices['loopbackAudio']) {
         deviceCmds.push("  --device /dev/snd/controlC0:/dev/snd/controlC0 \\");
         deviceCmds.push("  --device /dev/snd/pcmC0D0c:/dev/snd/pcmC0D0c \\");
         deviceCmds.push("  --device /dev/snd/pcmC0D0c:/dev/snd/pcmC0D0c \\");
