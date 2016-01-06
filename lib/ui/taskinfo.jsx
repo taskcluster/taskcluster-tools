@@ -365,9 +365,9 @@ var TaskInfo = React.createClass({
       if (payload.capabilities.devices['loopbackAudio']) {
         deviceCmds.push("  --device /dev/snd/controlC0:/dev/snd/controlC0 \\");
         deviceCmds.push("  --device /dev/snd/pcmC0D0c:/dev/snd/pcmC0D0c \\");
-        deviceCmds.push("  --device /dev/snd/pcmC0D0c:/dev/snd/pcmC0D0c \\");
+        deviceCmds.push("  --device /dev/snd/pcmC0D0p:/dev/snd/pcmC0D0p \\");
         deviceCmds.push("  --device /dev/snd/pcmC0D1c:/dev/snd/pcmC0D1c \\");
-        deviceCmds.push("  --device /dev/snd/pcmC0D1p:/dev/snd/pcmC0D0p \\");
+        deviceCmds.push("  --device /dev/snd/pcmC0D1p:/dev/snd/pcmC0D1p \\");
       }
     }
 
