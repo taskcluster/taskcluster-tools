@@ -49,6 +49,82 @@ var stripHookIds = function(hook) {
     return hook;
 }
 
+var HookStatusDisplay = React.createClass({
+  mixins: [
+    utils.createTaskClusterMixin({
+      clients: {
+        hooks:       taskcluster.Hooks,
+      },
+      reloadOnProps: ['currentHookId', 'currentHookGroupId']
+    })
+  ],
+
+  propTypes: {
+    currentHookId:      React.PropTypes.string.isRequired,
+    currentHookGroupId: React.PropTypes.string.isRequired,
+  },
+
+  getInitialState: function() {
+    return {
+      hookStatus: undefined
+    }
+  },
+
+  /** Load initial state */
+  load() {
+    return {
+      hookStatus: this.hooks.getHookStatus(this.props.currentHookGroupId,
+                                           this.props.currentHookId)
+    }
+  },
+
+  render: function() {
+    var waitFor = this.renderWaitFor("hookStatus");
+    if (waitFor) {
+      return waitFor;
+    }
+
+    var stat = this.state.hookStatus;
+    var lastTime;
+    var lastResult;
+    if (stat.lastFire.result == 'no-fire') {
+      lastTime = <span className="text-muted">Never Fired</span>;
+      lastResult = <span className="text-muted">None</span>;
+    } else {
+      lastTime = <format.DateView date={stat.lastFire.time}/>;
+      if (stat.lastFire.result == 'error') {
+        lastResult = <pre>{ JSON.stringify(stat.lastFire.error, null, 2) }</pre>;
+      } else {
+        var taskId = stat.lastFire.taskId;
+        var href = `/task-inspector/#${taskId}`
+        lastResult = <span>Created task <a href={href}>{taskId}</a></span>;
+      }
+    }
+
+    var when;
+    if (stat.nextScheduledDate) {
+      when = <format.DateView date={stat.nextScheduledDate} />;
+    } else {
+      when = <span className="text-muted">Not Scheduled</span>;
+    }
+
+    return <dl className="dl-horizontal">
+      <dt>Last Fired</dt>
+      <dd>
+        {lastTime}
+        <bs.Button className="btn-xs"
+          onClick={this.reload}>
+          <bs.Glyphicon glyph="refresh"/>
+        </bs.Button>
+      </dd>
+      <dt>Last Fire Result</dt>
+      <dd>{lastResult}</dd>
+      <dt>Next Scheduled Fire</dt>
+      <dd>{when}</dd>
+    </dl>
+  }
+});
+
 var HookDisplay = React.createClass({
   propTypes: {
     currentHookId:      React.PropTypes.string.isRequired,
@@ -93,7 +169,13 @@ var HookDisplay = React.createClass({
         <dd>{hook.expires} after creation</dd>
         <dt>Task Deadline</dt>
         <dd>{hook.deadline} after creation</dd>
+      </dl>
+      <HookStatusDisplay
+        currentHookGroupId={this.props.currentHookGroupId}
+        currentHookId={this.props.currentHookId} />
+      <dl className="dl-horizontal">
         <dt>Task Definition</dt>
+        <dd></dd>
       </dl>
       <format.Code language="json">
           {JSON.stringify(hook.task, undefined, 2)}
