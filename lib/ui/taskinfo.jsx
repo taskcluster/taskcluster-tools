@@ -310,7 +310,7 @@ var TaskInfo = React.createClass({
     var deviceCmds = [];
 
     if (!payload.image) {
-      return "# Failed to infer task payload format";
+      return "# Could not infer task payload format";
     }
 
     cmds.push("#!/bin/bash -e");
