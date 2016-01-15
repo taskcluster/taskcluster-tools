@@ -316,6 +316,22 @@ var TaskGraphInspector = React.createClass({
             {source}
           </a>
         </dd>
+        <dt>Graph Scopes</dt>
+        <dd>
+          {
+            taskGraph.scopes.length > 0 ? (
+              <ul>
+                {
+                  taskGraph.scopes.map((scope, index) => {
+                    return <li key={index}><code>{scope}</code></li>;
+                  })
+                }
+              </ul>
+            ) : (
+              '-'
+            )
+          }
+        </dd>
       </dl>
       <dl className="dl-horizontal">
         <dt>State</dt>
