@@ -8,6 +8,7 @@ var format          = require('../../lib/format');
 var _               = require('lodash');
 var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
+var ScopeEditor     = require('../../lib/ui/scopeeditor');
 
 
 /** Create client editor/viewer (same thing) */
@@ -191,12 +192,22 @@ var ClientEditor = React.createClass({
               );
             })
           }
+          <div className="form-group">
+            <label className="control-label col-md-3">Client Scopes</label>
+            <div className="col-md-9">
+              <ScopeEditor
+                editing={isEditing}
+                scopes={this.state.client.scopes}
+                scopesUpdated={this.scopesUpdated} />
+            </div>
+          </div>
           {
             this.state.client.expandedScopes ? (
               <div className="form-group">
-                <label className="control-label col-md-3">Scopes</label>
+                <label className="control-label col-md-3">Expanded Scopes</label>
                 <div className="col-md-9">
-                  {this.renderScopes(this.state.client.expandedScopes)}
+                  <ScopeEditor
+                    scopes={this.state.client.expandedScopes}/>
                 </div>
               </div>
             ) : undefined
@@ -302,6 +313,13 @@ var ClientEditor = React.createClass({
     this.setState(state);
   },
 
+  scopesUpdated(scopes) {
+    var client = _.cloneDeep(this.state.client);
+    client.scopes = scopes;
+    this.setState({client});
+  },
+
+
   /** When expires exchanges in the editor */
   onExpiresChange(date) {
     if (date instanceof Date) {
@@ -309,19 +327,6 @@ var ClientEditor = React.createClass({
       state.client.expires = date.toJSON();
       this.setState(state);
     }
-  },
-
-  /** Render a list of scopes */
-  renderScopes(scopes) {
-    return (
-      <ul className="form-control-static" style={{paddingLeft: 20}}>
-        {
-          scopes.map(function(scope, index) {
-            return <li key={index}><code>{scope}</code></li>;
-          })
-        }
-      </ul>
-    );
   },
 
   /** Reset accessToken for current client */
