@@ -201,17 +201,17 @@ var ClientEditor = React.createClass({
                 scopesUpdated={this.scopesUpdated} />
             </div>
           </div>
-          {
-            this.state.client.expandedScopes ? (
-              <div className="form-group">
-                <label className="control-label col-md-3">Expanded Scopes</label>
-                <div className="col-md-9">
-                  <ScopeEditor
-                    scopes={this.state.client.expandedScopes}/>
-                </div>
-              </div>
-            ) : undefined
-          }
+          <div className="form-group">
+            <label className="control-label col-md-3">Expanded Scopes</label>
+            <div className="col-md-9">
+              <span className="text-muted">Expanded scopes are determined from the client
+                scopes, expanding roles for scopes beginning with <code>assume:</code>.
+                The role <code>client-id:{this.state.client.clientId}</code> is implicitly
+                included.</span>
+              <ScopeEditor
+                scopes={this.state.client.expandedScopes}/>
+            </div>
+          </div>
           <hr/>
           <div className="form-group">
             <div className="col-md-9 col-md-offset-3">
