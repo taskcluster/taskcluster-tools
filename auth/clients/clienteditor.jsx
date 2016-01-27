@@ -10,7 +10,6 @@ var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
 var ScopeEditor     = require('../../lib/ui/scopeeditor');
 
-
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({
   /** Initialize mixins */
@@ -120,6 +119,16 @@ var ClientEditor = React.createClass({
                 </div>
               </div>
             )
+          }
+          {
+             this.state.client.disabled ? (
+              <div className="form-group">
+                <label className="control-label col-md-3">Disabled</label>
+                <div className="col-md-9">
+                  This client is disabled
+                </div>
+              </div>
+            ) : undefined
           }
           {
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
@@ -264,6 +273,29 @@ var ClientEditor = React.createClass({
           Are you sure you want to delete credentials with clientId&nbsp;
           <code>{this.state.client.clientId}</code>?
         </ConfirmAction>
+        { this.state.client.disabled ? (
+          <ConfirmAction
+            buttonStyle='warning'
+            glyph='ok-circle'
+            disabled={this.state.working}
+            label="Enable Client"
+            action={this.enableClient}
+            success="Client enabled">
+            Are you sure you want to enable clientId&nbsp;
+            <code>{this.state.client.clientId}</code>?
+          </ConfirmAction>
+        ) : (
+          <ConfirmAction
+            buttonStyle='warning'
+            glyph='remove-circle'
+            disabled={this.state.working}
+            label="Disable Client"
+            action={this.disableClient}
+            success="Client disabled">
+            Are you sure you want to disable clientId&nbsp;
+            <code>{this.state.client.clientId}</code>?
+          </ConfirmAction>
+        )}
       </bs.ButtonToolbar>
     );
   },
@@ -402,6 +434,18 @@ var ClientEditor = React.createClass({
     let clientId = this.state.client.clientId;
     await this.auth.deleteClient(clientId);
     await this.props.reloadClientId(clientId);
+  },
+
+  async disableClient() {
+    let clientId = this.state.client.clientId;
+    await this.auth.disableClient(clientId);
+    await this.reload();
+  },
+
+  async enableClient() {
+    let clientId = this.state.client.clientId;
+    await this.auth.enableClient(clientId);
+    await this.reload();
   },
 
   /** Reset error state from operation*/

@@ -109,8 +109,10 @@ var ClientManager = React.createClass({
   },
 
   async reloadClientId(clientId) {
+console.log("reload", clientId);
     // Load client ignore errors (assume client doesn't exist)
     let client = await this.auth.client(clientId).catch(() => null);
+console.log("reload", client);
     let selectedClientId = this.state.selectedClientId;
     let clients = _.cloneDeep(this.state.clients);
     var index = _.findIndex(clients, c => c.clientId === clientId);
