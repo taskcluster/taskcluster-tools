@@ -390,7 +390,7 @@ var TaskInfo = React.createClass({
       var command = payload.command.map(cmd => {
         cmd = cmd.replace(/\\/g, "\\\\");
         if (/['\n\r\t\v\b]/.test(cmd)) {
-          return "$'" + cmd.replace(/['\n\r\t\v\b]/g, c => {
+          return "'" + cmd.replace(/['\n\r\t\v\b]/g, c => {
             return {
               "'":  "\\'",
               "\n": "\\n",
