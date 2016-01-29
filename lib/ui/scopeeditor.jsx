@@ -13,21 +13,16 @@ var ScopeEditor = React.createClass({
   },
 
   render() {
-    try {
-      if (this.props.editing) {
-        return this.renderScopeEditor();
-      } else {
-        return this.renderScopes();
-      }
-    } catch(e) {
-      console.log(e);
-      return <span>uhoh</span>;
+    if (this.props.editing) {
+      return this.renderScopeEditor();
+    } else {
+      return this.renderScopes();
     }
   },
 
   /** Render scopes and associated editor */
   renderScopeEditor() {
-    var scopes = _.clone(this.props.scopes);
+    var scopes = _.clone(this.props.scopes || []);
     scopes.sort();
     return (
       <div className="form-control-static">
@@ -93,7 +88,7 @@ var ScopeEditor = React.createClass({
 
   /** Render a list of scopes */
   renderScopes() {
-    var scopes = _.clone(this.props.scopes);
+    var scopes = _.clone(this.props.scopes | []);
     scopes.sort();
     return (
       <ul className="form-control-static" style={{paddingLeft: 20}}>
