@@ -7,6 +7,7 @@ var format          = require('../../lib/format');
 var _               = require('lodash');
 var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
+var ScopeEditor     = require('../../lib/ui/scopeeditor');
 
 
 /** Create role editor/viewer (same thing) */
@@ -87,6 +88,7 @@ var RoleEditor = React.createClass({
     if (!isCreating) {
       title = (isEditing ? "Edit Role" : "View Role");
     }
+    try {
     return this.renderWaitFor('role') || (
       <span className="role-editor">
         <h3>{title}</h3>
@@ -145,12 +147,10 @@ var RoleEditor = React.createClass({
           <div className="form-group">
             <label className="control-label col-md-3">Scopes</label>
             <div className="col-md-9">
-              {
-                isEditing ?
-                  this.renderScopeEditor()
-                :
-                  this.renderScopes(this.state.role.scopes)
-              }
+              <ScopeEditor
+                editing={isEditing}
+                scopes={this.state.role.scopes}
+                scopesUpdated={this.scopesUpdated} />
             </div>
           </div>
           {
@@ -160,7 +160,7 @@ var RoleEditor = React.createClass({
                   Expanded Scopes
                 </label>
                 <div className="col-md-9">
-                  {this.renderScopes(this.state.role.expandedScopes)}
+                  <ScopeEditor scopes={this.state.role.expandedScopes}/>
                 </div>
               </div>
             ) : undefined
@@ -191,6 +191,9 @@ var RoleEditor = React.createClass({
         </div>
       </span>
     );
+    } catch(e) {
+      console.log(e);
+    }
   },
 
   /** Determine if roleId is valid */
@@ -266,79 +269,11 @@ var RoleEditor = React.createClass({
     this.setState(state);
   },
 
-  /** Render scopes and associated editor */
-  renderScopeEditor() {
-    return (
-      <div className="form-control-static">
-        <ul style={{paddingLeft: 20}}>
-          {
-            this.state.role.scopes.map((scope, index) => {
-              return (
-                <li key={index}>
-                  <code>{scope}</code>
-                  &nbsp;
-                  <bs.Button
-                    className="role-editor-remove-scope-btn"
-                    bsStyle="danger"
-                    bsSize="xsmall"
-                    onClick={this.removeScope.bind(this, index)}>
-                    <bs.Glyphicon glyph="trash"/>
-                  </bs.Button>
-                </li>
-              );
-            }, this)
-          }
-        </ul>
-        <div className="input-group">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="new-scope:for-something:*"
-            ref="newScope"/>
-          <span className="input-group-btn">
-            <button className="btn btn-success"
-                    type="button" onClick={this.addScope}>
-              <bs.Glyphicon glyph="plus"/>
-              &nbsp;
-              Add
-            </button>
-          </span>
-        </div>
-      </div>
-    );
-  },
-
   /** Add scope to state */
-  addScope() {
-    var scope = this.refs.newScope.getDOMNode().value;
-    // Let's skip empty strings
-    if (scope) {
-      var role = _.cloneDeep(this.state.role);
-      role.scopes.push(scope);
-      this.refs.newScope.getDOMNode().value = "";
-      this.setState({role});
-    }
-  },
-
-  /** Remove a scope from state */
-  removeScope(index) {
+  scopesUpdated(scopes) {
     var role = _.cloneDeep(this.state.role);
-    role.scopes.splice(index, 1);
-    this.setState({role });
-  },
-
-  /** Render a list of scopes */
-  renderScopes(scopes) {
-    scopes.sort();
-    return (
-      <ul className="form-control-static" style={{paddingLeft: 20}}>
-        {
-          scopes.map(function(scope, index) {
-            return <li key={index}><code>{scope}</code></li>;
-          })
-        }
-      </ul>
-    );
+    role.scopes = scopes;
+    this.setState({role});
   },
 
   /** Start editing */

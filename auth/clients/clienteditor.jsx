@@ -8,7 +8,7 @@ var format          = require('../../lib/format');
 var _               = require('lodash');
 var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
-
+var ScopeEditor     = require('../../lib/ui/scopeeditor');
 
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({
@@ -121,6 +121,16 @@ var ClientEditor = React.createClass({
             )
           }
           {
+             this.state.client.disabled ? (
+              <div className="form-group">
+                <label className="control-label col-md-3">Disabled</label>
+                <div className="col-md-9">
+                  This client is disabled
+                </div>
+              </div>
+            ) : undefined
+          }
+          {
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
               <div className="form-group">
                 <label className="control-label col-md-3">AccessToken</label>
@@ -191,16 +201,26 @@ var ClientEditor = React.createClass({
               );
             })
           }
-          {
-            this.state.client.expandedScopes ? (
-              <div className="form-group">
-                <label className="control-label col-md-3">Scopes</label>
-                <div className="col-md-9">
-                  {this.renderScopes(this.state.client.expandedScopes)}
-                </div>
-              </div>
-            ) : undefined
-          }
+          <div className="form-group">
+            <label className="control-label col-md-3">Client Scopes</label>
+            <div className="col-md-9">
+              <ScopeEditor
+                editing={isEditing}
+                scopes={this.state.client.scopes}
+                scopesUpdated={this.scopesUpdated} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="control-label col-md-3">Expanded Scopes</label>
+            <div className="col-md-9">
+              <span className="text-muted">Expanded scopes are determined from the client
+                scopes, expanding roles for scopes beginning with <code>assume:</code>.
+                The role <code>client-id:{this.state.client.clientId}</code> is implicitly
+                included.</span>
+              <ScopeEditor
+                scopes={this.state.client.expandedScopes}/>
+            </div>
+          </div>
           <hr/>
           <div className="form-group">
             <div className="col-md-9 col-md-offset-3">
@@ -253,6 +273,29 @@ var ClientEditor = React.createClass({
           Are you sure you want to delete credentials with clientId&nbsp;
           <code>{this.state.client.clientId}</code>?
         </ConfirmAction>
+        { this.state.client.disabled ? (
+          <ConfirmAction
+            buttonStyle='warning'
+            glyph='ok-circle'
+            disabled={this.state.working}
+            label="Enable Client"
+            action={this.enableClient}
+            success="Client enabled">
+            Are you sure you want to enable clientId&nbsp;
+            <code>{this.state.client.clientId}</code>?
+          </ConfirmAction>
+        ) : (
+          <ConfirmAction
+            buttonStyle='warning'
+            glyph='remove-circle'
+            disabled={this.state.working}
+            label="Disable Client"
+            action={this.disableClient}
+            success="Client disabled">
+            Are you sure you want to disable clientId&nbsp;
+            <code>{this.state.client.clientId}</code>?
+          </ConfirmAction>
+        )}
       </bs.ButtonToolbar>
     );
   },
@@ -302,6 +345,13 @@ var ClientEditor = React.createClass({
     this.setState(state);
   },
 
+  scopesUpdated(scopes) {
+    var client = _.cloneDeep(this.state.client);
+    client.scopes = scopes;
+    this.setState({client});
+  },
+
+
   /** When expires exchanges in the editor */
   onExpiresChange(date) {
     if (date instanceof Date) {
@@ -309,19 +359,6 @@ var ClientEditor = React.createClass({
       state.client.expires = date.toJSON();
       this.setState(state);
     }
-  },
-
-  /** Render a list of scopes */
-  renderScopes(scopes) {
-    return (
-      <ul className="form-control-static" style={{paddingLeft: 20}}>
-        {
-          scopes.map(function(scope, index) {
-            return <li key={index}><code>{scope}</code></li>;
-          })
-        }
-      </ul>
-    );
   },
 
   /** Reset accessToken for current client */
@@ -397,6 +434,18 @@ var ClientEditor = React.createClass({
     let clientId = this.state.client.clientId;
     await this.auth.deleteClient(clientId);
     await this.props.reloadClientId(clientId);
+  },
+
+  async disableClient() {
+    let clientId = this.state.client.clientId;
+    await this.auth.disableClient(clientId);
+    await this.reload();
+  },
+
+  async enableClient() {
+    let clientId = this.state.client.clientId;
+    await this.auth.enableClient(clientId);
+    await this.reload();
   },
 
   /** Reset error state from operation*/
