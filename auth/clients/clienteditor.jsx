@@ -55,7 +55,9 @@ var ClientEditor = React.createClass({
         client: {
           clientId:       '',
           expires:        new Date(3017, 1, 1),
-          description:    ""
+          description:    "",
+          scopes:         [],
+          expandedScopes: [],
         },
         accessToken:      null,
         editing:          true,
