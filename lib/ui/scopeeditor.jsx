@@ -88,7 +88,7 @@ var ScopeEditor = React.createClass({
 
   /** Render a list of scopes */
   renderScopes() {
-    var scopes = _.clone(this.props.scopes | []);
+    var scopes = _.clone(this.props.scopes || []);
     scopes.sort();
     return (
       <ul className="form-control-static" style={{paddingLeft: 20}}>
