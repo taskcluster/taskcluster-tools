@@ -423,6 +423,7 @@ var ClientEditor = React.createClass({
       client: this.auth.updateClient(clientId, {
         description:  this.state.client.description,
         expires:      this.state.client.expires,
+        scopes:       this.state.client.scopes,
       }).then(client => {
         this.props.reloadClientId(clientId);
         return client;
