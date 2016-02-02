@@ -1,11 +1,11 @@
-var React           = require('react');
-var bs              = require('react-bootstrap');
-var utils           = require('../lib/utils');
-var taskcluster     = require('taskcluster-client');
-var format          = require('../lib/format');
-var _               = require('lodash');
-var JSONInspector   = require('react-json-inspector');
-var slugid          = require('slugid');
+let React           = require('react');
+let bs              = require('react-bootstrap');
+let utils           = require('../lib/utils');
+let taskcluster     = require('taskcluster-client');
+let format          = require('../lib/format');
+let _               = require('lodash');
+let JSONInspector   = require('react-json-inspector');
+let slugid          = require('slugid');
 
 
 /**
@@ -21,7 +21,7 @@ var slugid          = require('slugid');
  */
 var MessageRow = React.createClass({
   /** Only update when strictly necessary */
-  shouldComponentUpdate: function(nextProps) {
+  shouldComponentUpdate(nextProps) {
     // Just compare the _idForInspector
     if (this.props.message._idForInspector !==
         nextProps.message._idForInspector) {
@@ -34,7 +34,7 @@ var MessageRow = React.createClass({
   },
 
   /** Render a message row*/
-  render: function() {
+  render() {
     var message         = this.props.message;
     var hasCustomRoutes = (message.routes.length > 0);
     if (!this.props.expanded) {
@@ -83,7 +83,7 @@ var MessageRow = React.createClass({
   },
 
   /** handleClick */
-  handleClick: function() {
+  handleClick() {
     // Do this indirectly so we don't have to render if the event handler
     // changes
     this.props.onClick();
@@ -104,14 +104,14 @@ var PulseInspector = React.createClass({
     })
   ],
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       hashIndex:        0
     };
   },
 
   /** Create initial state */
-  getInitialState: function() {
+  getInitialState() {
     return {
       doListen:         false,    // Do start listening
       bindings:         [],       // List of bindings
@@ -123,7 +123,7 @@ var PulseInspector = React.createClass({
   },
 
   /** Render User Interface */
-  render: function() {
+  render() {
     return (
       <bs.Row>
         <bs.Col md={12}>
@@ -174,7 +174,7 @@ var PulseInspector = React.createClass({
     );
   },
 
-  createDownload: function() {
+  createDownload() {
     var downloadUrl = "data:application/json;base64," + btoa(JSON.stringify(
       this.state.messages.map(function(message) {
         // We shouldn't expose _idForInspector as it's made up here!
@@ -183,16 +183,16 @@ var PulseInspector = React.createClass({
       null,
       2
     ));
-    this.refs.downloadLink.getDOMNode().href = downloadUrl;
+    this.refs.downloadLink.href = downloadUrl;
   },
 
   /** Clear all bindings */
-  clearBindings: function() {
+  clearBindings() {
     this.setState({bindings: [], doListen: false});
   },
 
   /** Render list of bindings */
-  renderBindings: function() {
+  renderBindings() {
     // Don't render bindings if we don't have any
     if (this.state.bindings.length === 0) {
       return <p><i>Please create some bindings...</i></p>;
@@ -201,7 +201,7 @@ var PulseInspector = React.createClass({
     return (
       <ul>
         {
-          this.state.bindings.map(function(binding, index) {
+          this.state.bindings.map((binding, index) => {
             return (
               <li key={index}>
                 <code>{binding.exchange}</code> with&nbsp;
@@ -214,7 +214,7 @@ var PulseInspector = React.createClass({
     );
   },
 
-  renderForm: function() {
+  renderForm() {
     return (
       <div className="form form-horizontal">
         <bs.Input type="text"
@@ -263,7 +263,7 @@ var PulseInspector = React.createClass({
   },
 
   /** Add binding to list of bindings */
-  addBinding: function() {
+  addBinding() {
     var binding = {
       exchange:           this.refs.exchange.getValue(),
       routingKeyPattern:  this.refs.routingKeyPattern.getValue()
@@ -271,16 +271,16 @@ var PulseInspector = React.createClass({
     this.setState({bindings: this.state.bindings.concat([binding])});
   },
 
-  dontListen: function() {
+  dontListen() {
     this.setState({doListen: false});
   },
 
-  doListen: function() {
+  doListen() {
     this.setState({doListen: true});
   },
 
   /** return bindings for WebListenerMixin */
-  bindings: function() {
+  bindings() {
     if (!this.state.doListen) {
       return [];
     }
@@ -289,13 +289,13 @@ var PulseInspector = React.createClass({
 
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
-  handleMessage: function(message) {
+  handleMessage(message) {
     message._idForInspector = slugid.nice();
     this.setState({messages: [message].concat(this.state.messages)});
   },
 
   /** Render table of messages */
-  renderMessages: function() {
+  renderMessages() {
     var expandedMsgId = this.state.expandedMessage;
     return (
       <bs.Table condensed hover>
@@ -307,7 +307,7 @@ var PulseInspector = React.createClass({
         </thead>
         <tbody>
           {
-            this.state.messages.map(function(message) {
+            this.state.messages.map(message => {
               var msgId       = message._idForInspector;
               var expanded    = (msgId === expandedMsgId);
               return <MessageRow
@@ -315,7 +315,7 @@ var PulseInspector = React.createClass({
                         expanded={expanded}
                         message={message}
                         onClick={this.expandMessage.bind(this, msgId)}/>
-            }, this)
+            })
           }
         </tbody>
       </bs.Table>
@@ -323,12 +323,12 @@ var PulseInspector = React.createClass({
   },
 
   /** Set expended message, note we rely on object reference comparison here */
-  expandMessage: function(idForInspector) {
+  expandMessage(idForInspector) {
     this.setState({expandedMessage: idForInspector});
   },
 
   /** Render a listening error */
-  renderListeningError: function() {
+  renderListeningError() {
     return (
       <bs.Alert bsStyle="danger" onDismiss={this.dismissListeningError}>
         <strong>Listening Error,</strong>&nbsp;
@@ -338,7 +338,7 @@ var PulseInspector = React.createClass({
   },
 
   /** Dismiss a listening error, basically reset error state */
-  dismissListeningError: function() {
+  dismissListeningError() {
     this.setState({listeningError: undefined});
     if (!this.state.listening) {
       this.setState({doListen: false});

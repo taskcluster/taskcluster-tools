@@ -1,10 +1,11 @@
-var React         = require('react');
-var debug         = require('debug')('lib:utils');
-var assert        = require('assert');
-var marked        = require('marked');
-var bs            = require('react-bootstrap');
-var moment        = require('moment');
-var hljs          = require('highlight.js');
+let React         = require('react');
+let debug         = require('debug')('lib:utils');
+let assert        = require('assert');
+let marked        = require('marked');
+let bs            = require('react-bootstrap');
+let moment        = require('moment');
+let hljs          = require('highlight.js');
+let slugid        = require('slugid');
 
 /**
  * Awesome Font Icon
@@ -62,7 +63,7 @@ var Markdown = React.createClass({
   },
 
   /** Get default properties */
-  getDefaultProperties: function() {
+  getDefaultProperties() {
     return {
       safe:     true,
       gfm:      true,
@@ -71,7 +72,7 @@ var Markdown = React.createClass({
   },
 
   /** Render Markdown */
-  render: function() {
+  render() {
     var html = marked(this.props.children || '', {
       sanitize:     this.props.safe,
       gfm:          this.props.gfm
@@ -104,7 +105,7 @@ var DateView = React.createClass({
   },
 
   /** default properties */
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       format:     'Do of MMMM YYYY, H:mm:ss',
       placement:  'top'
@@ -112,7 +113,9 @@ var DateView = React.createClass({
   },
 
   /** Render DateView */
-  render: function() {
+  render() {
+    this._id = this._id || slugid.v4();
+
     // Create since object if
     var since;
     if (this.props.since) {
@@ -123,7 +126,7 @@ var DateView = React.createClass({
     return (
       <bs.OverlayTrigger placement={this.props.placement}
                          overlay={this.renderTooltip()}>
-        <span>
+        <span id={this._id}>
           {moment(this.props.date).fromNow()}&nbsp;{since}
         </span>
       </bs.OverlayTrigger>
@@ -131,9 +134,9 @@ var DateView = React.createClass({
   },
 
   /** Render tooltip */
-  renderTooltip: function() {
+  renderTooltip() {
     return (
-      <bs.Tooltip>
+      <bs.Tooltip id={this._id}>
         {moment(this.props.date).format(this.props.format)}
       </bs.Tooltip>
     );
@@ -149,7 +152,7 @@ var Code = React.createClass({
   // Validate properties
   propTypes: {
     children:   React.PropTypes.string.isRequired,
-    language:   function(props, propName) {
+    language:   (props, propName) => {
       var language = props[propName];
       if (!hljs.getLanguage(language)) {
         return new Error("Language '" + language + "' not supported " +
@@ -159,7 +162,7 @@ var Code = React.createClass({
   },
 
   // Render code
-  render: function() {
+  render() {
     var code = hljs.highlight(this.props.language, this.props.children, true);
     /*var html = Prism.highlight(
       this.props.children,

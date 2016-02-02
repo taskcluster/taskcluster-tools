@@ -55,7 +55,7 @@ var TerminalView = React.createClass({
 
     // Create new terminal
     this.term = new Terminal(this.props.options);
-    this.term.open(this.refs.term.getDOMNode());
+    this.term.open(this.refs.term);
     // term.js does a setTimeout() then calls element.focus()
     // This is truly annoying. To avoid it we could remove the tabindex property
     // but then we can copy out text.

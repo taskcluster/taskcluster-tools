@@ -1,6 +1,7 @@
-var React               = require('react');
-var RoleManager         = require('./rolemanager');
-var $                   = require('jquery');
+let React               = require('react');
+let ReactDOM            = require('react-dom');
+let RoleManager         = require('./rolemanager');
+let $                   = require('jquery');
 
 var utils               = require('../../lib/utils');
 
@@ -10,7 +11,7 @@ var hashManager = utils.createHashManager({
 
 // Render component
 $(function() {
-  React.render(
+  ReactDOM.render(
     <RoleManager hashEntry={hashManager.root()}/>,
     $('#container')[0]
   );

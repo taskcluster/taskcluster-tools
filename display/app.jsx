@@ -4,6 +4,7 @@ let qs              = require('querystring');
 let _               = require('lodash');
 let Promise         = require('promise');
 let React           = require('react');
+let ReactDOM        = require('react-dom');
 let bs              = require('react-bootstrap');
 let format          = require('../lib/format');
 let utils           = require('../lib/utils');
@@ -65,7 +66,7 @@ let Display = React.createClass({
     // Create remote frame buffer
     try {
       this.rfb = new RFB({
-        target:               this.refs.display.getDOMNode(),
+        target:               this.refs.display,
         encrypt:              opts.protocol === 'wss:',
         true_color:           true,
         local_cursor:         true,
@@ -239,7 +240,7 @@ $(function() {
   //  * taskId
   //  * runId
   let args = qs.parse(URL.parse(window.location.href).query);
-  React.render(
+  ReactDOM.render(
     (
       <DisplayList {...args}/>
     ),

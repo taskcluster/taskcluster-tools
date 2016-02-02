@@ -462,13 +462,13 @@ var HookEditor = React.createClass({
   },
 
   onNewScheduleItem(e) {
-    var sch = this.refs.newSch.getDOMNode().value;
+    var sch = this.refs.newSch.value;
     if (sch != "") {
       let schedule = _.cloneDeep(this.state.schedule);
       schedule.push(sch)
       this.setState({schedule: schedule});
     }
-    this.refs.newSch.getDOMNode().value = "";
+    this.refs.newSch.value = "";
   },
 
   onScheduleTextChange(e) {

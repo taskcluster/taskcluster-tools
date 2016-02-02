@@ -262,7 +262,7 @@ var RoleEditor = React.createClass({
   /** Handle changes in the editor */
   onChange() {
     var state = _.cloneDeep(this.state);
-    state.role.description = this.refs.description.getDOMNode().value;
+    state.role.description = this.refs.description.value;
     if (this.refs.roleId) {
       state.role.roleId = this.refs.roleId.getValue();
     }

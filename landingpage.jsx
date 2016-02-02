@@ -1,8 +1,9 @@
-var React                   = require('react');
-var $                       = require('jquery');
-var bs                      = require('react-bootstrap');
-var menu                    = require('./menu');
-var format                  = require('./lib/format');
+let React                   = require('react');
+let ReactDOM                = require('react-dom');
+let $                       = require('jquery');
+let bs                      = require('react-bootstrap');
+let menu                    = require('./menu');
+let format                  = require('./lib/format');
 
 /** Split an array into chunks */
 var chunks = function(array, size) {
@@ -32,7 +33,7 @@ $(function() {
     );
   });
 
-  React.render(
+  ReactDOM.render(
     (
       <div className="landingpage-entries">
         <bs.Row>

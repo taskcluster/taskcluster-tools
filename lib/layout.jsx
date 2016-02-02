@@ -1,28 +1,29 @@
-var bs          = require('react-bootstrap');
-var React       = require('react');
-var $           = require('jquery');
-var menu        = require('../menu');
-var auth        = require('./auth');
-var format      = require('./format');
+let bs          = require('react-bootstrap');
+let React       = require('react');
+let ReactDOM    = require('react-dom');
+let $           = require('jquery');
+let menu        = require('../menu');
+let auth        = require('./auth');
+let format      = require('./format');
 
 
 /** Navigation bar for layout.jade */
-var Navigation = React.createClass({
+let Navigation = React.createClass({
   /** Get initial state */
-  getInitialState: function() {
+  getInitialState() {
     return {
       credentials:      auth.loadCredentials()
     };
   },
 
   /** Log-in open a authentication URL */
-  login: function() {
+  login() {
     // Open login url
     window.open(auth.buildLoginURL(), '_blank');
   },
 
   /** Log out (clear credentials) */
-  logout: function() {
+  logout() {
     // Clear credentials
     auth.saveCredentials(undefined);
     // Update state
@@ -30,7 +31,7 @@ var Navigation = React.createClass({
   },
 
   /** Listen for credentials-changed events */
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener(
       'credentials-changed',
       this.handleCredentialsChanged,
@@ -39,7 +40,7 @@ var Navigation = React.createClass({
   },
 
   /** Stop listening for credentials-changed events */
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     window.removeEventListener(
       'credentials-changed',
       this.handleCredentialsChanged,
@@ -48,21 +49,13 @@ var Navigation = React.createClass({
   },
 
   /** Credentials changed */
-  handleCredentialsChanged: function(e) {
+  handleCredentialsChanged(e) {
     // Reload credentials
     this.setState({credentials: e.detail});
   },
 
   /** Render navigation bar */
-  render: function() {
-    // Do a little branding
-    var branding = (
-      <a href="/">
-        <img src="/lib/assets/taskcluster-36.png" width="36" height="36"/>
-        &nbsp;
-        TaskCluster Tools
-      </a>
-    );
+  render() {
 
     // Find active menu entry
     var activeEntry = menu.filter(function(entry) {
@@ -75,8 +68,17 @@ var Navigation = React.createClass({
 
     // Construct the navbar
     return (
-      <bs.Navbar fluid={true} inverse={true} staticTop={true} brand={branding}>
-        <div className="navbar-text">
+      <bs.Navbar fluid={true} inverse={true} staticTop={true}>
+        <bs.Navbar.Header>
+          <bs.Navbar.Brand>
+            <a href="/">
+              <img src="/lib/assets/taskcluster-36.png" width="36" height="36"/>
+              &nbsp;
+              TaskCluster Tools
+            </a>
+          </bs.Navbar.Brand>
+        </bs.Navbar.Header>
+        <bs.Navbar.Text>
           {
             activeEntry ? (
               <span>
@@ -86,9 +88,9 @@ var Navigation = React.createClass({
               </span>
             ): undefined
           }
-        </div>
-        <bs.Nav className="navbar-right">
-          <bs.DropdownButton key={3} title="Tools">
+        </bs.Navbar.Text>
+        <bs.Nav pullRight={true}>
+          <bs.NavDropdown key={1} title="Tools" id="tools">
             {
               menu.filter(entry => entry.display).map((entry, index) => {
                 if (entry.type === 'divider') {
@@ -104,7 +106,7 @@ var Navigation = React.createClass({
                 );
               })
             }
-          </bs.DropdownButton>
+          </bs.NavDropdown>
           {
             ( this.state.credentials ?
               <bs.NavItem onSelect={this.logout}>
@@ -127,7 +129,7 @@ var Navigation = React.createClass({
 
 /** Render Navigation */
 $(function() {
-  React.render(
+  ReactDOM.render(
     <Navigation/>,
     $('#navbar')[0]
   );

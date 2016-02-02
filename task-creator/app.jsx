@@ -1,7 +1,8 @@
-var React                   = require('react');
-var $                       = require('jquery');
-var bs                      = require('react-bootstrap');
-var TaskCreator             = require('./taskcreator');
+let React                   = require('react');
+let ReactDOM                = require('react-dom');
+let $                       = require('jquery');
+let bs                      = require('react-bootstrap');
+let TaskCreator             = require('./taskcreator');
 
 // Initial task, if nothing is stored in localStorage
 var initialTask = {
@@ -24,7 +25,7 @@ var initialTask = {
 
 // Render component
 $(function() {
-  React.render(
+  ReactDOM.render(
     (
       <bs.Row style={{marginBottom: 50}}>
         <TaskCreator
