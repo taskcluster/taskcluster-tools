@@ -1,11 +1,12 @@
-var React           = require('react');
-var bs              = require('react-bootstrap');
-var utils           = require('../utils');
-var format          = require('../format');
-var _               = require('lodash');
-var taskcluster     = require('taskcluster-client');
-var ConfirmAction   = require('./confirmaction');
-var path            = require('path');
+let React           = require('react');
+let bs              = require('react-bootstrap');
+let utils           = require('../utils');
+let format          = require('../format');
+let _               = require('lodash');
+let taskcluster     = require('taskcluster-client');
+let ConfirmAction   = require('./confirmaction');
+let path            = require('path');
+let LoanerButton    = require('./loaner-button');
 
 /** Displays information about a task in a tab page */
 var TaskInfo = React.createClass({
@@ -112,7 +113,7 @@ var TaskInfo = React.createClass({
                          label="Schedule Task"
                          action={this.scheduleTask}
                          success="Successfully scheduled task!">
-            Are you wish to schedule the task?
+            Are you sure you wish to schedule the task?
             This will <b>overwrite any scheduling process</b> taking place,
             if this task is part of a continous integration process scheduling
             this task may cause your code to land with broken tests.
@@ -226,20 +227,25 @@ var TaskInfo = React.createClass({
             {JSON.stringify(task.payload, undefined, 2)}
           </format.Code>
         </dd>
-        <dt>Edit in Task Creator</dt>
+        <dt>Debug</dt>
         <dd>
-          <ConfirmAction buttonSize="xsmall"
-                         buttonStyle="danger"
+          <ConfirmAction buttonSize="small"
+                         buttonStyle="default"
                          glyph="edit"
-                         label="Edit Task"
+                         label="Edit and Re-create"
                          action={this.editTask}
                          success="Opening Task Creator">
-            Are you sure you wish to edit this task?
+            Are you sure you wish to edit this task?<br/>
             Note that the edited task will not be linked to other tasks or
-            have the same routes as other tasks, so this is not a way to "fix"
-            a failing task in a larger task graph.  Note that you may also
-            not have the scopes required to create the resulting task.
+            have the same <code>task.routes</code> as other tasks,
+            so this is not a way to "fix" a failing task in a larger task graph.
+            Note that you may also not have the scopes required to create the
+            resulting task.
           </ConfirmAction>&nbsp;
+          <LoanerButton task={this.state.task}
+                        taskId={status.taskId}
+                        buttonStyle="default"
+                        buttonSize="small"/>&nbsp;
         </dd>
       </dl>
       <dl className="dl-horizontal">

@@ -88,7 +88,16 @@ module.exports = [
   // Interactive display
   'display/index.jade',
   'display/app.jsx',
-  'display/app.less'
+  'display/app.less',
+
+  // one-click-loaner
+  'one-click-loaner/index.jade',
+  'one-click-loaner/app.jsx',
+
+  // one-click-loaner connect
+  'one-click-loaner/connect/index.jade',
+  'one-click-loaner/connect/app.jsx',
+  'one-click-loaner/connect/connect.less',
 ].map(function(file) {
   return path.join(__dirname, file);
 });

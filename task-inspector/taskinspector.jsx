@@ -37,7 +37,7 @@ var TaskInspector = React.createClass({
     })
   ],
 
-  getInitialState: function() {
+  getInitialState() {
     return {
       taskId:         '',
       statusLoaded:   true,
@@ -48,7 +48,7 @@ var TaskInspector = React.createClass({
   },
 
   /** Return promised state for TaskClusterMixin */
-  load: function() {
+  load() {
     // Skip loading empty-strings
     if (this.state.taskId === '') {
       return {
@@ -64,7 +64,7 @@ var TaskInspector = React.createClass({
   },
 
   /** Return bindings for WebListenerMixin */
-  bindings: function() {
+  bindings() {
     // Don't bother listening for empty strings, they're pretty boring
     if (this.state.taskId === '') {
       return [];
@@ -86,7 +86,7 @@ var TaskInspector = React.createClass({
   },
 
   /** Handle message from listener */
-  handleMessage: function(message) {
+  handleMessage(message) {
     // Update status structure
     this.setState({
       status:           message.payload.status
@@ -102,12 +102,12 @@ var TaskInspector = React.createClass({
   },
 
   /** When taskId changed we should update the input */
-  updateTaskIdInput: function() {
+  updateTaskIdInput() {
     this.setState({taskIdInput: this.state.taskId});
   },
 
   // Render a task-inspector
-  render: function() {
+  render() {
     // Render
     var invalidInput = !/^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/.test(this.state.taskIdInput);
     return (
@@ -150,14 +150,14 @@ var TaskInspector = React.createClass({
   },
 
   /** Update TaskIdInput to reflect input */
-  handleTaskIdInputChange: function() {
+  handleTaskIdInputChange() {
     this.setState({
       taskIdInput:      this.refs.taskId.getInputDOMNode().value.trim()
     });
   },
 
   /** Handle form submission */
-  handleSubmit: function(e) {
+  handleSubmit(e) {
     e.preventDefault();
     this.setState({taskId: this.state.taskIdInput});
   }

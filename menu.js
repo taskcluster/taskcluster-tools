@@ -147,6 +147,24 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "One-Click Loaner",
+    link:           '/one-click-loaner/',
+    icon:           'terminal',
+    display:        false,
+    description: [
+      "Create a loaner from an existing task."
+    ].join('\n')
+  },
+  {
+    title:          "Connect to Loaner",
+    link:           '/one-click-loaner/connect/',
+    icon:           'terminal',
+    display:        false,
+    description: [
+      "Connect to an interactive display within tasks."
+    ].join('\n')
+  },
+  {
     type:           'divider',
     display:        true
   },
