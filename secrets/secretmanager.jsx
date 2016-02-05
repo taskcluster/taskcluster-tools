@@ -79,11 +79,6 @@ var SecretsManager = React.createClass({
            &nbsp;
            Set
          </bs.Button>
-         <bs.Button bsStyle="primary" onClick={this.updateSecret} disabled={!this.state.editing}>
-           <bs.Glyphicon glyph="ok"/>
-           &nbsp;
-           Update
-         </bs.Button>
          <bs.Button bsStyle="primary" onClick={this.removeSecret}>
            <bs.Glyphicon glyph="trash"/>
            &nbsp;
@@ -116,14 +111,6 @@ var SecretsManager = React.createClass({
     var name = this.refs.name.getDOMNode().value;
     var value = JSON.parse(this.refs.value.getDOMNode().value);
     this.secrets.set(name, {secret: value, expires: taskcluster.fromNow("1 day")}).then(
-        x => this.setState({editing: false, value: value}),
-        this.showError)
-  },
-
-  async updateSecret() {
-    var name = this.refs.name.getDOMNode().value;
-    var value = JSON.parse(this.refs.value.getDOMNode().value);
-    this.secrets.update(name, {secret: value, expires: taskcluster.fromNow("1 day")}).then(
         x => this.setState({editing: false, value: value}),
         this.showError)
   },
