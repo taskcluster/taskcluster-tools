@@ -1,0 +1,19 @@
+language: node_js
+sudo: false
+cache: apt
+node_js:
+- '4'
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+script: npm test
+env:
+- CXX=g++-4.8
+deploy:
+  provider: script
+  script: npm run deploy
+  on:
+    branch: master
