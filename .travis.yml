@@ -13,6 +13,7 @@ script: npm test
 env:
 - CXX=g++-4.8
 deploy:
+  skip_cleanup: true
   provider: script
   script: npm run deploy
   on:
