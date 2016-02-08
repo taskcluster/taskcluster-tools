@@ -31,6 +31,7 @@ var ConfirmAction = React.createClass({
 
   getInitialState() {
     return {
+      showDialog:       false,
       executing:        false,
       resultLoaded:     false,
       resultError:      undefined,
@@ -43,7 +44,8 @@ var ConfirmAction = React.createClass({
       <span>
         <bs.Button bsSize={this.props.buttonSize}
                    bsStyle={this.props.buttonStyle}
-                   disabled={this.props.disabled}>
+                   disabled={this.props.disabled}
+                   onClick={this.openDialog}>
           <bs.Glyphicon glyph={this.props.glyph}/>&nbsp;
           <span>{this.props.label}</span>&nbsp;
         </bs.Button>
@@ -100,7 +102,7 @@ var ConfirmAction = React.createClass({
   },
 
   closeDialog() {
-    this.setState({showDialog: true});
+    this.setState({showDialog: false});
   },
 
   /** Execute asynchronous action */

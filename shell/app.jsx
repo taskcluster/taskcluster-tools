@@ -24,6 +24,7 @@ $(function () {
       tty: true,
       command: [
         'sh', '-c', [
+          'if [ -f "/etc/taskcluster-motd" ]; then cat /etc/taskcluster-motd; fi;',
           'if [ -z "$TERM" ]; then export TERM=xterm; fi;',
           'if [ -z "$HOME" ]; then export HOME=/root; fi;',
           'if [ -z "$USER" ]; then export USER=root; fi;',

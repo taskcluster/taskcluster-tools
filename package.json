@@ -48,7 +48,8 @@
     "docker-exec-websocket-server":     "^1.1.0",
     "hterm-umd":                        "^1.0.1",
     "react-treeview":                   "^0.4.2",
-    "envify":                           "^3.4.0"
+    "envify":                           "^3.4.0",
+    "shell-escape":                     "^0.2.0"
   },
   "engines": {
     "node":                             "^4.0.0"
