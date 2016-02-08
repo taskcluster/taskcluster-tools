@@ -6,7 +6,6 @@ let menu        = require('../menu');
 let auth        = require('./auth');
 let format      = require('./format');
 
-
 /** Navigation bar for layout.jade */
 let Navigation = React.createClass({
   /** Get initial state */

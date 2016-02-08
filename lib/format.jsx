@@ -6,6 +6,8 @@ let bs            = require('react-bootstrap');
 let moment        = require('moment');
 let hljs          = require('highlight.js');
 let slugid        = require('slugid');
+require('react-widgets/lib/localizers/moment')(moment);
+
 
 /**
  * Awesome Font Icon
