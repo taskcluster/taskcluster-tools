@@ -42,6 +42,9 @@ var wrapExorcist = function(dest) {
 
 // Setup grunt
 module.exports = function(grunt) {
+  if (grunt.option('q') || grunt.option('quiet')) {
+    require('quiet-grunt');
+  }
 
   // Configuration for the grunt tasks
   var config = {

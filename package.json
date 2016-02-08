@@ -4,7 +4,7 @@
   "private":  true,
   "scripts":  {
     "test":     "grunt build",
-    "deploy":   "grunt publish"
+    "deploy":   "grunt publish -q"
   },
   "repository": {
     "type":   "git",
@@ -41,6 +41,7 @@
     "grunt-contrib-watch":              "0.6.1",
     "grunt-contrib-clean":              "0.6.0",
     "grunt-aws":                        "0.4.0",
+    "quiet-grunt":                      "0.2.3",
     "exorcist":                         "0.1.6",
     "concat-stream":                    "1.4.6",
     "grunt-keepalive":                  "0.0.1",
