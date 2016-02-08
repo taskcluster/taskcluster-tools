@@ -1,7 +1,8 @@
-var React               = require('react');
-var ClientManager       = require('./clientmanager');
-var $                   = require('jquery');
-var utils               = require('../../lib/utils');
+let React               = require('react');
+let ReactDOM            = require('react-dom');
+let ClientManager       = require('./clientmanager');
+let $                   = require('jquery');
+let utils               = require('../../lib/utils');
 
 var hashManager = utils.createHashManager({
   separator:            '/'
@@ -9,7 +10,7 @@ var hashManager = utils.createHashManager({
 
 // Render component
 $(function() {
-  React.render(
+  ReactDOM.render(
     <ClientManager hashEntry={hashManager.root()}/>,
     $('#container')[0]
   );

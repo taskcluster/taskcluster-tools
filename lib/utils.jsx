@@ -90,7 +90,7 @@ var hasChanged = function(paths, obj1, obj2) {
  * When rendering `!propertyLoaded` will be true if it either haven't started
  * loading or is loading.
  */
-var createTaskClusterMixin = function(options) {
+var createTaskClusterMixin = (options) => {
   // Set default options
   options = _.defaults({}, options, {
     clients:        {},   // Mapping from name to clientClass
@@ -106,14 +106,14 @@ var createTaskClusterMixin = function(options) {
   options.reloadOnProps = parsePaths(options.reloadOnProps);
   options.reloadOnKeys = parsePaths(options.reloadOnKeys);
   return {
-    componentWillMount: function() {
+    componentWillMount() {
       // Create clients with current credentials
       this._createClients(auth.loadCredentials());
     },
 
 
     /** Setup object and start listening for events */
-    componentDidMount: function() {
+    componentDidMount() {
       // Create clients with current credentials
       this._createClients(auth.loadCredentials());
 
@@ -129,7 +129,7 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** Check if the props or state changes causes us to reload */
-    componentDidUpdate: function(prevProps, prevState) {
+    componentDidUpdate(prevProps, prevState) {
       // Reload state if we have to
       if (hasChanged(options.reloadOnProps, this.props, prevProps) ||
           hasChanged(options.reloadOnKeys, this.state, prevState)) {
@@ -138,7 +138,7 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** handle changes to credentials */
-    handleCredentialsChanged: function(e) {
+    handleCredentialsChanged(e) {
       // Update clients with new credentials
       this._createClients(e.detail);
 
@@ -149,7 +149,7 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** Stop listening for events */
-    componentWillUnmount: function() {
+    componentWillUnmount() {
       // Remove credentials-changed event handler
       window.removeEventListener(
         'credentials-changed',
@@ -159,7 +159,7 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** Load state from a map from property to promise */
-    loadState: function(promisedState) {
+    loadState(promisedState) {
       assert(promisedState instanceof Object, "Expected an object");
 
       // map from promised state property to load iteration count, so that old
@@ -173,7 +173,7 @@ var createTaskClusterMixin = function(options) {
       // promisedStateIterationMap
       var promisedStateIterationMap = {};
       var state = {};
-      _.forIn(promisedState, function(promise, key) {
+      _.forIn(promisedState, (promise, key) => {
         // Set loading state
         state[key + 'Loaded'] = false;
         state[key + 'Error']  = undefined;
@@ -186,12 +186,12 @@ var createTaskClusterMixin = function(options) {
         this.__promisedStateIterationMap[key] += 1;
         // Remember the current iteration
         promisedStateIterationMap[key] = this.__promisedStateIterationMap[key];
-      }, this);
+      });
       this.setState(state);
 
       // Construct a method that'll set state loaded and ignore old state if
       // a new promise for the property has arrived since
-      var setLoaded = function(key, result, err) {
+      var setLoaded = (key, result, err) => {
         // Ignore state, if loadState have been called again with this property
         var currentIteration = this.__promisedStateIterationMap[key];
         if (promisedStateIterationMap[key] === currentIteration) {
@@ -201,7 +201,7 @@ var createTaskClusterMixin = function(options) {
           state[key]            = result;
           this.setState(state);
         }
-      }.bind(this);
+      };
 
       // Update state as promises are resolved
       var promises = _.map(promisedState, function(promise, key) {
@@ -223,7 +223,7 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** Reload state given properties to reload with */
-    reload: function() {
+    reload() {
       // If there is no `load` function then we're done
       if (!(this.load instanceof Function)) {
         return Promise.resolve(undefined);
@@ -236,9 +236,9 @@ var createTaskClusterMixin = function(options) {
       // an infinite loop, I hate those!
       var firstKeys = options.reloadOnKeys.map(_.first.bind(_));
       var conflictKeys = _.keys(promisedState).filter(function(key) {
-        return _.contains(firstKeys, key) ||
-               _.contains(firstKeys, key + 'Error') ||
-               _.contains(firstKeys, key + 'Loaded');
+        return _.includes(firstKeys, key) ||
+               _.includes(firstKeys, key + 'Error') ||
+               _.includes(firstKeys, key + 'Loaded');
       });
       if (conflictKeys.length > 0) {
         debug("Keys that shouldn't be in reloadOnKeys or not returned",
@@ -259,7 +259,7 @@ var createTaskClusterMixin = function(options) {
      *
      * Returns undefined if the property is loaded.
      */
-    renderWaitFor: function(property) {
+    renderWaitFor(property) {
       if (this.state[property + 'Loaded']) {
         if (this.state[property + 'Error']) {
           return this.renderError(this.state[property + 'Error']);
@@ -271,7 +271,7 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** Render a spinner */
-    renderSpinner: function() {
+    renderSpinner() {
       return (
         <div style={{textAlign: 'center', margin: 20}}>
           <format.Icon name="spinner" size="2x" spin/>
@@ -283,7 +283,7 @@ var createTaskClusterMixin = function(options) {
      * Error object, assumed to have message and possible properties from
      * taskcluster-client
      */
-    renderError: function(err) {
+    renderError(err) {
       var body = undefined;
       if (err.body) {
         body = (
@@ -308,12 +308,12 @@ var createTaskClusterMixin = function(options) {
     },
 
     /** Initialize client objects requested in options */
-    _createClients: function(credentials) {
-      _.forIn(options.clients, function(Client, key) {
+    _createClients(credentials) {
+      _.forIn(options.clients, (Client, key) => {
         this[key] = new Client(_.defaults(options.clientOpts[key] || {}, {
           credentials:        credentials
         }));
-      }, this);
+      });
     },
   };
 };
@@ -355,7 +355,7 @@ exports.createTaskClusterMixin = createTaskClusterMixin;
  * }
  * And calls `this.handleMessage(message)` when a message arrives.
  */
-var createWebListenerMixin = function(options) {
+var createWebListenerMixin = (options) => {
   // Set default options
   options = _.defaults({}, options || {}, {
     reloadOnProps:        [],   // List of properties to reload on
@@ -369,13 +369,13 @@ var createWebListenerMixin = function(options) {
   options.reloadOnKeys  = parsePaths(options.reloadOnKeys);
   return {
     /** Perform some sanity checks */
-    componentWillMount: function() {
+    componentWillMount() {
       assert(this.handleMessage instanceof Function,
              "components with this mixin must implement 'handleMessage'");
     },
 
     /** Start listening if bindings are configured */
-    componentDidMount: function() {
+    componentDidMount() {
       this.__listener = null;
       this.__bindings = [];
 
@@ -385,12 +385,12 @@ var createWebListenerMixin = function(options) {
     },
 
     /** Stop listening */
-    componentWillUnmount: function() {
+    componentWillUnmount() {
       this.stopListening();
     },
 
     /** Reload listener if bindings changed */
-    componentDidUpdate: function(prevProps, prevState) {
+    componentDidUpdate(prevProps, prevState) {
       // No need to check state if this.bindings() isn't implemented
       if (!(this.bindings instanceof Function)) {
         return;
@@ -414,12 +414,12 @@ var createWebListenerMixin = function(options) {
       });
 
       // Find bindings added
-      var bindingsAdded = bindings.filter(function(binding) {
+      var bindingsAdded = bindings.filter(binding => {
         return !this.__bindings.some(function(currentBinding) {
           return currentBinding.exchange === binding.exchange &&
                  currentBinding.routingKeyPattern === binding.routingKeyPattern;
         });
-      }, this);
+      });
 
       // bind to bindings
       if (bindingsRemoved.length > 0) {
@@ -433,7 +433,7 @@ var createWebListenerMixin = function(options) {
     },
 
     /** Start listening */
-    startListening: function(bindings) {
+    startListening(bindings) {
       // Get bindings if none are provided
       if (!bindings || bindings.length === 0) {
         return Promise.resolve(undefined);
@@ -445,20 +445,20 @@ var createWebListenerMixin = function(options) {
         // Create listener
         this.__listener = new taskcluster.WebListener();
         this.__listener.on('message', this.handleMessage);
-        this.__listener.on('error', function(err) {
+        this.__listener.on('error', err => {
           debug("Error while listening: %s, %j", err, err);
           if (!err) {
             err = new Error("Unknown error");
           }
           this.setState({listeningError: err});
           this.stopListening();
-        }.bind(this));
+        });
 
         // Bind to bindings
-        var bound = bindings.map(function(binding) {
+        var bound = bindings.map(binding => {
           this.__bindings.push(binding);
           return this.__listener.bind(binding);
-        }, this);
+        });
 
         this.setState({
           listening:        null,
@@ -466,20 +466,20 @@ var createWebListenerMixin = function(options) {
         });
         return Promise.all(bound.concat([
           this.__listener.resume()
-        ])).then(function() {
+        ])).then(() => {
           debug("Listening for messages...");
           this.setState({
             listening:        true,
             listeningError:   undefined
           });
-        }.bind(this), function(err) {
+        }, err => {
           debug("Error while listening: %s, %j", err, err);
           if (!err) {
             err = new Error("Unknown error");
           }
           this.setState({listeningError: err});
           return this.stopListening();
-        }.bind(this));
+        });
       }
 
       // Bind to all new bindings
@@ -487,26 +487,26 @@ var createWebListenerMixin = function(options) {
         listening:        null,
         listeningError:   undefined
       });
-      return Promise.all(bindings.map(function(binding) {
+      return Promise.all(bindings.map(binding => {
         this.__bindings.push(binding);
         return this.__listener.bind(binding);
-      }, this)).then(function() {
+      })).then(() => {
         this.setState({
           listening:        true,
           listeningError:   undefined
         });
-      }.bind(this), function(err) {
+      }, err => {
         debug("Error while listening: %s, %j", err, err);
         if (!err) {
           err = new Error("Unknown error");
         }
         this.setState({listeningError: err});
         return this.stopListening();
-      }.bind(this));
+      });
     },
 
     /** Stop listening, if already listening */
-    stopListening: function() {
+    stopListening() {
       this.setState({listening: false});
       if (this.__listener) {
         var closed = this.__listener.close();
@@ -609,7 +609,7 @@ HashManager.prototype.handleHashChange = function() {
     .split(this._options.separator)
     .map(unescapeChar.bind(null, this._options.separator));
 
-  this._states.forEach(function(hashState, index) {
+  this._states.forEach((hashState, index) => {
     var entry = this._entries[index];
     // If there is an entry and hashState has changed, set it and call handler
     if (entry && !_.isEqual(entry.hashState, hashState)) {
@@ -618,7 +618,7 @@ HashManager.prototype.handleHashChange = function() {
         entry._handler(hashState);
       }
     }
-  }, this);
+  });
 };
 
 /**
@@ -725,7 +725,7 @@ exports.createHashManager = createHashManager;
  *
  * Note, only one subcomponent can persist it's state.
  */
-var createLocationHashMixin =  function(options) {
+var createLocationHashMixin = (options) => {
   options = _.defaults({}, options || {}, {
     type:                 'string'
   });
@@ -736,7 +736,7 @@ var createLocationHashMixin =  function(options) {
   options.keys = parsePaths(options.keys);
   return {
     /** Get state from with hashEntry */
-    componentWillMount: function() {
+    componentWillMount() {
       // Add new manager
       if (this.props.hashEntry) {
         // Create a hashEntry for key that needs to be stored
@@ -746,21 +746,19 @@ var createLocationHashMixin =  function(options) {
           prevEntry = this.__hashEntries[i] = prevEntry.next();
         }
         // Add handlers
-        this.__hashEntries.forEach(function(hashEntry, index) {
+        this.__hashEntries.forEach((hashEntry, index) => {
           hashEntry.add(this.handleStateHashChange.bind(this, index));
-        }, this);
+        });
       }
     },
 
     /** Get state if new hashEntry is given */
-    componentWillReceiveProps: function(nextProps) {
+    componentWillReceiveProps(nextProps) {
       // Only add remove if the hashEntry actually changed
       if (this.props.hashEntry !== nextProps.hashEntry) {
         // Remove existing hashEntry
         if (this.props.hashEntry && this.__hashEntries.length > 0) {
-          this.__hashEntries.forEach(function(hashEntry) {
-            hashEntry.remove();
-          });
+          this.__hashEntries.forEach(hashEntry => hashEntry.remove());
           this.__hashEntries = [];
         }
         // Add new hashEntry
@@ -772,26 +770,24 @@ var createLocationHashMixin =  function(options) {
             prevEntry = this.__hashEntries[i] = prevEntry.next();
           }
           // Add handlers
-          this.__hashEntries.forEach(function(hashEntry, index) {
+          this.__hashEntries.forEach((hashEntry, index) => {
             hashEntry.add(this.handleStateHashChange.bind(this, index));
-          }, this);
+          });
         }
       }
     },
 
     /** Remove from hashEntry */
-    componentWillUnmount: function() {
+    componentWillUnmount() {
       // Remove hashEntry
       if (this.props.hashEntry && this.__hashEntries.length > 0) {
-        this.__hashEntries.forEach(function(hashEntry) {
-          hashEntry.remove();
-        });
+        this.__hashEntries.forEach(hashEntry => hashEntry.remove());
         this.__hashEntries = [];
       }
     },
 
     /** Provide hashEntry with new state */
-    componentDidUpdate: function() {
+    componentDidUpdate() {
       if (this.props.hashEntry && this.__hashEntries.length > 0) {
         assert(this.__hashEntries.length === options.keys.length);
 
@@ -799,7 +795,7 @@ var createLocationHashMixin =  function(options) {
         var doUpdate = false;
 
         // For each key/hashEntry that we have
-        options.keys.forEach(function(key, index) {
+        options.keys.forEach((key, index) => {
           // Find hashState for key
           var hashState = valueAtPath(key, this.state);
           if (options.type === 'json') {
@@ -816,7 +812,7 @@ var createLocationHashMixin =  function(options) {
             hashEntry.hashState = hashState;
             doUpdate = true;
           }
-        }, this);
+        });
 
         // Update if necessary
         if (doUpdate) {
@@ -826,7 +822,7 @@ var createLocationHashMixin =  function(options) {
     },
 
     /** Handle updates from hashEntry */
-    handleStateHashChange: function(index, hashState) {
+    handleStateHashChange(index, hashState) {
       // decode json if necessary
       if (options.type === 'json') {
         // If empty string we'll load initial state
@@ -844,7 +840,7 @@ var createLocationHashMixin =  function(options) {
     },
 
     /** Return next hashEntry if one is available */
-    nextHashEntry: function() {
+    nextHashEntry() {
       if (this.props.hashEntry) {
         // Make sure next() follows the number we need to hold keys that we store
         var lastHashEntry = this.props.hashEntry;
@@ -882,35 +878,35 @@ exports.createLocationHashMixin = createLocationHashMixin;
  * Be careful with this mixin and watch out for infinite loops. Never modify
  * a state property that triggers a method in a handler.
  */
-var createWatchStateMixin = function(options) {
+var createWatchStateMixin = (options) => {
   options = _.defaults({}, options || {}, {
     onProps:              {},
     onKeys:               {},
     triggerAfterMount:    true
   });
-  _.forIn(options.onProps, function(paths, key) {
+  _.forIn(options.onProps, (paths, key) => {
     assert(paths instanceof Array, "'" + key + "' must map to an array");
     options.onProps[key] = parsePaths(paths);
   });
-  _.forIn(options.onKeys, function(paths, key) {
+  _.forIn(options.onKeys, (paths, key) => {
     assert(paths instanceof Array, "'" + key + "' must map to an array");
     options.onKeys[key] = parsePaths(paths);
   });
   return {
     /** Perform sanity check to ensure that handlers are available */
-    componentWillMount: function() {
-      _.forIn(options.onKeys, function(paths, method) {
+    componentWillMount() {
+      _.forIn(options.onKeys, (paths, method) => {
         assert(this[method] instanceof Function,
                "Handler '" + method + "' is missing");
-      }, this);
-      _.forIn(options.inProps, function(paths, method) {
+      });
+      _.forIn(options.inProps, (paths, method) => {
         assert(this[method] instanceof Function,
                "Handler '" + method + "' is missing");
-      }, this);
+      });
     },
 
     /** Check if any keys that we're watching changed since launch */
-    componentDidMount: function() {
+    componentDidMount() {
       // Don't trigger on DidMount of options don't allow it
       if (!options.triggerAfterMount) {
         return;
@@ -930,35 +926,33 @@ var createWatchStateMixin = function(options) {
     },
 
     /** Handle state changes */
-    componentDidUpdate: function(prevProps, prevState) {
+    componentDidUpdate(prevProps, prevState) {
       this.triggerWatchHandler(prevProps, prevState)
     },
 
     /** Check if handlers needs to be triggered */
-    triggerWatchHandler: function(prevProps, prevState) {
+    triggerWatchHandler(prevProps, prevState) {
       // Build a list of handlers to call
       var handlers = [];
 
       // Find handlers triggered by state changes
-      _.forIn(options.onKeys, function(paths, method) {
-        if (!_.contains(handlers, method) &&
+      _.forIn(options.onKeys, (paths, method) => {
+        if (!_.includes(handlers, method) &&
             hasChanged(paths, this.state, prevState)) {
           handlers.push(method);
         }
-      }, this);
+      });
 
       // Find handlers triggered by property changes
-      _.forIn(options.onProps, function(paths, method) {
-        if (!_.contains(handlers, method) &&
+      _.forIn(options.onProps, (paths, method) => {
+        if (!_.includes(handlers, method) &&
             hasChanged(paths, this.props, prevProps)) {
           handlers.push(method);
         }
-      }, this);
+      });
 
       // Call handlers that needs to be invoked
-      _.uniq(handlers).forEach(function(handler) {
-        this[handler]();
-      }, this);
+      _.uniq(handlers).forEach(handler => this[handler]());
     }
   };
 };

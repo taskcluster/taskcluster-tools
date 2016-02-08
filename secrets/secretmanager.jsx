@@ -99,37 +99,37 @@ var SecretsManager = React.createClass({
   },
 
   async getSecret() {
-    var name = this.refs.name.getDOMNode().value;
+    var name = this.refs.name.value;
     this.secrets.get(name).then(
         value => this.setState({editing: false, value: value.secret, expires: value.expires}),
         this.showError);
   },
 
   async editSecret() {
-    var name = this.refs.name.getDOMNode().value;
+    var name = this.refs.name.value;
     this.secrets.get(name).then(
         value => this.setState({editing: true, value: value.secret, expires: value.expires}),
         err => this.setState({editing: true, value: {}, expires: undefined}))
   },
 
   async setSecret() {
-    var name = this.refs.name.getDOMNode().value;
-    var value = JSON.parse(this.refs.value.getDOMNode().value);
+    var name = this.refs.name.value;
+    var value = JSON.parse(this.refs.value.value);
     this.secrets.set(name, {secret: value, expires: taskcluster.fromNow("1 day")}).then(
         x => this.setState({editing: false, value: value}),
         this.showError)
   },
 
   async updateSecret() {
-    var name = this.refs.name.getDOMNode().value;
-    var value = JSON.parse(this.refs.value.getDOMNode().value);
+    var name = this.refs.name.value;
+    var value = JSON.parse(this.refs.value.value);
     this.secrets.update(name, {secret: value, expires: taskcluster.fromNow("1 day")}).then(
         x => this.setState({editing: false, value: value}),
         this.showError)
   },
 
   async removeSecret() {
-    var name = this.refs.name.getDOMNode().value;
+    var name = this.refs.name.value;
     this.secrets.remove(name).then(
         value => this.setState({editing: false, value: null}),
         this.showError)

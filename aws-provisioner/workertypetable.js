@@ -90,21 +90,28 @@ var WorkerTypeRow = React.createClass({
       console.error(e);
     }
     //return <pre>{JSON.stringify(p, null, 2)}</pre>;
-
-    return <bs.ProgressBar style={{marginBottom: 0}}>
-      { p.r ?
+    let pgs = [];
+    if (p.r) {
+      pgs.push(
         <bs.ProgressBar bsStyle='success' key='running' now={p.r} label={p.rc}/>
-        : ''
-      }
-      { p.p ?
+      );
+    }
+    if (p.p) {
+      pgs.push(
         <bs.ProgressBar bsStyle='warning' key='pending' now={p.p} label={p.pc}/>
-        : ''
-      }
-      { p.s ?
+      );
+    }
+    if (p.s) {
+      pgs.push(
         <bs.ProgressBar bsStyle='info' key='spotReq' now={p.s} label={p.sc}/>
-        : ''
-      }
-    </bs.ProgressBar>
+      );
+    }
+
+    return (
+      <bs.ProgressBar /*style={{marginBottom: 0}}*/>
+        {pgs}
+      </bs.ProgressBar>
+    );
   },
 
   /* Return an object which has the fuzzed percentages to use for creating
@@ -152,7 +159,7 @@ var WorkerTypeRow = React.createClass({
   },
 
   runningCapacity() {
-    return _.sum(this.props.awsState.running.map(instance => {
+    return _.sumBy(this.props.awsState.running.map(instance => {
       return _.find(this.state.workerType.instanceTypes, {
         instanceType:     instance.type
       });
@@ -160,7 +167,7 @@ var WorkerTypeRow = React.createClass({
   },
 
   pendingCapacity() {
-    return _.sum(this.props.awsState.pending.map(instance => {
+    return _.sumBy(this.props.awsState.pending.map(instance => {
       return _.find(this.state.workerType.instanceTypes, {
         instanceType:     instance.type
       });
@@ -168,7 +175,7 @@ var WorkerTypeRow = React.createClass({
   },
 
   spotReqCapacity() {
-    return _.sum(this.props.awsState.spotReq.map(spotReq => {
+    return _.sumBy(this.props.awsState.spotReq.map(spotReq => {
       return _.find(this.state.workerType.instanceTypes, {
         instanceType:     spotReq.type
       });
@@ -177,7 +184,7 @@ var WorkerTypeRow = React.createClass({
 
   tooltip() {
     return (
-      <bs.Tooltip>
+      <bs.Tooltip id={this.props.workerType}>
         {this.props.workerType} has
         running capacity to handle {this.runningCapacity()  || '0'} tasks,
         pending instances to handle {this.pendingCapacity() || '0'} tasks, and
@@ -306,9 +313,11 @@ var WorkerTypeTable = React.createClass({
     return (
       <bs.Table>
         <thead>
-          <th>WorkerType</th>
-          <th className='col-md-6'>Capacity</th>
-          <th>Pending Tasks</th>
+          <tr>
+            <th>WorkerType</th>
+            <th className='col-md-6'>Capacity</th>
+            <th>Pending Tasks</th>
+          </tr>
         </thead>
         <tbody>
         {

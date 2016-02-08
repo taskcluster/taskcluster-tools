@@ -7,6 +7,7 @@ var concat    = require('concat-stream')
 // Common modules to compiled into a single bundle
 var COMMON_MODULES = [
   'react',
+  'react-dom',
   'react-bootstrap',
   'jquery',
   'promise',

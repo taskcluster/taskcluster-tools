@@ -42,7 +42,7 @@ var ScopeEditor = React.createClass({
                   </bs.Button>
                 </li>
               );
-            }, this)
+            })
           }
         </ul>
         <div className="input-group">
@@ -66,7 +66,7 @@ var ScopeEditor = React.createClass({
 
   /** Add scope to state */
   addScope() {
-    var scope = this.refs.newScope.getDOMNode().value;
+    var scope = this.refs.newScope.value;
     // Let's skip empty strings
     if (scope) {
       var scopes = _.clone(this.props.scopes);
@@ -75,7 +75,7 @@ var ScopeEditor = React.createClass({
         scopes.sort();
         this.props.scopesUpdated(scopes);
       }
-      this.refs.newScope.getDOMNode().value = "";
+      this.refs.newScope.value = "";
     }
   },
 

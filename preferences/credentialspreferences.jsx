@@ -1,20 +1,21 @@
-var React       = require('react');
-var bs          = require('react-bootstrap');
-var auth        = require('../lib/auth');
+let React       = require('react');
+let bs          = require('react-bootstrap');
+let auth        = require('../lib/auth');
+let slugid      = require('slugid');
 
 /**
  * User interface for displaying credentials loaded, setting other credentials,
  * removing the credentials from the browser etc.
  */
 var CredentialsPreferences = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       parseError:       false
     };
   },
 
   /** Handle changes looks for parse errors */
-  handleChange: function() {
+  handleChange() {
     // Parse certificate to see if it is valid
     var parseError = false;
     if (this.refs.temporary.getChecked()) {
@@ -32,7 +33,7 @@ var CredentialsPreferences = React.createClass({
   },
 
   /** Save changes to localStorage */
-  save: function() {
+  save() {
     // Construct credentials
     var credentials = {
       clientId:     this.refs.clientId.getValue(),
@@ -46,7 +47,7 @@ var CredentialsPreferences = React.createClass({
   },
 
   /** Removed credentials from localStorage */
-  remove: function() {
+  remove() {
     auth.saveCredentials(undefined);
     // Reset inputs
     this.refs.clientId.getInputDOMNode().value    = "";
@@ -58,7 +59,7 @@ var CredentialsPreferences = React.createClass({
   },
 
   /** Listen for credentials-changed events */
-  componentDidMount: function() {
+  componentDidMount() {
     window.addEventListener(
       'credentials-changed',
       this.handleCredentialsChanged,
@@ -67,7 +68,7 @@ var CredentialsPreferences = React.createClass({
   },
 
   /** Stop listening for credentials-changed events */
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     window.removeEventListener(
       'credentials-changed',
       this.handleCredentialsChanged,
@@ -76,7 +77,7 @@ var CredentialsPreferences = React.createClass({
   },
 
   /** handle changes to credentials */
-  handleCredentialsChanged: function(e) {
+  handleCredentialsChanged(e) {
     var creds = e.detail || {};
     // Update clients with new credentials
     var certificate = JSON.stringify(
@@ -92,7 +93,8 @@ var CredentialsPreferences = React.createClass({
     this.forceUpdate();
   },
 
-  render: function() {
+  render() {
+    this._id = this._id || slugid.v4();
     var creds = auth.loadCredentials() || {};
     var certificate = JSON.stringify(
       creds.certificate || {},
@@ -154,7 +156,10 @@ var CredentialsPreferences = React.createClass({
                 </bs.Button>
                 <bs.OverlayTrigger placement="top"
                                    overlay={this.renderRemoveTooltip()}>
-                  <bs.Button bsStyle="danger" onClick={this.remove}>
+                  <bs.Button
+                    bsStyle="danger"
+                    onClick={this.remove}
+                    id={this._id}>
                     Remove
                   </bs.Button>
                 </bs.OverlayTrigger>
@@ -167,9 +172,9 @@ var CredentialsPreferences = React.createClass({
   },
 
   /** Render tooltip for remove button */
-  renderRemoveTooltip: function() {
+  renderRemoveTooltip() {
     return (
-      <bs.Tooltip>
+      <bs.Tooltip id={this._id}>
         <strong>Remove</strong> credentials stored in <code>localStorage</code>
       </bs.Tooltip>
     );

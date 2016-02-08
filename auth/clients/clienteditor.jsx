@@ -340,7 +340,7 @@ var ClientEditor = React.createClass({
   /** Handle changes in the editor */
   onChange() {
     var state = _.cloneDeep(this.state);
-    state.client.description = this.refs.description.getDOMNode().value;
+    state.client.description = this.refs.description.value;
     if (this.refs.clientId) {
       state.client.clientId = this.refs.clientId.getValue();
     }

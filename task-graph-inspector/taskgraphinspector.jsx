@@ -135,7 +135,7 @@ var TaskGraphInspector = React.createClass({
     ];
 
     // Dispatch to handleQueueMessage or handleSchedulerMessage
-    if (_.contains(queueExchanges, message.exchange)) {
+    if (_.includes(queueExchanges, message.exchange)) {
       this.handleQueueMessage(message);
     } else {
       this.handleSchedulerMessage(message);

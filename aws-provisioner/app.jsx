@@ -1,8 +1,9 @@
-var React                   = require('react');
-var $                       = require('jquery');
-var bs                      = require('react-bootstrap');
-var utils                   = require('../lib/utils');
-var WorkerTypeTable         = require('./workertypetable');
+let React                   = require('react');
+let ReactDOM                = require('react-dom');
+let $                       = require('jquery');
+let bs                      = require('react-bootstrap');
+let utils                   = require('../lib/utils');
+let WorkerTypeTable         = require('./workertypetable');
 
 const PROVISIONER_ID = 'aws-provisioner-v1';
 
@@ -12,12 +13,11 @@ var hashManager = utils.createHashManager({
 
 // Render component
 $(function() {
-  React.render(
+  ReactDOM.render(
     (
       <WorkerTypeTable
         provisionerId={PROVISIONER_ID}
-        hashEntry={hashManager.root()}
-        />
+        hashEntry={hashManager.root()}/>
     ),
     $('#container')[0]
   );

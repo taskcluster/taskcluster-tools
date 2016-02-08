@@ -40,21 +40,27 @@ var ConfirmAction = React.createClass({
 
   render() {
     return (
-      <bs.ModalTrigger modal={this.renderDialog()} ref="modalTrigger">
+      <span>
         <bs.Button bsSize={this.props.buttonSize}
                    bsStyle={this.props.buttonStyle}
                    disabled={this.props.disabled}>
           <bs.Glyphicon glyph={this.props.glyph}/>&nbsp;
           <span>{this.props.label}</span>&nbsp;
         </bs.Button>
-      </bs.ModalTrigger>
+        {this.renderDialog()}
+      </span>
     );
   },
 
   renderDialog() {
     return (
-      <bs.Modal bsStyle="primary" title={this.props.label}>
-        <div className="modal-body">
+      <bs.Modal bsStyle="primary"
+        show={this.state.showDialog}
+        onHide={this.closeDialog}>
+        <bs.Modal.Header closeButton>
+          {this.props.label}
+        </bs.Modal.Header>
+        <bs.Modal.Body>
           <span>{this.props.children}</span>
           {
             this.state.executing ? (
@@ -67,8 +73,8 @@ var ConfirmAction = React.createClass({
               </span>
             ) : undefined
           }
-        </div>
-        <div className="modal-footer">
+        </bs.Modal.Body>
+        <bs.Modal.Footer>
           {
             !(this.state.executing || this.state.result) ? (
               <bs.Button
@@ -84,13 +90,17 @@ var ConfirmAction = React.createClass({
             <bs.Glyphicon glyph="remove"/>&nbsp;
             Close
           </bs.Button>
-        </div>
+        </bs.Modal.Footer>
       </bs.Modal>
     );
   },
 
+  openDialog() {
+    this.setState({showDialog: true});
+  },
+
   closeDialog() {
-    this.refs.modalTrigger.hide();
+    this.setState({showDialog: true});
   },
 
   /** Execute asynchronous action */

@@ -184,7 +184,7 @@ var WorkerTypeResources = React.createClass({
   },
 
   runningCapacity() {
-    return _.sum(this.props.awsState.running.map(instance => {
+    return _.sumBy(this.props.awsState.running.map(instance => {
       return _.find(this.props.workerType.instanceTypes, {
         instanceType:     instance.type
       });
@@ -192,7 +192,7 @@ var WorkerTypeResources = React.createClass({
   },
 
   pendingCapacity() {
-    return _.sum(this.props.awsState.pending.map(instance => {
+    return _.sumBy(this.props.awsState.pending.map(instance => {
       return _.find(this.props.workerType.instanceTypes, {
         instanceType:     instance.type
       });
@@ -200,7 +200,7 @@ var WorkerTypeResources = React.createClass({
   },
 
   spotReqCapacity() {
-    return _.sum(this.props.awsState.spotReq.map(spotReq => {
+    return _.sumBy(this.props.awsState.spotReq.map(spotReq => {
       return _.find(this.props.workerType.instanceTypes, {
         instanceType:     spotReq.type
       });

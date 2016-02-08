@@ -1,9 +1,10 @@
-var React                   = require('react');
-var $                       = require('jquery');
-var bs                      = require('react-bootstrap');
-var IndexBrowser            = require('./indexbrowser');
-var EntryView               = require('./entryview');
-var utils                   = require('../lib/utils');
+let React                   = require('react');
+let ReactDOM                = require('react-dom');
+let $                       = require('jquery');
+let bs                      = require('react-bootstrap');
+let IndexBrowser            = require('./indexbrowser');
+let EntryView               = require('./entryview');
+let utils                   = require('../lib/utils');
 
 var hashManager = utils.createHashManager({
   separator:            '/'
@@ -11,7 +12,7 @@ var hashManager = utils.createHashManager({
 
 // Render component
 $(function() {
-  React.render(
+  ReactDOM.render(
     (
       <IndexBrowser
         hashEntry={hashManager.root()}
