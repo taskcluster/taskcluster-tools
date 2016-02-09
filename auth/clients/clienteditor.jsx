@@ -3,13 +3,13 @@ var bs              = require('react-bootstrap');
 var slugid          = require('slugid');
 var taskcluster     = require('taskcluster-client');
 var DatePicker      = require('react-datepicker');
+var moment          = require('moment');
 var utils           = require('../../lib/utils');
 var format          = require('../../lib/format');
 var _               = require('lodash');
 var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
 var ScopeEditor     = require('../../lib/ui/scopeeditor');
-var moment          = require('moment');
 
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({

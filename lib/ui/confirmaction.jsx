@@ -41,16 +41,14 @@ var ConfirmAction = React.createClass({
 
   render() {
     return (
-      <span>
-        <bs.Button bsSize={this.props.buttonSize}
-                   bsStyle={this.props.buttonStyle}
-                   disabled={this.props.disabled}
-                   onClick={this.openDialog}>
-          <bs.Glyphicon glyph={this.props.glyph}/>&nbsp;
-          <span>{this.props.label}</span>&nbsp;
-        </bs.Button>
+      <bs.Button bsSize={this.props.buttonSize}
+                 bsStyle={this.props.buttonStyle}
+                 disabled={this.props.disabled}
+                 onClick={this.openDialog}>
+        <bs.Glyphicon glyph={this.props.glyph}/>&nbsp;
+        <span>{this.props.label}</span>&nbsp;
         {this.renderDialog()}
-      </span>
+      </bs.Button>
     );
   },
 
