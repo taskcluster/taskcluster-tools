@@ -2,7 +2,7 @@ var React           = require('react');
 var _               = require('lodash');
 var taskcluster     = require('taskcluster-client');
 var utils           = require('../utils');
-var DropdownList    = require('react-widgets').DropdownList;
+var Select          = require('react-select');
 var TerminalView    = require('./terminalview');
 
 /** Render a terminal and a dropdown menu to select logs from */
@@ -17,7 +17,7 @@ var LogView = React.createClass({
   ],
 
   // Get initial state
-  getInitialState: function() {
+  getInitialState() {
     var entry = _.find(this.props.logs, {name: 'public/logs/terminal.log'}) ||
                 _.find(this.props.logs, {name: 'public/logs/live.log'}) ||
                 this.props.logs[0];
@@ -37,11 +37,11 @@ var LogView = React.createClass({
   },
 
   // Fresh the log at request of the user
-  refreshLog: function() {
+  refreshLog() {
     this.refs.termView.refresh();
   },
 
-  render: function() {
+  render() {
     // Create URL for the artifact
     var logUrl;
     if (this.state.name) {
@@ -53,6 +53,9 @@ var LogView = React.createClass({
       );
     }
 
+    let logs = this.props.logs.map(log => {
+      return {value: log.name, label: log.name};
+    });
     return (
       <span>
       <dl className="dl-horizontal log-view">
@@ -60,12 +63,11 @@ var LogView = React.createClass({
         <dd>
           <div className="log-view-log-chooser">
             <div className="log-view-dropdown-wrapper">
-              <DropdownList
-                data={this.props.logs}
+              <Select
                 value={this.state.name}
                 onChange={this.handleLogChanged}
-                textField='name'
-                valueField='name'/>
+                options={logs}
+                clearable={false}/>
             </div>
             <button type="button"
                     className="btn btn-sm btn-default log-view-btn-refresh"
@@ -81,8 +83,8 @@ var LogView = React.createClass({
   },
 
   /** Handle select changes in drop down box */
-  handleLogChanged: function(log) {
-    this.setState({name: log.name});
+  handleLogChanged(logName) {
+    this.setState({name: logName});
   }
 });
 

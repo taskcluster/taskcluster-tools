@@ -9,7 +9,6 @@ var COMMON_MODULES = [
   'react',
   'react-dom',
   'react-bootstrap',
-  'react-widgets',
   'jquery',
   'promise',
   'taskcluster-client',

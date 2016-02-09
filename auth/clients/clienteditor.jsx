@@ -2,13 +2,14 @@ var React           = require('react');
 var bs              = require('react-bootstrap');
 var slugid          = require('slugid');
 var taskcluster     = require('taskcluster-client');
-var DateTimePicker  = require('react-widgets').DateTimePicker;
+var DatePicker      = require('react-datepicker');
 var utils           = require('../../lib/utils');
 var format          = require('../../lib/format');
 var _               = require('lodash');
 var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
 var ScopeEditor     = require('../../lib/ui/scopeeditor');
+var moment          = require('moment');
 
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({
@@ -171,9 +172,9 @@ var ClientEditor = React.createClass({
               <div className="form-control-static">
                 {
                   isEditing ?
-                    <DateTimePicker
-                      format='dd, MMM yyyy HH:mm'
-                      value={new Date(this.state.client.expires)}
+                    <DatePicker
+                      dateFormat='dddd, MMMM YYYY'
+                      selected={moment(new Date(this.state.client.expires))}
                       onChange={this.onExpiresChange}/>
                   :
                     <format.DateView date={this.state.client.expires}/>
@@ -356,11 +357,9 @@ var ClientEditor = React.createClass({
 
   /** When expires exchanges in the editor */
   onExpiresChange(date) {
-    if (date instanceof Date) {
-      var state = _.cloneDeep(this.state);
-      state.client.expires = date.toJSON();
-      this.setState(state);
-    }
+    var state = _.cloneDeep(this.state);
+    state.client.expires = date.toDate().toJSON();
+    this.setState(state);
   },
 
   /** Reset accessToken for current client */
