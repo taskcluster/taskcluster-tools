@@ -398,6 +398,7 @@ var ClientEditor = React.createClass({
       let client = await this.auth.createClient(clientId, {
         description:  this.state.client.description,
         expires:      this.state.client.expires,
+        scopes:       this.state.client.scopes,
       });
       this.setState({
         client:         client,
