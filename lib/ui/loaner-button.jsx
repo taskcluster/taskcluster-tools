@@ -62,7 +62,7 @@ let LoanerButton = React.createClass({
           <li>Strip <code>task.payload.caches</code> to avoid poisoning,</li>
           <li>Ensures <code>task.payload.maxRunTime</code> is minimum 60 minutes,</li>
           <li>Strip <code>task.routes</code> to avoid side-effects, and</li>
-          <li>Have the <code>command</code> set to <code>sleep 5m</code>.</li>
+          <li>Set the environment variable<code>TASKCLUSTER_INTERACTIVE=true</code>.</li>
         </ul>
         Note: this may not work with all tasks.
       </ConfirmAction>
@@ -81,15 +81,18 @@ let LoanerButton = React.createClass({
               this.props.taskId + "\\n" +
               "Original command was: " + shellescape(task.payload.command);
 
+    task.payload.env = task.payload.env || {};
+    task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
+
     // Construct new task command
-    task.payload.command = [
+    /*task.payload.command = [
       '/.taskclusterutils/busybox', 'sh', '-c', [
         '/.taskclusterutils/busybox echo -e \'' + msg + '\'',
         ' >> /etc/taskcluster-motd;',
         '/.taskclusterutils/busybox echo "Ready...";',
         '/.taskclusterutils/busybox sleep 5m;',
       ].join('')
-    ];
+    ];*/
 
     // Set interactive = true
     task.payload.features = task.payload.features || {};
