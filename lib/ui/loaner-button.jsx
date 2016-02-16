@@ -84,16 +84,6 @@ let LoanerButton = React.createClass({
     task.payload.env = task.payload.env || {};
     task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
 
-    // Construct new task command
-    /*task.payload.command = [
-      '/.taskclusterutils/busybox', 'sh', '-c', [
-        '/.taskclusterutils/busybox echo -e \'' + msg + '\'',
-        ' >> /etc/taskcluster-motd;',
-        '/.taskclusterutils/busybox echo "Ready...";',
-        '/.taskclusterutils/busybox sleep 5m;',
-      ].join('')
-    ];*/
-
     // Set interactive = true
     task.payload.features = task.payload.features || {};
     task.payload.features.interactive = true;
