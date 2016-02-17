@@ -58,7 +58,6 @@ let RetriggerButton = React.createClass({
         <code>taskId</code>.<br/><br/>
         The new task will be altered as to:
         <ul>
-          <li>Strip <code>task.payload.caches</code> to avoid poisoning,</li>
           <li>Strip <code>task.routes</code> to avoid side-effects, and</li>
           <li>Update deadlines and other timestamps for the current time.</li>
         </ul>
@@ -77,11 +76,11 @@ let RetriggerButton = React.createClass({
     let msg = "\\nRetriggered task based on taskId: " +
               this.props.taskId + "\\n"
 
-    delete task.payload.caches;
-
-    task.deadline = taskcluster.fromNowJSON('12 hours');
-    task.created = taskcluster.fromNowJSON();
-    task.expires = taskcluster.fromNowJSON('7 days');
+    let now = Date.now();
+    let created = Date.parse(task.created);
+    task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
+    task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
+    task.created = new Date(now).toJSON();
 
     task.retries = 0;
 
