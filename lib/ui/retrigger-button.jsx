@@ -4,7 +4,6 @@ let ConfirmAction   = require('./confirmaction');
 let utils           = require('../utils');
 let slugid          = require('slugid');
 let _               = require('lodash');
-let shellescape     = require('shell-escape');
 
 
 let RetriggerButton = React.createClass({
@@ -71,10 +70,6 @@ let RetriggerButton = React.createClass({
     let task = _.cloneDeep(this.props.task);
 
     delete task.routes;
-
-    // Construct message of the day
-    let msg = "\\nRetriggered task based on taskId: " +
-              this.props.taskId + "\\n"
 
     let now = Date.now();
     let created = Date.parse(task.created);
