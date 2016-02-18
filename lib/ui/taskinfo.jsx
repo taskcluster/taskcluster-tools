@@ -119,19 +119,10 @@ var TaskInfo = React.createClass({
             if this task is part of a continous integration process scheduling
             this task may cause your code to land with broken tests.
           </ConfirmAction>&nbsp;
-          <ConfirmAction buttonSize="xsmall"
-                         buttonStyle="success"
-                         disabled={!isResolved}
-                         glyph="repeat"
-                         label="Rerun Task"
-                         action={this.rerunTask}
-                         success="Successfully scheduled task rerun!">
-            Are you sure you wish to rerun this task?
-            This will cause a new run of the task to be created. It will only
-            succeed if the task hasn't passed it's deadline. Notice that this
-            may interfere with listeners who only expects this tasks to be
-            resolved once.
-          </ConfirmAction>&nbsp;
+          <RetriggerButton task={this.state.task}
+                        taskId={status.taskId}
+                        buttonStyle="success"
+                        buttonSize="xsmall"/>&nbsp;
           <ConfirmAction buttonSize="xsmall"
                          buttonStyle="danger"
                          disabled={isResolved}
@@ -243,10 +234,6 @@ var TaskInfo = React.createClass({
             Note that you may also not have the scopes required to create the
             resulting task.
           </ConfirmAction>&nbsp;
-          <RetriggerButton task={this.state.task}
-                        taskId={status.taskId}
-                        buttonStyle="default"
-                        buttonSize="small"/>&nbsp;
           <LoanerButton task={this.state.task}
                         taskId={status.taskId}
                         buttonStyle="default"
