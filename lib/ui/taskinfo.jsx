@@ -7,6 +7,7 @@ let taskcluster     = require('taskcluster-client');
 let ConfirmAction   = require('./confirmaction');
 let path            = require('path');
 let LoanerButton    = require('./loaner-button');
+let RetriggerButton = require('./retrigger-button');
 
 /** Displays information about a task in a tab page */
 var TaskInfo = React.createClass({
@@ -242,6 +243,10 @@ var TaskInfo = React.createClass({
             Note that you may also not have the scopes required to create the
             resulting task.
           </ConfirmAction>&nbsp;
+          <RetriggerButton task={this.state.task}
+                        taskId={status.taskId}
+                        buttonStyle="default"
+                        buttonSize="small"/>&nbsp;
           <LoanerButton task={this.state.task}
                         taskId={status.taskId}
                         buttonStyle="default"
