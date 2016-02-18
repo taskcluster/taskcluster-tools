@@ -57,7 +57,6 @@ let RetriggerButton = React.createClass({
         <code>taskId</code>.<br/><br/>
         The new task will be altered as to:
         <ul>
-          <li>Strip <code>task.routes</code> to avoid side-effects, and</li>
           <li>Update deadlines and other timestamps for the current time.</li>
         </ul>
         Note: this may not work with all tasks.
@@ -68,8 +67,6 @@ let RetriggerButton = React.createClass({
   async createTask() {
     let taskId = slugid.nice();
     let task = _.cloneDeep(this.props.task);
-
-    delete task.routes;
 
     let now = Date.now();
     let created = Date.parse(task.created);
