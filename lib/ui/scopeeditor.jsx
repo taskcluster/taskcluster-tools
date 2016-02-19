@@ -28,7 +28,7 @@ var ScopeEditor = React.createClass({
       <div className="form-control-static">
         <ul style={{paddingLeft: 20}}>
           {
-            scopes.map(scope) => {
+            scopes.map((scope) => {
               return (
                 <li key={index}>
                   <code>{scope}</code>
