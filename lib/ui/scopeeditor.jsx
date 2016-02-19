@@ -30,7 +30,7 @@ var ScopeEditor = React.createClass({
           {
             scopes.map((scope) => {
               return (
-                <li key={index}>
+                <li key={scope}>
                   <code>{scope}</code>
                   &nbsp;
                   <bs.Button
