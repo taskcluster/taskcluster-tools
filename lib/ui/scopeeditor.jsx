@@ -28,7 +28,7 @@ var ScopeEditor = React.createClass({
       <div className="form-control-static">
         <ul style={{paddingLeft: 20}}>
           {
-            scopes.map((scope, index) => {
+            scopes.map(scope) => {
               return (
                 <li key={index}>
                   <code>{scope}</code>
@@ -37,7 +37,7 @@ var ScopeEditor = React.createClass({
                     className="role-editor-remove-scope-btn"
                     bsStyle="danger"
                     bsSize="xsmall"
-                    onClick={this.removeScope.bind(this, index)}>
+                    onClick={this.removeScope.bind(this, scope)}>
                     <bs.Glyphicon glyph="trash"/>
                   </bs.Button>
                 </li>
@@ -80,10 +80,13 @@ var ScopeEditor = React.createClass({
   },
 
   /** Remove a scope from state */
-  removeScope(index) {
+  removeScope(scope) {
     var scopes = _.clone(this.props.scopes);
-    scopes.splice(index, 1);
-    this.props.scopesUpdated(scopes);
+    var index = scopes.indexOf(scope);
+    if (index != -1) {
+      scopes.splice(index, 1);
+      this.props.scopesUpdated(scopes);
+    }
   },
 
   /** Render a list of scopes */
