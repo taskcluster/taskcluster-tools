@@ -23,7 +23,7 @@
     "jquery":                           "^2.2.0",
     "react":                            "^0.14.0",
     "react-dom":                        "^0.14.0",
-    "react-datepicker":                 "^0.21.0",
+    "react-datepicker":                 "^0.23.2",
     "react-select":                     "^1.0.0-beta1",
     "react-json-inspector":             "^6.1.1",
     "rison":                            "^0.1.1",
