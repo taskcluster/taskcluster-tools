@@ -106,22 +106,31 @@ let Navigation = React.createClass({
               })
             }
           </bs.NavDropdown>
-          {
-            ( this.state.credentials ?
-              <bs.NavItem onSelect={this.logout}>
-                <bs.Glyphicon glyph="log-out"/>&nbsp;
-                Log out
-              </bs.NavItem>
-            :
-              <bs.NavItem onSelect={this.login}>
-                <bs.Glyphicon glyph="log-in"/>&nbsp;
-                Log in
-              </bs.NavItem>
-            )
-          }
+          {this.renderCredentialsMenu()}
         </bs.Nav>
       </bs.Navbar>
     );
+  },
+
+  renderCredentialsMenu() {
+    var menuHeading;
+    if (this.state.credentials) {
+      // TODO: color this according to time until expiry
+      menuHeading = <span><bs.Glyphicon glyph='user'/>&nbsp; {this.state.credentials.clientId}</span>;
+    } else {
+      menuHeading = <span><bs.Glyphicon glyph='question-sign'/>&nbsp; no credentials</span>;
+    }
+    // TODO: "Log in via Okta", ".. Mozillians", etc.
+    return <bs.NavDropdown key={2} title={menuHeading} id="credentials">
+      <bs.MenuItem href="/preferences">
+        <format.Icon name="cogs"/>&nbsp;Manage Credentials
+      </bs.MenuItem>
+      <bs.MenuItem divider />
+      <bs.NavItem onSelect={this.login}>
+        <bs.Glyphicon glyph="log-in"/>&nbsp;
+        Log in
+      </bs.NavItem>
+    </bs.NavDropdown>;
   }
 });
 

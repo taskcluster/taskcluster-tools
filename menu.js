@@ -200,14 +200,10 @@ module.exports = [
     ].join('\n')
   },
   {
-    type:           'divider',
-    display:        true
-  },
-  {
     title:          "Preferences",
     link:           '/preferences/',
     icon:           'cogs',
-    display:        true,
+    display:        false,
     description: [
       "Manage settings on this site, these settings, stored in `localStorage`,",
       "includes `clientId` and `accessToken` for TaskCluster."

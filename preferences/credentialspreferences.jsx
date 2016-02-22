@@ -160,7 +160,7 @@ var CredentialsPreferences = React.createClass({
                     bsStyle="danger"
                     onClick={this.remove}
                     id={this._id}>
-                    Remove
+                    <bs.Glyphicon glyph="log-out" />&nbsp; Log Out
                   </bs.Button>
                 </bs.OverlayTrigger>
               </bs.ButtonToolbar>
