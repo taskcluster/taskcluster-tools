@@ -200,13 +200,12 @@ module.exports = [
     ].join('\n')
   },
   {
-    title:          "Preferences",
-    link:           '/preferences/',
-    icon:           'cogs',
+    title:          "Credentials",
+    link:           '/credentials/',
+    icon:           'key',
     display:        false,
     description: [
-      "Manage settings on this site, these settings, stored in `localStorage`,",
-      "includes `clientId` and `accessToken` for TaskCluster."
+      "Manage credentials stored in the browser."
     ].join("\n")
   }
 ];

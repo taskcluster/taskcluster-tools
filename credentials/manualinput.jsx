@@ -7,7 +7,7 @@ let slugid      = require('slugid');
  * User interface for displaying credentials loaded, setting other credentials,
  * removing the credentials from the browser etc.
  */
-var CredentialsPreferences = React.createClass({
+var ManualInput = React.createClass({
   getInitialState() {
     return {
       parseError:       false
@@ -108,11 +108,11 @@ var CredentialsPreferences = React.createClass({
     return (
       <span>
         <h3>TaskCluster Credentials</h3>
+        {(creds.clientId? undefined :
         <p>
-          Some tools and actions requires TaskCluster credentials, you can
-          login to <code>auth.taskcluster.net</code> and obtain temporary
-          credentials, or you can enter some static credentials here.
-        </p>
+          Some tools and actions require scopes.  Use the options on the login
+          menu to connect to your account and get a set of credentials.
+        </p>)}
         <form className="form-horizontal">
           <bs.Input type="text"
                     label="ClientId"
@@ -181,6 +181,5 @@ var CredentialsPreferences = React.createClass({
   }
 });
 
-// Export CredentialsPreferences
-module.exports = CredentialsPreferences;
-
+// Export ManualInput
+module.exports = ManualInput;

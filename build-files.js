@@ -29,8 +29,8 @@ module.exports = [
   'login/app.jsx',
 
   // Preferences
-  'preferences/index.jade',
-  'preferences/app.jsx',
+  'credentials/index.jade',
+  'credentials/app.jsx',
 
   // Pulse Inspector
   'pulse-inspector/index.jade',

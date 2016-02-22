@@ -122,8 +122,8 @@ let Navigation = React.createClass({
     }
     // TODO: "Log in via Okta", ".. Mozillians", etc.
     return <bs.NavDropdown key={2} title={menuHeading} id="credentials">
-      <bs.MenuItem href="/preferences">
-        <format.Icon name="cogs"/>&nbsp;Manage Credentials
+      <bs.MenuItem href="/credentials">
+        <format.Icon name="key"/>&nbsp;Manage Credentials
       </bs.MenuItem>
       <bs.MenuItem divider />
       <bs.NavItem onSelect={this.login}>
