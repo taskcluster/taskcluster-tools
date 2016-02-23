@@ -17,6 +17,7 @@ var TaskInfo = React.createClass({
       // Need updated clients for Queue
       clients: {
         queue:                taskcluster.Queue,
+        purgeCache:           taskcluster.PurgeCache
       },
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps:          ['status.taskId'],
@@ -33,16 +34,25 @@ var TaskInfo = React.createClass({
   getInitialState() {
     return {
       // task definition
-      taskLoaded:   false,
-      taskError:    undefined,
-      task:         undefined
+      taskLoaded:         false,
+      taskError:          undefined,
+      task:               undefined,
+      purgedCacheNames:   undefined,
+      selectedCacheNames: []
     };
   },
 
   /** Load task definition */
   load() {
+    var self = this;
+    var task = self.queue.task(self.props.status.taskId);
     return {
-      task:         this.queue.task(this.props.status.taskId)
+      task: task,
+      selectedCacheNames: new Promise(function(resolve, reject) {
+        var resolved = Promise.resolve(task).then(
+          function(result) { resolve(Object.keys(self.getCacheNames(result))); },
+          function(err) { reject(err); });
+      })
     };
   },
 
@@ -134,6 +144,15 @@ var TaskInfo = React.createClass({
             Notice that another process or developer may still be able to
             schedule a rerun. But all existing runs will be aborted and any
             scheduling process will not be able to schedule the task.
+          </ConfirmAction>&nbsp;
+          <ConfirmAction buttonSize="xsmall"
+                         buttonStyle="danger"
+                         disabled={this.getCacheNames(task) === undefined}
+                         glyph="trash"
+                         label="Purge worker cache"
+                         action={this.purgeWorkerCache}
+                         success="Cache successfully purged!">
+            {this.state.purgedCacheNames === undefined ? this.listCacheNames(task) : undefined}
           </ConfirmAction>&nbsp;
         </dd>
       </dl>
@@ -288,6 +307,53 @@ var TaskInfo = React.createClass({
 
     // ..and go there
     window.location.href = '../task-creator';
+  },
+
+  getCacheNames(task) {
+    return (((task || {}).payload) || {}).cache;
+  },
+  listCacheNames(task) {
+    var updateSelectedCacheNames  = this.updateSelectedCacheNames;
+    var selectedCacheNames        = this.state.selectedCacheNames;
+    return (
+      <div>
+        <span>Are you sure you wish to purge cache of this task?</span>
+        <ul>
+          {this.getCacheNames(task) === undefined ? null :
+              Object.keys(task.payload.cache).map(function(cacheName) {
+                return <li className="checkbox" key={cacheName}>
+                         <label>
+                           <input name="cacheNames"
+                                  type="checkbox"
+                                  onChange={updateSelectedCacheNames}
+                                  checked={selectedCacheNames === undefined ? false : selectedCacheNames.indexOf(cacheName) !== -1}
+                                  value={cacheName}
+                                  />
+                           {cacheName}
+                         </label>
+                      </li>;
+            })}
+        </ul>
+      </div>);
+  },
+  updateSelectedCacheNames(e) {
+    var cacheNames = _.clone(this.state.selectedCacheNames);
+    if (e.target.checked === true) {
+      cacheNames.push(e.target.value);
+    } else if (e.target.checked === false) {
+      cacheNames = cacheNames.filter(function(i) { return i !== e.target.value});
+    }
+    this.setState({ selectedCacheNames: cacheNames });
+  },
+  purgeWorkerCache() {
+    var self = this;
+    this.setState({ purgedCacheNames: [] });
+    _.forEach(this.state.selectedCacheNames, function(cacheName) {
+      self.purgeCache.purgeCache(
+          self.state.task.provisionerId,
+          self.state.task.workerType,
+          { cacheName: cacheName });
+    });
   },
 
   /** Render script illustrating how to run locally */
