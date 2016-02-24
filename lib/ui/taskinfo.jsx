@@ -1,13 +1,14 @@
-let React           = require('react');
-let bs              = require('react-bootstrap');
-let utils           = require('../utils');
-let format          = require('../format');
-let _               = require('lodash');
-let taskcluster     = require('taskcluster-client');
-let ConfirmAction   = require('./confirmaction');
-let path            = require('path');
-let LoanerButton    = require('./loaner-button');
-let RetriggerButton = require('./retrigger-button');
+let ConfirmAction     = require('./confirmaction');
+let LoanerButton      = require('./loaner-button');
+let PurgeCacheButton  = require('./purgecache-button');
+let React             = require('react');
+let RetriggerButton   = require('./retrigger-button');
+let _                 = require('lodash');
+let bs                = require('react-bootstrap');
+let format            = require('../format');
+let path              = require('path');
+let taskcluster       = require('taskcluster-client');
+let utils             = require('../utils');
 
 /** Displays information about a task in a tab page */
 var TaskInfo = React.createClass({
@@ -16,7 +17,7 @@ var TaskInfo = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue:                taskcluster.Queue,
+        queue:                taskcluster.Queue
       },
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps:          ['status.taskId'],
@@ -33,16 +34,16 @@ var TaskInfo = React.createClass({
   getInitialState() {
     return {
       // task definition
-      taskLoaded:   false,
-      taskError:    undefined,
-      task:         undefined
+      taskLoaded:         false,
+      taskError:          undefined,
+      task:               undefined
     };
   },
 
   /** Load task definition */
   load() {
     return {
-      task:         this.queue.task(this.props.status.taskId)
+      task: this.queue.task(this.props.status.taskId)
     };
   },
 
@@ -135,6 +136,9 @@ var TaskInfo = React.createClass({
             schedule a rerun. But all existing runs will be aborted and any
             scheduling process will not be able to schedule the task.
           </ConfirmAction>&nbsp;
+          <PurgeCacheButton caches={_.keys(((task || {}).payload || {}).cache || {})}
+                            provisionerId={task.provisionerId}
+                            workerType={task.workerType}/>&nbsp;
         </dd>
       </dl>
       <dl className="dl-horizontal">
