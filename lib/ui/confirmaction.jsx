@@ -100,14 +100,18 @@ var ConfirmAction = React.createClass({
   },
 
   closeDialog() {
-    this.setState({showDialog: false});
+    this.setState(this.getInitialState());
   },
 
   /** Execute asynchronous action */
   executeAction() {
     this.loadState({
       executing:    true,
-      result:       this.props.action()
+      result:       async () => {
+        let result = await this.props.action();
+        this.setState({ executing: false });
+        return result;
+      }
     });
   }
 });
