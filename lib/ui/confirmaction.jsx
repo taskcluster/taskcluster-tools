@@ -107,11 +107,11 @@ var ConfirmAction = React.createClass({
   executeAction() {
     this.loadState({
       executing:    true,
-      result:       async () => {
+      result:       (async () => {
         let result = await this.props.action();
         this.setState({ executing: false });
         return result;
-      }
+      })()
     });
   }
 });
