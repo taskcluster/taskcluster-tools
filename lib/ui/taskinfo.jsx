@@ -1,13 +1,14 @@
-let React           = require('react');
-let bs              = require('react-bootstrap');
-let utils           = require('../utils');
-let format          = require('../format');
-let _               = require('lodash');
-let taskcluster     = require('taskcluster-client');
-let ConfirmAction   = require('./confirmaction');
-let path            = require('path');
-let LoanerButton    = require('./loaner-button');
-let RetriggerButton = require('./retrigger-button');
+let ConfirmAction     = require('./confirmaction');
+let LoanerButton      = require('./loaner-button');
+let PurgeCacheButton  = require('./purgecache-button');
+let React             = require('react');
+let RetriggerButton   = require('./retrigger-button');
+let _                 = require('lodash');
+let bs                = require('react-bootstrap');
+let format            = require('../format');
+let path              = require('path');
+let taskcluster       = require('taskcluster-client');
+let utils             = require('../utils');
 
 /** Displays information about a task in a tab page */
 var TaskInfo = React.createClass({
@@ -16,8 +17,7 @@ var TaskInfo = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue:                taskcluster.Queue,
-        purgeCache:           taskcluster.PurgeCache
+        queue:                taskcluster.Queue
       },
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps:          ['status.taskId'],
@@ -36,19 +36,14 @@ var TaskInfo = React.createClass({
       // task definition
       taskLoaded:         false,
       taskError:          undefined,
-      task:               undefined,
-      purgedCacheNames:   undefined,
-      selectedCacheNames: []
+      task:               undefined
     };
   },
 
   /** Load task definition */
   load() {
-    var self = this;
-    var task = self.queue.task(self.props.status.taskId);
     return {
-      task: task,
-      selectedCacheNames: task.then(t => _.keys(self.getCacheNames(t)))
+      task: this.queue.task(this.props.status.taskId)
     };
   },
 
@@ -141,15 +136,9 @@ var TaskInfo = React.createClass({
             schedule a rerun. But all existing runs will be aborted and any
             scheduling process will not be able to schedule the task.
           </ConfirmAction>&nbsp;
-          <ConfirmAction buttonSize="xsmall"
-                         buttonStyle="danger"
-                         disabled={this.getCacheNames(task) === undefined}
-                         glyph="trash"
-                         label="Purge worker cache"
-                         action={this.purgeWorkerCache}
-                         success="Cache successfully purged!">
-            { this.listCacheNames(task) }
-          </ConfirmAction>&nbsp;
+          <PurgeCacheButton caches={_.keys(((task || {}).payload || {}).cache || {})}
+                            provisionerId={task.provisionerId}
+                            workerType={task.workerType}/>&nbsp;
         </dd>
       </dl>
       <dl className="dl-horizontal">
@@ -303,54 +292,6 @@ var TaskInfo = React.createClass({
 
     // ..and go there
     window.location.href = '../task-creator';
-  },
-
-  getCacheNames(task) {
-    return (((task || {}).payload) || {}).cache;
-  },
-  listCacheNames(task) {
-    var updateSelectedCacheNames  = this.updateSelectedCacheNames;
-    var selectedCacheNames        = this.state.selectedCacheNames;
-    return (
-      <div>
-        <p>Are you sure you wish to purge caches used in this task across all workers of this workerType?</p>
-        <p>Select the caches to purge:</p>
-        <ul>
-          {this.getCacheNames(task) === undefined ? null :
-              _.keys(task.payload.cache).map(cacheName => {
-                return <li className="checkbox" key={cacheName}>
-                         <label>
-                           <input name="cacheNames"
-                                  type="checkbox"
-                                  onChange={updateSelectedCacheNames}
-                                  checked={this.selectedCacheNames === undefined
-                                      ? false
-                                      : this.selectedCacheNames.indexOf(cacheName) !== -1}
-                                  value={cacheName}
-                                  />
-                           {cacheName}
-                         </label>
-                      </li>;
-            })}
-        </ul>
-      </div>);
-  },
-  updateSelectedCacheNames(e) {
-    var cacheNames = _.clone(this.state.selectedCacheNames);
-    if (e.target.checked === true) {
-      cacheNames.push(e.target.value);
-    } else if (e.target.checked === false) {
-      cacheNames = cacheNames.filter(i => i !== e.target.value);
-    }
-    this.setState({ selectedCacheNames: cacheNames });
-  },
-
-  purgeWorkerCache() {
-    return Promise.all(this.state.selectedCacheNames.map(cacheName => {
-      return this.purgeCache.purgeCache(this.state.task.provisionerId,
-                                        this.state.task.workerType,
-                                        {cacheName});
-    }));
   },
 
   /** Render script illustrating how to run locally */
