@@ -323,9 +323,9 @@ var TaskInfo = React.createClass({
                            <input name="cacheNames"
                                   type="checkbox"
                                   onChange={updateSelectedCacheNames}
-                                  checked={this.selectedCacheNames !== undefined
-                                      ? this.selectedCacheNames.indexOf(cacheName) !== -1
-                                      : false}
+                                  checked={this.selectedCacheNames === undefined
+                                      ? false
+                                      : this.selectedCacheNames.indexOf(cacheName) !== -1}
                                   value={cacheName}
                                   />
                            {cacheName}
@@ -340,21 +340,17 @@ var TaskInfo = React.createClass({
     if (e.target.checked === true) {
       cacheNames.push(e.target.value);
     } else if (e.target.checked === false) {
-      cacheNames = cacheNames.filter(i => { return i !== e.target.value});
+      cacheNames = cacheNames.filter(i => i !== e.target.value);
     }
     this.setState({ selectedCacheNames: cacheNames });
   },
 
-  async purgeWorkerCache() {
-    let result = [];
-    for (let cacheName of this.state.selectedCacheNames) {
-      result.push(await this.purgeCache.purgeCache(
-          this.state.task.provisionerId,
-          this.state.task.workerType,
-          { cacheName: cacheName }));
-
-    };
-    return result;
+  purgeWorkerCache() {
+    return Promise.all(this.state.selectedCacheNames.map(cacheName => {
+      return this.purgeCache.purgeCache(this.state.task.provisionerId,
+                                        this.state.task.workerType,
+                                        {cacheName});
+    }));
   },
 
   /** Render script illustrating how to run locally */
