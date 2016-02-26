@@ -352,13 +352,22 @@ var TaskInfo = React.createClass({
       cmds.push("# Either use the docker vagrant environment located");
       cmds.push("# in the docker-worker repo or ensure local environment ");
       cmds.push("# has the correct devices configured.");
+      cmds.push("");
       cmds.push("# Consult the vagrant.sh file in the docker-worker repo ");
       cmds.push("# for more information on how to install and configure ");
       cmds.push("# the loopback devices. http://www.github.com/taskcluster/docker-worker");
+      cmds.push("");
       cmds.push("# Warning: This is entirely dependent on local setup and ");
       cmds.push("# availability of devices.");
+      cmds.push("");
       if (payload.capabilities.devices['loopbackVideo']) {
-        deviceCmds.push("  --device /dev/video0:/dev/video0 \\");
+	cmds.push("# This job requires access to your video device.");
+	cmds.push("# If this is the first time you're trying to run this locally,");
+	cmds.push("# make sure to run this first:");
+	cmds.push("# sudo apt-get install v4l2loopback-dkms");
+	cmds.push("# sudo modprobe v4l2loopback # This will create a device under /dev/video*");
+        cmds.push("last_device=`ls /dev/video* | tail -n 1`");
+        deviceCmds.push("  --device $last_device:$last_device \\");
       }
       if (payload.capabilities.devices['loopbackAudio']) {
         deviceCmds.push("  --device /dev/snd/controlC0:/dev/snd/controlC0 \\");
@@ -382,9 +391,19 @@ var TaskInfo = React.createClass({
     _.keys(payload.env || {}).forEach(key => {
       cmds.push("  -e " + key + "='" + payload.env[key] + "' \\");
     });
+
+    // This allows changing behaviour on the script to be run to change
+    // behaviour from production (e.g. start VNC)
+    cmds.push("  -e RUN_LOCALLY='true' \\")
+
     deviceCmds.forEach(function (cmd) { cmds.push(cmd); });
     cmds.push("  ${image_name} \\");
     if (payload.command) {
+      // We add a new line between 'docker run' and the command to ensure
+      // that the container won't execute it and end since we want to allow
+      // the developer to interact with it
+      cmds.push("");
+
       var command = payload.command.map(cmd => {
         cmd = cmd.replace(/\\/g, "\\\\");
         if (/['\n\r\t\v\b]/.test(cmd)) {
