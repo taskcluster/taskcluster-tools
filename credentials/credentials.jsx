@@ -84,13 +84,8 @@ var CredentialView = React.createClass({
 
   load() {
     if (this.props.credentials) {
-      // see https://github.com/taskcluster/taskcluster-client/pull/43
-      let creds = _.cloneDeep(this.props.credentials);
-      if (typeof creds.certificate !== "string") {
-        creds.certificate = JSON.stringify(creds.certificate);
-      }
       return {
-        info: taskcluster.credentialInformation(creds),
+        info: taskcluster.credentialInformation(this.props.credentials),
       };
     } else {
       return {
