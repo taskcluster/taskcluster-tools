@@ -16,13 +16,12 @@ let Navigation = React.createClass({
   },
 
   /** Log-in open a authentication URL */
-  login() {
-    // Open login url
+  signIn() {
     window.open(auth.buildLoginURL(), '_blank');
   },
 
   /** Log out (clear credentials) */
-  logout() {
+  signOut() {
     // Clear credentials
     auth.saveCredentials(undefined);
     // Update state
@@ -113,22 +112,27 @@ let Navigation = React.createClass({
   },
 
   renderCredentialsMenu() {
-    var menuHeading;
-    if (this.state.credentials) {
-      // TODO: color this according to time until expiry
-      menuHeading = <span><bs.Glyphicon glyph='user'/>&nbsp; {this.state.credentials.clientId}</span>;
-    } else {
-      menuHeading = <span><bs.Glyphicon glyph='question-sign'/>&nbsp; no credentials</span>;
+    // if there are no credentials at all, then there is no menu -- just a sign-in link
+    if (!this.state.credentials) {
+      return <bs.NavItem onSelect={this.signIn}>
+        <bs.Glyphicon glyph="log-in"/>&nbsp;Sign in
+      </bs.NavItem>
     }
-    // TODO: "Log in via Okta", ".. Mozillians", etc.
+
+    // TODO: color this according to time until expiry
+    let menuHeading = <span><bs.Glyphicon glyph='user'/>&nbsp; {this.state.credentials.clientId}</span>;
     return <bs.NavDropdown key={2} title={menuHeading} id="credentials">
       <bs.MenuItem href="/credentials">
         <format.Icon name="key"/>&nbsp;Manage Credentials
       </bs.MenuItem>
       <bs.MenuItem divider />
-      <bs.NavItem onSelect={this.login}>
+      <bs.NavItem onSelect={this.signIn}>
         <bs.Glyphicon glyph="log-in"/>&nbsp;
-        Log in
+        Sign In
+      </bs.NavItem>
+      <bs.NavItem onSelect={this.signOut}>
+        <bs.Glyphicon glyph="log-out"/>&nbsp;
+        Sign Out
       </bs.NavItem>
     </bs.NavDropdown>;
   }
