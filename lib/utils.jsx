@@ -218,7 +218,7 @@ var createTaskClusterMixin = (options) => {
 
       // Return promise all promises are resolved
       return Promise.all(promises).then(() => undefined).catch(err => {
-        console.log(err.stack);
+        console.log(err);
         throw err;
       });
     },
