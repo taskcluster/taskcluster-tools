@@ -358,7 +358,7 @@ var TaskInfo = React.createClass({
       cmds.push("# has the correct devices configured.");
       cmds.push("# Consult the vagrant.sh file in the docker-worker repo ");
       cmds.push("# for more information on how to install and configure ");
-      cmds.push("# the loopback devices. http://www.github.com/taskcluster/docker-worker");
+      cmds.push("# the loopback devices. https://www.github.com/taskcluster/docker-worker");
       cmds.push("# Warning: This is entirely dependent on local setup and ");
       cmds.push("# availability of devices.");
       if (payload.capabilities.devices['loopbackVideo']) {

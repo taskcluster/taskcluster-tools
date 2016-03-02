@@ -35,7 +35,7 @@ var initialHook = {
       name:             "Hook Task",
       description:      "Task Description",
       owner:            "name@example.com",
-      source:           "http://tools.taskcluster.net/hooks/"
+      source:           "https://tools.taskcluster.net/hooks/"
     }
   }
 };
