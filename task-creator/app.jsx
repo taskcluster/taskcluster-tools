@@ -19,7 +19,7 @@ var initialTask = {
     name:             "Example Task",
     description:      "Markdown description of **what** this task does",
     owner:            "name@example.com",
-    source:           "http://tools.taskcluster.net/task-creator/"
+    source:           "https://tools.taskcluster.net/task-creator/"
   }
 };
 
