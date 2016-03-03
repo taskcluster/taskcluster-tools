@@ -2,6 +2,7 @@ var React           = require('react');
 var bs              = require('react-bootstrap');
 var ClientEditor    = require('./clienteditor');
 var utils           = require('../../lib/utils');
+var auth            = require('../../lib/auth');
 var taskcluster     = require('taskcluster-client');
 var format          = require('../../lib/format');
 var _               = require('lodash');
@@ -11,8 +12,9 @@ var ClientManager = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
+      reloadOnKeys: ['clientPrefix'],
       clients: {
-        auth:       taskcluster.Auth
+        auth:                 taskcluster.Auth,
       }
     }),
     // Serialize state.selectedClientId to location.hash as string
@@ -24,7 +26,9 @@ var ClientManager = React.createClass({
 
   /** Create an initial state */
   getInitialState() {
+    let clientId = auth.loadCredentials().clientId;
     return {
+      clientPrefix:       clientId? clientId + "/" : "",
       clientsLoaded:      false,
       clientsError:       undefined,
       clients:            undefined,
@@ -39,7 +43,8 @@ var ClientManager = React.createClass({
     // - clientsError
     // - clients
     return {
-      clients:    this.auth.listClients()
+      clients:    this.auth.listClients(
+                      this.state.clientPrefix? {prefix: this.state.clientPrefix} : undefined)
     };
   },
 
@@ -48,6 +53,7 @@ var ClientManager = React.createClass({
     return (
       <bs.Row>
         <bs.Col md={6}>
+          {this.renderPrefixInput()}
           {this.renderClientsTable()}
           <bs.ButtonToolbar>
             <bs.Button bsStyle="primary"
@@ -72,6 +78,28 @@ var ClientManager = React.createClass({
         </bs.Col>
       </bs.Row>
     );
+  },
+
+  renderPrefixInput() {
+    let setPrefix = (e) => this.setState({clientPrefix: e.target.value});
+    let enterPrefix = (e) => {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        setPrefix(e);
+      }
+    };
+    return <div className="form-group form-group-sm">
+       <div className="input-group">
+         <div className="input-group-addon text-sm"><em>ClientIds beginning with</em></div>
+         <input type="search" className="form-control"
+                defaultValue={this.state.clientPrefix}
+                onBlur={setPrefix}
+                onKeyUp={enterPrefix}/>
+         <div className="input-group-addon">
+           <bs.Glyphicon glyph="search"/>
+         </div>
+       </div>
+     </div>;
   },
 
   /** Render table of all clients */
