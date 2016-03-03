@@ -370,7 +370,7 @@ var TaskInfo = React.createClass({
         cmds.push("# This job requires access to your audio device.");
         cmds.push("");
         cmds.push("# This command will create virtual devices under /dev/snd*");
-        cmds.push("# sudo modprobe snd-aloop
+        cmds.push("# sudo modprobe snd-aloop");
         cmds.push("");
         cmds.push("# Adjust the following list of --devices to match your host. Pick the most recently created ones.");
         deviceCmds.push("  --device /dev/snd/controlC0:/dev/snd/controlC0 \\");
