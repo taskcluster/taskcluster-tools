@@ -68,7 +68,15 @@ var ClientEditor = React.createClass({
         error:            null
       };
     } else {
-      // Load currentClientId
+      // Load currentClientId, but avoid doing so after creating a new client
+      if (this.state.client && this.state.client.clientId === this.props.currentClientId) {
+        this.setState({
+          editing:          false,
+          working:          false,
+          error:            null
+        });
+        return {};
+      }
       return {
         client:           this.auth.client(this.props.currentClientId),
         accessToken:      null,

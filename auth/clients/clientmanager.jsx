@@ -139,7 +139,7 @@ var ClientManager = React.createClass({
   async reloadClientId(clientId) {
     // Load client ignore errors (assume client doesn't exist)
     let client = await this.auth.client(clientId).catch(() => null);
-    let selectedClientId = this.state.selectedClientId;
+    let selectedClientId = clientId;
     let clients = _.cloneDeep(this.state.clients);
     var index = _.findIndex(clients, c => c.clientId === clientId);
     if (index === -1 && client !== null) {
@@ -149,10 +149,11 @@ var ClientManager = React.createClass({
     } else {
       clients = clients.filter(c => c.clientId !== clientId);
     }
+    clients.sort((a, b) => a.clientId > b.clientId);
+    clients = clients.filter(c => c.clientId.startsWith(this.state.clientPrefix));
     if (_.findIndex(clients, c => c.clientId === selectedClientId) === -1) {
       selectedClientId = '';
     }
-    clients.sort((a, b) => a.clientId > b.clientId);
     this.setState({clients, selectedClientId});
   },
 
