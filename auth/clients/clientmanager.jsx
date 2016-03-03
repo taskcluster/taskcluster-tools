@@ -52,7 +52,7 @@ var ClientManager = React.createClass({
   render() {
     return (
       <bs.Row>
-        <bs.Col md={6}>
+        <bs.Col md={5}>
           {this.renderPrefixInput()}
           {this.renderClientsTable()}
           <bs.ButtonToolbar>
@@ -72,7 +72,7 @@ var ClientManager = React.createClass({
             </bs.Button>
           </bs.ButtonToolbar>
         </bs.Col>
-        <bs.Col md={6}>
+        <bs.Col md={7}>
           <ClientEditor currentClientId={this.state.selectedClientId}
                         reloadClientId={this.reloadClientId}/>
         </bs.Col>
@@ -109,9 +109,6 @@ var ClientManager = React.createClass({
         <thead>
           <tr>
             <th>ClientId</th>
-            <th>Expires</th>
-            <th>Last Used</th>
-            <th>Last Rotated</th>
           </tr>
         </thead>
         <tbody>
@@ -129,9 +126,6 @@ var ClientManager = React.createClass({
           className={isSelected ? 'info' : undefined}
           onClick={this.selectClientId.bind(this, client.clientId)}>
         <td><code>{client.clientId}</code></td>
-        <td><format.DateView date={client.expires}/></td>
-        <td><format.DateView date={client.lastDateUsed}/></td>
-        <td><format.DateView date={client.lastRotated}/></td>
       </tr>
     );
   },
