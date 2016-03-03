@@ -97,7 +97,7 @@ var createTaskClusterMixin = (options) => {
     clientOpts:     {},   // Mapping from name to client options
     reloadOnProps:  [],   // List of properties to reload on
     reloadOnKeys:   [],   // List of state keys to reload on
-    reloadOnLogin:  true  // Reload when credentials are changed
+    reloadOnLogin:  false // Reload when credentials are changed
   });
   assert(options.reloadOnProps instanceof Array,
          "reloadOnProps must be an array");
