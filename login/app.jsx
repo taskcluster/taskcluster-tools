@@ -7,9 +7,8 @@ var credentials = querystring.parse(location.search.substr(1));
 
 // Update credentials if new ones were provided by querystring
 if (credentials.clientId &&
-    credentials.accessToken &&
-    credentials.certificate) {
-  // Parse certificate
+    credentials.accessToken) {
+  // Parse certificate, if present
   if (typeof(credentials.certificate) === 'string') {
     credentials.certificate = JSON.parse(credentials.certificate);
   }

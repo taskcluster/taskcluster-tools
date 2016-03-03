@@ -1,13 +1,14 @@
-let React           = require('react');
-let bs              = require('react-bootstrap');
-let utils           = require('../utils');
-let format          = require('../format');
-let _               = require('lodash');
-let taskcluster     = require('taskcluster-client');
-let ConfirmAction   = require('./confirmaction');
-let path            = require('path');
-let LoanerButton    = require('./loaner-button');
-let RetriggerButton = require('./retrigger-button');
+let ConfirmAction     = require('./confirmaction');
+let LoanerButton      = require('./loaner-button');
+let PurgeCacheButton  = require('./purgecache-button');
+let React             = require('react');
+let RetriggerButton   = require('./retrigger-button');
+let _                 = require('lodash');
+let bs                = require('react-bootstrap');
+let format            = require('../format');
+let path              = require('path');
+let taskcluster       = require('taskcluster-client');
+let utils             = require('../utils');
 
 /** Displays information about a task in a tab page */
 var TaskInfo = React.createClass({
@@ -16,7 +17,7 @@ var TaskInfo = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue:                taskcluster.Queue,
+        queue:                taskcluster.Queue
       },
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps:          ['status.taskId'],
@@ -33,16 +34,16 @@ var TaskInfo = React.createClass({
   getInitialState() {
     return {
       // task definition
-      taskLoaded:   false,
-      taskError:    undefined,
-      task:         undefined
+      taskLoaded:         false,
+      taskError:          undefined,
+      task:               undefined
     };
   },
 
   /** Load task definition */
   load() {
     return {
-      task:         this.queue.task(this.props.status.taskId)
+      task: this.queue.task(this.props.status.taskId)
     };
   },
 
@@ -135,6 +136,9 @@ var TaskInfo = React.createClass({
             schedule a rerun. But all existing runs will be aborted and any
             scheduling process will not be able to schedule the task.
           </ConfirmAction>&nbsp;
+          <PurgeCacheButton caches={_.keys(((task || {}).payload || {}).cache || {})}
+                            provisionerId={task.provisionerId}
+                            workerType={task.workerType}/>&nbsp;
         </dd>
       </dl>
       <dl className="dl-horizontal">
@@ -349,27 +353,26 @@ var TaskInfo = React.createClass({
       cmds.push("");
       cmds.push("# Task uses the following devices :");
       cmds.push("# " + Object.keys(payload.capabilities.devices).join(', '));
-      cmds.push("# Either use the docker vagrant environment located");
-      cmds.push("# in the docker-worker repo or ensure local environment ");
-      cmds.push("# has the correct devices configured.");
-      cmds.push("");
-      cmds.push("# Consult the vagrant.sh file in the docker-worker repo ");
-      cmds.push("# for more information on how to install and configure ");
-      cmds.push("# the loopback devices. http://www.github.com/taskcluster/docker-worker");
       cmds.push("");
       cmds.push("# Warning: This is entirely dependent on local setup and ");
       cmds.push("# availability of devices.");
       cmds.push("");
       if (payload.capabilities.devices['loopbackVideo']) {
-	cmds.push("# This job requires access to your video device.");
-	cmds.push("# If this is the first time you're trying to run this locally,");
-	cmds.push("# make sure to run this first:");
-	cmds.push("# sudo apt-get install v4l2loopback-dkms");
-	cmds.push("# sudo modprobe v4l2loopback # This will create a device under /dev/video*");
+        cmds.push("# This job requires access to your video device.");
+        cmds.push("# If this is the first time you're trying to run this locally,");
+        cmds.push("# make sure to run this first:");
+        cmds.push("# sudo apt-get install v4l2loopback-dkms");
+        cmds.push("# sudo modprobe v4l2loopback # This will create a device under /dev/video*");
         cmds.push("last_device=`ls /dev/video* | tail -n 1`");
         deviceCmds.push("  --device $last_device:$last_device \\");
       }
       if (payload.capabilities.devices['loopbackAudio']) {
+        cmds.push("# This job requires access to your audio device.");
+        cmds.push("");
+        cmds.push("# This command will create virtual devices under /dev/snd*");
+        cmds.push("# sudo modprobe snd-aloop
+        cmds.push("");
+        cmds.push("# Adjust the following list of --devices to match your host. Pick the most recently created ones.");
         deviceCmds.push("  --device /dev/snd/controlC0:/dev/snd/controlC0 \\");
         deviceCmds.push("  --device /dev/snd/pcmC0D0c:/dev/snd/pcmC0D0c \\");
         deviceCmds.push("  --device /dev/snd/pcmC0D0p:/dev/snd/pcmC0D0p \\");

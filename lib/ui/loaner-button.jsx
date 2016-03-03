@@ -94,7 +94,7 @@ let LoanerButton = React.createClass({
     // Update maxRunTime
     task.payload.maxRunTime = Math.max(
       task.payload.maxRunTime,
-      60 * 60
+      3 * 60 * 60
     );
 
     // Update timestamps
