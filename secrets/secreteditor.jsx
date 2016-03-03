@@ -4,8 +4,8 @@ var utils            = require('../lib/utils');
 var taskcluster      = require('taskcluster-client');
 var format           = require('../lib/format');
 var ConfirmAction    = require('../lib/ui/confirmaction');
+var TimeInput        = require('../lib/ui/timeinput');
 var _                = require('lodash');
-var DatePicker      = require('react-datepicker');
 var moment          = require('moment');
 
 var SecretEditor = React.createClass({
@@ -115,10 +115,11 @@ var SecretEditor = React.createClass({
            <div className="col-md-10">
                 {
                   isEditing ?
-                    <DatePicker
-                      dateFormat='dddd, MMMM YYYY'
-                      selected={moment(new Date(this.state.secret.expires))}
-                      onChange={this.onExpiresChange} />
+                    <TimeInput
+                      format='YYYY-MM-DD HH:mm:ss ZZ'
+                      value={moment(new Date(this.state.secret.expires))}
+                      onChange={this.onExpiresChange}
+                      className="form-control" />
                   :
                     <format.DateView date={this.state.secret.expires}/>
                 }
@@ -184,6 +185,7 @@ var SecretEditor = React.createClass({
   onExpiresChange(date) {
     var state = _.cloneDeep(this.state);
     state.secret.expires = date.toDate().toJSON();
+    console.log(this.state.secret.expires);
     this.setState(state);
   },
 

@@ -53,7 +53,8 @@
     "react-treeview":                   "^0.4.2",
     "envify":                           "^3.4.0",
     "shell-escape":                     "^0.2.0",
-    "babel-plugin-object-assign":       "1.2.1"
+    "babel-plugin-object-assign":       "1.2.1",
+    "classnames":                       "^2.2.3"
   },
   "engines": {
     "node":                             "^4.0.0"

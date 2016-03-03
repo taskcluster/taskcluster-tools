@@ -2,7 +2,6 @@ var React           = require('react');
 var bs              = require('react-bootstrap');
 var slugid          = require('slugid');
 var taskcluster     = require('taskcluster-client');
-var DatePicker      = require('react-datepicker');
 var moment          = require('moment');
 var utils           = require('../../lib/utils');
 var format          = require('../../lib/format');
@@ -10,6 +9,7 @@ var _               = require('lodash');
 var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
 var ScopeEditor     = require('../../lib/ui/scopeeditor');
+var TimeInput       = require('../../lib/ui/timeinput');
 
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({
@@ -169,17 +169,18 @@ var ClientEditor = React.createClass({
           <div className="form-group">
             <label className="control-label col-md-3">Expires</label>
             <div className="col-md-9">
-              <div className="form-control-static">
                 {
                   isEditing ?
-                    <DatePicker
-                      dateFormat='dddd, MMMM YYYY'
-                      selected={moment(new Date(this.state.client.expires))}
-                      onChange={this.onExpiresChange}/>
+                    <TimeInput
+                      format='YYYY-MM-DD HH:mm:ss ZZ'
+                      value={moment(new Date(this.state.client.expires))}
+                      onChange={this.onExpiresChange}
+                      className="form-control"/>
                   :
-                    <format.DateView date={this.state.client.expires}/>
+                    <div className="form-control-static">
+                      <format.DateView date={this.state.client.expires}/>
+                    </div>
                 }
-              </div>
             </div>
           </div>
           {
