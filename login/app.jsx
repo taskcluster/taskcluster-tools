@@ -5,6 +5,8 @@ var auth        = require('../lib/auth');
 // Load credentials for querystring
 var credentials = querystring.parse(location.search.substr(1));
 
+console.log("credentials", credentials);
+
 // Update credentials if new ones were provided by querystring
 if (credentials.clientId &&
     credentials.accessToken) {

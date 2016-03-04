@@ -10,6 +10,7 @@ var ConfirmAction   = require('../../lib/ui/confirmaction');
 var Promise         = require('promise');
 var ScopeEditor     = require('../../lib/ui/scopeeditor');
 var TimeInput       = require('../../lib/ui/timeinput');
+var auth            = require('../../lib/auth');
 
 /** Create client editor/viewer (same thing) */
 var ClientEditor = React.createClass({
@@ -52,9 +53,11 @@ var ClientEditor = React.createClass({
   load() {
     // If there is no currentClientId, we're creating a new client
     if (this.props.currentClientId === '') {
+      let creds = auth.loadCredentials();
+      let clientId = creds? creds.clientId + '/' : '';
       return {
         client: {
-          clientId:       '',
+          clientId:       clientId,
           expires:        new Date(3017, 1, 1),
           description:    "",
           scopes:         [],
@@ -66,7 +69,15 @@ var ClientEditor = React.createClass({
         error:            null
       };
     } else {
-      // Load currentClientId
+      // Load currentClientId, but avoid doing so after creating a new client
+      if (this.state.client && this.state.client.clientId === this.props.currentClientId) {
+        this.setState({
+          editing:          false,
+          working:          false,
+          error:            null
+        });
+        return {};
+      }
       return {
         client:           this.auth.client(this.props.currentClientId),
         accessToken:      null,
@@ -94,6 +105,10 @@ var ClientEditor = React.createClass({
     if (!isCreating) {
       title = (isEditing ? "Edit Client" : "View Client");
     }
+
+    let creds = auth.loadCredentials();
+    let clientId = creds? creds.clientId + '/' : '';
+
     return this.renderWaitFor('client') || (
       <span className="client-editor">
         <h3>{title}</h3>
@@ -101,17 +116,24 @@ var ClientEditor = React.createClass({
         <div className="form-horizontal">
           {
             isCreating ? (
-              <bs.Input
-                type="text"
-                ref="clientId"
-                value={this.state.client.clientId}
-                bsStyle={this.validClientId() ? 'success' : 'error'}
-                hasFeedback
-                label="ClientId"
-                labelClassName="col-md-3"
-                wrapperClassName="col-md-9"
-                onChange={this.onChange}
-                placeholder="ClientId"/>
+              <bs.OverlayTrigger
+                placement="bottom"
+                trigger="focus"
+                show={clientId != ''}
+                overlay={<bs.Tooltip>You can create as many clients as you would like
+                         that begin with "{clientId}".</bs.Tooltip>}>
+                <bs.Input
+                  type="text"
+                  ref="clientId"
+                  value={this.state.client.clientId}
+                  bsStyle={this.validClientId() ? 'success' : 'error'}
+                  hasFeedback
+                  label="ClientId"
+                  labelClassName="col-md-3"
+                  wrapperClassName="col-md-9"
+                  onChange={this.onChange}
+                  placeholder="ClientId"/>
+                </bs.OverlayTrigger>
             ) : (
               <div className="form-group">
                 <label className="control-label col-md-3">ClientId</label>

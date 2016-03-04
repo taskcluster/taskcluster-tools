@@ -47,7 +47,7 @@ var RoleManager = React.createClass({
   render() {
     return (
       <bs.Row>
-        <bs.Col md={6}>
+        <bs.Col md={5}>
           {this.renderRolesTable()}
           <bs.ButtonToolbar>
             <bs.Button bsStyle="primary"
@@ -66,7 +66,7 @@ var RoleManager = React.createClass({
             </bs.Button>
           </bs.ButtonToolbar>
         </bs.Col>
-        <bs.Col md={6}>
+        <bs.Col md={7}>
           <RoleEditor currentRoleId={this.state.selectedRoleId}
                       reloadRoleId={this.reloadRoleId}/>
         </bs.Col>
@@ -81,8 +81,6 @@ var RoleManager = React.createClass({
         <thead>
           <tr>
             <th>RoleId</th>
-            <th>Created</th>
-            <th>Last Modified</th>
           </tr>
         </thead>
         <tbody>
@@ -100,8 +98,6 @@ var RoleManager = React.createClass({
           className={isSelected ? 'info' : undefined}
           onClick={this.selectRoleId.bind(this, role.roleId)}>
         <td><code>{role.roleId}</code></td>
-        <td><format.DateView date={role.created}/></td>
-        <td><format.DateView date={role.lastModified}/></td>
       </tr>
     );
   },

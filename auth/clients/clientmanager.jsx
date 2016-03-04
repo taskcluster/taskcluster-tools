@@ -2,6 +2,7 @@ var React           = require('react');
 var bs              = require('react-bootstrap');
 var ClientEditor    = require('./clienteditor');
 var utils           = require('../../lib/utils');
+var auth            = require('../../lib/auth');
 var taskcluster     = require('taskcluster-client');
 var format          = require('../../lib/format');
 var _               = require('lodash');
@@ -11,8 +12,9 @@ var ClientManager = React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
+      reloadOnKeys: ['clientPrefix'],
       clients: {
-        auth:       taskcluster.Auth
+        auth:                 taskcluster.Auth,
       }
     }),
     // Serialize state.selectedClientId to location.hash as string
@@ -24,7 +26,9 @@ var ClientManager = React.createClass({
 
   /** Create an initial state */
   getInitialState() {
+    let creds = auth.loadCredentials();
     return {
+      clientPrefix:       creds? creds.clientId + "/" : "",
       clientsLoaded:      false,
       clientsError:       undefined,
       clients:            undefined,
@@ -39,7 +43,8 @@ var ClientManager = React.createClass({
     // - clientsError
     // - clients
     return {
-      clients:    this.auth.listClients()
+      clients:    this.auth.listClients(
+                      this.state.clientPrefix? {prefix: this.state.clientPrefix} : undefined)
     };
   },
 
@@ -47,7 +52,8 @@ var ClientManager = React.createClass({
   render() {
     return (
       <bs.Row>
-        <bs.Col md={6}>
+        <bs.Col md={5}>
+          {this.renderPrefixInput()}
           {this.renderClientsTable()}
           <bs.ButtonToolbar>
             <bs.Button bsStyle="primary"
@@ -66,12 +72,34 @@ var ClientManager = React.createClass({
             </bs.Button>
           </bs.ButtonToolbar>
         </bs.Col>
-        <bs.Col md={6}>
+        <bs.Col md={7}>
           <ClientEditor currentClientId={this.state.selectedClientId}
                         reloadClientId={this.reloadClientId}/>
         </bs.Col>
       </bs.Row>
     );
+  },
+
+  renderPrefixInput() {
+    let setPrefix = (e) => this.setState({clientPrefix: e.target.value});
+    let enterPrefix = (e) => {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        setPrefix(e);
+      }
+    };
+    return <div className="form-group form-group-sm">
+       <div className="input-group">
+         <div className="input-group-addon text-sm"><em>ClientIds beginning with</em></div>
+         <input type="search" className="form-control"
+                defaultValue={this.state.clientPrefix}
+                onBlur={setPrefix}
+                onKeyUp={enterPrefix}/>
+         <div className="input-group-addon">
+           <bs.Glyphicon glyph="search"/>
+         </div>
+       </div>
+     </div>;
   },
 
   /** Render table of all clients */
@@ -81,9 +109,6 @@ var ClientManager = React.createClass({
         <thead>
           <tr>
             <th>ClientId</th>
-            <th>Expires</th>
-            <th>Last Used</th>
-            <th>Last Rotated</th>
           </tr>
         </thead>
         <tbody>
@@ -101,9 +126,6 @@ var ClientManager = React.createClass({
           className={isSelected ? 'info' : undefined}
           onClick={this.selectClientId.bind(this, client.clientId)}>
         <td><code>{client.clientId}</code></td>
-        <td><format.DateView date={client.expires}/></td>
-        <td><format.DateView date={client.lastDateUsed}/></td>
-        <td><format.DateView date={client.lastRotated}/></td>
       </tr>
     );
   },
@@ -111,7 +133,7 @@ var ClientManager = React.createClass({
   async reloadClientId(clientId) {
     // Load client ignore errors (assume client doesn't exist)
     let client = await this.auth.client(clientId).catch(() => null);
-    let selectedClientId = this.state.selectedClientId;
+    let selectedClientId = clientId;
     let clients = _.cloneDeep(this.state.clients);
     var index = _.findIndex(clients, c => c.clientId === clientId);
     if (index === -1 && client !== null) {
@@ -121,10 +143,11 @@ var ClientManager = React.createClass({
     } else {
       clients = clients.filter(c => c.clientId !== clientId);
     }
+    clients.sort((a, b) => a.clientId > b.clientId);
+    clients = clients.filter(c => c.clientId.startsWith(this.state.clientPrefix));
     if (_.findIndex(clients, c => c.clientId === selectedClientId) === -1) {
       selectedClientId = '';
     }
-    clients.sort((a, b) => a.clientId > b.clientId);
     this.setState({clients, selectedClientId});
   },
 

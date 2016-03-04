@@ -11,18 +11,18 @@ let Navigation = React.createClass({
   /** Get initial state */
   getInitialState() {
     return {
-      credentials:      auth.loadCredentials()
+      credentials:        auth.loadCredentials(),
+      credentialsMessage: undefined
     };
   },
 
   /** Log-in open a authentication URL */
-  login() {
-    // Open login url
+  signIn() {
     window.open(auth.buildLoginURL(), '_blank');
   },
 
   /** Log out (clear credentials) */
-  logout() {
+  signOut() {
     // Clear credentials
     auth.saveCredentials(undefined);
     // Update state
@@ -50,7 +50,16 @@ let Navigation = React.createClass({
   /** Credentials changed */
   handleCredentialsChanged(e) {
     // Reload credentials
-    this.setState({credentials: e.detail});
+    this.setState({
+      credentials: e.detail,
+      credentialsMessage: e.detail? {
+        title: "Signed In",
+        body: "You are now signed in as " + e.detail.clientId + ".",
+      } : {
+        title: "Signed Out",
+        body: "You are now signed out.",
+      }
+    });
   },
 
   /** Render navigation bar */
@@ -106,23 +115,54 @@ let Navigation = React.createClass({
               })
             }
           </bs.NavDropdown>
-          {
-            ( this.state.credentials ?
-              <bs.NavItem onSelect={this.logout}>
-                <bs.Glyphicon glyph="log-out"/>&nbsp;
-                Log out
-              </bs.NavItem>
-            :
-              <bs.NavItem onSelect={this.login}>
-                <bs.Glyphicon glyph="log-in"/>&nbsp;
-                Log in
-              </bs.NavItem>
-            )
-          }
+          {this.renderCredentialsMenu()}
         </bs.Nav>
+        {this.renderCredentialsPopover()}
       </bs.Navbar>
     );
-  }
+  },
+
+  renderCredentialsMenu() {
+    // if there are no credentials at all, then there is no menu -- just a sign-in link
+    if (!this.state.credentials) {
+      return <bs.NavItem onSelect={this.signIn} ref="credentials">
+        <bs.Glyphicon glyph="log-in"/>&nbsp;Sign in
+      </bs.NavItem>
+    }
+
+    // TODO: color this according to time until expiry
+    let menuHeading = <span><bs.Glyphicon glyph='user'/>&nbsp; {this.state.credentials.clientId}</span>;
+    return <bs.NavDropdown key={2} title={menuHeading} ref="credentials" id="credentials">
+      <bs.MenuItem href="/credentials">
+        <format.Icon name="key"/>&nbsp;Manage Credentials
+      </bs.MenuItem>
+      <bs.MenuItem divider />
+      <bs.NavItem onSelect={this.signIn}>
+        <bs.Glyphicon glyph="log-in"/>&nbsp;
+        Sign In
+      </bs.NavItem>
+      <bs.NavItem onSelect={this.signOut}>
+        <bs.Glyphicon glyph="log-out"/>&nbsp;
+        Sign Out
+      </bs.NavItem>
+    </bs.NavDropdown>;
+  },
+
+  renderCredentialsPopover() {
+    if (this.state.credentialsMessage) {
+      let popover = <bs.Popover placement="bottom" id="signin-alert" title={this.state.credentialsMessage.title}>
+        {this.state.credentialsMessage.body}
+      </bs.Popover>;
+      return <bs.Overlay
+              show={true}
+              rootClose={true}
+              onHide={ () => this.setState({credentialsMessage: undefined}) }
+              placement="bottom"
+              target={ props => ReactDOM.findDOMNode(this.refs.credentials) }>
+        {popover}
+      </bs.Overlay>
+    }
+  },
 });
 
 
