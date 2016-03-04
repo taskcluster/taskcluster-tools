@@ -18,7 +18,6 @@ Code Organization
   - `*.jsx` (file containing JSX)
   - `*.js`  (file with pure Javascript, no JSX syntax or header)
 
-
 Grunt Tasks and Configuration
 -----------------------------
 Our grunt file offers compilation of:
@@ -27,15 +26,24 @@ Our grunt file offers compilation of:
  - less files to CSS
  - jade files to HTML
 
+Testing changes
+---------------
+Install the dependencies needed for grunt and start it up:
+* npm install
+* grunt develop
+
+Grunt allows you to test and see your changes.
 The grunt default task builds, watches sources and serves them from
 `http://localhost:9000`.
 
-targets:
+Available targets
+-----------------
 
   - `grunt`, the default target build, watches sources and serves the `build/`
     folder on `http://localhost:9000/`.
   - `grunt build`, builds sources into the `build/` folder.
   - `grunt clean`, delete generated files (ie. deletes the `build/` folder).
+  - `grunt develop`, it serves on localhost and watches sources
 
 
 Configuration with Sublime 2
