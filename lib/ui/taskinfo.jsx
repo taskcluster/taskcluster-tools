@@ -346,8 +346,6 @@ var TaskInfo = React.createClass({
       return "# Failed to infer task payload format";
     }
 
-    imagePullCmds.forEach(function(cmd) { cmds.push(cmd); })
-
     // TODO Add devices other than loopback at some point
     if (payload.capabilities && payload.capabilities.devices) {
       cmds.push("");
@@ -390,6 +388,12 @@ var TaskInfo = React.createClass({
         deviceCmds.push("  --device /dev/snd/pcmC0D1p:/dev/snd/pcmC0D1p \\");
       }
     }
+
+    // The commands for video device initialization require some user interaction
+    // Let's make sure we don't start downloading the image before user input might
+    // be required to prevent the script execution to be halted half-way due to user
+    // input being required.
+    imagePullCmds.forEach(function(cmd) { cmds.push(cmd); })
 
     cmds.push("");
     cmds.push("# Find a unique container name");
