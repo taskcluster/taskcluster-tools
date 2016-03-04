@@ -120,7 +120,7 @@ var ClientEditor = React.createClass({
                 placement="bottom"
                 trigger="focus"
                 show={clientId != ''}
-                overlay={<bs.Tooltip>You can create as many clients as you would like
+                overlay={<bs.Tooltip id="clientId">You can create as many clients as you would like
                          that begin with "{clientId}".</bs.Tooltip>}>
                 <bs.Input
                   type="text"
