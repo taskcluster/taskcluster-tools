@@ -346,8 +346,6 @@ var TaskInfo = React.createClass({
       return "# Failed to infer task payload format";
     }
 
-    imagePullCmds.forEach(function(cmd) { cmds.push(cmd); })
-
     // TODO Add devices other than loopback at some point
     if (payload.capabilities && payload.capabilities.devices) {
       cmds.push("");
@@ -359,10 +357,20 @@ var TaskInfo = React.createClass({
       cmds.push("");
       if (payload.capabilities.devices['loopbackVideo']) {
         cmds.push("# This job requires access to your video device.");
-        cmds.push("# If this is the first time you're trying to run this locally,");
-        cmds.push("# make sure to run this first:");
-        cmds.push("# sudo apt-get install v4l2loopback-dkms");
-        cmds.push("# sudo modprobe v4l2loopback # This will create a device under /dev/video*");
+        cmds.push("");
+        cmds.push("if [[ `apt-cache search v4l2loopback-dkms | wc -l` -eq 0 ]]; then");
+        cmds.push("  echo 'We are going to install v42loopback-dkms on your host.'");
+        cmds.push("  echo 'If you're OK with it type your root password.'");
+        cmds.push("  sudo apt-get install -qq -f v4l2loopback-dkms");
+        cmds.push("fi");
+        cmds.push("");
+        cmds.push("if [[ `lsmod | grep "v4l2loopback" | wc -l` -eq 0 ]]; then");
+        cmds.push("  echo 'We\'re going to create a video device under /dev/video*'");
+        cmds.push("  echo 'This needs to happen everytime after you reboot your machine.'");
+        cmds.push("  echo 'If you\'re OK with it type your root password.'");
+        cmds.push("  sudo modprobe v4l2loopback");
+        cmds.push("fi");
+        cmds.push("");
         cmds.push("last_device=`ls /dev/video* | tail -n 1`");
         deviceCmds.push("  --device $last_device:$last_device \\");
       }
@@ -380,6 +388,12 @@ var TaskInfo = React.createClass({
         deviceCmds.push("  --device /dev/snd/pcmC0D1p:/dev/snd/pcmC0D1p \\");
       }
     }
+
+    // The commands for video device initialization require some user interaction
+    // Let's make sure we don't start downloading the image before user input might
+    // be required to prevent the script execution to be halted half-way due to user
+    // input being required.
+    imagePullCmds.forEach(function(cmd) { cmds.push(cmd); })
 
     cmds.push("");
     cmds.push("# Find a unique container name");
