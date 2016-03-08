@@ -1,6 +1,16 @@
 @import "../lib/ui/taskview.less";
 
 .task-graph-inspector-tasks > tbody > tr:not(.info) {
-  cursor:         pointer;
+  cursor: pointer;
+
 }
+.table > tbody > tr > td > span.markdown-view > p:last-of-type {
+  margin: 0px;
+  
+  &:hover {
+    text-decoration: underline;
+	}
+}
+
+
 
