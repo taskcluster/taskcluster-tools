@@ -65,8 +65,9 @@ let PurgeCacheButton = React.createClass({
   },
   purge() {
     return Promise.all(this.state.selected.map(cache => {
+      console.log(cache);
       return this.purgeCache.purgeCache(
-          this.props.provisionerId, this.props.workerType, {cache});
+          this.props.provisionerId, this.props.workerType, {cacheName: cache});
     }));
   }
 });
