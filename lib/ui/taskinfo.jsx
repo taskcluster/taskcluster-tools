@@ -364,7 +364,7 @@ var TaskInfo = React.createClass({
         cmds.push("  sudo apt-get install -qq -f v4l2loopback-dkms");
         cmds.push("fi");
         cmds.push("");
-        cmds.push("if [[ `lsmod | grep "v4l2loopback" | wc -l` -eq 0 ]]; then");
+        cmds.push("if [[ `lsmod | grep \"v4l2loopback\" | wc -l` -eq 0 ]]; then");
         cmds.push("  echo 'We\'re going to create a video device under /dev/video*'");
         cmds.push("  echo 'This needs to happen everytime after you reboot your machine.'");
         cmds.push("  echo 'If you\'re OK with it type your root password.'");
