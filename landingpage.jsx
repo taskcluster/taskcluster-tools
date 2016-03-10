@@ -37,16 +37,18 @@ $(function() {
     (
       <div className="landingpage-entries">
         <bs.Row>
-          <bs.Col md={12}>
-            <bs.Well className="landingpage-well">
-              <img src="/lib/assets/taskcluster-120.png"
-                   className="landingpage-image"/>
-              <h2>Welcome to TaskCluster Tools,</h2>
-              A collection of tools for TaskCluster components and elements in
-              the TaskCluster eco-system. Here you'll find tools to manage
-              TaskCluster as well as run, debug, inspect and view tasks,
-              task-graphs, and other TaskCluster related entities.
-            </bs.Well>
+          <bs.Col md={8} mdOffset={2} sm={10} smOffset={1}>
+            <div className="landingpage-header">
+              <img src={"/lib/assets/taskcluster-180.png"}/>
+              <h2><span className="light-font">Welcome to</span> <span className="landingpage-logo">TaskCluster Tools</span></h2>
+            </div>
+          </bs.Col>
+        </bs.Row>
+        <bs.Row className="landingpage-description">
+          <bs.Col sm={12}>
+            <p>
+              A collection of tools for TaskCluster components and elements in the TaskCluster eco-system. Here you'll find tools to manage TaskCluster as well as run, debug, inspect and view tasks, task-graphs, and other TaskCluster related entities.
+            </p>
           </bs.Col>
         </bs.Row>
       {
@@ -63,5 +65,3 @@ $(function() {
     $('#container')[0]
   );
 });
-
-

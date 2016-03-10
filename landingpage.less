@@ -1,25 +1,59 @@
-@import "./lib/format.less";
+@import (less) "./lib/format";
+@import (less) "./lib/custom-bootstrap-variables";
+
+
+.landingpage-entries > .row:first-of-type {
+  background: @navbar-inverse-bg;
+  color: white;
+  position: relative;
+  //accounts for navbar's margin-bottom
+  top: -22px;
+  overflow: hidden;
+}
+
+.landingpage-header {
+  margin: 40px 0;
+  text-align: center;
+}
+
+.landingpage-description {
+  font-size: 20px;
+  font-weight: 300;
+  border-bottom: 2px solid @gray-lighter;
+  padding: 0 30px;
+  margin-bottom: 10px;
+}
+
+.landingpage-header img {
+  position: absolute;
+  opacity: 0.18;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.landingpage-header h2 {
+  position: relative;
+  z-index: 1;
+}
+
+.landingpage-logo {
+  color: @taskcluster-color;
+}
+
+.light-font {
+  font-weight: 300;
+}
 
 .landingpage-entry {
-  display:          block;
-  border-radius:    15px;
-  padding:          15px;
-  margin:           10px;
-  text-decoration:  none !important;
-  color:            #000 !important;
-  min-height:       200px;
+  display: block;
+  padding: 15px;
+  text-decoration: none !important;
+  color: @text-color !important;
+  min-height: 200px;
 }
 
 .landingpage-entry:hover {
-  background:       #ccc;
-}
-
-.landingpage-image {
-  float:          left;
-  padding-right:  20px;
-}
-
-.landingpage-well {
-  min-height:     160px;
-  margin:         10px;
+  background: @gray-lighter;
 }
