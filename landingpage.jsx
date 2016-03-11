@@ -47,7 +47,9 @@ $(function() {
         <bs.Row className="landingpage-description">
           <bs.Col sm={12}>
             <p>
-              A collection of tools for TaskCluster components and elements in the TaskCluster eco-system. Here you'll find tools to manage TaskCluster as well as run, debug, inspect and view tasks, task-graphs, and other TaskCluster related entities.
+              A collection of tools for TaskCluster components and elements in the TaskCluster eco-system.
+              Here you'll find tools to manage TaskCluster as well as run, debug, inspect and view tasks, task-graphs, and
+              other TaskCluster related entities.
             </p>
           </bs.Col>
         </bs.Row>
