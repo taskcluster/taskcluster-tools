@@ -7,7 +7,7 @@ let TaskCreator             = require('./taskcreator');
 // Initial task, if nothing is stored in localStorage
 var initialTask = {
   provisionerId:      'aws-provisioner-v1',
-  workerType:         'b2gtest',
+  workerType:         'tutorial',
   created:            null, // later
   deadline:           null, // later
   payload: {

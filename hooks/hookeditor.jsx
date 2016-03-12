@@ -25,7 +25,7 @@ var initialHook = {
   deadline: "6 hours",
   task: {
     provisionerId:      'aws-provisioner-v1',
-    workerType:         'b2gtest',
+    workerType:         'tutorial',
     payload: {
       image:            'ubuntu:14.04',
       command:          ['/bin/bash', '-c', 'echo "hello World"'],
