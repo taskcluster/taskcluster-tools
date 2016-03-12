@@ -6,13 +6,17 @@ let menu        = require('../menu');
 let auth        = require('./auth');
 let format      = require('./format');
 
+// time before expiration at which we warn
+let EXPIRY_WARNING = 5 * 60 * 1000;
+
 /** Navigation bar for layout.jade */
 let Navigation = React.createClass({
   /** Get initial state */
   getInitialState() {
     return {
-      credentials:        auth.loadCredentials(),
-      credentialsMessage: undefined
+      credentials:             auth.loadCredentials(),
+      credentialsExpiringSoon: false,
+      credentialsMessage:      undefined
     };
   },
 
@@ -36,6 +40,8 @@ let Navigation = React.createClass({
       this.handleCredentialsChanged,
       false
     );
+
+    this.startExpirationTimer();
   },
 
   /** Stop listening for credentials-changed events */
@@ -45,21 +51,65 @@ let Navigation = React.createClass({
       this.handleCredentialsChanged,
       false
     );
+
+    this.stopExpirationTimer();
   },
 
   /** Credentials changed */
   handleCredentialsChanged(e) {
+    let credentials = auth.loadCredentials();
+
     // Reload credentials
     this.setState({
-      credentials: e.detail,
-      credentialsMessage: e.detail? {
+      credentials: credentials,
+      credentialsExpiringSoon: false,
+      credentialsMessage: credentials? {
         title: "Signed In",
-        body: "You are now signed in as " + e.detail.clientId + ".",
+        body: "You are now signed in as " + credentials.clientId + ".",
       } : {
         title: "Signed Out",
         body: "You are now signed out.",
       }
     });
+
+    this.startExpirationTimer();
+  },
+
+  startExpirationTimer() {
+    this.stopExpirationTimer();
+
+    // we only support monitoring expiration of temporary credentials (anything
+    // else requires hitting the auth API, and temporary credentials are the
+    // common case)
+    let credentials = auth.loadCredentials();
+    if (!credentials || !credentials.certificate || !credentials.certificate.expiry) {
+      return;
+    }
+    let expiry = credentials.certificate.expiry;
+    if (expiry < Date.now() + EXPIRY_WARNING) {
+      this.showExpirationWarning();
+      return;
+    }
+
+    this.expirationTimer = setTimeout(
+        () => this.showExpirationWarning(),
+        expiry - Date.now() - EXPIRY_WARNING + 500);
+  },
+
+  stopExpirationTimer() {
+    if (this.expirationTimer) {
+      clearTimeout(this.expirationTimer);
+      this.expirationTimer = null;
+    }
+  },
+
+  showExpirationWarning() {
+    this.setState({
+      credentialsExpiringSoon: true,
+      credentialsMessage: {
+        title: "Expiring Soon",
+        body: "Your temporary credentials will expire soon.  Sign in again to refresh them."
+      }});
   },
 
   /** Render navigation bar */
@@ -131,7 +181,10 @@ let Navigation = React.createClass({
     }
 
     // TODO: color this according to time until expiry
-    let menuHeading = <span><bs.Glyphicon glyph='user'/>&nbsp; {this.state.credentials.clientId}</span>;
+    let glyph = this.state.credentialsExpiringSoon? 'exclamation-sign' : 'user';
+    let className = this.state.credentialsExpiringSoon? 'text-warning' : '';
+    let menuHeading = <span><bs.Glyphicon className={className} glyph={glyph}/>&nbsp;
+                          {this.state.credentials.clientId}</span>;
     return <bs.NavDropdown key={2} title={menuHeading} ref="credentials" id="credentials">
       <bs.MenuItem href="/credentials">
         <format.Icon name="key"/>&nbsp;Manage Credentials
