@@ -236,6 +236,7 @@ var ClientEditor = React.createClass({
                 scopesUpdated={this.scopesUpdated} />
             </div>
           </div>
+          {(!isEditing && !isCreating) ? (
           <div className="form-group">
             <label className="control-label col-md-3">Expanded Scopes</label>
             <div className="col-md-9">
@@ -247,6 +248,7 @@ var ClientEditor = React.createClass({
                 scopes={this.state.client.expandedScopes}/>
             </div>
           </div>
+          ) : undefined}
           <hr/>
           <div className="form-group">
             <div className="col-md-9 col-md-offset-3">

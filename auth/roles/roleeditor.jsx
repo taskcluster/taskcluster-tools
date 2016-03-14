@@ -154,7 +154,7 @@ var RoleEditor = React.createClass({
             </div>
           </div>
           {
-            this.state.role.expandedScopes ? (
+            (!isEditing && !isCreating && this.state.role.expandedScopes) ? (
               <div className="form-group">
                 <label className="control-label col-md-3">
                   Expanded Scopes
