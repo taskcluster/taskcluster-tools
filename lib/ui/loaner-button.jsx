@@ -84,6 +84,9 @@ let LoanerButton = React.createClass({
     task.payload.env = task.payload.env || {};
     task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
 
+    // Strip artifacts
+    delete task.payload.artifacts;
+
     // Set interactive = true
     task.payload.features = task.payload.features || {};
     task.payload.features.interactive = true;
