@@ -54,3 +54,7 @@ Install [sublime-react](https://github.com/reactjs/sublime-react), open one of
 `View` > `Syntax` > `Open all with current extension as...` > `JavaScript (JSX)`
 
 
+Testing
+-------
+Until someone comes up with something better, which probably involves redux or similar,
+all testing is manual. Open the tools and check that they work.
