@@ -159,7 +159,7 @@ var ClientEditor = React.createClass({
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
               <div className="form-group">
                 <label className="control-label col-md-3">AccessToken</label>
-                <div className="col-md-9">
+                <div className="col-md-9 aqui">
                   {
                     isEditing && !isCreating ?
                     <bs.Button
@@ -170,11 +170,9 @@ var ClientEditor = React.createClass({
                     </bs.Button>
                     : (
                       this.state.accessToken !== null ? (
-                        <bs.Alert bsStyle="warning"
-                               onDismiss={this.dismissAccessKey}
-                               dismissAfter={5 * 60 * 1000}>
+                        <bs.Modal show="true">
                           <code>{this.state.accessToken}</code>
-                        </bs.Alert>
+                        </bs.Modal>
                       ) : undefined
                     )
                   }
