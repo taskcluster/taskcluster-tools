@@ -1,7 +1,105 @@
 var React           = require('react');
-var Terminal        = require('term.js/src/term');
 var utils           = require('../utils');
+var log_fetcher     = require('./log-fetcher.js');
 
+var Viewer = React.createClass({
+    getDefaultProps: function(){
+        return {
+            cols: 120,
+            rows: 20,
+        };
+    },
+
+    getInitialState: function(){
+        return {
+            fromBottom: 0
+        };
+    },
+
+    scrollbarHeight: function(){
+        if(!this.refs.buffer) return 0;
+        var ratio = this.props.rows / this.props.lines.length;
+        if(ratio > 1) ratio = 1;
+        var height = ratio * this.refs.buffer.offsetHeight;
+        return Math.max(height, 10);
+    },
+
+    scrollbarMargin: function(){
+        if(!this.refs.buffer) return 0;
+        var ratio = (this.props.lines.length - this.state.fromBottom - this.props.rows)
+                    / this.props.lines.length;
+        return ratio * (this.refs.buffer.offsetHeight - this.scrollbarHeight());
+    },
+
+    scrollbarSet: function(newState){
+        newState = Math.floor(newState);
+        newState = Math.max(0, newState);
+        newState = Math.min(this.props.lines.length - this.props.rows, newState);
+        if(newState != this.state.fromBottom)
+            this.setState({fromBottom: newState});
+    },
+
+    scrollbarMove: function(dist){
+        this.scrollbarSet(this.state.fromBottom - dist);
+    },
+
+    onMouseWheel: function(e){
+        e.preventDefault();
+        this.scrollbarMove(Math.sign(e.deltaY));
+    },
+
+    onMouseMove: function(e){
+        if(this.dragging){
+            var diff = e.pageY - this.startY;
+            var space = this.refs.buffer.offsetHeight;
+            var margin = this.margin + diff;
+            var currentTop = (margin + this.scrollbarHeight()) / space * this.props.lines.length;
+            this.scrollbarSet(this.props.lines.length - currentTop);
+        }
+    },
+
+    onMouseDown: function(e){
+        e.preventDefault();
+        if(e.button == 0){
+            this.dragging = true;
+            this.startY = e.pageY;
+            this.margin = this.scrollbarMargin();
+            this.startOffset = this.state.fromBottom;
+        }
+    },
+
+    onMouseUp: function(e){
+        if(e.button == 0)
+            this.dragging = false;
+    },
+
+    componentDidMount: function(){
+        this.refs.scrollbar.addEventListener('mousedown', this.onMouseDown);
+        window.addEventListener('mouseup', this.onMouseUp);
+        window.addEventListener('mousemove', this.onMouseMove);
+    },
+
+    render: function(){
+        var start = this.props.lines.length - this.state.fromBottom - this.props.rows;
+        if(start < 0) start = 0;
+        var frame = this.props.lines.slice(start, start + this.props.rows);
+        var left = this.props.rows - frame.length; // number of padding divs
+        while(left--) frame.push('');
+        return <div className="viewer" onWheel={this.onMouseWheel}>
+            <div className="buffer" ref="buffer">
+            {
+                frame.map(function(line){
+                    return <div key={start++}>{line}</div>;
+                })
+            }
+            </div>
+            <div className="scrollbar" style={{
+                height: this.scrollbarHeight(),
+                marginTop: this.scrollbarMargin()
+                }} ref="scrollbar"/>
+        </div>;
+    }
+});
 
 /** Display terminal output */
 var TerminalView = React.createClass({
@@ -17,23 +115,19 @@ var TerminalView = React.createClass({
   getDefaultProps: function() {
     return {
       url:            undefined,  // No URL to display at this point
-      options: {
-        cols:         120,
-        rows:         40,
-        cursorBlink:  true,
-        visualBell:   false,
-        popOnBell:    false,
-        screenKeys:   false,
-        scrollback:   50000,
-        debug:        false,
-        useStyle:     true
-      }
+      cols: 90,
+      rows: 40
+    };
+  },
+
+  getInitialState: function(){
+    return {
+      lines: ['one', 'two', 'three', 'testing...']
     };
   },
 
   propTypes: {
     url:      React.PropTypes.string,
-    options:  React.PropTypes.object.isRequired
   },
 
   // Refresh the currently displayed file
@@ -43,31 +137,10 @@ var TerminalView = React.createClass({
 
   /** Open a URL in the terminal */
   open: function() {
-    // Destroy existing terminal if there is one
-    if (this.term) {
-      this.term.destroy();
-      this.term = null;
-    }
     // Abort previous request if any
     if (this.request) {
       this.abortRequest();
     }
-
-    // Create new terminal
-    this.term = new Terminal(this.props.options);
-    this.term.open(this.refs.term);
-    // term.js does a setTimeout() then calls element.focus()
-    // This is truly annoying. To avoid it we could remove the tabindex property
-    // but then we can copy out text.
-    //   this.term.element.removeAttribute('tabindex');
-    // So the solution is to be naughty and monkey patch the element, we'll then
-    // restore it to it's former glory when it is called the first time.
-    // This is super ugly and fragile, but it works...
-    var focusMethod = this.term.element.focus;
-    var element     = this.term.element;
-    element.focus = function() {
-      element.focus = focusMethod;
-    };
 
     // If not given a URL we'll just stop here with an empty terminal
     if (!this.props.url) {
@@ -76,61 +149,35 @@ var TerminalView = React.createClass({
 
     // Open a new request
     this.dataOffset = 0;
-    this.request = new XMLHttpRequest();
-    this.request.open('get', this.props.url, true);
-    this.request.addEventListener('progress', this.onData);
-    this.request.addEventListener('load', this.onData);
-    this.request.send();
+    this.worker = new Worker(log_fetcher);
+    this.worker.addEventListener('message', this.onData);
+    this.worker.postMessage({url: this.props.url, cols: this.props.cols});
   },
 
-  onData: function() {
-    // Write data to term if there is any data
-    if (this.request.responseText !== null ||
-        this.request.responseText !== undefined) {
-      // Check if we have new data
-      var length = this.request.responseText.length;
-      if (length > this.dataOffset) {
-        // Find new data
-        var data = this.request.responseText.slice(this.dataOffset, length);
-        // Update dataOffset
-        this.dataOffset = length;
-        // Write to term
-        this.term.write(data);
-      }
-    }
-    // When request is done
-    if (this.request.readyState === this.request.DONE) {
-      // Stop cursor from blinking
-      this.term.cursorBlink = false;
-      if (this.term._blink) {
-        clearInterval(this.term._blink);
-      }
-      this.term.showCursor();
+  onData: function(e) {
+    var response = e.data;
 
-      // Write an error, if request failed
-      if (this.request.status !== 200) {
-        this.term.write("\r\n[task-inspector] Failed to fetch log!\r\n");
-      }
-    }
+    // Write data to term if there is any data
+    if (response.data)
+        this.setState({lines : response.data});
   },
 
   abortRequest: function() {
-    this.request.removeEventListener('progress', this.onData);
-    this.request.removeEventListener('load', this.onData);
-    this.request.abort();
-    this.request = null;
+    if(this.worker){
+        this.worker.postMessage({abort: true});
+        this.worker = null;
+    }
   },
 
   componentWillUnmount: function() {
-    if (this.request) {
+    if (this.worker) {
       this.abortRequest();
     }
-    this.term.destroy();
-    this.term = null;
   },
 
   render: function() {
-    return <div className="terminal-view" ref="term"></div>;
+    return <Viewer rows={this.props.rows} cols={this.props.cols}
+                   lines={this.state.lines}/>;
   }
 });
 
