@@ -45,7 +45,8 @@ var ClientEditor = React.createClass({
       editing:          true,
       // Operation details, if currently doing anything
       working:          false,
-      error:            null
+      error:            null,
+      showDialog:       false,
     };
   },
 
@@ -170,8 +171,13 @@ var ClientEditor = React.createClass({
                     </bs.Button>
                     : (
                       this.state.accessToken !== null ? (
-                        <bs.Modal show="true">
-                          <code>{this.state.accessToken}</code>
+                        <bs.Modal show={this.state.showDialog} onHide={this.closeDialog}>
+                          <bs.Modal.Header closeButton>
+                            Token Reset 
+                          </bs.Modal.Header>
+                          <bs.Modal.Body>
+                            <code>{this.state.accessToken}</code>
+                          </bs.Modal.Body>
                         </bs.Modal>
                       ) : undefined
                     )
@@ -393,6 +399,7 @@ var ClientEditor = React.createClass({
         client:         client,
         accessToken:    client.accessToken,
         editing:        false,
+        showDialog:     true,
         working:        false
       });
     } catch (err) {
@@ -405,6 +412,13 @@ var ClientEditor = React.createClass({
 
   /** dismiss the visible access key */
   dismissAccessKey() {
+    this.setState({accessToken: null});
+  },
+
+  /** Close modal */
+  closeDialog() {
+    // this.setState({showDialog: false});
+    // this.setState(this.getInitialState());
     this.setState({accessToken: null});
   },
 
