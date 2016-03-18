@@ -1,4 +1,29 @@
+.viewer {
+    width: 100%;
+}
 
+.viewer > div {
+    display: inline-block;
+    vertical-align: top;
+    overflow-y: hidden;
+}
 
+.viewer > .buffer {
+    background-color: black;
+    width: calc(~'100% - 20px');
+    overflow-x: auto;
+    overflow-y: hidden;
+}
 
+.viewer > .buffer > div {
+    font-family: monospace;
+    color: white;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    height: 1em;
+}
 
+.viewer > .scrollbar {
+    width: 20px;
+    background-color: #7f7f7f;
+}
