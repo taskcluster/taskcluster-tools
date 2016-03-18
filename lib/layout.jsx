@@ -122,6 +122,14 @@ let Navigation = React.createClass({
     // Remove title on landing page
     if (window.location.pathname === '/') {
       activeEntry = null;
+    } else {
+        var link = document.createElement('link');
+        link.setAttribute('rel', 'shortcut icon');
+        link.setAttribute('type', 'image/png');
+        link.setAttribute('href', '/lib/assets/font-awesome-favicons/black/png/16/'+ activeEntry.icon + '.png');
+        for(var icons = document.querySelectorAll('link[rel*=icon]'), i = 0, l = icons.length; i < l; i++)
+            icons[i].parentNode.removeChild(icons[i]);
+        document.getElementsByTagName('head')[0].appendChild(link);
     }
 
     // Construct the navbar
