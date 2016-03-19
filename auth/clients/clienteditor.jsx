@@ -160,7 +160,7 @@ var ClientEditor = React.createClass({
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
               <div className="form-group">
                 <label className="control-label col-md-3">AccessToken</label>
-                <div className="col-md-9 aqui">
+                <div className="col-md-9">
                   {
                     isEditing && !isCreating ?
                     <bs.Button
@@ -417,8 +417,6 @@ var ClientEditor = React.createClass({
 
   /** Close modal */
   closeDialog() {
-    // this.setState({showDialog: false});
-    // this.setState(this.getInitialState());
     this.setState({accessToken: null});
   },
 
