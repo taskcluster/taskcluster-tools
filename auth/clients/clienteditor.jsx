@@ -45,7 +45,7 @@ var ClientEditor = React.createClass({
       editing:          true,
       // Operation details, if currently doing anything
       working:          false,
-      error:            null
+      error:            null,
     };
   },
 
@@ -158,27 +158,33 @@ var ClientEditor = React.createClass({
           {
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
               <div className="form-group">
-                <label className="control-label col-md-3">AccessToken</label>
-                <div className="col-md-9">
                   {
                     isEditing && !isCreating ?
-                    <bs.Button
-                      bsStyle="warning"
-                      onClick={this.resetAccessToken}
-                      disabled={this.state.working}>
-                      <bs.Glyphicon glyph="fire"/>&nbsp;Reset accessToken
-                    </bs.Button>
+                    <div>
+                      <label className="control-label col-md-3">AccessToken</label>
+                      <div className="col-md-9">
+                        <bs.Button
+                          bsStyle="warning"
+                          onClick={this.resetAccessToken}
+                          disabled={this.state.working}>
+                          <bs.Glyphicon glyph="fire"/>&nbsp;Reset accessToken
+                        </bs.Button>
+                      </div>
+                    </div>
                     : (
                       this.state.accessToken !== null ? (
-                        <bs.Alert bsStyle="warning"
-                               onDismiss={this.dismissAccessKey}
-                               dismissAfter={5 * 60 * 1000}>
-                          <code>{this.state.accessToken}</code>
-                        </bs.Alert>
+                        <bs.Modal show="true" onHide={this.closeDialog}>
+                          <bs.Modal.Header closeButton>
+                            Access Token 
+                          </bs.Modal.Header>
+                          <bs.Modal.Body>
+                            <p>The access token for this clientId is:</p>
+                            <code>{this.state.accessToken}</code>
+                          </bs.Modal.Body>
+                        </bs.Modal>
                       ) : undefined
                     )
                   }
-                </div>
               </div>
             ) : undefined
           }
@@ -405,8 +411,8 @@ var ClientEditor = React.createClass({
     }
   },
 
-  /** dismiss the visible access key */
-  dismissAccessKey() {
+  /** Close modal */
+  closeDialog() {
     this.setState({accessToken: null});
   },
 
@@ -487,4 +493,3 @@ var ClientEditor = React.createClass({
 
 // Export ClientEditor
 module.exports = ClientEditor;
-
