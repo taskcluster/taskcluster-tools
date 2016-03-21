@@ -157,33 +157,33 @@ var ClientEditor = React.createClass({
           }
           {
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
-              <div className="form-group">
-                <label className="control-label col-md-3">AccessToken</label>
-                <div className="col-md-9">
-                  {
-                    isEditing && !isCreating ?
+              {
+                (isEditing && !isCreating) ? (
+                <div className="form-group">
+                  <label className="control-label col-md-3">AccessToken</label>
+                  <div className="col-md-9">
                     <bs.Button
                       bsStyle="warning"
                       onClick={this.resetAccessToken}
                       disabled={this.state.working}>
                       <bs.Glyphicon glyph="fire"/>&nbsp;Reset accessToken
                     </bs.Button>
-                    : (
-                      this.state.accessToken !== null ? (
-                        <bs.Modal show="true" onHide={this.closeDialog}>
-                          <bs.Modal.Header closeButton>
-                            Access Token 
-                          </bs.Modal.Header>
-                          <bs.Modal.Body>
-                            <p>The access token for this clientId:</p>
-                            <code>{this.state.accessToken}</code>
-                          </bs.Modal.Body>
-                        </bs.Modal>
-                      ) : undefined
-                    )
-                  }
+                  </div>
                 </div>
-              </div>
+                ) : (
+                  this.state.accessToken !== null ? (
+                      <bs.Modal show="true" onHide={this.closeDialog}>
+                        <bs.Modal.Header closeButton>
+                          Access Token 
+                        </bs.Modal.Header>
+                        <bs.Modal.Body>
+                          <p>The access token for this clientId is:</p>
+                          <code>{this.state.accessToken}</code>
+                        </bs.Modal.Body>
+                      </bs.Modal>
+                  ) : undefined
+                )
+              }
             ) : undefined
           }
           <div className="form-group">
