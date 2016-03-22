@@ -87,6 +87,10 @@ let LoanerButton = React.createClass({
     // Strip artifacts
     delete task.payload.artifacts;
 
+    // Strip dependencies and requires
+    delete task.dependencies;
+    delete task.requires;
+
     // Set interactive = true
     task.payload.features = task.payload.features || {};
     task.payload.features.interactive = true;
