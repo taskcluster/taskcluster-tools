@@ -5,6 +5,7 @@ var exorcist  = require('exorcist');
 var concat    = require('concat-stream')
 var menu      = require("./menu");
 var _         = require('lodash');
+var fs        = require('fs');
 
 // Common modules to compiled into a single bundle
 var COMMON_MODULES = [
@@ -245,6 +246,9 @@ module.exports = function(grunt) {
     var icons = _.uniq(
         menu.map(function(entry) { return entry.icon; })
         .filter(function(icon) { return icon != undefined;})
+        .filter(function(icon) {
+          return !fs.existsSync('lib/assets/font-awesome-favicons/black/png/16/' + icon + '.png');
+        })
     ).join();
     console.log("Generating icons " + icons);
     grunt.util.spawn({
