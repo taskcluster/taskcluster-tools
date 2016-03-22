@@ -3,6 +3,8 @@ var babelify  = require('babelify');
 var stream    = require('stream');
 var exorcist  = require('exorcist');
 var concat    = require('concat-stream')
+var menu      = require("./menu");
+var _         = require('lodash');
 
 // Common modules to compiled into a single bundle
 var COMMON_MODULES = [
@@ -201,7 +203,7 @@ module.exports = function(grunt) {
         options: {
           logConcurrentOutput:      false
         },
-        tasks:    ['copy', 'jade', 'less']
+        tasks:    ['render-favicons', 'copy', 'jade', 'less']
       },
       develop: {
         options: {
@@ -220,7 +222,7 @@ module.exports = function(grunt) {
   grunt.registerTask(
     'build',
     "Build sources into the build/ folder",
-    ['copy', 'jade', 'less', 'browserify']
+    ['render-favicons', 'copy', 'jade', 'less', 'browserify']
   );
   grunt.registerTask(
     'develop',
@@ -237,6 +239,32 @@ module.exports = function(grunt) {
     "develop with single grunt process",
     ['build', 'connect', 'watch']
   );
+
+  grunt.registerTask('render-favicons', function() {
+    var done = this.async();
+    var icons = _.uniq(
+        menu.map(function(entry) { return entry.icon; })
+        .filter(function(icon) { return icon != undefined;})
+    ).join();
+    console.log("Generating icons " + icons);
+    grunt.util.spawn({
+    cmd: 'font-awesome-svg-png',
+    args: ['--color=black',
+          '--sizes=16',
+          '--no-svg',
+          '--dest=lib/assets/font-awesome-favicons',
+          '--icons=' + icons],
+
+    },
+    function(error, result, code) {
+      // done function
+      console.log("Error: " + error);
+      console.log("Result: " + result);
+      console.log("Code: " + code);
+      done();
+    }
+    );
+  });
 
   var files = require('./build-files');
 

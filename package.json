@@ -11,6 +11,7 @@
     "url":    "https://github.com/taskcluster/taskcluster-tools.git"
   },
   "dependencies": {
+    "font-awesome-svg-png":             "~1.1.5",
     "promise":                          "^7.1.1",
     "lodash":                           "^4.1.0",
     "debug":                            "^2.0.0",
