@@ -1,7 +1,7 @@
-var React                   = require('react');
-var $                       = require('jquery');
-var bs                      = require('react-bootstrap');
-var ts       = require('./status');
+let React = require('react');
+let $     = require('jquery');
+let bs    = require('react-bootstrap');
+let ts    = require('./status');
 
 // Render component
 $(function() {

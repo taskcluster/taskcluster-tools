@@ -1,22 +1,37 @@
-var React = require('react');
-var bs = require('react-bootstrap');
-var path = require('path');
-var $ = require('jquery');
-var WWW_Authenticate = require('www-authenticate').parsers.WWW_Authenticate;
+const React = require('react');
+const bs = require('react-bootstrap');
+const path = require('path');
+const $ = require('jquery');
+const WWW_Authenticate = require('www-authenticate').parsers.WWW_Authenticate;
+
+// Make a request to the cors proxy service
+function makeRequest(options, allowHeaders = []) {
+  let headers = {};
+
+  if (allowHeaders) {
+    headers['X-Cors-Proxy-Expose-Headers'] = allowHeaders.join(', ');
+  }
+
+  return $.ajax({
+    url: 'http://localhost:8080/request',
+    method: 'POST',
+    contentType: 'application/json',
+    headers,
+    data: JSON.stringify(options)
+  });
+}
 
 function pollTaskclusterService(url, cb) {
-  $.getJSON(url, function(data) {
-    cb(data.alive);
-  }).error(err => {
-    cb(false);
-  })
+  $.getJSON(url)
+    .done(data => cb(data.alive))
+    .fail(err => cb(false));
 }
 
 function dummyPoll(cb) {
   setTimeout(cb.bind(null, true), 0);
 }
 
-var taskclusterServices = [
+let taskclusterServices = [
   {
     name: "Queue",
     poll: pollTaskclusterService.bind(null, "https://queue.taskcluster.net/v1/ping")
@@ -35,62 +50,74 @@ var taskclusterServices = [
   }
 ];
 
-var otherServices = [
+let otherServices = [
   {
     name: "AWS",
     poll: dummyPoll
   },
   {
     name: "Docker Registry",
-    poll: dummyPoll
-    // Houston, we have a problem.
-    // Docker registry doesn't support cross domain requests
-    /*poll: function(cb) {
-      var handleFail = function(response, err, err2) {
-        cb(false);
-      };
 
-      $.ajax({
-        url: 'https://auth.docker.io/token?service=registry.docker.io',
-        method: 'GET',
-        dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        }
-      }).done(function(data) {
-        $.ajax({
+    // Authentication procedure is described at
+    // https://docs.docker.com/registry/spec/auth/token/
+    poll: async function(cb) {
+      let req;
+
+      try {
+        req = makeRequest({
           url: 'https://index.docker.io/v2/',
-          method: 'GET',
-          dataType: 'json',
-          xhrFields: {
-            withCredentials: true
-          },
-          headers: {
-            Authorization: `Bearer ${data.token}`
-          }
-        }).done(function (data) {
-          cb(true);
-        }).fail(handleFail);
-      }).fail(handleFail);
-    }*/
+        }, [
+          'www-authenticate'
+        ]);
+
+        await Promise.resolve(req);
+      } catch (err) {
+        if (err.status != 401) {
+          cb(false);
+          return;
+        }
+
+        try {
+          let auth = new WWW_Authenticate(req.getResponseHeader('www-authenticate'));
+
+          let data = await Promise.resolve(makeRequest({
+            url: `${auth.parms.realm}?service=${auth.parms.service}`
+          }));
+
+          await Promise.resolve(makeRequest({
+            url: 'https://index.docker.io/v2/',
+            method: 'GET',
+            headers: {
+              Authorization: `${auth.scheme} ${data.token}`
+            }
+          }));
+        } catch (err) {
+          console.log(err.stack || err);
+          cb(false);
+          return;
+        }
+      }
+
+      cb(true);
+    }
   }
 ];
 
-export var StatusChecker = React.createClass({
+export let StatusChecker = React.createClass({
   propTypes: {
     up: React.PropTypes.bool.isRequired
   },
   render: function() {
-    var image = this.props.up ? "green-check.png" : "red-check.png";
+    let image = this.props.up ? "green-check.png" : "red-check.png";
     return (
       <img className="img-check img-fluid center-block" src={image}/>
     );
   }
 });
 
-export var Service = React.createClass({
+export let Service = React.createClass({
   getInitialState() {
-    var intervalId = setInterval(this.props.poll.bind(this, serviceUp => {
+    let intervalId = setInterval(this.props.poll.bind(this, serviceUp => {
       this.setState({up: serviceUp});
     }), 5000);
 
@@ -109,7 +136,7 @@ export var Service = React.createClass({
   }
 });
 
-export var ServiceGroup = React.createClass({
+export let ServiceGroup = React.createClass({
   PropTypes: {
     name: React.PropTypes.string.isRequired,
     services: React.PropTypes.array.isRequired
@@ -128,7 +155,7 @@ export var ServiceGroup = React.createClass({
   }
 });
 
-export var TaskclusterStatus = React.createClass({
+export let TaskclusterStatus = React.createClass({
   render: function() {
     return (
       <bs.Col className="taskcluster-status" lg={12} md={12} sm={12} xs={12}>
@@ -143,7 +170,7 @@ export var TaskclusterStatus = React.createClass({
   }
 });
 
-export var TaskclusterDashboard  = React.createClass({
+export let TaskclusterDashboard  = React.createClass({
   render: function() {
     return (
       <bs.Row>
