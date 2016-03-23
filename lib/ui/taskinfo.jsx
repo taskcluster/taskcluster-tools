@@ -279,7 +279,9 @@ var TaskInfo = React.createClass({
         'schedulerId',
         'priority',
         'created',
-        'deadline'
+        'deadline',
+        'dependencies',
+        'requires'
     ];
     _.keys(this.state.task).forEach(key => {
       if (!_.includes(exclude, key)) {
