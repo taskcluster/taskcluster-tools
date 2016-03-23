@@ -100,8 +100,11 @@ var SecretEditor = React.createClass({
            <label className="control-label col-md-2">Secret Name</label>
            <div className="col-md-10">
            { isCreating? (
-               <input type="text" className="form-control" ref="name"
-                      placeholder="garbage/<ircnick>/my-secret" />
+               <div>
+                 <input type="text" className="form-control" ref="name"
+                        placeholder="garbage/<ircnick>/my-secret" />
+                 <p className="text-muted">Note that secrets starting with "garbage/" are visible to just about everybody.  Use them to experiment, but not for real secrets!</p>
+               </div>
              ) : (
                 <div className="form-control-static">
                   {this.state.secretId}
