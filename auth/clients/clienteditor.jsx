@@ -46,6 +46,8 @@ var ClientEditor = React.createClass({
       // Operation details, if currently doing anything
       working:          false,
       error:            null,
+      // Modal
+      showModal:        true,
     };
   },
 
@@ -173,7 +175,7 @@ var ClientEditor = React.createClass({
                     </div>
                     : (
                       this.state.accessToken !== null ? (
-                        <bs.Modal show="true" onHide={this.closeDialog}>
+                        <bs.Modal show={this.state.showModal} onHide={this.closeDialog}>
                           <bs.Modal.Header closeButton>
                             Access Token 
                           </bs.Modal.Header>
