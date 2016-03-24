@@ -209,10 +209,10 @@ module.exports = [
     ].join("\n")
   },
   {
-    title:        "Taskcluster status",
+    title:        "Status",
     link:         "/status/",
     icon:         "cogs",
-    display:      "true",
+    display:      true,
     description: [
       "Display the status of Taskcluster services and underlying services ",
       "Taskcluster depends on."

@@ -101,7 +101,6 @@ module.exports = [
 
   // Status
   'status/index.jade',
-  'status/status.jsx',
   'status/app.jsx',
   'status/app.less'
 ].map(function(file) {

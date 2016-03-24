@@ -13,7 +13,7 @@ function makeRequest(options, allowHeaders = []) {
   }
 
   return $.ajax({
-    url: 'http://localhost:8080/request',
+    url: 'https://cors-proxy.taskcluster.net/request',
     method: 'POST',
     contentType: 'application/json',
     headers,
@@ -53,7 +53,25 @@ let taskclusterServices = [
 let otherServices = [
   {
     name: "AWS",
-    poll: dummyPoll
+    poll: async function(cb) {
+      try {
+        let data = await Promise.resolve(makeRequest({
+          url: 'http://status.aws.amazon.com/rss/ec2-us-west-2.rss'
+        }));
+
+        let items = data.getElementsByTagName('item');
+        if (!items.length) {
+          cb(true);
+          return;
+        }
+
+        let title = items[0].getElementsByTagName('title');
+        cb(title[0].innerHTML.startsWith('Service is operating normally'));
+      } catch (err) {
+        console.log(err.stack || err);
+        cb(false);
+      }
+    }
   },
   {
     name: "Docker Registry",
@@ -141,7 +159,7 @@ export let ServiceGroup = React.createClass({
     name: React.PropTypes.string.isRequired,
     services: React.PropTypes.array.isRequired
   },
-  render: function() {
+  render() {
     return (
       <div>
         <h2>{this.props.name}</h2>
