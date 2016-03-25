@@ -1,14 +1,14 @@
 {
-  "name":     "taskcluster-tools",
-  "version":  "0.1.0",
-  "private":  true,
-  "scripts":  {
-    "test":     "grunt build",
-    "deploy":   "grunt publish -q"
+  "name": "taskcluster-tools",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "grunt build",
+    "deploy": "grunt publish -q"
   },
   "repository": {
-    "type":   "git",
-    "url":    "https://github.com/taskcluster/taskcluster-tools.git"
+    "type": "git",
+    "url": "https://github.com/taskcluster/taskcluster-tools.git"
   },
   "dependencies": {
     "font-awesome-svg-png":             "~1.1.5",
@@ -55,9 +55,10 @@
     "envify":                           "^3.4.0",
     "shell-escape":                     "^0.2.0",
     "babel-plugin-object-assign":       "1.2.1",
-    "classnames":                       "^2.2.3"
+    "classnames":                       "^2.2.3",
+    "www-authenticate": "^0.6.2"
   },
   "engines": {
-    "node":                             "^4.0.0"
+    "node": "^4.0.0"
   }
 }

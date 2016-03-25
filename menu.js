@@ -207,5 +207,15 @@ module.exports = [
     description: [
       "Manage credentials stored in the browser."
     ].join("\n")
+  },
+  {
+    title:        "Status",
+    link:         "/status/",
+    icon:         "cogs",
+    display:      true,
+    description: [
+      "Display the status of Taskcluster services and underlying services ",
+      "Taskcluster depends on."
+    ].join("\n")
   }
 ];

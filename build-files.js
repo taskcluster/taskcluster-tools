@@ -98,6 +98,11 @@ module.exports = [
   'one-click-loaner/connect/index.jade',
   'one-click-loaner/connect/app.jsx',
   'one-click-loaner/connect/connect.less',
+
+  // Status
+  'status/index.jade',
+  'status/app.jsx',
+  'status/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });
