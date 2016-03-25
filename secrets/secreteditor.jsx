@@ -42,7 +42,8 @@ var SecretEditor = React.createClass({
 
       // Operation details, if currently doing anything
       working:          false,
-      error:            null
+      error:            null,
+      showSecret:       false
     };
   },
 
@@ -58,7 +59,7 @@ var SecretEditor = React.createClass({
         },
         editing:          true,
         working:          false,
-        error:            null
+        error:            null,
       };
     } else {
       // Load currentSecretId
@@ -67,7 +68,8 @@ var SecretEditor = React.createClass({
         secret:           this.secrets.get(this.props.currentSecretId),
         editing:          false,
         working:          false,
-        error:            null
+        error:            null,
+        showSecret:       false
       };
     }
   },
@@ -136,7 +138,16 @@ var SecretEditor = React.createClass({
                this.state.editing ?
                  <textarea rows="10" className="form-control" ref="value" defaultValue={JSON.stringify(this.state.secret.secret, null, 2)} />
                : this.state.secret.secret !== undefined ?
+                 this.state.showSecret ?
                  <pre>{JSON.stringify(this.state.secret.secret, null, 2)}</pre>
+                 :
+                 <bs.Button
+                    onClick={this.openSecret}
+                    bsStyle="warning">
+                    <format.Icon  name='user-secret'
+                        style={{padding: '.15em'}}/>
+                    &nbsp;Show secret
+                 </bs.Button>
                : <em>none</em>
              }
            </div>
@@ -194,6 +205,10 @@ var SecretEditor = React.createClass({
 
   startEditing() {
     this.setState({editing: true});
+  },
+
+  openSecret() {
+    this.setState({showSecret: true});
   },
 
   async saveSecret() {
