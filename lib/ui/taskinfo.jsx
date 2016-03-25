@@ -367,9 +367,9 @@ var TaskInfo = React.createClass({
         cmds.push("fi");
         cmds.push("");
         cmds.push("if [[ `lsmod | grep \"v4l2loopback\" | wc -l` -eq 0 ]]; then");
-        cmds.push("  echo 'We\'re going to create a video device under /dev/video*'");
+        cmds.push("  echo 'We are going to create a video device under /dev/video*'");
         cmds.push("  echo 'This needs to happen everytime after you reboot your machine.'");
-        cmds.push("  echo 'If you\'re OK with it type your root password.'");
+        cmds.push("  echo 'If you are OK with it type your root password.'");
         cmds.push("  sudo modprobe v4l2loopback");
         cmds.push("fi");
         cmds.push("");
