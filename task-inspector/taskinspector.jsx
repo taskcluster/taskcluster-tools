@@ -4,6 +4,7 @@ var utils           = require('../lib/utils');
 var taskcluster     = require('taskcluster-client');
 var _               = require('lodash');
 var TaskView        = require('../lib/ui/taskview');
+var PreviousTasks   = require('../lib/ui/previoustasks');
 
 
 /** Renders the task-inspector with a control to enter `taskId` into */
@@ -115,23 +116,32 @@ var TaskInspector = React.createClass({
       <h1>Task Inspector</h1>
       <p>This tool lets you inspect a task given the <code>taskId</code></p>
       <form className="form-horizontal" onSubmit={this.handleSubmit}>
-        <bs.Input
-          type="text"
-          ref="taskId"
-          placeholder="taskId"
-          value={this.state.taskIdInput}
-          label={<span>Enter <code>TaskId</code></span>}
-          bsStyle={invalidInput ? 'error' : null}
-          onChange={this.handleTaskIdInputChange}
-          hasFeedback
-          labelClassName="col-sm-2"
-          wrapperClassName="col-sm-10"/>
-        <div className="form-group">
-          <div className="col-sm-offset-2 col-sm-10">
-            <input type="submit"
-                   className="btn btn-primary"
-                   disabled={!this.state.statusLoaded || invalidInput}
-                   value="Inspect task"/>
+        <div className="row">
+          <div className="col-sm-8">
+            <bs.Input
+              type="text"
+              ref="taskId"
+              placeholder="taskId"
+              value={this.state.taskIdInput}
+              label={<span>Enter <code>TaskId</code></span>}
+              bsStyle={invalidInput ? 'error' : null}
+              onChange={this.handleTaskIdInputChange}
+              hasFeedback
+              labelClassName="col-sm-2"
+              wrapperClassName="col-sm-10"/>
+
+            <div className="form-group">
+              <div className="col-sm-offset-2 col-sm-10">
+                <input type="submit"
+                    className="btn btn-primary"
+                    disabled={!this.state.statusLoaded || invalidInput}
+                    value="Inspect task"/>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-sm-4">
+            <PreviousTasks objectId={this.state.taskId} objectType="taskId"/>
           </div>
         </div>
       </form>

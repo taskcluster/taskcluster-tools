@@ -5,6 +5,7 @@ var taskcluster     = require('taskcluster-client');
 var _               = require('lodash');
 var TaskView        = require('../lib/ui/taskview');
 var format          = require('../lib/format');
+var PreviousTasks   = require('../lib/ui/previoustasks');
 
 /** Renders task-graph-inspector with a control to enter `taskGraphId` into */
 var TaskGraphInspector = React.createClass({
@@ -243,23 +244,33 @@ var TaskGraphInspector = React.createClass({
         This tool lets you inspect a task-graph given the <code>taskGraphId</code>
       </p>
       <form className="form-horizontal" onSubmit={this.handleSubmit}>
-        <bs.Input
-          type="text"
-          ref="taskGraphId"
-          placeholder="taskGraphId"
-          value={this.state.taskGraphIdInput}
-          label={<span>Enter <code>TaskGraphId</code></span>}
-          bsStyle={invalidInput ? 'error' : null}
-          onChange={this.handleTaskGraphIdInputChange}
-          hasFeedback
-          labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"/>
-        <div className="form-group">
-          <div className="col-sm-offset-3 col-sm-9">
-            <input type="submit"
-                   className="btn btn-primary"
-                   disabled={!this.state.taskGraphLoaded || invalidInput}
-                   value="Inspect task-graph"/>
+        <div className="list">
+          <div className="col-sm-9">
+            <bs.Input
+              type="text"
+              ref="taskGraphId"
+              placeholder="taskGraphId"
+              value={this.state.taskGraphIdInput}
+              label={<span>Enter <code>TaskGraphId</code></span>}
+              bsStyle={invalidInput ? 'error' : null}
+              onChange={this.handleTaskGraphIdInputChange}
+              hasFeedback
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9"/>
+
+            <div className="col-sm-offset-3 col-sm-9">
+              <input type="submit"
+                className="btn btn-primary"
+                disabled={!this.state.taskGraphLoaded || invalidInput}
+                value="Inspect task-graph"/>
+            </div>
+          </div>
+
+          <div className="col-sm-3">
+            <PreviousTasks objectId={this.state.taskGraphId} objectType="taskGraphId"/>
+          </div>
+
+          <div className="form-group">
           </div>
         </div>
       </form>
