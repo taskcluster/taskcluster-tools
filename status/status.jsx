@@ -132,6 +132,21 @@ let otherServices = [
 
       cb(true);
     }
+  },
+  {
+    name: "Heroku",
+    description: "https://status.heroku.com/",
+    link: "https://status.heroku.com/",
+    poll: function(cb) {
+      Promise.resolve(makeRequest({
+        url: 'https://status.heroku.com/feed'
+      }))
+      .then(data => cb(!data.length || data[0].title.startsWith('Resolved')))
+      .catch(err => {
+        console.log(err || err.stack);
+        cb(false);
+      });
+    }
   }
 ];
 
