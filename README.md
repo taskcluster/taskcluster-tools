@@ -11,6 +11,21 @@ for details.
 Developing TaskCluster Tools
 ============================
 
+Prerequisites for building TaskCluster Tools
+--------------------------------------------
+  - Node version 4.x
+  - Grunt-cli (Allows you to test and see the changes)
+  - Jade (installed as one of the dependencies)
+
+Building
+--------
+
+``` sh
+git clone https://github.com/taskcluster/taskcluster-tools.git
+cd taskcluster-tools
+npm install
+```
+
 Code Organization
 -----------------
   - lib/    (code intended for reuse)
@@ -30,7 +45,7 @@ Testing changes
 ---------------
 Install the dependencies needed for grunt and start it up:
 * npm install
-* grunt develop
+* grunt develop or (./node_modules/.bin/grunt develop)
 
 Grunt allows you to test and see your changes.
 The grunt default task builds, watches sources and serves them from
