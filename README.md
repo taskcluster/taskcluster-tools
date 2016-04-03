@@ -45,9 +45,14 @@ Install the dependencies needed for grunt and start it up:
 * npm install
 * grunt develop or (./node_modules/.bin/grunt develop)
 
+```
+Note: "grunt develop --force" allows grunt not to bail out when you save a syntax error or something similarly harmless.
+```
 Grunt allows you to test and see your changes.
 The grunt default task builds, watches sources and serves them from
 `http://localhost:9000`.
+
+
 
 Available targets
 -----------------
@@ -81,3 +86,7 @@ For using ngrok:
   - Create an account (free) on [ngrok](https://ngrok.com/).
   - Install ngrok - npm install ngrok
   - Run ngrok - ngrok http 9000
+
+```
+Note: You have to run ngrok in a separate terminal/console.
+```
