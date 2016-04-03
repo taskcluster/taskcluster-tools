@@ -14,12 +14,6 @@ Developing TaskCluster Tools
 Prerequisites for building TaskCluster Tools
 --------------------------------------------
   - Node version 4.x
-  - Grunt-cli (Allows you to test and see the changes)
-  - Jade (installed as one of the dependencies)
-
-```
-Note:  Grunt-cli and Jade will be installed as dependencies when you run "npm install".
-```
 
 Building
 --------
