@@ -17,10 +17,14 @@ Prerequisites for building TaskCluster Tools
   - Grunt-cli (Allows you to test and see the changes)
   - Jade (installed as one of the dependencies)
 
+```
+Note:  Grunt-cli and Jade will be installed as dependencies when you run "npm install".
+```
+
 Building
 --------
 
-``` sh
+```
 git clone https://github.com/taskcluster/taskcluster-tools.git
 cd taskcluster-tools
 npm install
@@ -73,3 +77,13 @@ Testing
 -------
 Until someone comes up with something better, which probably involves redux or similar,
 all testing is manual. Open the tools and check that they work.
+
+
+Ngrok Setup (optional)
+-----------
+Ngrok allows you to expose a web server running on your local machine to the internet.
+Ngrok is used creating a https connection, so that you can login to the taskcluster-tools.
+For using ngrok:
+  - Create an account (free) on [ngrok](https://ngrok.com/).
+  - Install ngrok - npm install ngrok
+  - Run ngrok - ngrok http 9000
