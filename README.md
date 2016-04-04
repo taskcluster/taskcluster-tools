@@ -11,6 +11,19 @@ for details.
 Developing TaskCluster Tools
 ============================
 
+Prerequisites for building TaskCluster Tools
+--------------------------------------------
+  - Node version 4.x
+
+Building
+--------
+
+```
+git clone https://github.com/taskcluster/taskcluster-tools.git
+cd taskcluster-tools
+npm install
+```
+
 Code Organization
 -----------------
   - lib/    (code intended for reuse)
@@ -30,11 +43,16 @@ Testing changes
 ---------------
 Install the dependencies needed for grunt and start it up:
 * npm install
-* grunt develop
+* grunt develop or (./node_modules/.bin/grunt develop)
 
+```
+Note: "grunt develop --force" allows grunt not to bail out when you save a syntax error or something similarly harmless.
+```
 Grunt allows you to test and see your changes.
 The grunt default task builds, watches sources and serves them from
 `http://localhost:9000`.
+
+
 
 Available targets
 -----------------
@@ -58,3 +76,17 @@ Testing
 -------
 Until someone comes up with something better, which probably involves redux or similar,
 all testing is manual. Open the tools and check that they work.
+
+
+Ngrok Setup (optional)
+-----------
+Ngrok allows you to expose a web server running on your local machine to the internet.
+Ngrok is used creating a https connection, so that you can login to the taskcluster-tools.
+For using ngrok:
+  - Create an account (free) on [ngrok](https://ngrok.com/).
+  - Install ngrok - npm install ngrok
+  - Run ngrok - ngrok http 9000
+
+```
+Note: You have to run ngrok in a separate terminal/console.
+```
