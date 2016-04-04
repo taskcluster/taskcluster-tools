@@ -18,7 +18,7 @@
     "slugid":                           "^1.1.0",
     "moment":                           "^2.11.1",
     "marked":                           "^0.3.5",
-    "taskcluster-client":               "^0.23.13",
+    "taskcluster-client":               "0.23.13",
     "react-bootstrap":                  "^0.28.2",
     "bootstrap":                        "^3.3.6",
     "jquery":                           "^2.2.0",
