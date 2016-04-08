@@ -18,7 +18,7 @@
     "codemirror": "^5.11.0",
     "concat-stream": "1.4.6",
     "debug": "^2.0.0",
-    "docker-exec-websocket-server": "^1.1.0",
+    "docker-exec-websocket-server": "1.1.0",
     "durable-json-lint": "0.0.1",
     "envify": "^3.4.0",
     "exorcist": "0.1.6",
