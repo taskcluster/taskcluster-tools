@@ -44,14 +44,46 @@ var GraphView = React.createClass({
     this.renderer = this.sig.addRenderer({
       type: "canvas",
       container: "graph-container",
-      labelThreshold: 10
-    });
-    var props = this.props;
-    this.sig.bind('clickNode', function (e) {
-      props.clickNode(e.data.node.id);
+      labelThreshold: 14
     });
     this.sig.startForceAtlas2({worker:true,barnesHutOptimize:false});
+
+    var props = this.props, sig = this.sig;
+    var refreshNodes = function () {
+      sig.graph.nodes().forEach(function (node) {
+        node.color = node.originalColor;
+        node.borderColor = node.originalBorderColor;
+      });
+    }
+    // Handle click
+    this.sig.bind('clickNode', function (e) {
+      //Display task view
+      props.clickNode(e.data.node.id);
+      //Colour neighbour nodes
+      var centerNode = e.data.node;
+      sig.graph.nodes().forEach(function (node) {
+        if(centerNode.dependents.indexOf(node.id)!== -1){
+          node.color = '#ADD8E6';
+          node.borderColor = '#0000A0';
+        }else{
+          node.color = '#d3d3d3';
+          node.borderColor = '#a3a3a3';
+        }
+        if(node.id === centerNode.id){
+          node.color = '#ADD8E6';
+          node.borderColor = '#0000A0';
+        }
+      });
+      sig.refresh();
+    });
+
+    this.sig.bind('clickStage',function (e) {
+      refreshNodes();
+      sig.refresh();
+    });
+
     this.sig.refresh();
+    setTimeout(this.sig.stopForceAtlas2,50);
   },
 
   render: function() {
@@ -81,11 +113,13 @@ var buildGraph = function (tasks) {
       label: task.name,
       x: Math.random(),
       y: Math.random(),
-      size: 3 + 0.7*task.dependents.length,
+      size: 5 + 0.7*task.dependents.length,
       color: COLOR[task.state],
-      borderWidth : 2+0.2*task.dependents.length,
-      borderColor: task.satisfied? '#009402' :  '#e7cc25'
-
+      originalColor: COLOR[task.state],
+      borderWidth : 4+0.2*task.dependents.length,
+      borderColor: task.satisfied? '#009402' :  '#e7cc25',
+      originalBorderColor: task.satisfied? '#009402' :  '#e7cc25',
+      dependents: task.dependents
     });
     task.dependents.forEach(function (dep) {
       graph.edges.push({
