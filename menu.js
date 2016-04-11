@@ -83,7 +83,7 @@ module.exports = [
     icon:           'sitemap',
     display:        true,
     description: [
-      "The generic index browser let's you browse through the hierarchy of",
+      "The generic index browser lets you browse through the hierarchy of",
       "namespaces in the index, and discover indexed tasks."
     ].join('\n')
   },
@@ -93,7 +93,7 @@ module.exports = [
     icon:           'folder-open',
     display:        true,
     description: [
-      "The indexed artifact browser, let's you easily view the artifacts",
+      "The indexed artifact browser lets you easily view the artifacts",
       "from the latest run of an indexed task."
     ].join('\n')
   },
