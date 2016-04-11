@@ -84,7 +84,7 @@ var PreviousTasks = React.createClass({
 
     return (
       <span>
-        <strong>Previous Tasks</strong>
+        <strong>Previously Viewed Tasks</strong>
         <ul>
           {rows}
         </ul>
