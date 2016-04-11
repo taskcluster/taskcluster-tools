@@ -6,134 +6,8 @@ var _               = require('lodash');
 var TaskView        = require('../lib/ui/taskview');
 var format          = require('../lib/format');
 var PreviousTasks   = require('../lib/ui/previoustasks');
-
-/** Graph methods*/
-var COLOR = {
-  completed: '#4ad24a',
-  unscheduled: '#abb0ab',
-  scheduled: '#77f077',
-  failed: '#ff4d5f',
-  exception: '#ecbe00'
-}
-
-sigma.canvas.nodes.border = function (node, context, settings) {
-  var prefix = settings('prefix') || '';
-  context.fillStyle = node.color || settings('defaultNodeColor');
-  context.beginPath();
-  context.arc(
-    node[prefix + 'x'],
-    node[prefix + 'y'],
-    node[prefix + 'size'],
-    0,
-    Math.PI * 2,
-    true
-  );
-
-  context.closePath();
-  context.fill();
-
-  // Adding a border
-  context.lineWidth = node.borderWidth || 1;
-  context.strokeStyle = node.borderColor || '#fff';
-  context.stroke();
-}
-
-var GraphView = React.createClass({
-  componentDidMount: function () {
-    this.sig = this.props.sigma;
-    this.renderer = this.sig.addRenderer({
-      type: "canvas",
-      container: "graph-container",
-      labelThreshold: 14
-    });
-    this.sig.startForceAtlas2({worker:true,barnesHutOptimize:false});
-
-    var props = this.props, sig = this.sig;
-    var refreshNodes = function () {
-      sig.graph.nodes().forEach(function (node) {
-        node.color = node.originalColor;
-        node.borderColor = node.originalBorderColor;
-      });
-    }
-    // Handle click
-    this.sig.bind('clickNode', function (e) {
-      //Display task view
-      props.clickNode(e.data.node.id);
-      //Colour neighbour nodes
-      var centerNode = e.data.node;
-      sig.graph.nodes().forEach(function (node) {
-        if(centerNode.dependents.indexOf(node.id)!== -1){
-          node.color = '#ADD8E6';
-          node.borderColor = '#0000A0';
-        }else{
-          node.color = '#d3d3d3';
-          node.borderColor = '#a3a3a3';
-        }
-        if(node.id === centerNode.id){
-          node.color = '#ADD8E6';
-          node.borderColor = '#0000A0';
-        }
-      });
-      sig.refresh();
-    });
-
-    this.sig.bind('clickStage',function (e) {
-      refreshNodes();
-      sig.refresh();
-    });
-
-    this.sig.refresh();
-    setTimeout(this.sig.stopForceAtlas2,50);
-  },
-
-  render: function() {
-    return (
-      <div id="graph-container"></div>
-    );
-  },
-
-  componentWillUnmount: function() {
-    this.sig.killRenderer(this.renderer);
-  },
-});
-
-var buildGraph = function (tasks) {
-  if(!tasks){
-    return {};
-  }
-
-  var graph = {
-    nodes: [],
-    edges: []
-  }
-
-  tasks.forEach(function (task) {
-    graph.nodes.push({
-      id: task.taskId,
-      label: task.name,
-      x: Math.random(),
-      y: Math.random(),
-      size: 5 + 0.7*task.dependents.length,
-      color: COLOR[task.state],
-      originalColor: COLOR[task.state],
-      borderWidth : 4+0.2*task.dependents.length,
-      borderColor: task.satisfied? '#009402' :  '#e7cc25',
-      originalBorderColor: task.satisfied? '#009402' :  '#e7cc25',
-      dependents: task.dependents
-    });
-    task.dependents.forEach(function (dep) {
-      graph.edges.push({
-        id: task.taskId+' '+dep,
-        source: task.taskId,
-        target: dep,
-        type: 'arrow',
-        size: 50
-      });
-    });
-  });
-
-  return graph;
-}
+var buildGraph      = require('./graphfunctions');
+var GraphView       = require('./GraphView.jsx');
 
 /** Renders task-graph-inspector with a control to enter `taskGraphId` into */
 var TaskGraphInspector = React.createClass({
@@ -177,7 +51,8 @@ var TaskGraphInspector = React.createClass({
       taskGraphLoaded:    true,
       taskGraphError:     undefined,
       taskGraph:          null,
-      taskGraphIdInput:   ''
+      taskGraphIdInput:   '',
+      showGraph: false
       // Remark we'll cache task status structures under
       // 'task/<taskId>/status' as arrive from messages or when we load a
       // a task...
@@ -430,15 +305,7 @@ var TaskGraphInspector = React.createClass({
     if (source.length > 90) {
       source = "..." + source.substr(8 - 90);
     }
-
-    var sig = new sigma ({
-      graph: buildGraph(this.state.taskGraph.tasks),
-      settings: {
-        defaultNodeType: 'border',
-        labelThreshold: 8,
-        defaultArrowSize: 3
-      }
-    });
+    var graph = buildGraph(this.state.taskGraph.tasks);
 
     return (
       <span>
@@ -490,7 +357,11 @@ var TaskGraphInspector = React.createClass({
         </dd>
         <dt>TaskGraphId</dt>
         <dd><code>{taskGraph.status.taskGraphId}</code></dd>
-        <GraphView sigma={sig} clickNode={this.handleSelectTask} />
+        <input type="checkbox" checked = {this.state.showGraph}
+          onChange={this.handleShowGraphChange} /><label>Show Graph</label>
+        <div>
+        { this.state.showGraph?<GraphView graph={graph} clickNode={this.handleSelectTask} labelThreshold={14}/>:''}
+        </div>
       </dl>
       {this.renderTaskTable()}
       <hr/>
@@ -628,6 +499,11 @@ var TaskGraphInspector = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
     this.setState({taskGraphId: this.state.taskGraphIdInput});
+  },
+
+  /** handle show graph change */
+  handleShowGraphChange: function (e) {
+    this.setState({showGraph: !this.state.showGraph});
   }
 });
 
