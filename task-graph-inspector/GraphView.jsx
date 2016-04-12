@@ -1,5 +1,6 @@
 import React from 'react'
 import _ from 'lodash'
+import {findIndependentNodes} from '../lib/graph/builder/cluster'
 
 sigma.canvas.nodes.border = function (node, context, settings) {
   var prefix = settings('prefix') || '';
@@ -33,6 +34,7 @@ export default class GraphView extends React.Component {
     this.runForceAtlas2 = this.runForceAtlas2.bind(this);
     this.clickNode = this.clickNode.bind(this);
     this.clickStage = this.clickStage.bind(this);
+    this.toggleShowIndependentTasks = this.toggleShowIndependentTasks.bind(this);
 
     this.sigma = new sigma({
       graph: props.graph,
@@ -41,6 +43,9 @@ export default class GraphView extends React.Component {
       }
     });
 
+    this.independentNodes = findIndependentNodes(props.graph);
+
+    this.state = {showIndependentTasks: true};
     this.runForceAtlas2(props.forceAtlas2Timeout);
 
     this.sigma.bind('clickNode',this.clickNode);
@@ -62,7 +67,13 @@ export default class GraphView extends React.Component {
   }
 
   render(){
-    return <div id="graph-container"></div>
+    return (
+      <div>
+        <input type="checkbox" onChange={this.toggleShowIndependentTasks} checked={this.state.showIndependentTasks}/>
+        <label>Show independent tasks</label>
+        <div id="graph-container"></div>
+      </div>
+      )
   }
 
   refreshNodes(){
@@ -113,6 +124,21 @@ export default class GraphView extends React.Component {
 
   clickStage(e){
     this.refreshNodes();
+    this.sigma.refresh();
+  }
+
+  toggleShowIndependentTasks(){
+    var show = !this.state.showIndependentTasks;
+    if(show){
+      this.independentNodes.forEach((node)=>{
+        this.sigma.graph.addNode(node);
+      });
+    }else{
+      this.independentNodes.forEach((node)=>{
+        this.sigma.graph.dropNode(node.id);
+      });
+    }
+    this.setState({showIndependentTasks:show});
     this.sigma.refresh();
   }
 }

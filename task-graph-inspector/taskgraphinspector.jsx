@@ -6,7 +6,7 @@ var _               = require('lodash');
 var TaskView        = require('../lib/ui/taskview');
 var format          = require('../lib/format');
 var PreviousTasks   = require('../lib/ui/previoustasks');
-var buildGraph      = require('./graphfunctions');
+var buildGraph      = require('../lib/graph/builder/build');
 var GraphView       = require('./GraphView.jsx');
 
 /** Renders task-graph-inspector with a control to enter `taskGraphId` into */
