@@ -70,7 +70,7 @@ export default class GraphView extends React.Component {
     return (
       <div>
         <input type="checkbox" onChange={this.toggleShowIndependentTasks} checked={this.state.showIndependentTasks}/>
-        <label>Show independent tasks</label>
+        <label>Show lone tasks</label>
         <div id="graph-container"></div>
       </div>
       )
