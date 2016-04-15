@@ -25,6 +25,17 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Task Group Inspector",
+    link:           '/task-group-inspector/',
+    icon:           'cubes',
+    display:        true,
+    description: [
+      "Inspect task groups, monitor progress, view dependencies, states and",
+      "inspect the individual tasks that makes up the task group using the",
+      "embedded task-inspector."
+    ].join('\n')
+  },
+  {
     title:          "Task Creator",
     link:           '/task-creator/',
     icon:           'pencil-square-o',

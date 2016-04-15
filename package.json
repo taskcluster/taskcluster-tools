@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "test": "grunt build",
-    "deploy": "grunt publish -q"
+    "deploy": "grunt publish -q",
+    "start": "grunt"
   },
   "repository": {
     "type": "git",
