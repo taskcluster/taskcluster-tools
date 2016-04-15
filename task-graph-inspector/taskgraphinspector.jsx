@@ -360,7 +360,7 @@ var TaskGraphInspector = React.createClass({
         <input type="checkbox" checked = {this.state.showGraph}
           onChange={this.handleShowGraphChange} /><label>Show Graph</label>
         <div>
-        { this.state.showGraph?<GraphView graph={graph} clickNode={this.handleSelectTask} labelThreshold={14}/>:''}
+        { this.state.showGraph?<GraphView graph={graph} clickNode={this.handleSelectTask} ref="graphVis"labelThreshold={14}/>:''}
         </div>
       </dl>
       {this.renderTaskTable()}
@@ -493,6 +493,9 @@ var TaskGraphInspector = React.createClass({
   /** Handle selection of a task */
   handleSelectTask: function(taskId) {
     this.setState({taskId: taskId});
+    if(this.refs['graphVis']){
+      this.refs['graphVis'].colorNode(taskId);
+    }
   },
 
   /** Handle form submission */

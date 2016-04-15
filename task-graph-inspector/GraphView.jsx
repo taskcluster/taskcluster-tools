@@ -116,6 +116,19 @@ export default class GraphView extends React.Component {
     });
   }
 
+  colorNode(id){
+    this.sigma.graph.nodes().forEach((node)=>{
+      if(node.id === id){
+        node.color = '#ADD8E6';
+        node.borderColor = '#0000A0';
+      }else{
+        node.color = '#d3d3d3';
+        node.borderColor = '#a3a3a3';
+      }
+    });
+    this.sigma.refresh();
+  }
+
   clickNode(e){
     this.props.clickNode(e.data.node.id);
     this.colorDependents(e.data.node);
