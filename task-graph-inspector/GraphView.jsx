@@ -71,7 +71,7 @@ export default class GraphView extends React.Component {
       <div>
         <input type="checkbox" onChange={this.toggleShowIndependentTasks} checked={this.state.showIndependentTasks}/>
         <label>Show lone tasks</label>
-        <div id="graph-container"></div>
+        <div id="graph-container" style={graphContainerStyle}></div>
       </div>
       )
   }
@@ -142,3 +142,7 @@ export default class GraphView extends React.Component {
     this.sigma.refresh();
   }
 }
+
+const graphContainerStyle = {
+  border: "2px solid #ddd"
+};
