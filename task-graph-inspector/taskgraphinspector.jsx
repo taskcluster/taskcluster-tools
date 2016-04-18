@@ -49,10 +49,16 @@ var TaskGraphInspector = React.createClass({
       taskGraphLoaded:    true,
       taskGraphError:     undefined,
       taskGraph:          null,
-      taskGraphIdInput:   ''
+      taskGraphIdInput:   '',
       // Remark we'll cache task status structures under
       // 'task/<taskId>/status' as arrive from messages or when we load a
       // a task...
+
+      //used for sorting
+      order:{
+        key:'',
+        asc:false
+      }
     };
   },
 
@@ -389,10 +395,10 @@ var TaskGraphInspector = React.createClass({
       <table className="table table-condensed task-graph-inspector-tasks">
         <thead>
           <tr>
-            <th>TaskId</th>
-            <th>Name</th>
-            <th>State</th>
-            <th>Satisfied</th>
+            <th onClick={()=>this.sortBy('taskId')}>TaskId</th>
+            <th onClick={()=>this.sortBy('name')}>Name</th>
+            <th onClick={()=>this.sortBy('state')}>State</th>
+            <th onClick={()=>this.sortBy('satisfied')}>Satisfied</th>
             <th>Reruns</th>
             <th>Relation</th>
           </tr>
@@ -490,9 +496,30 @@ var TaskGraphInspector = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
     this.setState({taskGraphId: this.state.taskGraphIdInput});
+  },
+
+  /** Sort by columns
+  TaskId
+  Name
+  State
+  Satisfied
+  Reruns
+  Relation
+  */
+  sortBy: function(col){
+    var tasks = _.map(this.state.taskGraph.tasks, _.clone);
+    var order = _.clone(this.state.order);
+    if(order.key == col){
+      order.asc=!order.asc;
+    }else{
+      order.key=col;
+      order.asc = true;
+    }
+    tasks = _.orderBy(tasks,[col],[(order.asc)?'asc':'desc']);
+    var newState = _.assign({},this.state.taskGraph,{tasks:tasks});
+    this.setState({taskGraph: newState, order:order});
   }
 });
 
 // Export TaskGraphInspector
 module.exports = TaskGraphInspector;
-
