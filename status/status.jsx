@@ -3,6 +3,7 @@ const bs = require('react-bootstrap');
 const path = require('path');
 const $ = require('jquery');
 const WWW_Authenticate = require('www-authenticate').parsers.WWW_Authenticate;
+const ReactTooltip = require("react-tooltip");
 
 // Make a request to the cors proxy service
 function makeRequest(options, allowHeaders = []) {
@@ -34,25 +35,35 @@ function dummyPoll(cb) {
 let taskclusterServices = [
   {
     name: "Queue",
-    poll: pollTaskclusterService.bind(null, "https://queue.taskcluster.net/v1/ping")
+    poll: pollTaskclusterService.bind(null, "https://queue.taskcluster.net/v1/ping"),
+    link: "https://queue.taskcluster.net/v1/ping",
+    description: "queue.taskcluster.net"
   },
   {
-    name: "Provisioner",
-    poll: pollTaskclusterService.bind(null, "https://aws-provisioner.taskcluster.net/v1/ping")
+    name: "AWS Provisioner",
+    poll: pollTaskclusterService.bind(null, "https://aws-provisioner.taskcluster.net/v1/ping"),
+    link: "https://aws-provider.taskcluster.net/v1/ping",
+    description: "aws-provisioner.taskcluster.net"
   },
   {
     name: "Index",
-    poll: pollTaskclusterService.bind(null, "https://index.taskcluster.net/v1/ping")
+    poll: pollTaskclusterService.bind(null, "https://index.taskcluster.net/v1/ping"),
+    link: "https://index.taskcluster.net/v1/ping",
+    description: "index.taskcluster.net"
   },
   {
     name: "Scheduler",
-    poll: pollTaskclusterService.bind(null, "https://scheduler.taskcluster.net/v1/ping")
+    poll: pollTaskclusterService.bind(null, "https://scheduler.taskcluster.net/v1/ping"),
+    link: "https://scheduler.taskcluster.net/v1/ping",
+    description: "https://scheduler.taskcluster.net"
   }
 ];
 
 let otherServices = [
   {
     name: "AWS",
+    description: "Amazon Elastic Compute Cloud (Oregon)",
+    link: "http://status.aws.amazon.com/",
     poll: async function(cb) {
       try {
         let data = await Promise.resolve(makeRequest({
@@ -75,6 +86,8 @@ let otherServices = [
   },
   {
     name: "Docker Registry",
+    description: "Docker images provider",
+    link: "https://index.docker.io/",
 
     // Authentication procedure is described at
     // https://docs.docker.com/registry/spec/auth/token/
@@ -134,6 +147,12 @@ export let StatusChecker = React.createClass({
 });
 
 export let Service = React.createClass({
+  propTypes: {
+    name: React.PropTypes.string.isRequired,
+    description: React.PropTypes.string.isRequired,
+    link: React.PropTypes.string.isRequired,
+    poll: React.PropTypes.func.isRequired
+  },
   getInitialState() {
     let intervalId = setInterval(this.props.poll.bind(this, serviceUp => {
       this.setState({up: serviceUp});
@@ -147,8 +166,15 @@ export let Service = React.createClass({
   render: function() {
     return (
       <div className="form-horizontal service-status-container">
-        <label className="service-status"><StatusChecker up={this.state.up}/></label>
-        <label className="service-status">{this.props.name}</label>
+        <a target="_blank" href={this.props.link}>
+          <div data-tip data-for={this.props.name}>
+            <label className="service-status"><StatusChecker up={this.state.up}/></label>
+            <label className="service-status">{this.props.name}</label>
+          </div>
+        </a>
+        <ReactTooltip id={this.props.name} place="top" type="info" effect="float">
+          <span>{this.props.description}</span>
+        </ReactTooltip>
       </div>
     );
   }
@@ -157,17 +183,27 @@ export let Service = React.createClass({
 export let ServiceGroup = React.createClass({
   PropTypes: {
     name: React.PropTypes.string.isRequired,
-    services: React.PropTypes.array.isRequired
+    services: React.PropTypes.array.isRequired,
+    description: React.PropTypes.string.isRequired
   },
   render() {
     return (
       <div>
-        <h2>{this.props.name}</h2>
+        <h2 data-tip data-for={this.props.name}>{this.props.name}</h2>
         <bs.ButtonToolbar>
           {this.props.services.map(service => {
-            return <Service name={service.name} key={service.name} poll={service.poll}/>;
+            return <Service
+              name={service.name}
+              key={service.name}
+              poll={service.poll}
+              description={service.description}
+              link={service.link}
+            />;
           })}
         </bs.ButtonToolbar>
+        <ReactTooltip id={this.props.name} place="top" type="info" effect="float">
+          <span>{this.props.description}</span>
+        </ReactTooltip>
       </div>
     );
   }
@@ -193,8 +229,8 @@ export let TaskclusterDashboard  = React.createClass({
     return (
       <bs.Row>
         <TaskclusterStatus/>
-        <ServiceGroup name="Taskcluster" services={taskclusterServices}/>
-        <ServiceGroup name="Services" services={otherServices}/>
+        <ServiceGroup name="Taskcluster" services={taskclusterServices} description="Taskcluster services"/>
+        <ServiceGroup name="Services" services={otherServices} description="External services Taskcluster depends on"/>
       </bs.Row>
     );
   }
