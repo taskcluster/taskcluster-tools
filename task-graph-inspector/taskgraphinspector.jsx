@@ -56,8 +56,8 @@ var TaskGraphInspector = React.createClass({
 
       //used for sorting
       order:{
-        key:'',
-        asc:false
+        key:              '',
+        asc:              false
       }
     };
   },
@@ -506,7 +506,7 @@ var TaskGraphInspector = React.createClass({
   Reruns
   Relation
   */
-  sortBy: function(col){
+  sortBy: function(col) {
     var tasks = _.map(this.state.taskGraph.tasks, _.clone);
     var order = _.clone(this.state.order);
     if(order.key == col){
