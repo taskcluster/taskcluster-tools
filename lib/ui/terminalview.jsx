@@ -3,20 +3,20 @@ var utils           = require('../utils');
 var log_fetcher     = require('./log-fetcher.js');
 
 var Viewer = React.createClass({
-    getDefaultProps: function(){
+    getDefaultProps(){
         return {
             cols: 120,
             rows: 20,
         };
     },
 
-    getInitialState: function(){
+    getInitialState(){
         return {
             fromBottom: 0
         };
     },
 
-    scrollbarHeight: function(){
+    scrollbarHeight(){
         if(!this.refs.buffer) return 0;
         var ratio = this.props.rows / this.props.lines.length;
         if(ratio > 1) ratio = 1;
@@ -24,14 +24,14 @@ var Viewer = React.createClass({
         return Math.max(height, 10);
     },
 
-    scrollbarMargin: function(){
+    scrollbarMargin(){
         if(!this.refs.buffer) return 0;
         var ratio = (this.props.lines.length - this.state.fromBottom - this.props.rows)
                     / this.props.lines.length;
         return ratio * (this.refs.buffer.offsetHeight - this.scrollbarHeight());
     },
 
-    scrollbarSet: function(newState){
+    scrollbarSet(newState){
         newState = Math.floor(newState);
         newState = Math.max(0, newState);
         newState = Math.min(this.props.lines.length - this.props.rows, newState);
@@ -39,16 +39,16 @@ var Viewer = React.createClass({
             this.setState({fromBottom: newState});
     },
 
-    scrollbarMove: function(dist){
+    scrollbarMove(dist){
         this.scrollbarSet(this.state.fromBottom - dist);
     },
 
-    onMouseWheel: function(e){
+    onMouseWheel(e){
         e.preventDefault();
         this.scrollbarMove(Math.sign(e.deltaY));
     },
 
-    onMouseMove: function(e){
+    onMouseMove(e){
         if(this.dragging){
             var diff = e.pageY - this.startY;
             var space = this.refs.buffer.offsetHeight;
@@ -58,7 +58,7 @@ var Viewer = React.createClass({
         }
     },
 
-    onMouseDown: function(e){
+    onMouseDown(e){
         e.preventDefault();
         if(e.button == 0){
             this.dragging = true;
@@ -68,18 +68,18 @@ var Viewer = React.createClass({
         }
     },
 
-    onMouseUp: function(e){
+    onMouseUp(e){
         if(e.button == 0)
             this.dragging = false;
     },
 
-    componentDidMount: function(){
+    componentDidMount(){
         this.refs.scrollbar.addEventListener('mousedown', this.onMouseDown);
         window.addEventListener('mouseup', this.onMouseUp);
         window.addEventListener('mousemove', this.onMouseMove);
     },
 
-    render: function(){
+    render(){
         var start = this.props.lines.length - this.state.fromBottom - this.props.rows;
         if(start < 0) start = 0;
         var frame = this.props.lines.slice(start, start + this.props.rows);
@@ -112,7 +112,7 @@ var TerminalView = React.createClass({
     })
   ],
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return {
       url:            undefined,  // No URL to display at this point
       cols: 90,
@@ -120,7 +120,7 @@ var TerminalView = React.createClass({
     };
   },
 
-  getInitialState: function(){
+  getInitialState(){
     return {
       lines: ['one', 'two', 'three', 'testing...']
     };
@@ -131,12 +131,12 @@ var TerminalView = React.createClass({
   },
 
   // Refresh the currently displayed file
-  refresh: function() {
+  refresh() {
     this.open();
   },
 
   /** Open a URL in the terminal */
-  open: function() {
+  open() {
     // Abort previous request if any
     if (this.request) {
       this.abortRequest();
@@ -154,7 +154,7 @@ var TerminalView = React.createClass({
     this.worker.postMessage({url: this.props.url, cols: this.props.cols});
   },
 
-  onData: function(e) {
+  onData(e) {
     var response = e.data;
 
     // Write data to term if there is any data
@@ -162,20 +162,20 @@ var TerminalView = React.createClass({
         this.setState({lines : response.data});
   },
 
-  abortRequest: function() {
+  abortRequest() {
     if(this.worker){
         this.worker.postMessage({abort: true});
         this.worker = null;
     }
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     if (this.worker) {
       this.abortRequest();
     }
   },
 
-  render: function() {
+  render() {
     return <Viewer rows={this.props.rows} cols={this.props.cols}
                    lines={this.state.lines}/>;
   }
