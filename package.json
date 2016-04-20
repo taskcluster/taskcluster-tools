@@ -58,7 +58,7 @@
     "rison": "^0.1.1",
     "shell-escape": "^0.2.0",
     "slugid": "^1.1.0",
-    "taskcluster-client": "^0.23.16",
+    "taskcluster-client": "^0.23.17",
     "term.js": "0.0.4",
     "www-authenticate": "^0.6.2"
   },
