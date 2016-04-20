@@ -28,11 +28,13 @@ var WorkerTypeRow = React.createClass({
 
   propTypes: {
     provisionerId: React.PropTypes.string.isRequired,
-    workerType: React.PropTypes.string.isRequired,
-    awsState: React.PropTypes.shape({
-      running: React.PropTypes.arrayOf(React.PropTypes.object),
-      pending: React.PropTypes.arrayOf(React.PropTypes.object),
-      spotReq: React.PropTypes.arrayOf(React.PropTypes.object),
+    workerType: React.PropTypes.shape({
+      workerType: React.PropTypes.string.isRequired,
+      minCapacity: React.PropTypes.number.isRequired,
+      maxCapacity: React.PropTypes.number.isRequired,
+      requestedCapacity: React.PropTypes.number.isRequired,
+      pendingCapacity: React.PropTypes.number.isRequired,
+      runningCapacity: React.PropTypes.number.isRequired,
     }).isRequired,
     selected: React.PropTypes.bool.isRequired,
     onClick: React.PropTypes.func.isRequired
@@ -43,9 +45,6 @@ var WorkerTypeRow = React.createClass({
       pendingTasks: {pendingTasks: 0},
       pendingTasksLoaded: false,
       pendingTasksError: undefined,
-      workerType: {},
-      workerTypeLoaded: false,
-      workerTypeError: undefined
     };
   },
 
@@ -53,43 +52,30 @@ var WorkerTypeRow = React.createClass({
     return {
       pendingTasks: this.queue.pendingTasks(
         this.props.provisionerId,
-        this.props.workerType
+        this.props.workerType.workerType
       ),
-      workerType: this.awsProvisioner.workerType(this.props.workerType)
     };
   },
 
   render() {
-    var waitFor = this.renderWaitFor('workerType') ||
-                  this.renderWaitFor('pendingTasks');
-    return waitFor ? (
-        <tr><td colSpan={3}>
-        {waitFor}
-        </td></tr>
-      ) : (
+    return (
       <tr
         onClick={this.props.onClick}
         className={this.props.selected ? 'active' : undefined}
         style={{cursor: 'pointer'}}>
-        <td><code>{this.props.workerType}</code></td>
+        <td><code>{this.props.workerType.workerType}</code></td>
         <td>
           <bs.OverlayTrigger placement='left' overlay={this.tooltip()}>
           {this.renderCapacityBar()}
           </bs.OverlayTrigger>
         </td>
-        <td>{this.state.pendingTasks.pendingTasks}</td>
+        <td>{this.state.pendingTasksLoaded ? this.state.pendingTasks.pendingTasks : "..."}</td>
       </tr>
     );
   },
 
   renderCapacityBar() {
-    // Without this try catch, we get no exception :(
-    try {
-      var p = this.doMath();
-    } catch (e) {
-      console.error(e);
-    }
-    //return <pre>{JSON.stringify(p, null, 2)}</pre>;
+    var p = this.doMath();
     let pgs = [];
     if (p.r) {
       pgs.push(
@@ -120,11 +106,10 @@ var WorkerTypeRow = React.createClass({
    * above 5% for the running, pending and requested numbers */
   doMath() {
     // Actual capacities
-    var runningCap = this.runningCapacity();
-    var pendingCap = this.pendingCapacity();
-    var spotReqCap = this.spotReqCapacity();
-
-    var maxCap = this.state.workerType.maxCapacity;
+    var runningCap = this.props.workerType.runningCapacity;
+    var pendingCap = this.props.workerType.pendingCapacity;
+    var spotReqCap = this.props.workerType.requestedCapacity;
+    var maxCap = this.props.workerType.maxCapacity;
 
     // We want to make sure that if a bar is there that it's visible
     var smallestCapUnit = maxCap * 0.05;
@@ -158,38 +143,14 @@ var WorkerTypeRow = React.createClass({
     };
   },
 
-  runningCapacity() {
-    return _.sumBy(this.props.awsState.running.map(instance => {
-      return _.find(this.state.workerType.instanceTypes, {
-        instanceType:     instance.type
-      });
-    }), 'capacity');
-  },
-
-  pendingCapacity() {
-    return _.sumBy(this.props.awsState.pending.map(instance => {
-      return _.find(this.state.workerType.instanceTypes, {
-        instanceType:     instance.type
-      });
-    }), 'capacity');
-  },
-
-  spotReqCapacity() {
-    return _.sumBy(this.props.awsState.spotReq.map(spotReq => {
-      return _.find(this.state.workerType.instanceTypes, {
-        instanceType:     spotReq.type
-      });
-    }), 'capacity');
-  },
-
   tooltip() {
     return (
-      <bs.Tooltip id={this.props.workerType}>
-        {this.props.workerType} has
-        running capacity to handle {this.runningCapacity()  || '0'} tasks,
-        pending instances to handle {this.pendingCapacity() || '0'} tasks, and
+      <bs.Tooltip id={this.props.workerType.workerType}>
+        {this.props.workerType.workerType} has
+        running capacity to handle {this.props.workerType.runningCapacity  || '0'} tasks,
+        pending instances to handle {this.props.workerType.pendingCapacity || '0'} tasks, and
         spot requests for capacity to
-        handle {this.spotReqCapacity()  || '0'} tasks in parallel.
+        handle {this.props.workerType.requestedCapacity  || '0'} tasks in parallel.
       </bs.Tooltip>
     );
   }
@@ -264,19 +225,15 @@ var WorkerTypeTable = React.createClass({
       // selected workerType identifier (string)
       // or 'create:worker-type' to indicate creation of workerType
       selected: '',
-      workerTypes: [],  // workerType identifier (string)
-      workerTypesLoaded: true,
-      workerTypesError: undefined,
-      awsState: {},
-      awsStateLoaded: true,
-      awsStateError: undefined,
+      workerTypeSummaries: [],
+      workerTypeSummariesLoaded: false,
+      workerTypeSummariesError: undefined,
     };
   },
 
   load() {
     return {
-      workerTypes: this.awsProvisioner.listWorkerTypes(),
-      awsState: this.awsProvisioner.awsState(),
+      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries(),
     };
   },
 
@@ -285,11 +242,9 @@ var WorkerTypeTable = React.createClass({
   },
 
   render() {
-    return this.renderWaitFor('workerTypes') ||
-           this.renderWaitFor('awsState') || (
-      <span>
-        {this.renderWorkerTypeTable()}
-        <bs.ButtonToolbar>
+    return <span>{
+      this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()
+      } <bs.ButtonToolbar>
           <bs.Button
             bsStyle='primary'
             onClick={this.setSelected.bind(this, 'create:worker-type')}
@@ -306,7 +261,6 @@ var WorkerTypeTable = React.createClass({
           )
         }
       </span>
-    );
   },
 
   renderWorkerTypeTable() {
@@ -321,20 +275,14 @@ var WorkerTypeTable = React.createClass({
         </thead>
         <tbody>
         {
-          this.state.workerTypes.map(workerType => {
-            // Find awsState for workerType
-            var awsState = this.state.awsState[workerType] || {
-              running: [],
-              pending: [],
-              spotReq: []
-            };
+          this.state.workerTypeSummaries.map(workerType => {
             return <WorkerTypeRow
-                      key={workerType}
+                      key={workerType.workerType}
                       provisionerId={this.props.provisionerId}
                       workerType={workerType}
-                      selected={this.state.selected === workerType}
-                      onClick={this.setSelected.bind(this, workerType)}
-                      awsState={awsState}/>;
+                      selected={this.state.selected === workerType.workerType}
+                      onClick={this.setSelected.bind(this, workerType.workerType)}
+                      summary={workerType}/>;
           })
         }
         </tbody>
@@ -343,16 +291,10 @@ var WorkerTypeTable = React.createClass({
   },
 
   renderWorkerTypeView() {
-    if (!_.includes(this.state.workerTypes, this.state.selected)) {
+    if (!_.find(this.state.workerTypeSummaries, {workerType: this.state.selected})) {
       return undefined;
     }
 
-    // Find awsState for workerType
-    var awsState = this.state.awsState[this.state.selected] || {
-      running: [],
-      pending: [],
-      spotReq: []
-    };
     return (
       <div style={{marginBottom: 50}}>
         <hr/>
@@ -360,11 +302,24 @@ var WorkerTypeTable = React.createClass({
         <WorkerTypeView
           provisionerId={this.props.provisionerId}
           workerType={this.state.selected}
-          awsState={awsState}
           hashEntry={this.nextHashEntry()}
-          reload={this.reload}/>
+          reload={this.reload}
+          updateSummary={this.updateSummary}/>
       </div>
     );
+  },
+
+  updateSummary(workerType, summary) {
+    console.log("updateSummary", workerType, summary);
+    var workerTypeSummaries = this.state.workerTypeSummaries.map(function(wt) {
+      if (wt.workerType === workerType) {
+        // work around https://github.com/taskcluster/aws-provisioner/pull/70
+        return _.assign({workerType: workerType}, summary);
+      } else {
+        return wt;
+      }
+    });
+    this.setState({workerTypeSummaries: workerTypeSummaries});
   },
 
   renderWorkerTypeCreator() {

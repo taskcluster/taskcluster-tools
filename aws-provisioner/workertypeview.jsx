@@ -11,9 +11,9 @@ var WorkerTypeResources = React.createClass({
   propTypes: {
     workerType: React.PropTypes.object.isRequired,
     awsState: React.PropTypes.shape({
-      running: React.PropTypes.arrayOf(React.PropTypes.object),
-      pending: React.PropTypes.arrayOf(React.PropTypes.object),
-      spotReq: React.PropTypes.arrayOf(React.PropTypes.object),
+      instances: React.PropTypes.arrayOf(React.PropTypes.object),
+      internalTrackedRequests: React.PropTypes.arrayOf(React.PropTypes.object),
+      requests: React.PropTypes.arrayOf(React.PropTypes.object),
     }).isRequired
   },
 
@@ -22,7 +22,7 @@ var WorkerTypeResources = React.createClass({
       <span>
         <h3>Running Instances</h3>
         We have&nbsp;
-        {this.props.awsState.running.length}
+        {this.props.awsState.instances.length}
         &nbsp;instances running with total capacity of {this.runningCapacity()}.
         <bs.Table>
           <thead>
@@ -37,12 +37,12 @@ var WorkerTypeResources = React.createClass({
           </thead>
           <tbody>
           {
-            this.props.awsState.running.map(this.renderInstanceRow)
+            this.props.awsState.instances.map(this.renderInstanceRow)
           }
           </tbody>
         </bs.Table>
         <h3>Pending Instances</h3>
-        We have {this.props.awsState.pending.length}
+        We have {this.props.awsState.internalTrackedRequests.length}
         &nbsp;instances starting up with total capacity of&nbsp;
         {this.pendingCapacity()}.
         <bs.Table>
@@ -58,13 +58,13 @@ var WorkerTypeResources = React.createClass({
           </thead>
           <tbody>
           {
-            this.props.awsState.pending.map(this.renderInstanceRow)
+            this.props.awsState.internalTrackedRequests.map(this.renderInstanceRow)
           }
           </tbody>
         </bs.Table>
         <h3>Spot Requests</h3>
         We have spot requests for&nbsp;
-        {this.props.awsState.spotReq.length}
+        {this.props.awsState.requests.length}
         &nbsp;instances with total capacity of {this.spotReqCapacity()}.
         <bs.Table>
           <thead>
@@ -78,7 +78,7 @@ var WorkerTypeResources = React.createClass({
           </thead>
           <tbody>
           {
-            this.props.awsState.spotReq.map(this.renderSpotRow)
+            this.props.awsState.requests.map(this.renderSpotRow)
           }
           </tbody>
         </bs.Table>
@@ -184,7 +184,7 @@ var WorkerTypeResources = React.createClass({
   },
 
   runningCapacity() {
-    return _.sumBy(this.props.awsState.running.map(instance => {
+    return _.sumBy(this.props.awsState.instances.map(instance => {
       return _.find(this.props.workerType.instanceTypes, {
         instanceType:     instance.type
       });
@@ -192,7 +192,7 @@ var WorkerTypeResources = React.createClass({
   },
 
   pendingCapacity() {
-    return _.sumBy(this.props.awsState.pending.map(instance => {
+    return _.sumBy(this.props.awsState.internalTrackedRequests.map(instance => {
       return _.find(this.props.workerType.instanceTypes, {
         instanceType:     instance.type
       });
@@ -200,7 +200,7 @@ var WorkerTypeResources = React.createClass({
   },
 
   spotReqCapacity() {
-    return _.sumBy(this.props.awsState.spotReq.map(spotReq => {
+    return _.sumBy(this.props.awsState.requests.map(spotReq => {
       return _.find(this.props.workerType.instanceTypes, {
         instanceType:     spotReq.type
       });
@@ -212,18 +212,18 @@ var WorkerTypeStatus = React.createClass({
   propTypes: {
     workerType: React.PropTypes.object.isRequired,
     awsState: React.PropTypes.shape({
-      running: React.PropTypes.arrayOf(React.PropTypes.object),
-      pending: React.PropTypes.arrayOf(React.PropTypes.object),
-      spotReq: React.PropTypes.arrayOf(React.PropTypes.object),
+      instances: React.PropTypes.arrayOf(React.PropTypes.object),
+      internalTrackedRequests: React.PropTypes.arrayOf(React.PropTypes.object),
+      requests: React.PropTypes.arrayOf(React.PropTypes.object),
     }).isRequired
   },
 
   render() {
     // Find availability zones
     var availabilityZones = _.union(
-      this.props.awsState.running.map(_.property('zone')),
-      this.props.awsState.pending.map(_.property('zone')),
-      this.props.awsState.spotReq.map(_.property('zone'))
+      this.props.awsState.instances.map(_.property('zone')),
+      this.props.awsState.internalTrackedRequests.map(_.property('zone')),
+      this.props.awsState.requests.map(_.property('zone'))
     );
     return (
       <bs.Table>
@@ -253,15 +253,15 @@ var WorkerTypeStatus = React.createClass({
 
   renderRow(instTypeDef, availabilityZone) {
     // Find number of running, pending and spotRequests
-    var running = this.props.awsState.running.filter(inst => {
+    var running = this.props.awsState.instances.filter(inst => {
       return inst.type === instTypeDef.instanceType &&
              inst.zone === availabilityZone;
     }).length;
-    var pending = this.props.awsState.pending.filter(inst => {
+    var pending = this.props.awsState.internalTrackedRequests.filter(inst => {
       return inst.type === instTypeDef.instanceType &&
              inst.zone === availabilityZone;
     }).length;
-    var spotReq = this.props.awsState.spotReq.filter(spotReq => {
+    var spotReq = this.props.awsState.requests.filter(spotReq => {
       return spotReq.type === instTypeDef.instanceType &&
              spotReq.zone === availabilityZone;
     }).length;
@@ -312,13 +312,10 @@ var WorkerTypeView = React.createClass({
   propTypes: {
     provisionerId: React.PropTypes.string.isRequired,
     workerType: React.PropTypes.string.isRequired,
-    awsState: React.PropTypes.shape({
-      running: React.PropTypes.arrayOf(React.PropTypes.object),
-      pending: React.PropTypes.arrayOf(React.PropTypes.object),
-      spotReq: React.PropTypes.arrayOf(React.PropTypes.object),
-    }).isRequired,
     // Reload list of workerTypes
-    reload: React.PropTypes.func.isRequired
+    reload: React.PropTypes.func.isRequired,
+    // update the summary for this workerType
+    updateSummary: React.PropTypes.func.isRequired
   },
 
   getInitialState() {
@@ -329,17 +326,25 @@ var WorkerTypeView = React.createClass({
       pendingTasksError: undefined,
       workerType: {},
       workerTypeLoaded: false,
-      workerTypeError: undefined
+      workerTypeError: undefined,
+      awsState: {},
+      awsStateLoaded: false,
+      awsStateError: undefined,
     };
   },
 
   load() {
+    var self = this;
     return {
       pendingTasks: this.queue.pendingTasks(
         this.props.provisionerId,
         this.props.workerType
       ),
-      workerType: this.awsProvisioner.workerType(this.props.workerType)
+      workerType: this.awsProvisioner.workerType(this.props.workerType),
+      awsState: this.awsProvisioner.state(this.props.workerType).then(function (res) {
+        self.props.updateSummary(self.props.workerType, res.summary);
+        return res;
+      }),
     };
   },
 
@@ -386,13 +391,17 @@ var WorkerTypeView = React.createClass({
                 definition={this.state.workerType}
                 updated={this.props.reload}/>
     } else if (this.state.currentTab === 'resources') {
-      return <WorkerTypeResources
-                workerType={this.state.workerType}
-                awsState={this.props.awsState}/>
+      return this.renderWaitFor('awsState') || (
+        <WorkerTypeResources
+              workerType={this.state.workerType}
+              awsState={this.state.awsState}/>
+      );
     } else {
-      return <WorkerTypeStatus
-                workerType={this.state.workerType}
-                awsState={this.props.awsState}/>
+      return this.renderWaitFor('awsState') || (
+        <WorkerTypeStatus
+              workerType={this.state.workerType}
+              awsState={this.state.awsState}/>
+      );
     }
   },
 
