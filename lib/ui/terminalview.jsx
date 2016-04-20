@@ -18,6 +18,7 @@ var TerminalView = React.createClass({
             url:            undefined,  // No URL to display at this point
             cols: 90,
             rows: 40,
+            scrollDown: false,
         };
     },
 
@@ -61,8 +62,18 @@ var TerminalView = React.createClass({
         var response = e.data;
 
         // Write data to term if there is any data
-        if (response.data)
-            this.setState({lines : response.data});
+        if (response.data){
+            var newFromBottom = this.state.fromBottom;
+            if(!this.props.scrollDown){
+                // we don't expect the data to get shrunk
+                // since it's a log, it can only grow
+                newFromBottom += response.data.length - this.state.lines.length;
+            }
+            this.setState({
+                lines : response.data,
+                fromBottom: newFromBottom,
+            });
+        }
     },
 
     abortRequest(){
