@@ -346,7 +346,7 @@ let TaskGroupInspector = React.createClass({
     }, this);
 
     return (
-      <div className="col-md-5">
+      <div className="col-xs-5">
         <table className="table table-condensed task-group-inspector-tasks">
           <thead>
             <tr>
@@ -426,7 +426,7 @@ let TaskGroupInspector = React.createClass({
     let status = this.state[key];
 
     return (
-      <div className="col-md-7">
+      <div className="col-xs-7">
         <TaskView
           ref="taskView"
           hashEntry={this.nextHashEntry()}
