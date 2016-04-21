@@ -4,6 +4,7 @@ const path = require('path');
 const $ = require('jquery');
 const WWW_Authenticate = require('www-authenticate').parsers.WWW_Authenticate;
 const ReactTooltip = require("react-tooltip");
+const config = require("../build/status/config")
 
 // Make a request to the cors proxy service
 function makeRequest(options, allowHeaders = []) {
@@ -14,7 +15,7 @@ function makeRequest(options, allowHeaders = []) {
   }
 
   return $.ajax({
-    url: 'https://cors-proxy.taskcluster.net/request',
+    url: config.CORS_PROXY,
     method: 'POST',
     contentType: 'application/json',
     headers,

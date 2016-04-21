@@ -204,13 +204,25 @@ module.exports = function(grunt) {
         options: {
           logConcurrentOutput:      false
         },
-        tasks:    ['render-favicons', 'copy', 'jade', 'less']
+        tasks:    ['render-favicons', 'copy', 'jade', 'less', 'envify']
       },
       develop: {
         options: {
           logConcurrentOutput:      true
         },
         tasks:    ['server', 'watch-browserify', 'watch']
+      }
+    },
+    envify: {
+      status: {
+        options: {
+          env: {
+            CORS_PROXY: process.env.CORS_PROXY || 'https://cors-proxy.taskcluster.net/request'
+          }
+        },
+        files: {
+          'build/status/config.js': 'status/config.js.in'
+        }
       }
     }
   };
@@ -223,7 +235,7 @@ module.exports = function(grunt) {
   grunt.registerTask(
     'build',
     "Build sources into the build/ folder",
-    ['render-favicons', 'copy', 'jade', 'less', 'browserify']
+    ['render-favicons', 'copy', 'jade', 'less', 'envify', 'browserify']
   );
   grunt.registerTask(
     'develop',
@@ -351,4 +363,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-aws');
   grunt.loadNpmTasks('grunt-keepalive');
   grunt.loadNpmTasks('grunt-concurrent');
+  grunt.loadNpmTasks('grunt-envify');
 };
