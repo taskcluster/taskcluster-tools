@@ -1,9 +1,15 @@
 import React from 'react'
 import _ from 'lodash'
-import {findIndependentNodes} from '../lib/graph/builder/cluster'
+import { findIndependentNodes } from '../lib/graph/builder/cluster'
+
+const GRAPH_CONTAINER_STYLE = {
+  border: "2px solid #ddd"
+};
 
 sigma.canvas.nodes.border = function (node, context, settings) {
+
   var prefix = settings('prefix') || '';
+
   context.fillStyle = node.color || settings('defaultNodeColor');
   context.beginPath();
   context.arc(
@@ -25,7 +31,7 @@ sigma.canvas.nodes.border = function (node, context, settings) {
 }
 
 export default class GraphView extends React.Component {
-  constructor(props){
+  constructor(props) {
     super();
     this.props = props;
     // Bind functions
@@ -34,25 +40,23 @@ export default class GraphView extends React.Component {
     this.runForceAtlas2 = this.runForceAtlas2.bind(this);
     this.clickNode = this.clickNode.bind(this);
     this.clickStage = this.clickStage.bind(this);
-    this.toggleShowIndependentTasks = this.toggleShowIndependentTasks.bind(this);
 
     this.sigma = new sigma({
       graph: props.graph,
-      settings:{
+      settings: {
         defaultNodeType: 'border'
       }
     });
 
     this.independentNodes = findIndependentNodes(props.graph);
 
-    this.state = {showIndependentTasks: true};
     this.runForceAtlas2(props.forceAtlas2Timeout);
 
-    this.sigma.bind('clickNode',this.clickNode);
-    this.sigma.bind('clickStage',this.clickStage);
+    this.sigma.bind('clickNode', this.clickNode);
+    this.sigma.bind('clickStage', this.clickStage);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.renderer = this.sigma.addRenderer({
       type:"canvas",
       container:"graph-container",
@@ -62,47 +66,51 @@ export default class GraphView extends React.Component {
     this.sigma.refresh();
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     this.sigma.killRenderer(this.renderer);
   }
 
-  render(){
+  render() {
     return (
       <div>
-        <input type="checkbox" onChange={this.toggleShowIndependentTasks} checked={this.state.showIndependentTasks}/>
-        <label>Show lone tasks</label>
-        <div id="graph-container" style={graphContainerStyle}></div>
+        <div id="graph-container" style={GRAPH_CONTAINER_STYLE}></div>
       </div>
       )
   }
 
-  refreshNodes(){
-    this.sigma.graph.nodes().forEach((node)=>{
+  refreshNodes() {
+    this.sigma.graph
+    .nodes()
+    .forEach( node => {
       node.color = node.originalColor;
       node.borderColor = node.originalBorderColor;
-    })
+    });
   }
 
-  runForceAtlas2(timeout){
+  runForceAtlas2(timeout) {
     this.sigma.startForceAtlas2({
       worker: true
     });
 
-    setTimeout(()=>{
+    setTimeout(() => {
       this.sigma.stopForceAtlas2();
-    },timeout|| 500);
+    }, timeout || 500);
   }
 
-  colorDependents(centerNode){
-    let dependents = centerNode.dependents, indices = [],index;
-    this.sigma.graph.nodes().forEach((node)=>{
+  colorDependents(centerNode) {
+    let dependents = centerNode.dependents;
+    let indices = [];
+    let index;
+    this.sigma.graph
+    .nodes()
+    .forEach( node => {
       if(node.id === centerNode.id){
         node.color = '#ADD8E6';
         node.borderColor = '#0000A0';
         return;
       }
 
-      index = _.findIndex(dependents,(id)=>{return id === node.id} );
+      index = _.findIndex(dependents, id => id === node.id);
 
       if(index === -1){
         //Grey out the node
@@ -116,8 +124,10 @@ export default class GraphView extends React.Component {
     });
   }
 
-  colorNode(id){
-    this.sigma.graph.nodes().forEach((node)=>{
+  colorNode(id) {
+    this.sigma.graph
+    .nodes()
+    .forEach( node => {
       if(node.id === id){
         node.color = '#ADD8E6';
         node.borderColor = '#0000A0';
@@ -129,33 +139,15 @@ export default class GraphView extends React.Component {
     this.sigma.refresh();
   }
 
-  clickNode(e){
+  clickNode(e) {
     this.props.clickNode(e.data.node.id);
     this.colorDependents(e.data.node);
     this.sigma.refresh();
   }
 
-  clickStage(e){
+  clickStage(e) {
     this.refreshNodes();
     this.sigma.refresh();
   }
 
-  toggleShowIndependentTasks(){
-    var show = !this.state.showIndependentTasks;
-    if(show){
-      this.independentNodes.forEach((node)=>{
-        this.sigma.graph.addNode(node);
-      });
-    }else{
-      this.independentNodes.forEach((node)=>{
-        this.sigma.graph.dropNode(node.id);
-      });
-    }
-    this.setState({showIndependentTasks:show});
-    this.sigma.refresh();
-  }
 }
-
-const graphContainerStyle = {
-  border: "2px solid #ddd"
-};
