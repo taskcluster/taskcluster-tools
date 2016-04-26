@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "test": "grunt build",
-    "deploy": "grunt publish -q"
+    "deploy": "grunt publish -q",
+    "start": "grunt"
   },
   "repository": {
     "type": "git",
@@ -99,6 +100,10 @@
     "rison": "^0.1.1",
     "shell-escape": "^0.2.0",
     "sigma": "^1.1.0",
+    "react-tooltip": "^1.2.0",
+    "react-treeview": "0.4.2",
+    "rison": "^0.1.1",
+    "shell-escape": "^0.2.0",
     "slugid": "^1.1.0",
     "taskcluster-client": "^0.23.16",
     "term.js": "0.0.4",

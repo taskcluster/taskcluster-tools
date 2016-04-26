@@ -1,0 +1,29 @@
+@import "../lib/ui/taskview.less";
+
+.results-container .affix {
+  top: 1vh;
+  max-height: 95vh;
+  width: 48%; // approximation of similar element width once moved to fixed layout
+  right: 8.33333333%;
+}
+
+.task-group-inspector-tasks {
+  font-size: 14px;
+
+  tbody > tr:not(.info) {
+    cursor: pointer;
+  }
+}
+
+.task-view .tab-content {
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+.table > tbody > tr > td > span.markdown-view > p:last-of-type {
+  margin: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

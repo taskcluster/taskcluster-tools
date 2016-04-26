@@ -47,6 +47,11 @@ module.exports = [
   'task-graph-inspector/app.jsx',
   'task-graph-inspector/app.less',
 
+  // Task Group Inspector
+  'task-group-inspector/index.jade',
+  'task-group-inspector/app.jsx',
+  'task-group-inspector/app.less',
+
   // Task Creator
   'task-creator/index.jade',
   'task-creator/app.jsx',
