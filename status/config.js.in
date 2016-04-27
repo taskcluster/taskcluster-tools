@@ -1,0 +1,1 @@
+export const CORS_PROXY = process.env.CORS_PROXY;

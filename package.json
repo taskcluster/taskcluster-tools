@@ -35,6 +35,8 @@
     "grunt-contrib-jade": "0.13.0",
     "grunt-contrib-less": "0.11.4",
     "grunt-contrib-watch": "0.6.1",
+    "grunt-env": "^0.4.4",
+    "grunt-envify": "0.0.3",
     "grunt-keepalive": "0.0.1",
     "highlight.js": "^9.1.0",
     "hterm-umd": "^1.0.1",
