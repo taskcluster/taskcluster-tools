@@ -21,9 +21,8 @@ var WorkerTypeResources = React.createClass({
     return (
       <span>
         <h3>Running Instances</h3>
-        We have&nbsp;
-        {this.props.awsState.instances.length}
-        &nbsp;instances running with total capacity of {this.runningCapacity()}.
+        We have a total running capacity of {this.props.awsState.summary.runningCapacity}.  This is
+        capacity that is running and capable of accepting tasks.
         <bs.Table>
           <thead>
             <tr>
@@ -37,14 +36,14 @@ var WorkerTypeResources = React.createClass({
           </thead>
           <tbody>
           {
-            this.props.awsState.instances.map(this.renderInstanceRow)
+            this.props.awsState.instances.filter(x => x.state === 'running').map(this.renderInstanceRow)
           }
           </tbody>
         </bs.Table>
         <h3>Pending Instances</h3>
-        We have {this.props.awsState.internalTrackedRequests.length}
-        &nbsp;instances starting up with total capacity of&nbsp;
-        {this.pendingCapacity()}.
+        We have a total pending capacity of {this.props.awsState.summary.pendingCapacity}.  This is
+        capacity for which Amazon has fulfilled the spot request but is not yet
+        able to accept tasks.
         <bs.Table>
           <thead>
             <tr>
@@ -58,14 +57,16 @@ var WorkerTypeResources = React.createClass({
           </thead>
           <tbody>
           {
-            this.props.awsState.internalTrackedRequests.map(this.renderInstanceRow)
+            this.props.awsState.instances.filter(x => x.state === 'pending').map(this.renderInstanceRow)
           }
           </tbody>
         </bs.Table>
         <h3>Spot Requests</h3>
-        We have spot requests for&nbsp;
-        {this.props.awsState.requests.length}
-        &nbsp;instances with total capacity of {this.spotReqCapacity()}.
+        We have spot requests outanding for a capacity of {this.props.awsState.summary.requestedCapacity}.
+        These are requests for instances that we have made to Amazon but have not yet
+        had those requests evaluated or acted on.  Sometimes, because of the eventual
+        consistency semantics of the EC2 api, there are instances which are only known
+        to the provisioner and are not visible through the normal API.
         <bs.Table>
           <thead>
             <tr>
@@ -79,6 +80,12 @@ var WorkerTypeResources = React.createClass({
           <tbody>
           {
             this.props.awsState.requests.map(this.renderSpotRow)
+          }
+          {
+            this.props.awsState.internalTrackedRequests.length > 0 ? <tr><td colSpan="5">Below are spot requests which have not become visible to the Amazon API yet</td></tr> : undefined;
+          }
+          {
+            this.props.awsState.internalTrackedRequests.length > 0 ? this.props.awsState.internalTrackedRequests.map(this.renderSpotRow) : undefined;
           }
           </tbody>
         </bs.Table>
@@ -128,7 +135,6 @@ var WorkerTypeResources = React.createClass({
         <td>
           <code>{spotReq.zone}</code>
         </td>
-        <td><code>{spotReq.ami}</code></td>
         <td>
           {
             this.renderImageIdLink(
@@ -182,30 +188,6 @@ var WorkerTypeResources = React.createClass({
       </a>
     );
   },
-
-  runningCapacity() {
-    return _.sumBy(this.props.awsState.instances.map(instance => {
-      return _.find(this.props.workerType.instanceTypes, {
-        instanceType:     instance.type
-      });
-    }), 'capacity');
-  },
-
-  pendingCapacity() {
-    return _.sumBy(this.props.awsState.internalTrackedRequests.map(instance => {
-      return _.find(this.props.workerType.instanceTypes, {
-        instanceType:     instance.type
-      });
-    }), 'capacity');
-  },
-
-  spotReqCapacity() {
-    return _.sumBy(this.props.awsState.requests.map(spotReq => {
-      return _.find(this.props.workerType.instanceTypes, {
-        instanceType:     spotReq.type
-      });
-    }), 'capacity');
-  },
 });
 
 var WorkerTypeStatus = React.createClass({
@@ -254,14 +236,17 @@ var WorkerTypeStatus = React.createClass({
   renderRow(instTypeDef, availabilityZone) {
     // Find number of running, pending and spotRequests
     var running = this.props.awsState.instances.filter(inst => {
-      return inst.type === instTypeDef.instanceType &&
+      return inst.state === 'running' &&
+             inst.type === instTypeDef.instanceType &&
              inst.zone === availabilityZone;
     }).length;
-    var pending = this.props.awsState.internalTrackedRequests.filter(inst => {
-      return inst.type === instTypeDef.instanceType &&
+    var pending = this.props.awsState.instances.filter(inst => {
+      return inst.state === 'pending' &&
+             inst.type === instTypeDef.instanceType &&
              inst.zone === availabilityZone;
     }).length;
     var spotReq = this.props.awsState.requests.filter(spotReq => {
+      // TODO: We should do something for internalTrackedRequests
       return spotReq.type === instTypeDef.instanceType &&
              spotReq.zone === availabilityZone;
     }).length;
