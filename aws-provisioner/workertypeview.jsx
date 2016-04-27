@@ -82,10 +82,10 @@ var WorkerTypeResources = React.createClass({
             this.props.awsState.requests.map(this.renderSpotRow)
           }
           {
-            this.props.awsState.internalTrackedRequests.length > 0 ? <tr><td colSpan="5">Below are spot requests which have not become visible to the Amazon API yet</td></tr> : undefined;
+            this.props.awsState.internalTrackedRequests.length > 0 ? <tr><td colSpan="5">Below are spot requests which have not become visible to the Amazon API yet</td></tr> : undefined
           }
           {
-            this.props.awsState.internalTrackedRequests.length > 0 ? this.props.awsState.internalTrackedRequests.map(this.renderSpotRow) : undefined;
+            this.props.awsState.internalTrackedRequests.length > 0 ? this.props.awsState.internalTrackedRequests.map(this.renderSpotRow) : undefined
           }
           </tbody>
         </bs.Table>
@@ -245,10 +245,12 @@ var WorkerTypeStatus = React.createClass({
              inst.type === instTypeDef.instanceType &&
              inst.zone === availabilityZone;
     }).length;
-    var spotReq = this.props.awsState.requests.filter(spotReq => {
+    var allReq = _.concat(this.props.awsState.requests,
+                          this.props.awsState.internalTrackedRequests);
+    var spotReq = this.props.awsState.requests.filter(req => {
       // TODO: We should do something for internalTrackedRequests
-      return spotReq.type === instTypeDef.instanceType &&
-             spotReq.zone === availabilityZone;
+      return req.type === instTypeDef.instanceType &&
+             req.zone === availabilityZone;
     }).length;
     if (running + pending + spotReq === 0) {
       return undefined;
