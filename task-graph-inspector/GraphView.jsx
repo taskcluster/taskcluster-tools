@@ -1,6 +1,6 @@
-import React from 'react'
-import _ from 'lodash'
-import { findIndependentNodes } from '../lib/graph/builder/cluster'
+import React from 'react';
+import _ from 'lodash';
+import { findIndependentNodes } from '../lib/graph/builder/cluster';
 
 const GRAPH_CONTAINER_STYLE = {
   border: "2px solid #ddd"
@@ -72,9 +72,7 @@ export default class GraphView extends React.Component {
 
   render() {
     return (
-      <div>
         <div id="graph-container" style={GRAPH_CONTAINER_STYLE}></div>
-      </div>
       )
   }
 
