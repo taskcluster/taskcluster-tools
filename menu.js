@@ -181,7 +181,7 @@ module.exports = [
   },
   {
     title:          "Documentation",
-    link:           'http://docs.taskcluster.net',
+    link:           'https://docs.taskcluster.net',
     icon:           'book',
     display:        true,
     description: [
