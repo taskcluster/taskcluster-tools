@@ -114,7 +114,7 @@ var TaskCreator = React.createClass({
         <p>
           Write and submit a task to TaskCluster. For details on what you can
           write refer to the&nbsp;
-          <a href="http://docs.taskcluster.net">documentation</a>.
+          <a href="https://docs.taskcluster.net">documentation</a>.
           When you submit a task here, you will be taken to the inspector, and the
           task will be stored in <code>localStorage</code>, so you can always
           come back and easily try a new variation.

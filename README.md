@@ -4,7 +4,7 @@ TaskCluster Tools
 This repository contains a collection of useful tools for use with TaskCluster.
 Generally, we strive to not add UI to TaskCluster components, but instead offer
 well documented APIs that can be easily consumed using a client library for
-TaskCluster. See [TaskCluster documentation site](http://docs.taskcluster.net)
+TaskCluster. See [TaskCluster documentation site](https://docs.taskcluster.net)
 for details.
 
 

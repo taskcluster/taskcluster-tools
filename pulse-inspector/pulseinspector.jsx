@@ -138,7 +138,7 @@ var PulseInspector = React.createClass({
               wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
             </a>. Notice that all exchanges from TaskCluster is formally
             documented on&nbsp;
-            <a href="http://docs.taskcluster.net">docs.taskcluster.net</a>.
+            <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
           </p>
           {this.renderForm()}
           {this.state.listeningError ? this.renderListeningError() : undefined}
