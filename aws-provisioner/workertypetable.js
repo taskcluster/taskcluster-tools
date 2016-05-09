@@ -242,29 +242,33 @@ var WorkerTypeTable = React.createClass({
   },
 
   render() {
-    return <span>{
-      this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()
-      } <bs.ButtonToolbar>
-          <bs.Button
-            bsStyle='primary'
-            onClick={this.setSelected.bind(this, 'create:worker-type')}
-            style={{marginBottom: 10}}>
-            <bs.Glyphicon glyph="plus"/>&nbsp;
-            Create WorkerType
-          </bs.Button>
-        </bs.ButtonToolbar>
-        {
-          this.state.selected === 'create:worker-type' ? (
-            this.renderWorkerTypeCreator()
-          ) : (
-            this.renderWorkerTypeView()
-          )
-        }
+    return <span>
+      <bs.ButtonToolbar>
+        <bs.Button
+          bsStyle='primary'
+          onClick={this.setSelected.bind(this, 'create:worker-type')}
+          style={{marginBottom: 10}}>
+          <bs.Glyphicon glyph="plus"/>&nbsp;
+          Create WorkerType
+        </bs.Button>
+      </bs.ButtonToolbar>
+      {
+        this.state.selected === 'create:worker-type' ? (
+          this.renderWorkerTypeCreator()
+        ) : (
+          this.renderWorkerTypeView()
+        )
+      }
+      <span>{
+        this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()
+      }</span>
       </span>
   },
 
   renderWorkerTypeTable() {
     return (
+      <span>
+      <h2>Worker Types</h2>
       <bs.Table>
         <thead>
           <tr>
@@ -287,6 +291,7 @@ var WorkerTypeTable = React.createClass({
         }
         </tbody>
       </bs.Table>
+      </span>
     );
   },
 
@@ -298,7 +303,7 @@ var WorkerTypeTable = React.createClass({
     return (
       <div style={{marginBottom: 50}}>
         <hr/>
-        <h2>WorkerType: <code>{this.state.selected}</code></h2>
+        <h2>Worker Type: <code>{this.state.selected}</code></h2>
         <WorkerTypeView
           provisionerId={this.props.provisionerId}
           workerType={this.state.selected}
