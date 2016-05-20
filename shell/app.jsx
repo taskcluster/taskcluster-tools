@@ -34,7 +34,7 @@ $(function () {
           'if [ -z `which "$SHELL"` ]; then export SHELL="/.taskclusterutils/busybox sh"; fi;',
           'SPAWN="$SHELL";',
           'if [ "$SHELL" = "bash" ]; then SPAWN="bash -li"; fi;',
-          'if [ -f "/etc/taskcluster-interactive-shell.sh" ]; then SPAWN="/etc/taskcluster-interactive-shell.sh"; fi;',
+          'if [ -f "/bin/taskcluster-interactive-shell" ]; then SPAWN="/bin/taskcluster-interactive-shell"; fi;',
           'exec $SPAWN;'
         ].join('')
       ]
