@@ -172,6 +172,29 @@ var TaskInfo = React.createClass({
             <dd><code>{task.taskGroupId}</code></dd>
           )
         }
+        {
+          task.schedulerId === 'task-graph-scheduler' && task.dependencies.length ? (
+            <dt>Dependencies</dt>
+          ) : (
+            ''
+          )
+        }
+        {
+          task.schedulerId === 'task-graph-scheduler' && task.dependencies.length ? (
+            <dd>
+              This task will run when all of the following tasks are
+              { task.requires == "all-completed" ? " completed successfully:" : " resolved in any way:" }
+              <ul>
+                {
+                  task.dependencies.sort().map((dep, index) =>
+                    <li key={index}><a href="../task-inspector/#{dep}">{dep}</a></li>)
+                }
+              </ul>
+            </dd>
+          ) : (
+            ''
+          )
+        }
       </dl>
       <dl className="dl-horizontal">
         <dt>Scopes</dt>
