@@ -66,7 +66,7 @@ var MessageRow = React.createClass({
                   <ul>
                     {
                       message.routes.map(function(route, index) {
-                        return <li key={index}><code>{route}</code></li>;
+                        return <li key={index}><code>route.{route}</code></li>;
                       })
                     }
                   </ul>
