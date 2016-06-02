@@ -6,6 +6,8 @@ var _               = require('lodash');
 var TaskView        = require('../lib/ui/taskview');
 var format          = require('../lib/format');
 var PreviousTasks   = require('../lib/ui/previoustasks');
+var buildGraph      = require('../lib/graph/builder/build');
+var GraphView       = require('./GraphView.jsx');
 
 /** Renders task-graph-inspector with a control to enter `taskGraphId` into */
 var TaskGraphInspector = React.createClass({
@@ -49,7 +51,8 @@ var TaskGraphInspector = React.createClass({
       taskGraphLoaded:    true,
       taskGraphError:     undefined,
       taskGraph:          null,
-      taskGraphIdInput:   ''
+      taskGraphIdInput:   '',
+      showGraph:          false
       // Remark we'll cache task status structures under
       // 'task/<taskId>/status' as arrive from messages or when we load a
       // a task...
@@ -90,7 +93,7 @@ var TaskGraphInspector = React.createClass({
   /** Update taskGraphId input field when taskGraphId changes */
   updateTaskGraphIdInput: function() {
     // This handle changes that occurs due to modifications of location.hash
-    this.setState({taskGraphIdInput: this.state.taskGraphId});
+    this.setState({ taskGraphIdInput: this.state.taskGraphId });
   },
 
   /** Return bindings for WebListenerMixin */
@@ -164,7 +167,7 @@ var TaskGraphInspector = React.createClass({
 
     // Find index of task entry
     var taskId  = message.payload.status.taskId;
-    var index   = _.findIndex(taskGraph.tasks, {taskId: taskId});
+    var index   = _.findIndex(taskGraph.tasks, { taskId: taskId });
     if (index === -1) {
       return; // if not present, we can't update it
     }
@@ -299,9 +302,12 @@ var TaskGraphInspector = React.createClass({
 
     // Shorten source if necessary
     var source = taskGraph.metadata.source;
+
     if (source.length > 90) {
       source = "..." + source.substr(8 - 90);
     }
+
+    var graph = buildGraph(this.state.taskGraph.tasks);
 
     return (
       <span>
@@ -353,6 +359,22 @@ var TaskGraphInspector = React.createClass({
         </dd>
         <dt>TaskGraphId</dt>
         <dd><code>{taskGraph.status.taskGraphId}</code></dd>
+        <div className="checkbox">
+          <label>
+            <input type="checkbox"
+              checked={this.state.showGraph}
+              onChange={this.handleShowGraphChange} /> Show Graph
+          </label>
+        </div>
+        <div>
+        { this.state.showGraph ?
+          <GraphView
+            graph={graph}
+            clickNode={this.handleSelectTask}
+            ref="graphVis"labelThreshold={14} /> :
+          ''
+        }
+        </div>
       </dl>
       {this.renderTaskTable()}
       <hr/>
@@ -483,16 +505,24 @@ var TaskGraphInspector = React.createClass({
 
   /** Handle selection of a task */
   handleSelectTask: function(taskId) {
-    this.setState({taskId: taskId});
+    this.setState({ taskId });
+
+    if(this.refs.graphVis){
+      this.refs.graphVis.colorNode(taskId);
+    }
   },
 
   /** Handle form submission */
   handleSubmit: function(e) {
     e.preventDefault();
-    this.setState({taskGraphId: this.state.taskGraphIdInput});
+    this.setState({ taskGraphId: this.state.taskGraphIdInput });
+  },
+
+  /** handle show graph change */
+  handleShowGraphChange: function (e) {
+    this.setState({ showGraph: !this.state.showGraph });
   }
 });
 
 // Export TaskGraphInspector
 module.exports = TaskGraphInspector;
-
