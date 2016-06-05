@@ -217,8 +217,7 @@ var ClientEditor = React.createClass({
             <div className="col-md-9">
               <span className="text-muted">Expanded scopes are determined from the client
                 scopes, expanding roles for scopes beginning with <code>assume:</code>.
-                The role <code>client-id:{this.state.client.clientId}</code> is implicitly
-                included.</span>
+                </span>
               <ScopeEditor
                 scopes={this.state.client.expandedScopes}/>
             </div>
