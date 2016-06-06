@@ -16,7 +16,7 @@ var TerminalView = React.createClass({
     })
   ],
 
-  getDefaultProps(){
+  getDefaultProps() {
     return {
       url:            undefined,  // No URL to display at this point
       rows: 40,
@@ -24,7 +24,7 @@ var TerminalView = React.createClass({
     };
   },
 
-  getInitialState(){
+  getInitialState() {
     return {
       lines: ['Loading log...'],
       fromBottom: 0,
@@ -36,19 +36,19 @@ var TerminalView = React.createClass({
   },
 
   // Refresh the currently displayed file
-  refresh(){
+  refresh() {
     this.open();
   },
 
   /** Open a URL in the terminal */
-  open(){
+  open() {
     // Abort previous request if any
-    if (this.request){
+    if (this.request) {
       this.abortRequest();
     }
 
     // If not given a URL we'll just stop here with an empty terminal
-    if (!this.props.url){
+    if (!this.props.url) {
       return;
     }
 
@@ -56,75 +56,82 @@ var TerminalView = React.createClass({
     this.dataOffset = 0;  
     this.worker = work(require('./log-fetcher.js'));
     this.worker.addEventListener('message', this.onData);
-    this.worker.postMessage({url: this.props.url});
+    this.worker.postMessage({ url: this.props.url });
   },
 
   /* Communicate with the worker */
-  onData(e){
+  onData(e) {
     var response = e.data;
     // Write data to term if there is any data
-    if (response.data){
+    if (response.data) {
       var newFromBottom = 0;
-      if(!this.props.scrollDown){
+      if (!this.props.scrollDown) {
         // we don't expect the data to get shrunk
         // since it's a log, it can only grow
         newFromBottom += response.data.length - this.state.lines.length;
       }
       this.setState({
-        lines : response.data,
+        lines: response.data,
         fromBottom: newFromBottom,
       });
     }
   },
 
-  abortRequest(){
-    if(this.worker){
-      this.worker.postMessage({abort: true});
+  abortRequest() {
+    if (this.worker) {
+      this.worker.postMessage({ abort: true });
       this.worker = null;
     }
   },
 
-  componentWillUnmount(){
-    if (this.worker){
+  componentWillUnmount() {
+    if (this.worker) {
       this.abortRequest();
     }
   },
 
   /* Some methods to work with the scrollbar. * 
    * Maybe should become a separate class?    */
-  scrollbarHeight(){
-    if(!this.refs.buffer) return 0;
+  scrollbarHeight() {
+    if (!this.refs.buffer) {
+      return 0;
+    } 
     var ratio = this.props.rows / this.state.lines.length;
-    if(ratio > 1) ratio = 1;
+    if (ratio > 1) {
+      ratio = 1;
+    } 
     var height = ratio * this.refs.buffer.offsetHeight;
     return Math.max(height, 10);
   },
 
-  scrollbarMargin(){
-    if(!this.refs.buffer) return 0;
+  scrollbarMargin() {
+    if (!this.refs.buffer) {
+      return 0;
+    }
     var ratio = (this.state.lines.length - this.state.fromBottom - this.props.rows) / this.state.lines.length;
     return ratio * (this.refs.buffer.offsetHeight - this.scrollbarHeight());
   },
 
-  scrollbarSet(newState){
+  scrollbarSet(newState) {
     newState = Math.floor(newState);
     newState = Math.max(0, newState);
     newState = Math.min(this.state.lines.length - this.props.rows, newState);
-    if(newState != this.state.fromBottom)
-      this.setState({fromBottom: newState});
+    if (newState != this.state.fromBottom) {
+      this.setState({ fromBottom: newState });
+    }
   },
 
-  scrollbarMove(dist){
+  scrollbarMove(dist) {
     this.scrollbarSet(this.state.fromBottom - dist);
   },
 
-  onMouseWheel(e){
+  onMouseWheel(e) {
     e.preventDefault();
     this.scrollbarMove(Math.sign(e.deltaY));
   },
 
-  onMouseMove(e){
-    if(this.dragging){
+  onMouseMove(e) {
+    if (this.dragging) {
       var diff = e.pageY - this.startY;
       var space = this.refs.buffer.offsetHeight;
       var margin = this.margin + diff;
@@ -133,9 +140,9 @@ var TerminalView = React.createClass({
     }
   },
 
-  onMouseDown(e){
+  onMouseDown(e) {
     e.preventDefault();
-    if(e.button == 0){
+    if (e.button == 0) {
       this.dragging = true;
       this.startY = e.pageY;
       this.margin = this.scrollbarMargin();
@@ -143,32 +150,35 @@ var TerminalView = React.createClass({
     }
   },
 
-  onMouseUp(e){
-    if(e.button == 0)
+  onMouseUp(e) {
+    if (e.button == 0) {
       this.dragging = false;
+    }
   },
 
-  componentDidMount(){
+  componentDidMount() {
     this.refs.scrollbar.addEventListener('mousedown', this.onMouseDown);
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('mousemove', this.onMouseMove);
   },
 
-  render(){
+  render() {
     var start = this.state.lines.length - this.state.fromBottom - this.props.rows;
-    if(start < 0) start = 0;
-    //Check if the log has less lines than the number of rows or if we are displaying the beggining of the log
-    if ((this.state.lines.length < this.props.rows) || (this.state.lines[start] == this.state.lines[0])) {
-      var frame = this.state.lines.slice(start, start + this.props.rows);
-    } else {
-      var frame = this.state.lines.slice(start + 15, start + this.props.rows + 15);
+    if (start < 0) {
+      start = 0;
     }
+    var paddingRows = 0;
+    //Check if the log has less lines than the number of rows or if we are displaying the beggining of the log
+    if (this.props.rows <= this.state.lines.length && this.state.lines[start] !== this.state.lines[0]) {
+      paddingRows = 15;
+    }
+    var frame = this.state.lines.slice(start + paddingRows, start + this.props.rows + paddingRows);
     return <div className="viewer" onWheel={this.onMouseWheel}>
       <div className="buffer" ref="buffer">
       {
-        frame.map(function(line){
+        frame.map(function(line) {
           // Check if there are any ansi colors/styles
-          if (ansiRegex().test(line) === true) {
+          if (ansiRegex().test(line)) {
             var new_line = ansi_up.ansi_to_html(line);
             return <div key={start++} dangerouslySetInnerHTML={{__html: new_line}}></div>;
           } else {
