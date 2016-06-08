@@ -187,7 +187,7 @@ var TaskInfo = React.createClass({
               <ul>
                 {
                   task.dependencies.sort().map((dep, index) =>
-                    <li key={index}><a href="../task-inspector/#{dep}">{dep}</a></li>)
+                    <li key={index}><a href={'../task-inspector/#' + dep}>{dep}</a></li>)
                 }
               </ul>
             </dd>
