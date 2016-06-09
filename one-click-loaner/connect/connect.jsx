@@ -61,7 +61,7 @@ let Connect = React.createClass({
       };
     }
     this.queue.listLatestArtifacts(this.state.taskId).then(result => {
-      result.artifacts.forEach(a => this.processArtifact(a));
+      result.artifacts.forEach(a => this.processArtifact(a, false));
     }).catch(err => console.log("Failed to list artifacts: ", err));
     // Reload status structure
     return {
@@ -103,11 +103,11 @@ let Connect = React.createClass({
     if (message.exchange === this.queueEvents.artifactCreated().exchange) {
       let name = message.payload.artifact.name;
       debug("Received artifact: %s", name);
-      this.processArtifact(message.payload.artifact);
+      this.processArtifact(message.payload.artifact, true);
     }
   },
 
-  processArtifact(artifact) {
+  processArtifact(artifact, notify) {
     let name = artifact.name;
     if (/shell\.html$/.test(name)) {
       this.setState({
@@ -117,6 +117,9 @@ let Connect = React.createClass({
           name,
         ],
       });
+      if (notify) {
+        this.notify();
+      }
     }
     if (/display\.html$/.test(name)) {
       this.setState({
@@ -126,6 +129,9 @@ let Connect = React.createClass({
           name,
         ],
       });
+      if (notify) {
+        this.notify();
+      }
     }
   },
 
@@ -189,6 +195,8 @@ let Connect = React.createClass({
       );
     }
 
+    this.requestNotificationPermission();
+
     return (
       <span>
         <h1>Waiting for Loaner...</h1>
@@ -246,6 +254,37 @@ let Connect = React.createClass({
   openDisplay() {
     let url = this.queue.buildSignedUrl(...this.state.displayUrl);
     window.open(url, '_blank');
+  },
+
+  requestNotificationPermission() {
+    if (window.Notification) {
+      if (window.Notification.permission === 'default' &&
+          !this._notificationPermissionRequest) {
+        this._notificationPermissionRequest = true;
+        window.Notification.requestPermission()
+      }
+    }
+  },
+
+  notify() {
+    // Don't notify if we don't have permission or already did so
+    if (window.Notification && window.Notification.permission === 'granted' &&
+        !this._notified) {
+      this._notified = true; // don't notify twice
+      // Create notification
+      let n = new window.Notification('TaskCluster - Loaner Ready!', {
+        icon: '/one-click-loaner/connect/terminal.png',
+        body: 'The one-click-loaner task: ' + this.state.taskId + ' that ' +
+              'you have been waiting for is now ready. Connect now, ' +
+              'if don\'t connect quickly the task will terminate.',
+      });
+      // Close notification after 30s (browser may close it sooner)
+      setTimeout(() => n.close(), 30000);
+      n.addEventListener('click', () => {
+        n.close();
+        window.focus();
+      });
+    }
   },
 });
 
