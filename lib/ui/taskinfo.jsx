@@ -161,40 +161,42 @@ var TaskInfo = React.createClass({
         <dt>SchedulerId</dt>
         <dd><code>{task.schedulerId}</code></dd>
         <dt>TaskGroupId</dt>
-        {
-          task.schedulerId === 'task-graph-scheduler' ? (
-            <dd>
-              <a href={'../task-graph-inspector/#' + task.taskGroupId}>
-                {task.taskGroupId}
-              </a>
-            </dd>
-          ) : (
-            <dd><code>{task.taskGroupId}</code></dd>
-          )
-        }
-        {
-          task.schedulerId === 'task-graph-scheduler' && task.dependencies.length ? (
-            <dt>Dependencies</dt>
-          ) : (
-            ''
-          )
-        }
-        {
-          task.schedulerId === 'task-graph-scheduler' && task.dependencies.length ? (
-            <dd>
-              This task will run when all of the following tasks are
-              { task.requires == "all-completed" ? " completed successfully:" : " resolved in any way:" }
+        <dd>
+          <a href={'../task-group-inspector/#' + task.taskGroupId}>
+            {task.taskGroupId}
+          </a>
+        </dd>
+        <dt>Dependencies</dt>
+        <dd>
+          {
+            task.dependencies.length > 0 ? (
               <ul>
                 {
-                  task.dependencies.sort().map((dep, index) =>
-                    <li key={index}><a href={'../task-inspector/#' + dep}>{dep}</a></li>)
+                  task.dependencies.map((dep, index) => {
+                    return (
+                      <li key={index}>
+                        <a href={'../task-inspector/#' + dep}>{dep}</a>
+                      </li>
+                    );
+                  })
                 }
               </ul>
-            </dd>
-          ) : (
-            ''
-          )
-        }
+            ) : (
+              '-'
+            )
+          }
+        </dd>
+        <dt>Requires</dt>
+        <dd>
+          This task will be scheduled when <i>dependencies</i> are
+          {
+            task.requires === 'all-completed' ?
+              <span> <code>all-completed</code> successfully</span>
+            :
+              <span> <code>all-resolved</code> with any resolution</span>
+          }
+          .
+        </dd>
       </dl>
       <dl className="dl-horizontal">
         <dt>Scopes</dt>
