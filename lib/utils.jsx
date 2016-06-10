@@ -285,25 +285,28 @@ var createTaskClusterMixin = (options) => {
      * taskcluster-client
      */
     renderError(err) {
-      var body = undefined;
-      if (err.body) {
-        body = (
-          <pre>
-            {JSON.stringify(err.body, null, 2)}
-          </pre>
-        );
+      // Find some sort of summary or error code
+      let code = err.code + ' Error!';
+      if (!err.code && err.statusCode) {
+        code = 'HTTP ' + err.statusCode;
       }
-      var code = undefined;
-      if (err.statusCode) {
-        code = err.statusCode + ': ';
-      }
+      code = code || 'Unknown Error';
+
+      // Find some sort of message
+      let message = err.message || '```\n' + err.stack + '\n```';
+
+      let title = <bs.Button bsStyle="link">Additional details...</bs.Button>;
       return (
         <bs.Alert bsStyle="danger">
           <strong>
             {code}&nbsp;
-            {err.message || 'Unknown Error'}
           </strong>
-          {body}
+          <format.Markdown>{message}</format.Markdown>
+          <format.Collapse title={title}>
+            <pre>
+              {JSON.stringify(err.body, null, 2)}
+            </pre>
+          </format.Collapse>
         </bs.Alert>
       );
     },

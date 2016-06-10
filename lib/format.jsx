@@ -182,3 +182,43 @@ var Code = React.createClass({
 exports.Code = Code;
 
 
+/** Simple collapsible section */
+var Collapse = React.createClass({
+  propTypes: {
+    title:            React.PropTypes.node.isRequired,
+    children:         React.PropTypes.node.isRequired,
+    initialExpanded:  React.PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return {
+      initialExpanded: false,
+    };
+  },
+
+  getInitialState() {
+    return {
+      expanded: this.props.initialExpanded,
+    };
+  },
+
+  render() {
+    return (
+      <div>
+        <span onClick={this.toggle}>{this.props.title}</span>
+        {
+          this.state.expanded ?
+            <div>{this.props.children}</div>
+          :
+            ''
+        }
+      </div>
+    );
+  },
+
+  toggle() {
+    this.setState({expanded: !this.state.expanded});
+  },
+});
+
+exports.Collapse = Collapse;
