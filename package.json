@@ -12,8 +12,10 @@
     "url": "https://github.com/taskcluster/taskcluster-tools.git"
   },
   "dependencies": {
+    "aws-sdk": "^2.3.19",
     "babel-plugin-object-assign": "1.2.1",
     "babelify": "6.0.2",
+    "bluebird": "^3.4.0",
     "bootstrap": "^3.3.6",
     "classnames": "^2.2.3",
     "codemirror": "^5.11.0",
