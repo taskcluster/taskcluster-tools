@@ -12,6 +12,7 @@
     "url": "https://github.com/taskcluster/taskcluster-tools.git"
   },
   "dependencies": {
+    "assume": "^1.4.1",
     "aws-sdk": "^2.3.19",
     "babel-plugin-object-assign": "1.2.1",
     "babelify": "6.0.2",
