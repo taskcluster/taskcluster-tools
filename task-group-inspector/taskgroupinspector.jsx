@@ -60,17 +60,24 @@ let TaskGroupInspector = React.createClass({
     let tasks = [];
 
     do {
-      let result = await this.queue.listTaskGroup(taskGroupId,
-        continuationToken ? { continuationToken } : null);
+      let payload = {};
+
+      if (!continuationToken) {
+        payload.limit = 20;
+      } else {
+        payload.continuationToken = continuationToken;
+      }
+
+      let result = await this.queue.listTaskGroup(taskGroupId, payload);
 
       tasks.push(...result.tasks);
+
+      this.setState({
+        taskGroup: { taskGroupId, tasks }
+      });
+
       continuationToken = result.continuationToken;
     } while (continuationToken);
-
-    return {
-      taskGroupId,
-      tasks
-    };
   },
 
   /** Return promised state for TaskClusterMixin */
@@ -80,11 +87,7 @@ let TaskGroupInspector = React.createClass({
       return { taskGroup: null };
     }
 
-    // Construct promised state
-    // Load task status and take the `status` key from the response
-    return {
-      taskGroup: this.listTaskGroup(this.state.taskGroupId)
-    };
+    this.listTaskGroup(this.state.taskGroupId);
   },
 
   /** Load task status structure for state.taskId */
