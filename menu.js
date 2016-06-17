@@ -229,13 +229,13 @@ module.exports = [
       "Taskcluster depends on."
     ].join("\n")
   },
-	{
-		title:				"Diagnostics",
-		link:					"/diagnostics/",
-		icon:					"cogs",
-		display:			true,
-		description: 	[
-			"Display results from diagnostics tests"
-		].join("\n")
-	}
+  {
+    title:        "Diagnostics",
+    link:         "/diagnostics/",
+    icon:         "cogs",
+    display:      true,
+    description:  [
+      "Display results from diagnostics tests"
+    ].join("\n")
+  }
 ];
