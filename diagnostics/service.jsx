@@ -19,7 +19,7 @@ export default class Service extends React.Component {
 
   showPassing () {
     return <div> 
-      <p>Passing: </p>
+      <p><b>Passing:</b> </p>
       <ul className="container-fluid pass">
        {
           this.props.test.pass.map(res => <li>{res}</li>)
@@ -30,7 +30,7 @@ export default class Service extends React.Component {
 
   showFailing () {
     return <div> 
-      <p>Failing: </p>
+      <p><b>Failing:</b> </p>
       <ul>
         {
           this.props.test.fail.map(res => <li>{res}</li>)
