@@ -10,7 +10,11 @@ This module retreives the latest JSON and Raw logs from the server
 
 const BUCKET_NAME = 'taskcluster-diagnostic-logs';
 const REGION = 'us-west-2';
+<<<<<<< HEAD
 const BASE_URL = 'https://taskcluster-diagnostic-logs.s3.amazonaws.com';
+=======
+const BASE_URL = 'http://taskcluster-diagnostic-logs.s3.amazonaws.com';
+>>>>>>> f6fd10ca700644a5f578838b0583c0899a528780
 
 const parsePromise = xml => {
   return new Promise((resolve, reject) => {
