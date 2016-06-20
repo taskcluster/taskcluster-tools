@@ -228,5 +228,14 @@ module.exports = [
       "Display the status of Taskcluster services and underlying services ",
       "Taskcluster depends on."
     ].join("\n")
+  },
+  {
+    title:        "Diagnostics",
+    link:         "/diagnostics/",
+    icon:         "cogs",
+    display:      true,
+    description:  [
+      "Display results from diagnostics tests"
+    ].join("\n")
   }
 ];

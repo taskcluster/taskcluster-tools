@@ -12,8 +12,10 @@
     "url": "https://github.com/taskcluster/taskcluster-tools.git"
   },
   "dependencies": {
+    "assume": "^1.4.1",
     "babel-plugin-object-assign": "1.2.1",
     "babelify": "6.0.2",
+    "bluebird": "^3.4.0",
     "bootstrap": "^3.3.6",
     "classnames": "^2.2.3",
     "codemirror": "^5.11.0",
@@ -60,7 +62,8 @@
     "slugid": "^1.1.0",
     "taskcluster-client": "^0.23.17",
     "term.js": "0.0.4",
-    "www-authenticate": "^0.6.2"
+    "www-authenticate": "^0.6.2",
+    "xml2js": "^0.4.16"
   },
   "engines": {
     "node": "^4.0.0"

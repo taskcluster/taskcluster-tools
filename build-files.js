@@ -107,7 +107,12 @@ module.exports = [
   // Status
   'status/index.jade',
   'status/app.jsx',
-  'status/app.less'
+  'status/app.less',
+
+  //Diagnostics
+  'diagnostics/index.jade',
+  'diagnostics/app.jsx',
+  'diagnostics/app.less'
 ].map(function(file) {
   return path.join(__dirname, file);
 });
