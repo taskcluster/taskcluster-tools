@@ -30,18 +30,27 @@ export default class PurgeCacheButton extends Component {
   }
 
   purge() {
-  	console.log('purging');
+    
+    let purgeCache = new taskcluster.PurgeCache({
+      credentials: JSON.parse(localStorage.credentials)
+    });
+
+    return Promise.all(this.state.selected.map(cache => {
+      return purgeCache.purgeCache(
+        this.props.provisionerId, this.props.workerType, {cacheName: cache});
+    }));
   }
 
 
   render() {
     
     const 	glyph = "trash",
-    		label = "Purger Worker Cache",
-    		{ caches, provisionerId, workerType } = this.props;
+    		    label = "Purger Worker Cache",
+    		    { caches, provisionerId, workerType } = this.props;
 
-    return (
-               
+    
+
+    return (         
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
