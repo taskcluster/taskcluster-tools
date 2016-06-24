@@ -1,0 +1,117 @@
+@import "../lib/ui/taskview.less";
+
+.results-container .affix {
+  top: 1vh;
+  max-height: 95vh;
+  width: 48%; // approximation of similar element width once moved to fixed layout
+  right: 8.33333333%;
+}
+
+.task-group-inspector-tasks {
+  font-size: 14px;
+
+  tbody > tr:not(.info) {
+    cursor: pointer;
+  }
+}
+
+.task-view .tab-content {
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+.table > tbody > tr > td > span.markdown-view > p:last-of-type {
+  margin: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+
+
+
+
+
+
+
+
+.removeLeftPadding {
+  padding-left: 0;
+}
+.removeRightPadding {
+  padding-right: 0;
+}
+.remove-border-radius {
+  border-radius: 0;
+}
+.table-wrapper {
+  height:60vh;
+  overflow-y: auto;
+}
+.detail-table, .run-table {
+    width:100%;
+}
+
+.topPadding {
+  padding-top: 15px;
+}
+.search-form {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+input[type="submit"] {
+  border: 1px solid #ccc
+}
+
+.label-exception {
+    background-color: #333;
+}
+.label-completed {
+    background-color: #5cb85c;
+}
+.label-failed {
+    background-color: #d9534f;
+}
+.label-unscheduled {
+    background-color: #777777;
+}
+.label-pending {
+    background-color: #5bc0de;
+}
+.label-running {
+    background-color: #337ab7;
+}
+
+.baseline-align {
+  vertical-align: baseline;
+}
+.my-label {
+  display: inline;
+  padding: .2em .6em .3em !important;
+  font-weight: bold;
+  line-height: 4em !important;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+}
+
+.hideDisplay {
+  display: none;
+}
+.hideVisibility {
+  visibility: hidden;
+}
+
+.tableColumnBaseline {
+  vertical-align: baseline !important;
+}
+
+.spinner {
+  text-align: center;
+  margin: 20;
+}
+
