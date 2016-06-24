@@ -9,36 +9,17 @@ import ScheduleTaskButton from '../buttons/scheduleTaskButton';
 import CancelTaskButton from '../buttons/cancelTaskButton';
 
 
-class TaskDetail extends Component {
+export default class TaskDetail extends Component {
 
 	constructor(props) {
 		super(props);
-		this.showScope = this.showScope.bind(this);
 	}
-
-	showScope(task, status) {
-		const scopes = task.scopes;
-		return scopes.map((scope, i) => {
-			return (
-				<ul key={i}>{scope}</ul>
-			);
-		});
-	}
-
-	componentWillMount() {
-		const { taskId } = this.props.params;
-		this.props.fetchStatus(taskId);
-		this.props.fetchTask(taskId);
-	}
-
-
 
 	render() {
+
 		if(!!!this.props.task || !!!this.props.status) {
 			return <div>Loading...</div>;
 		}
-
-	
 
 		const { task, status } = this.props;
 		return (
@@ -85,26 +66,14 @@ class TaskDetail extends Component {
 									provisionerId={task.provisionerId}
 	                            	workerType={task.workerType} />
 	                            		
-							</bs.ButtonToolbar>
-							
+							</bs.ButtonToolbar>						
 
 						</td>
 					</tr>
 					<tr>
 						<td><b>Debug</b></td>
 						<td>
-							<bs.ButtonToolbar>
-								<Modal
-				          label="Edit and Create"
-				          content="Text in a modal"
-				          glyph="edit"
-				          actionOnClick={() => console.log('action clicked')} />
-								<Modal
-				          label="One-Click Loaner"
-				          content="Text in a modal"
-				          glyph="console"
-				          actionOnClick={() => console.log('action clicked')} />
-							</bs.ButtonToolbar>
+							edit and create and one click loaner
 						</td>
 					</tr>
 
@@ -115,11 +84,23 @@ class TaskDetail extends Component {
 	}
 }
 
-function mapStateToProps(state) {
-	return {
-		task: state.task,
-		status: state.status
-	}
-}
+// <bs.ButtonToolbar>
+// 								<Modal
+// 				          label="Edit and Create"
+// 				          content="Text in a modal"
+// 				          glyph="edit"
+// 				          actionOnClick={() => console.log('action clicked')} />
+// 								<Modal
+// 				          label="One-Click Loaner"
+// 				          content="Text in a modal"
+// 				          glyph="console"
+// 				          actionOnClick={() => console.log('action clicked')} />
+// 							</bs.ButtonToolbar>
 
-export default connect(mapStateToProps, actions )(TaskDetail)
+// function mapStateToProps(state) {
+// 	return {
+// 		task: state.task,
+// 		status: state.status
+// 	}
+// }
+

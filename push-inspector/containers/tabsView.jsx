@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 import * as bs from 'react-bootstrap';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import TaskDetail from './TaskDetail';
+import TaskDetail from '../components/taskDetail';
 import TaskRun from '../components/taskRun';
 
 class TabsView extends Component {
@@ -13,8 +13,10 @@ class TabsView extends Component {
 	}
 
 	componentWillMount() {
-		const { params, fetchArtifacts } = this.props;
+		const { params, fetchArtifacts, fetchTask, fetchStatus } = this.props;
 		fetchArtifacts(params.taskId);
+		fetchTask(params.taskId);
+		fetchStatus(params.taskId);
 	}
 
 	
@@ -34,7 +36,7 @@ class TabsView extends Component {
 	        </TabList>
 
 	        <TabPanel>
-	          <TaskDetail params={params} />
+	          <TaskDetail task={task} status={status} />
 	        </TabPanel>
 	        <TabPanel>
 	          <TaskRun task={task} status={status} artifacts={artifacts} />
@@ -47,7 +49,6 @@ class TabsView extends Component {
 	    )
   	}
 }
-
 function mapStateToProps(state) {
 	return {
 		task: state.task,
