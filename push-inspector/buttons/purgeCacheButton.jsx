@@ -48,13 +48,14 @@ export default class PurgeCacheButton extends Component {
     		    label = "Purger Worker Cache",
     		    { caches, provisionerId, workerType } = this.props;
 
-    
+
 
     return (         
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
-	      	action = {this.purge} >
+	      	action = {this.purge}
+          success = "Cache successfully purged!" >
             
 	      	<div>
 	          <p>Are you sure you wish to purge caches used in this task across all

@@ -10,10 +10,10 @@ export default class RetriggerButton extends Component {
   constructor(props) {
     super(props);
   
-    this.retrigger = this.retrigger.bind(this);
+    this.createTask = this.createTask.bind(this);
   }
 
-  retrigger() {
+  createTask() {
   	console.log('retriggering');
   }
 
@@ -47,7 +47,7 @@ export default class RetriggerButton extends Component {
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
-	      	action = {this.retrigger} >
+	      	action = {this.createTask} >
             
 	      	{retriggerContent}
 

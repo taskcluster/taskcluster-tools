@@ -2,7 +2,7 @@ import React from 'react';
 import { Component } from 'react';
 import * as bs from 'react-bootstrap';
 import format from '../../lib/format';
-
+import Utils from '../lib/utils';
 
 export default class Modal extends Component {
 
@@ -17,7 +17,6 @@ export default class Modal extends Component {
     this.open = this.open.bind(this);
     this.close = this.close.bind(this);
     this.executeAction = this.executeAction.bind(this);
-    this.renderError = this.renderError.bind(this);
   }
 
   
@@ -33,49 +32,18 @@ export default class Modal extends Component {
     this.setState({showDialog: true});
   }
 
-
-  renderError(err) {
-    // Find some sort of summary or error code
-    console.log('err: ', err);
-    let code = err.code + ' Error!';
-    if (!err.code && err.statusCode) {
-      code = 'HTTP ' + err.statusCode;
-    }
-    code = code || 'Unknown Error';
-
-    // Find some sort of message
-    let message = err.message || '```\n' + err.stack + '\n```';
-
-    let title = <bs.Button bsStyle="link">Additional details...</bs.Button>;
-    return (
-      <bs.Alert bsStyle="danger">
-          <strong>
-            {code}&nbsp;
-          </strong>
-          <format.Markdown>{message}</format.Markdown>
-          <format.Collapse title={title}>
-            <pre>
-              {JSON.stringify(err.body, null, 2)}
-            </pre>
-          </format.Collapse>
-        </bs.Alert>
-    );
-  }
-
   executeAction() {
     this.setState({executing: true});
     let result = this.props.action(),
         message = undefined;
   
     result.then((value) => {
-      console.log('value: ', value);
-      message = value;
+      message = this.props.success;
+      this.setState({result: message})
     }, (reason) => {
-      message = this.renderError(reason);
-      this.setState({
-        result: message
-      });
-    })
+      message = Utils.renderError(reason);
+      this.setState({result: message});
+    });
  
   }
 
@@ -88,7 +56,7 @@ export default class Modal extends Component {
         <hr/>
         <h4>Status</h4>
         <span>
-          {this.state.result}
+          {this.state.result || this.props.success}
         </span>
       </span>
     );
