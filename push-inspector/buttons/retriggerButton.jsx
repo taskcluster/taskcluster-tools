@@ -2,6 +2,7 @@ import React from 'react';
 import { Component } from 'react';
 import * as bs from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
+import slugid from 'slugid';
 import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
@@ -13,8 +14,30 @@ export default class RetriggerButton extends Component {
     this.createTask = this.createTask.bind(this);
   }
 
+  // NOT WORKING YET
   createTask() {
   	console.log('retriggering');
+
+    const queue = new taskcluster.Queue();
+
+    let taskId = slugid.nice();
+    let task = _.cloneDeep(this.props.task);
+
+    console.log('TASK ID: ', taskId);
+
+    let now = Date.now();
+    let created = Date.parse(task.created);
+    task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
+    task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
+    task.created = new Date(now).toJSON();
+
+    task.retries = 0;
+
+    
+    let result =  queue.createTask(taskId, task);
+    
+    return result;
+    //window.location = '/task-inspector/#' + taskId;
   }
 
 
@@ -22,6 +45,7 @@ export default class RetriggerButton extends Component {
     
     const glyph = "repeat",
     		  label = "Retrigger";
+
     	
 
     const retriggerContent = (

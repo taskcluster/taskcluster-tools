@@ -2,7 +2,7 @@ import React from 'react';
 import { Component } from 'react';
 import * as bs from 'react-bootstrap';
 import format from '../../lib/format';
-import Utils from '../lib/utils';
+import { rendering } from '../lib/utils';
 
 export default class Modal extends Component {
 
@@ -41,7 +41,7 @@ export default class Modal extends Component {
       message = this.props.success;
       this.setState({result: message})
     }, (reason) => {
-      message = Utils.renderError(reason);
+      message = rendering.renderError(reason);
       this.setState({result: message});
     });
  

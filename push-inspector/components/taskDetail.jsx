@@ -56,7 +56,8 @@ export default class TaskDetail extends Component {
 								
 				          		<ScheduleTaskButton />
 								
-				          		<RetriggerButton />
+				          		<RetriggerButton
+				          			task={task} />
 							
 								
 								<CancelTaskButton />

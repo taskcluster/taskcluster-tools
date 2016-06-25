@@ -5,6 +5,7 @@ import * as actions from '../actions';
 //import ProgressBar from '../components/progressBar';
 import Table from './table';
 import taskcluster from 'taskcluster-client';
+import { webListener } from '../lib/utils';
 
 
 class Listings extends Component {
@@ -12,56 +13,39 @@ class Listings extends Component {
   constructor(props) {
     super(props);
     this.listener = null;
+    this.webListener = webListener();
   }
 
   // Close Listener connection
-  removeBindings() {
-    this.listener.close();
+  stopListening() {
+    this.webListener.stopListening();
+  }
+
+  startListening(taskGroupId, onMessageAction) {
+    this.webListener.startListening(taskGroupId, onMessageAction);
   }
 
 
   //  Remove the list of tasks that were previously loaded
-  componentWillUnmount(nextProps) {
+  componentWillUnmount() {
       this.props.removeTasks();
-      this.removeBindings();
+      this.stopListening();
   }
 
-  setupListener() {
-    const queue = new taskcluster.Queue(),
-          queueEvents = new taskcluster.QueueEvents(),
-          { params } = this.props;
-
-    this.listener = new taskcluster.WebListener();
-    this.listener.bind(queueEvents.taskPending({
-      taskGroupId: params.taskGroupId
-    }));
-
-    this.listener.bind(queueEvents.taskCompleted({
-      taskGroupId: params.taskGroupId
-    }));
-
-    this.listener.on("message", (message) => {
-      console.log('MESSAGE: ', message.payload.status);
-      this.props.fetchTasks(params.taskGroupId);
-      //  message.payload.status is the only property that is consistent across all exchanges
-      //  message.payload.task never changes because its the task definition
-      //  updateReduxStore();
-    });
-
-    this.listener.on("error", function(err) {
-      console.log('ERROR: ', err);
-      //  Perhaps display an error banner on top of the dashboard. This happens when a user puts him laptop to sleep
-      //  A smart way is to restart listening from scratch.
-      //  If you reconnect, make sure there is a limit. if more than 5 times in the 5 min interval, then stop reconnecting.
-    });
-
-    this.listener.resume();
+  componentDidUpdate(prevProps, prevState) {
+    console.log('recevied new nextprops: ', this.props);
+    console.log('old: ', prevProps);
+    if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {
+      this.webListener.stopListening();
+      this.stopListening();
+      this.startListening(this.props.params.taskGroupId, this.props.fetchTasks);
+    }
   }
 
   componentWillMount() {
     const { taskGroupId } = this.props.params;
     this.props.fetchTasks(taskGroupId);
-    this.setupListener();
+    this.startListening(taskGroupId, this.props.fetchTasks);
   }
 
   render() {
