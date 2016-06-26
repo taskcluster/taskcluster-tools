@@ -33,8 +33,6 @@ class Listings extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('recevied new nextprops: ', this.props);
-    console.log('old: ', prevProps);
     if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {
       this.webListener.stopListening();
       this.stopListening();

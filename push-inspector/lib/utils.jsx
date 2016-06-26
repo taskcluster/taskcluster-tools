@@ -36,7 +36,6 @@ export const webListener = () => {
 
       listener.resume();
 
-      console.log('listening for new tasks...');
     },
 
     stopListening : () => {
