@@ -387,7 +387,7 @@ var TaskInfo = React.createClass({
         cmds.push("");
         cmds.push("if [[ `apt-cache search v4l2loopback-dkms | wc -l` -eq 0 ]]; then");
         cmds.push("  echo 'We are going to install v42loopback-dkms on your host.'");
-        cmds.push("  echo 'If you're OK with it type your root password.'");
+        cmds.push("  echo 'If you are OK with it type your root password.'");
         cmds.push("  sudo apt-get install -qq -f v4l2loopback-dkms");
         cmds.push("fi");
         cmds.push("");
