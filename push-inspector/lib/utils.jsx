@@ -3,12 +3,12 @@ import * as bs from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 
+// All of the application uses this queue and queueEvents
+export const queue = new taskcluster.Queue();
+export const queueEvents = new taskcluster.QueueEvents();
 
 export const webListener = () => {
   
-  const queue = new taskcluster.Queue(),
-        queueEvents = new taskcluster.QueueEvents();
-
   let listener = new taskcluster.WebListener();
   return {
     startListening : (taskGroupId, onMessageAction) => {
