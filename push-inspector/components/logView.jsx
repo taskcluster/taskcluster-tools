@@ -62,7 +62,7 @@ export default class LogView extends Component {
           clearable={false}/>
       
       <button type="button"
-              className="btn btn-sm btn-default log-view-btn-refresh"
+              className="btn btn-sm btn-default"
               onClick={this.refreshLog}>
         <i className="glyphicon glyphicon-refresh"></i>
       </button>

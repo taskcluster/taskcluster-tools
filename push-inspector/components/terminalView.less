@@ -1,0 +1,32 @@
+.viewer {
+  width: 100%;
+}
+
+.viewer > div {
+  display: inline-block;
+  vertical-align: top;
+  overflow-y: hidden;
+}
+
+.viewer > .buffer {
+  background-color: black;
+  width: calc(~'100% - 20px');
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 600px; 
+  padding-left: 7px;
+}
+
+.viewer > .buffer > div {
+  font-family: monospace;
+  color: white;
+  margin-bottom: 2px;
+  margin-top: 2px;
+  min-height: 1em;
+  font-size: 0.8em;
+}
+
+.viewer > .scrollbar {
+  width: 20px;
+  background-color: #7f7f7f;
+}
