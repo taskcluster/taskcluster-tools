@@ -50,9 +50,6 @@ export default class LogView extends Component {
     });
     
     
-    debugger;
-
-
     return (
    		<span>
         
@@ -71,7 +68,7 @@ export default class LogView extends Component {
       </button>
    
    
-      <TerminalView url={logUrl} ref="termView"/>
+      <TerminalView url={logUrl} />
     </span>
 
     );
