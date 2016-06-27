@@ -36,9 +36,8 @@ export default class TaskRun extends Component {
     });
   }
 
-  renderLogView(status, runNumber, artifacts) {
-    const runId = status.runs[runNumber].runId,
-          taskId = status.taskId;
+  renderLogView(taskId, runId, artifacts) {
+    
 
     const logs = artifacts.filter(function(artifact) {
       return /^public\/logs\//.test(artifact.name);
@@ -59,6 +58,7 @@ export default class TaskRun extends Component {
   render() {
 
     const { task, status, artifacts } = this.props,
+          taskId = status.taskId,
           runNumber = status.runs.length - 1;          
 
     // Check if we have the run
@@ -72,7 +72,8 @@ export default class TaskRun extends Component {
     }
 
     const rowComponents = this.generateRows(),
-          logView = this.renderLogView(status, runNumber, artifacts);
+          runId = status.runs[runNumber].runId,          
+          logView = this.renderLogView(taskId, runId, artifacts);
 
     return (
       <div>
@@ -84,7 +85,7 @@ export default class TaskRun extends Component {
                 <b>Artifacts</b>
               </td>
               <td>                
-                <ArtifactList artifacts={artifacts} />
+                <ArtifactList artifacts={artifacts} taskId={taskId} runId={runId} />
               </td>
             </tr>            
             </tbody>
