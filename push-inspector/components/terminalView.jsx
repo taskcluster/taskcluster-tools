@@ -50,8 +50,23 @@ export default class TerminalView extends Component {
     }
   }
 
+  refresh() {
+    this.open();
+  }
+
 	open() {
-		this.worker = work(require('./log-fetcher.js'));
+		
+    // Abort previous request if any
+    if (this.worker) {
+      this.abortRequest();
+    }
+
+    // If not given a URL we'll just stop here with an empty terminal
+    if (!this.props.url) {
+      return;
+    }
+
+    this.worker = work(require('./log-fetcher.js'));
     this.worker.addEventListener('message', this.onData);
     this.worker.postMessage({ url: this.props.url });
 	}

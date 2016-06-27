@@ -29,19 +29,20 @@ export default class LogView extends Component {
     }
   }
 
-  handleLogChanged() {
-
+  handleLogChanged(log) {  
+    if(this.state.name != log.value) {
+      this.setState({name: log.value});
+      this.refreshLog();  
+    }   
   }
 
 	refreshLog() {
-
+    this.refs.termView.refresh();
 	}  
-
 
 
   render() {
   	const { runId, taskId } = this.props;
-    console.log('logs : ', logs);
 
     const logUrl = this.createUrlForArtifact();
 
@@ -68,7 +69,7 @@ export default class LogView extends Component {
       </button>
    
    
-      <TerminalView url={logUrl} />
+      <TerminalView ref="termView" url={logUrl} />
     </span>
 
     );
