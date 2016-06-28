@@ -1,5 +1,5 @@
 import {
-	FETCH_TASK
+	FETCH_TASK,
 } from '../actions/types';
 
 export default function(state = null, action) {

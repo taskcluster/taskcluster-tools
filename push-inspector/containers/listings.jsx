@@ -14,6 +14,8 @@ class Listings extends Component {
     super(props);
     this.listener = null;
     this.webListener = webListener();
+
+    this.update = this.update.bind(this);
   }
 
   // Close Listener connection
@@ -22,7 +24,16 @@ class Listings extends Component {
   }
 
   startListening(taskGroupId, onMessageAction) {
+    
     this.webListener.startListening(taskGroupId, onMessageAction);
+  }
+
+  update() {
+
+    const { params } = this.props;
+    this.props.fetchTasks(params.taskGroupId);
+    this.props.fetchTask(params.taskId);
+    this.props.fetchStatus(params.taskId);
   }
 
 
@@ -36,14 +47,14 @@ class Listings extends Component {
     if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {
       this.webListener.stopListening();
       this.stopListening();
-      this.startListening(this.props.params.taskGroupId, this.props.fetchTasks);
+      this.startListening(this.props.params.taskGroupId, this.update);
     }
   }
 
   componentWillMount() {
-    const { taskGroupId } = this.props.params;
+    const { taskGroupId, taskId } = this.props.params;
     this.props.fetchTasks(taskGroupId);
-    this.startListening(taskGroupId, this.props.fetchTasks);
+    this.startListening(taskGroupId, this.update);
   }
 
   render() {

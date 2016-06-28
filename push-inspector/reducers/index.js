@@ -11,7 +11,7 @@ const rootReducer = combineReducers({
   task: taskReducer,
   status: statusReducer,
   activeTaskStatus: activeTaskStatusReducer,
-  artifacts: artifactsReducer
+  artifacts: artifactsReducer,
 });
 
 export default rootReducer;

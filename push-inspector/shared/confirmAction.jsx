@@ -36,15 +36,27 @@ export default class Modal extends Component {
     this.setState({executing: true});
     let result = this.props.action(),
         message = undefined;
-  
-    result.then((value) => {
-      message = this.props.success;
-      this.setState({result: message})
-    }, (reason) => {
-      message = rendering.renderError(reason);
-      this.setState({result: message});
-    });
+    
+    this.handleResult(result, message);
+    
  
+  }
+
+  handleResult(result, message) {
+    debugger;
+    
+    //  Check if it is a promise
+    if(typeof result != "undefined" && typeof result.then === "function") {
+      result.then((value) => {
+        message = this.props.success;
+        this.setState({result: message});
+      }, (reason) => {
+        message = rendering.renderError(reason);
+        this.setState({result: message});
+      });
+
+    }
+
   }
 
   render() {

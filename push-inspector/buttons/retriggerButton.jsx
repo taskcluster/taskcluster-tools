@@ -1,53 +1,26 @@
 import React from 'react';
 import { Component } from 'react';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 import * as bs from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import slugid from 'slugid';
 import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
-export default class RetriggerButton extends Component {
+class RetriggerButton extends Component {
 
   constructor(props) {
     super(props);
-  
-    this.createTask = this.createTask.bind(this);
   }
-
-  // NOT WORKING YET
-  createTask() {
-  	console.log('retriggering');
-
-    const queue = new taskcluster.Queue();
-
-    let taskId = slugid.nice();
-    let task = _.cloneDeep(this.props.task);
-
-    console.log('TASK ID: ', taskId);
-
-    let now = Date.now();
-    let created = Date.parse(task.created);
-    task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
-    task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
-    task.created = new Date(now).toJSON();
-
-    task.retries = 0;
-
-    
-    let result =  queue.createTask(taskId, task);
-    
-    return result;
-    //window.location = '/task-inspector/#' + taskId;
-  }
-
 
   render() {
     
     const glyph = "repeat",
     		  label = "Retrigger";
 
-    	
-
+    const { tasks, task, retriggerTask } = this.props;
+  
     const retriggerContent = (
       <div>
         <p>
@@ -67,17 +40,25 @@ export default class RetriggerButton extends Component {
     );  	  
 
     return (
-               
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
-	      	action = {this.createTask} >
-            
+	      	action = {() => retriggerTask(tasks,task)} 
+          success = "Retrigger success" >
 	      	{retriggerContent}
 
     	</ConfirmAction>
-          
+
     );
   }
 
 }
+
+function mapStateToProps(state) {
+  return {
+    task: state.task,
+    tasks: state.tasks,
+  }
+}
+
+export default connect(mapStateToProps, actions )(RetriggerButton);

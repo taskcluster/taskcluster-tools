@@ -21,10 +21,7 @@ export const webListener = () => {
 
       listener.on("message", (message) => {
         console.log('MESSAGE: ', message.payload.status);
-        onMessageAction(taskGroupId);
-        //  message.payload.status is the only property that is consistent across all exchanges
-        //  message.payload.task never changes because its the task definition
-        //  updateReduxStore();
+        onMessageAction();
       });
 
       listener.on("error", function(err) {

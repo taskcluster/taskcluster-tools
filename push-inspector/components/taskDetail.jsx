@@ -21,7 +21,7 @@ export default class TaskDetail extends Component {
 			return <div>Loading...</div>;
 		}
 
-		const { task, status } = this.props;
+		const { task, status, actions } = this.props;
 		return (
 			<table className="detail-table">
 				<tbody>

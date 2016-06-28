@@ -32,8 +32,6 @@ class Table extends Component {
   taskClicked(task) {
     const { taskId, taskGroupId } = task.status;
 		hashHistory.push(taskGroupId + '/' + taskId);
-		this.props.fetchTask(taskId);
-		this.props.fetchStatus(taskId);
 	}
 
   clearFilter() {

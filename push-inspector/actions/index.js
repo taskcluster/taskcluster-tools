@@ -4,16 +4,23 @@ import {
 	FETCH_STATUS,
 	UPDATE_STATUS,
 	ACTIVE_TASK_STATUS,
-	FETCH_ARTIFACTS
+	FETCH_ARTIFACTS,
+	CREATE_TASK,
+	MODAL_ERROR_MESSAGE
 } from './types';
 
 import taskcluster from 'taskcluster-client';
+import { queue } from '../lib/utils';
+import slugid from 'slugid';
+import _ from 'lodash';
+import { hashHistory } from 'react-router';
+
+
 
 //	Get task group list
 // 	This function will iterate recursively to get the full list of tasks
 //	It will dispatch on each call
 export function fetchTasks(id = "ARUrTTyjQRiXEeo1uySLnA") {
-	const queue = new taskcluster.Queue();
 	let list = [];
 	return (dispatch) => {
 		(function iteratePromises(token) {
@@ -38,7 +45,6 @@ export function fetchTasks(id = "ARUrTTyjQRiXEeo1uySLnA") {
 
 //	Get task definition
 export function fetchTask(id = "AB0MITrrT2WoIfKvmruvyw") {
-	const queue = new taskcluster.Queue();
 	const request = queue.task(id);
 	return (dispatch) => {
 		request.then((task) => {
@@ -52,7 +58,6 @@ export function fetchTask(id = "AB0MITrrT2WoIfKvmruvyw") {
 
 //	Fetch list of artifacts
 export function fetchArtifacts(id = "AB0MITrrT2WoIfKvmruvyw") {
-	const queue = new taskcluster.Queue();
 	const request = queue.listLatestArtifacts(id);
 	return (dispatch) => {
 		request.then((data) => {
@@ -75,7 +80,6 @@ export function removeTasks() {
 
 //	Get task status
 export function fetchStatus(id = "AB0MITrrT2WoIfKvmruvyw") {
-	const queue = new taskcluster.Queue();
 	const request = queue.status(id);
 	return (dispatch) => {
 		request.then(({status}) => {
@@ -93,4 +97,48 @@ export function setActiveTaskStatus(status) {
 		type: ACTIVE_TASK_STATUS,
 		payload: status
 	}
+}
+
+// Retrigger a task
+export function retriggerTask(list, toClone) {
+
+	var queue = new taskcluster.Queue({
+		credentials: JSON.parse(localStorage.credentials)
+	});
+	
+	let taskId = slugid.nice();
+	console.log('creating task with id: ', taskId);
+    let task = _.cloneDeep(toClone);
+
+    let now = Date.now();
+    let created = Date.parse(task.created);
+    task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
+    task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
+    task.created = new Date(now).toJSON();
+
+    task.retries = 0;
+    const request = queue.createTask(taskId, task);
+	return (dispatch) => {
+		console.log('request is: ', request);
+		debugger;
+		//if(typeof request.then != "undefined") {
+			request.then((data) => {			
+				let dataObj = { task, status: data.status };
+				hashHistory.push(task.taskGroupId + '/' + data.status.taskId);
+				
+				dispatch({
+					type: CREATE_TASK,
+					payload: list.concat(dataObj)
+				})
+				
+			}, (err) => {
+				dispatch({
+					type: MODAL_ERROR_MESSAGE,
+					payload: err
+				})
+			});
+		//}
+		
+	}
+	
 }

@@ -8,21 +8,39 @@ import TaskRun from '../components/taskRun';
 
 class TabsView extends Component {
 
+	constructor(props) {
+		super(props);
+	}
+
 	handleSelect(index, last) {
 
 	}
 
-	componentWillMount() {
+	fetchTaskData() {
 		const { params, fetchArtifacts, fetchTask, fetchStatus } = this.props;
 		fetchArtifacts(params.taskId);
 		fetchTask(params.taskId);
 		fetchStatus(params.taskId);
 	}
 
+	componentWillMount() {
+		this.fetchTaskData();
+	}
+
+
+	componentDidUpdate(prevProps, prevState) {
+		//	This can happen when retriggering a task or clicking on a task
+		if(prevProps.params.taskId != this.props.params.taskId) {
+			this.fetchTaskData();
+		}
+	}
+
 	
 
 	render() {
 		const { params, task, status, artifacts } = this.props;
+
+
 		return (
 
 	      <Tabs
