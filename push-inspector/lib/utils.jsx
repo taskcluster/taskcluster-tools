@@ -59,17 +59,25 @@ export const rendering =  {
     let title = <bs.Button bsStyle="link">Additional details...</bs.Button>;
     return (
       <bs.Alert bsStyle="danger">
-          <strong>
-            {code}&nbsp;
-          </strong>
-          <format.Markdown>{message}</format.Markdown>
-          <format.Collapse title={title}>
-            <pre>
-              {JSON.stringify(err.body, null, 2)}
-            </pre>
-          </format.Collapse>
-        </bs.Alert>
+        <strong>
+          {code}&nbsp;
+        </strong>
+        <format.Markdown>{message}</format.Markdown>
+        <format.Collapse title={title}>
+          <pre>
+            {JSON.stringify(err.body, null, 2)}
+          </pre>
+        </format.Collapse>
+      </bs.Alert>
     );
+  },
+
+  renderSuccess(message) {
+    return (
+      <bs.Alert bsStyle="success">
+        {message}   
+      </bs.Alert>
+    )
   }
 }
 

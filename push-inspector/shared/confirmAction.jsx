@@ -1,10 +1,12 @@
 import React from 'react';
 import { Component } from 'react';
 import * as bs from 'react-bootstrap';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 import format from '../../lib/format';
 import { rendering } from '../lib/utils';
 
-export default class Modal extends Component {
+class ConfirmAction extends Component {
 
   constructor(props) {
     super(props);
@@ -35,29 +37,25 @@ export default class Modal extends Component {
   executeAction() {
     this.setState({executing: true});
     let result = this.props.action(),
-        message = undefined;
-    
-    this.handleResult(result, message);
-    
- 
+        message = undefined;  
   }
 
-  handleResult(result, message) {
-    debugger;
+  // handleResult(result, message) {
+  //   debugger;
     
-    //  Check if it is a promise
-    if(typeof result != "undefined" && typeof result.then === "function") {
-      result.then((value) => {
-        message = this.props.success;
-        this.setState({result: message});
-      }, (reason) => {
-        message = rendering.renderError(reason);
-        this.setState({result: message});
-      });
+  //   //  Check if it is a promise
+  //   if(typeof result != "undefined" && typeof result.then === "function") {
+  //     result.then((value) => {
+  //       message = this.props.success;
+  //       this.setState({result: message});
+  //     }, (reason) => {
+  //       message = rendering.renderError(reason);
+  //       this.setState({result: message});
+  //     });
 
-    }
+  //   }
 
-  }
+  // }
 
   render() {
     
@@ -67,6 +65,9 @@ export default class Modal extends Component {
       <span>
         <hr/>
         <h4>Status</h4>
+        <span>  
+          {this.props.taskActionMessage}
+        </span>
         <span>
           {this.state.result || this.props.success}
         </span>
@@ -113,3 +114,11 @@ export default class Modal extends Component {
   }
 
 }
+
+function mapStateToProps(state) {
+  return {
+    taskActionMessage: state.taskActionMessage,
+  }
+}
+
+export default connect(mapStateToProps, actions )(ConfirmAction)

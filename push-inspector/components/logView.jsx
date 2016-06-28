@@ -54,23 +54,22 @@ export default class LogView extends Component {
     return (
    		<span>
         
-        <label>Show Log</label>
-	   
-        <Select
-          value={this.state.name}
-          onChange={this.handleLogChanged}
-          options={logs}
-          clearable={false}/>
-      
-      <button type="button"
-              className="btn btn-sm btn-default"
-              onClick={this.refreshLog}>
-        <i className="glyphicon glyphicon-refresh"></i>
-      </button>
-   
-   
+        <label>Show Log</label>	   
+        <div>
+          <Select
+            value={this.state.name}
+            onChange={this.handleLogChanged}
+            options={logs}
+            clearable={false}/>
+        
+          <bs.Button type="button"
+                  className="btn btn-sm btn-default"
+                  onClick={this.refreshLog}>
+            <i className="glyphicon glyphicon-refresh"></i>
+          </bs.Button>
+        </div>
       <TerminalView ref="termView" url={logUrl} />
-    </span>
+      </span>
 
     );
   }

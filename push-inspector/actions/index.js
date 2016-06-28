@@ -6,7 +6,8 @@ import {
 	ACTIVE_TASK_STATUS,
 	FETCH_ARTIFACTS,
 	CREATE_TASK,
-	MODAL_ERROR_MESSAGE
+	TASK_ACTIONS_ERROR,
+	TASK_ACTIONS_SUCCESS
 } from './types';
 
 import taskcluster from 'taskcluster-client';
@@ -14,6 +15,7 @@ import { queue } from '../lib/utils';
 import slugid from 'slugid';
 import _ from 'lodash';
 import { hashHistory } from 'react-router';
+import { rendering } from '../lib/utils';
 
 
 
@@ -99,45 +101,74 @@ export function setActiveTaskStatus(status) {
 	}
 }
 
+export function purge(provisionerId, workerType, selectedCaches, successMessage) {   
+  
+  let purgeCache = new taskcluster.PurgeCache({
+    credentials: JSON.parse(localStorage.credentials)
+  });
+
+  let cachesPromise = Promise.all(selectedCaches.map(cache => {
+    return purgeCache.purgeCache(
+      provisionerId, workerType, {cacheName: cache});
+  }));
+
+  return (dispatch) => {
+		cachesPromise.then((data) => {
+			dispatch({
+				type: TASK_ACTIONS_SUCCESS,
+				payload: rendering.renderSuccess(successMessage)
+			})
+		}, (err) => {		
+			dispatch({
+				type: TASK_ACTIONS_ERROR,
+				payload: rendering.renderError(err)
+			})	
+		});
+	}
+
+}
+
 // Retrigger a task
-export function retriggerTask(list, toClone) {
+export function retriggerTask(list, toClone, successMessage) {
 
 	var queue = new taskcluster.Queue({
 		credentials: JSON.parse(localStorage.credentials)
 	});
 	
-	let taskId = slugid.nice();
-	console.log('creating task with id: ', taskId);
-    let task = _.cloneDeep(toClone);
+	const taskId = slugid.nice(),
+    	task = _.cloneDeep(toClone),
+    	now = Date.now(),
+    	created = Date.parse(task.created);
 
-    let now = Date.now();
-    let created = Date.parse(task.created);
+    console.log('Creating TaskId: ', taskId);
     task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
     task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
     task.created = new Date(now).toJSON();
-
     task.retries = 0;
+
     const request = queue.createTask(taskId, task);
+
 	return (dispatch) => {
-		console.log('request is: ', request);
-		debugger;
-		//if(typeof request.then != "undefined") {
-			request.then((data) => {			
-				let dataObj = { task, status: data.status };
-				hashHistory.push(task.taskGroupId + '/' + data.status.taskId);
-				
-				dispatch({
-					type: CREATE_TASK,
-					payload: list.concat(dataObj)
-				})
-				
-			}, (err) => {
-				dispatch({
-					type: MODAL_ERROR_MESSAGE,
-					payload: err
-				})
-			});
-		//}
+		request.then((data) => {			
+			
+			let dataObj = { task, status: data.status };
+			hashHistory.push(task.taskGroupId + '/' + data.status.taskId);
+			
+			dispatch({
+				type: CREATE_TASK,
+				payload: list.concat(dataObj)
+			})
+			dispatch({
+				type: TASK_ACTIONS_SUCCESS,
+				payload: rendering.renderSuccess(successMessage)
+			})
+			
+		}, (err) => {
+			dispatch({
+				type: TASK_ACTIONS_ERROR,
+				payload: rendering.renderError(err)
+			})
+		});
 		
 	}
 	
