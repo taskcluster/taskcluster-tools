@@ -1,31 +1,29 @@
 import React from 'react';
 import { Component } from 'react';
 import * as bs from 'react-bootstrap';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
-export default class ScheduleTaskButton extends Component {
+class ScheduleTaskButton extends Component {
 
   constructor(props) {
-    super(props);
-  
-    this.schedule = this.schedule.bind(this);
+    super(props);  
   }
 
-  schedule() {
-  	console.log('scheduleTask');
-  }
-
-
+ 
   render() {
     
     const glyph = "play",
-    		  label = "Schedule Task";
-    	
+          label = "Schedule Task",
+          successMsg = "Successfully scheduled task!";
+    
 
-
-
+    const { status, scheduleTask } = this.props,
+          taskId = status.taskId;
+          
     const scheduleContent = (
       <div>
         <p>
@@ -35,20 +33,28 @@ export default class ScheduleTaskButton extends Component {
           this task may cause your code to land with broken tests.
         </p>
       </div>
-    );	  
+    );     
 
     return (
                
-  		<ConfirmAction 
-	      	label = {label}
-	      	glyph = {glyph}
-	      	action = {this.schedule} >
+      <ConfirmAction 
+          label = {label}
+          glyph = {glyph}
+          action = {() => { scheduleTask(taskId, successMsg)}} >
             
-	      	{scheduleContent}
+          {scheduleContent}
 
-    	</ConfirmAction>
+      </ConfirmAction>
           
     );
   }
 
 }
+
+function mapStateToProps(state) {
+  return {
+    status: state.status,
+  }
+}
+
+export default connect(mapStateToProps, actions )(ScheduleTaskButton);

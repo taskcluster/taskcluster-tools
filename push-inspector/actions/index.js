@@ -170,6 +170,47 @@ export function retriggerTask(list, toClone, successMessage) {
 			})
 		});
 		
+	}	
+}
+
+//	Cancel a task
+export function cancelTask(taskId, successMessage) {   
+  
+	const request = queue.cancelTask(taskId);
+	debugger;
+	return (dispatch) => {
+		request.then((data) => {
+			dispatch({
+				type: TASK_ACTIONS_SUCCESS,
+				payload: data
+			})
+		}, (err) => {
+			dispatch({
+				type: TASK_ACTIONS_ERROR,
+				payload: rendering.renderError(err)
+			});
+		});
 	}
-	
+
+}
+
+//	Schedule a task
+export function scheduleTask(taskId, successMessage) {   
+  
+	const request = queue.scheduleTask(taskId);
+	debugger;
+	return (dispatch) => {
+		request.then((data) => {
+			dispatch({
+				type: TASK_ACTIONS_SUCCESS,
+				payload: data
+			})
+		}, (err) => {
+			dispatch({
+				type: TASK_ACTIONS_ERROR,
+				payload: rendering.renderError(err)
+			});
+		});
+	}
+
 }

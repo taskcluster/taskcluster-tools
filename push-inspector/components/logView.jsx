@@ -55,7 +55,7 @@ export default class LogView extends Component {
    		<span>
         
         <label>Show Log</label>	   
-        <div>
+        <div className="select-wrapper">
           <Select
             value={this.state.name}
             onChange={this.handleLogChanged}

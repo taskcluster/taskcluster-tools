@@ -1,11 +1,13 @@
 import React from 'react';
 import { Component } from 'react';
 import * as bs from 'react-bootstrap';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
-export default class CancelTaskButton extends Component {
+class CancelTaskButton extends Component {
 
   constructor(props) {
     super(props);
@@ -21,8 +23,12 @@ export default class CancelTaskButton extends Component {
   render() {
     
     const glyph = "stop",
-    		  label = "Cancel Task";
-    	
+    		  label = "Cancel Task",
+          successMsg = "Successfully canceled task!";
+    
+
+    const { status, cancelTask } = this.props,
+          taskId = status.taskId;
 
     const cancelContent = (
       <div>
@@ -40,7 +46,7 @@ export default class CancelTaskButton extends Component {
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
-	      	action = {this.cancel} >
+	      	action = {() => { cancelTask(taskId, successMsg)}} >
             
 	      	{cancelContent}
 
@@ -50,3 +56,11 @@ export default class CancelTaskButton extends Component {
   }
 
 }
+
+function mapStateToProps(state) {
+  return {
+    status: state.status,
+  }
+}
+
+export default connect(mapStateToProps, actions )(CancelTaskButton);
