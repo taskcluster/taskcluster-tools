@@ -3,6 +3,7 @@ import { hashHistory } from 'react-router';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import * as bs from 'react-bootstrap';
+import { beautify } from '../lib/utils';
 
 class Table extends Component {
 
@@ -12,22 +13,7 @@ class Table extends Component {
     this.generateRows = this.generateRows.bind(this);
   }
 
-  labelClassName(state) {
-      let cl = "my-label";
-      if (state == 'completed') {
-        return cl + " label-completed";
-      } else if (state == 'failed') {
-        return cl + " label-failed";
-      } else if (state == "exception") {
-        return cl + " label-exception";
-      } else if (state =="unscheduled") {
-        return cl + " label-unscheduled";
-      } else if (state =="pending") {
-        return cl + " label-pending";
-      } else if (state =="running") {
-        return cl + " label-running";
-      }
-  }
+  
 
   taskClicked(task) {
     const { taskId, taskGroupId } = task.status;
@@ -68,7 +54,7 @@ class Table extends Component {
   			}
 
         return list.map((task, i) => {
-            let state = this.labelClassName(task.status.state);
+            let state = beautify.labelClassName(task.status.state);
 
             return (
                 <tr onClick={this.taskClicked.bind(this, task)} key={i}>

@@ -20,9 +20,7 @@ import { rendering } from '../lib/utils';
 
 
 //	Get task group list
-// 	This function will iterate recursively to get the full list of tasks
-//	It will dispatch on each call
-export function fetchTasks(id = "ARUrTTyjQRiXEeo1uySLnA") {
+export function fetchTasks(id) {
 	let list = [];
 	return (dispatch) => {
 		(function iteratePromises(token) {
@@ -46,7 +44,7 @@ export function fetchTasks(id = "ARUrTTyjQRiXEeo1uySLnA") {
 }
 
 //	Get task definition
-export function fetchTask(id = "AB0MITrrT2WoIfKvmruvyw") {
+export function fetchTask(id) {
 	const request = queue.task(id);
 	return (dispatch) => {
 		request.then((task) => {
@@ -59,7 +57,7 @@ export function fetchTask(id = "AB0MITrrT2WoIfKvmruvyw") {
 }
 
 //	Fetch list of artifacts
-export function fetchArtifacts(id = "AB0MITrrT2WoIfKvmruvyw") {
+export function fetchArtifacts(id) {
 	const request = queue.listLatestArtifacts(id);
 	return (dispatch) => {
 		request.then((data) => {
@@ -81,7 +79,7 @@ export function removeTasks() {
 }
 
 //	Get task status
-export function fetchStatus(id = "AB0MITrrT2WoIfKvmruvyw") {
+export function fetchStatus(id) {
 	const request = queue.status(id);
 	return (dispatch) => {
 		request.then(({status}) => {
@@ -175,14 +173,16 @@ export function retriggerTask(list, toClone, successMessage) {
 
 //	Cancel a task
 export function cancelTask(taskId, successMessage) {   
-  
+  	var queue = new taskcluster.Queue({
+		credentials: JSON.parse(localStorage.credentials)
+	});
 	const request = queue.cancelTask(taskId);
 	debugger;
 	return (dispatch) => {
-		request.then((data) => {
+		request.then(({status}) => {
 			dispatch({
 				type: TASK_ACTIONS_SUCCESS,
-				payload: data
+				payload: successMessage
 			})
 		}, (err) => {
 			dispatch({

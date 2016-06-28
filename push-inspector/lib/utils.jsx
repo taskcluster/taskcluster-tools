@@ -3,7 +3,6 @@ import * as bs from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 
-// All of the application uses this queue and queueEvents
 export const queue = new taskcluster.Queue();
 export const queueEvents = new taskcluster.QueueEvents();
 
@@ -12,12 +11,24 @@ export const webListener = () => {
   let listener = new taskcluster.WebListener();
   return {
     startListening : (taskGroupId, onMessageAction) => {
+      
       listener.bind(queueEvents.taskPending({
         taskGroupId: taskGroupId
       }));
       listener.bind(queueEvents.taskCompleted({
         taskGroupId: taskGroupId
       }));
+      listener.bind(queueEvents.taskRunning({
+        taskGroupId: taskGroupId
+      }));
+      //  Task exception is currently not working for some reason...
+      listener.bind(queueEvents.taskException({
+        taskGroupId: taskGroupId
+      }));
+      listener.bind(queueEvents.taskFailed({
+        taskGroupId: taskGroupId
+      }));
+
 
       listener.on("message", (message) => {
         console.log('MESSAGE: ', message.payload.status);
@@ -80,6 +91,28 @@ export const rendering =  {
     )
   }
 }
+
+export const beautify = {
+
+  labelClassName(state) {
+    let cl = "my-label";
+    if (state == 'completed') {
+      return cl + " label-completed";
+    } else if (state == 'failed') {
+      return cl + " label-failed";
+    } else if (state == "exception") {
+      return cl + " label-exception";
+    } else if (state =="unscheduled") {
+      return cl + " label-unscheduled";
+    } else if (state =="pending") {
+      return cl + " label-pending";
+    } else if (state =="running") {
+      return cl + " label-running";
+    }
+  }
+}
+
+
 
 
 

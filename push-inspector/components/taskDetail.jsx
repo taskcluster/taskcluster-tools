@@ -7,6 +7,7 @@ import PurgeCacheButton from '../buttons/purgeCacheButton';
 import RetriggerButton from '../buttons/retriggerButton';
 import ScheduleTaskButton from '../buttons/scheduleTaskButton';
 import CancelTaskButton from '../buttons/cancelTaskButton';
+import { beautify } from '../lib/utils';
 
 
 export default class TaskDetail extends Component {
@@ -47,7 +48,7 @@ export default class TaskDetail extends Component {
 					</tr>
 					<tr>
 						<td><b>State</b></td>
-						<td>{status.state}</td>
+						<td className={beautify.labelClassName(status.state)}>{status.state}</td>
 					</tr>
 					<tr>
 						<td><b>Actions</b></td>
