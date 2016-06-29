@@ -59,7 +59,7 @@ class ConfirmAction extends Component {
 
   render() {
     
-    const { label, glyph, action, children } = this.props;
+    const { label, glyph, action, children, disabled } = this.props;
 
     const dialogContent = (
       <span>
@@ -79,6 +79,7 @@ class ConfirmAction extends Component {
         <bs.Button          
           bsSize="small"
           onClick={this.open}
+          disabled = {disabled}
         >
           <bs.Glyphicon glyph={glyph} />
           &nbsp;{label}

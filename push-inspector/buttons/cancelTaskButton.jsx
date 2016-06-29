@@ -41,15 +41,20 @@ class CancelTaskButton extends Component {
       </div>
     );  
 
+    var isResolved = [
+      'completed',
+      'failed',
+      'exception'
+    ].indexOf(status.state) !== -1;
+
     return (
                
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
-	      	action = {() => { cancelTask(taskId, successMsg)}} >
-            
+	      	action = {() => { cancelTask(taskId, successMsg)}}
+          disabled = {isResolved} >
 	      	{cancelContent}
-
     	</ConfirmAction>
           
     );

@@ -40,8 +40,9 @@ class ScheduleTaskButton extends Component {
       <ConfirmAction 
           label = {label}
           glyph = {glyph}
-          action = {() => { scheduleTask(taskId, successMsg)}} >
-            
+          action = {() => { scheduleTask(taskId, successMsg)}}
+          disabled = {status.state !== 'unscheduled'} >
+          
           {scheduleContent}
 
       </ConfirmAction>
