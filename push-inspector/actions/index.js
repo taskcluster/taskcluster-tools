@@ -127,12 +127,7 @@ export function purge(provisionerId, workerType, selectedCaches, successMessage)
 }
 
 // Retrigger a task
-export function retriggerTask(list, toClone, successMessage) {
-
-	var queue = new taskcluster.Queue({
-		credentials: JSON.parse(localStorage.credentials)
-	});
-	
+export function retriggerTask(list, toClone, successMessage) {	
 	const taskId = slugid.nice(),
     	task = _.cloneDeep(toClone),
     	now = Date.now(),
@@ -173,11 +168,7 @@ export function retriggerTask(list, toClone, successMessage) {
 
 //	Cancel a task
 export function cancelTask(taskId, successMessage) {   
-  	var queue = new taskcluster.Queue({
-		credentials: JSON.parse(localStorage.credentials)
-	});
 	const request = queue.cancelTask(taskId);
-	debugger;
 	return (dispatch) => {
 		request.then(({status}) => {
 			dispatch({
@@ -196,9 +187,7 @@ export function cancelTask(taskId, successMessage) {
 
 //	Schedule a task
 export function scheduleTask(taskId, successMessage) {   
-  
 	const request = queue.scheduleTask(taskId);
-	debugger;
 	return (dispatch) => {
 		request.then((data) => {
 			dispatch({

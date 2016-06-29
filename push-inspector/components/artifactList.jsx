@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import * as bs from 'react-bootstrap';
 import _ from 'lodash';
 import { queue } from '../lib/utils';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 import auth from '../../lib/auth';
 
 
@@ -93,7 +95,7 @@ var getIconFromMime = function(contentType) {
   return 'file-o';
 };
 
-export default class ArtifactList extends Component {
+class ArtifactList extends Component {
 
 	constructor(props) {
 		super(props);
@@ -105,6 +107,11 @@ export default class ArtifactList extends Component {
 	componentWillMount() {
 		this.load();
 	}
+
+  handleArtifactCreatedMessage() {
+    const { taskId, fetchArtifacts } = this.props;
+    fetchArtifacts();
+  }
 	
 	/** Build the right url for artifacts */
 	load() {
@@ -200,3 +207,4 @@ export default class ArtifactList extends Component {
   	}
 
 }
+export default connect(null, actions)(ArtifactList)

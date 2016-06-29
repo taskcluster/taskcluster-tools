@@ -5,7 +5,8 @@ import * as actions from '../actions';
 //import ProgressBar from '../components/progressBar';
 import Table from './table';
 import taskcluster from 'taskcluster-client';
-import { webListener } from '../lib/utils';
+import { queueEvents, webListener } from '../lib/utils';
+import _ from 'lodash';
 
 
 class Listings extends Component {
@@ -15,7 +16,7 @@ class Listings extends Component {
     this.listener = null;
     this.webListener = webListener();
 
-    this.update = this.update.bind(this);
+    this.handleMessage = this.handleMessage.bind(this);
   }
 
   // Close Listener connection
@@ -28,13 +29,41 @@ class Listings extends Component {
     this.webListener.startListening(taskGroupId, onMessageAction);
   }
 
-  update() {
-
-    const { params } = this.props;
-    this.props.fetchTasks(params.taskGroupId);
-    this.props.fetchTask(params.taskId);
-    this.props.fetchStatus(params.taskId);
+  /** Handle message from listener */
+  handleMessage(message) {
+    // Find queue exchanges
+    let queueExchanges = [
+      queueEvents.taskDefined().exchange,
+      queueEvents.taskPending().exchange,
+      queueEvents.taskRunning().exchange,
+      queueEvents.artifactCreated().exchange,
+      queueEvents.taskCompleted().exchange,
+      queueEvents.taskFailed().exchange,
+      queueEvents.taskException().exchange
+    ];
+    // Dispatch to handleQueueMessage or handleSchedulerMessage
+    if (_.includes(queueExchanges, message.exchange)) {
+      this.handleQueueMessage(message);
+    }
+ 
   }
+
+  /** Handle message from the queue */
+  handleQueueMessage(message) {
+    console.log('handleQueueMessage: ', message);
+    const { params, fetchArtifacts, fetchTasks, fetchTask, fetchStatus } = this.props;
+    const { taskId, taskGroupId } = params;
+    if(message.exchange == queueEvents.artifactCreated().exchange) {
+      fetchArtifacts(taskId);
+      return;
+    }
+
+    fetchTasks(taskGroupId);
+    fetchTask(taskId);
+    fetchStatus(taskId);
+
+  }
+
 
 
   //  Remove the list of tasks that were previously loaded
@@ -47,14 +76,14 @@ class Listings extends Component {
     if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {
       this.webListener.stopListening();
       this.stopListening();
-      this.startListening(this.props.params.taskGroupId, this.update);
+      this.startListening(this.props.params.taskGroupId, this.handleMessage);
     }
   }
 
   componentWillMount() {
     const { taskGroupId, taskId } = this.props.params;
     this.props.fetchTasks(taskGroupId);
-    this.startListening(taskGroupId, this.update);
+    this.startListening(taskGroupId, this.handleMessage);
   }
 
   render() {
@@ -75,6 +104,7 @@ class Listings extends Component {
 function mapStateToProps(state) {
   return {
     tasks: state.tasks,
+    status: state.status
   }
 }
 

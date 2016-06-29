@@ -85,7 +85,7 @@ export default class TaskRun extends Component {
                 <b>Artifacts</b>
               </td>
               <td>                
-                <ArtifactList artifacts={artifacts} taskId={taskId} runId={runId} />
+                <ArtifactList ref="artifactList" artifacts={artifacts} taskId={taskId} runId={runId} />
               </td>
             </tr>            
             </tbody>

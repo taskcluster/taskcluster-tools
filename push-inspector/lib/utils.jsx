@@ -2,44 +2,45 @@ import format from '../../lib/format';
 import * as bs from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
+import _ from 'lodash';
 
-export const queue = new taskcluster.Queue();
+export const queue = new taskcluster.Queue({
+    credentials: JSON.parse(localStorage.credentials)
+});
+
 export const queueEvents = new taskcluster.QueueEvents();
 
-export const webListener = () => {
+export const webListener = () => {  
   
   let listener = new taskcluster.WebListener();
+
   return {
     startListening : (taskGroupId, onMessageAction) => {
+      let qkey = { taskGroupId: taskGroupId};
       
-      listener.bind(queueEvents.taskPending({
-        taskGroupId: taskGroupId
-      }));
-      listener.bind(queueEvents.taskCompleted({
-        taskGroupId: taskGroupId
-      }));
-      listener.bind(queueEvents.taskRunning({
-        taskGroupId: taskGroupId
-      }));
-      //  Task exception is currently not working for some reason...
-      listener.bind(queueEvents.taskException({
-        taskGroupId: taskGroupId
-      }));
-      listener.bind(queueEvents.taskFailed({
-        taskGroupId: taskGroupId
-      }));
+      listener.bind(queueEvents.taskDefined(qkey));
+      listener.bind(queueEvents.taskPending(qkey));
+      listener.bind(queueEvents.taskRunning(qkey));
+      listener.bind(queueEvents.artifactCreated(qkey));
+      listener.bind(queueEvents.taskCompleted(qkey));
+      listener.bind(queueEvents.taskFailed(qkey));
+      listener.bind(queueEvents.taskException(qkey));
 
-
+      
       listener.on("message", (message) => {
         console.log('MESSAGE: ', message.payload.status);
-        onMessageAction();
+        onMessageAction(message);
       });
 
+    
+      // Display error banner on top of dashboard
+      // happens when a user goes to sleep
+      // Logical way is to restart listening from scratch
+      // If you reconnect, make sure the is a limit.
+      // If more than 5 times in the 5 min interval
+      // then stop reconnection
       listener.on("error", function(err) {
-        console.log('ERROR: ', err);
-        //  Perhaps display an error banner on top of the dashboard. This happens when a user puts him laptop to sleep
-        //  A smart way is to restart listening from scratch.
-        //  If you reconnect, make sure there is a limit. if more than 5 times in the 5 min interval, then stop reconnecting.
+        console.log('ERROR Listener: ', err);
       });
 
       listener.resume();
@@ -50,8 +51,7 @@ export const webListener = () => {
       listener.close();
     }  
 
-  }
-  
+  };
 
 }
 
