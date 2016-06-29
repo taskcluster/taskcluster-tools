@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 import format from '../../lib/format';
 import { rendering } from '../lib/utils';
+import Loading from './loading';
 
 class ConfirmAction extends Component {
 
@@ -36,23 +37,31 @@ class ConfirmAction extends Component {
 
   executeAction() {
     this.setState({executing: true});
-    let result = this.props.action(),
-        message = undefined;  
+    this.props.action();
   }
 
-  render() {
-    
-    const { label, glyph, action, children, disabled } = this.props;
 
+  message() {
+    const { taskActionInProgress, taskActionMessage } = this.props;
+    if(!!taskActionInProgress) {
+      return <Loading />
+    } else {
+      return taskActionMessage
+    }
+  }
+
+  
+
+  render() {
+
+    const { label, glyph, action, children, disabled } = this.props;
+    const message = this.message();
     const dialogContent = (
       <span>
         <hr/>
         <h4>Status</h4>
-        <span>  
-          {this.props.taskActionMessage}
-        </span>
-        <span>
-          {this.state.result || this.props.success}
+        <span> 
+          {message}           
         </span>
       </span>
     );
@@ -102,6 +111,7 @@ class ConfirmAction extends Component {
 function mapStateToProps(state) {
   return {
     taskActionMessage: state.taskActionMessage,
+    taskActionInProgress: state.taskActionInProgress
   }
 }
 

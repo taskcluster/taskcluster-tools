@@ -7,9 +7,12 @@ import utils from '../../lib/utils';
 
 export default class Loading extends Component {
   render() {
+    const 	spin = true,
+    		name = "spinner",
+    		size = "2x";
     return (        
 	    <div className="spinner">
-	    	<format.Icon name="spinner" size="2x" spin="true"></format.Icon>
+	    	<format.Icon name={name} size={size} spin={spin}></format.Icon>
 	    </div>      
     );
   }

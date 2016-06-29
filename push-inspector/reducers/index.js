@@ -6,6 +6,7 @@ import statusReducer from './status';
 import activeTaskStatusReducer from './activeTaskStatus';
 import artifactsReducer from './artifacts';
 import taskActionMessageReducer from './taskActionMessage';
+import taskActionInProgressReducer from './taskActionInProgress';
 
 const rootReducer = combineReducers({
   tasks: tasksReducer,
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
   status: statusReducer,
   activeTaskStatus: activeTaskStatusReducer,
   artifacts: artifactsReducer,
-  taskActionMessage: taskActionMessageReducer
+  taskActionMessage: taskActionMessageReducer,
+  taskActionInProgress: taskActionInProgressReducer
 });
 
 export default rootReducer;

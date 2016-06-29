@@ -7,9 +7,10 @@ import {
 	FETCH_ARTIFACTS,
 	CREATE_TASK,
 	TASK_ACTIONS_ERROR,
-	TASK_ACTIONS_SUCCESS
+	TASK_ACTIONS_SUCCESS,
+	TASK_ACTIONS_IN_PROGRESS
 } from './types';
-
+import { taskActionsInProgress } from './helper';
 import taskcluster from 'taskcluster-client';
 import { queue } from '../lib/utils';
 import slugid from 'slugid';
@@ -107,24 +108,28 @@ export function purge(provisionerId, workerType, selectedCaches, successMessage)
   let purgeCache = new taskcluster.PurgeCache({
     credentials: JSON.parse(localStorage.credentials)
   });
-
+  
   let cachesPromise = Promise.all(selectedCaches.map(cache => {
     return purgeCache.purgeCache(
       provisionerId, workerType, {cacheName: cache});
   }));
 
   return (dispatch) => {
+		dispatch(taskActionsInProgress(true));
 		cachesPromise.then((data) => {
 			dispatch({
 				type: TASK_ACTIONS_SUCCESS,
 				payload: rendering.renderSuccess(successMessage)
-			})
+			});
+			dispatch(taskActionsInProgress(false));
 		}, (err) => {		
 			dispatch({
 				type: TASK_ACTIONS_ERROR,
 				payload: rendering.renderError(err)
-			})	
+			});
+			dispatch(taskActionsInProgress(false));
 		});
+		
 	}
 
 }
@@ -144,6 +149,7 @@ export function retriggerTask(list, toClone, successMessage) {
     const request = queue.createTask(taskId, task);
 
 	return (dispatch) => {
+		dispatch(taskActionsInProgress(true));
 		request.then((data) => {			
 			
 			let dataObj = { task, status: data.status };
@@ -159,12 +165,14 @@ export function retriggerTask(list, toClone, successMessage) {
 				type: TASK_ACTIONS_SUCCESS,
 				payload: rendering.renderSuccess(successMessage)
 			})
+			dispatch(taskActionsInProgress(false));
 			
 		}, (err) => {
 			dispatch({
 				type: TASK_ACTIONS_ERROR,
 				payload: rendering.renderError(err)
 			})
+			dispatch(taskActionsInProgress(false));
 		});
 		
 	}	
@@ -174,16 +182,19 @@ export function retriggerTask(list, toClone, successMessage) {
 export function cancelTask(taskId, successMessage) {   
 	const request = queue.cancelTask(taskId);
 	return (dispatch) => {
+		dispatch(taskActionsInProgress(true));
 		request.then(({status}) => {
 			dispatch({
 				type: TASK_ACTIONS_SUCCESS,
-				payload: successMessage
-			})
+				payload: rendering.renderSuccess(successMessage)
+			});
+			dispatch(taskActionsInProgress(false));
 		}, (err) => {
 			dispatch({
 				type: TASK_ACTIONS_ERROR,
 				payload: rendering.renderError(err)
 			});
+			dispatch(taskActionsInProgress(false));
 		});
 	}
 
@@ -193,16 +204,19 @@ export function cancelTask(taskId, successMessage) {
 export function scheduleTask(taskId, successMessage) {   
 	const request = queue.scheduleTask(taskId);
 	return (dispatch) => {
+		dispatch(taskActionsInProgress(true));
 		request.then((data) => {
 			dispatch({
 				type: TASK_ACTIONS_SUCCESS,
 				payload: data
-			})
+			});
+			dispatch(taskActionsInProgress(false));
 		}, (err) => {
 			dispatch({
 				type: TASK_ACTIONS_ERROR,
 				payload: rendering.renderError(err)
 			});
+			dispatch(taskActionsInProgress(false));
 		});
 	}
 
@@ -299,6 +313,7 @@ export function loanerCreateTask(list, id, toClone, successMessage) {
     const request = queue.createTask(taskId, task);
 
 	return (dispatch) => {
+		dispatch(taskActionsInProgress(true));
 		request.then((data) => {			
 			const 	dataObj = { task, status: data.status },
 					location = window.location;
@@ -317,15 +332,17 @@ export function loanerCreateTask(list, id, toClone, successMessage) {
 				payload: rendering.renderSuccess(successMessage)
 			});
 			
-			
-				
+			dispatch(taskActionsInProgress(false));			
 			
 		}, (err) => {
 			dispatch({
 				type: TASK_ACTIONS_ERROR,
 				payload: rendering.renderError(err)
-			})
+			});
+			dispatch(taskActionsInProgress(false));
 		});
 		
 	}	
 }
+
+
