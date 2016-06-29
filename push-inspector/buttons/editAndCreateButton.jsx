@@ -17,16 +17,20 @@ class EditAndCreateButton extends Component {
     
     const glyph = "edit",
     		  label = "Edit and Create",
-          successMsg = "abc abc abc";
+          successMsg = "Upon creation, you will need to refresh the page to see the new task";
     
 
-    const { status, cancelTask } = this.props,
-          taskId = status.taskId;
+    const { task, editAndCreateTask } = this.props;
 
     const editAndCreateContent = (
       <div>
         <p>
-          Are you sure you wish to edit and create?
+          Are you sure you wish to edit this task?<br/>
+          Note that the edited task will not be linked to other tasks or
+          have the same <code>task.routes</code> as other tasks,
+          so this is not a way to "fix" a failing task in a larger task graph.
+          Note that you may also not have the scopes required to create the
+          resulting task.
         </p>
       </div>
     );  
@@ -37,7 +41,7 @@ class EditAndCreateButton extends Component {
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
-	      	action = {() => {console.log('edit and create clicked')}} >
+	      	action = {() => {editAndCreateTask(task, successMsg)}} >
 	      	{editAndCreateContent}
     	</ConfirmAction>
           
@@ -48,7 +52,7 @@ class EditAndCreateButton extends Component {
 
 function mapStateToProps(state) {
   return {
-    status: state.status,
+    task: state.task
   }
 }
 

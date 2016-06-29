@@ -208,6 +208,49 @@ export function scheduleTask(taskId, successMessage) {
 
 }
 
+// Edit and create task
+export function editAndCreateTask(oldTask, successMessage) {
+	let newTask = {
+      // filled in by task creator on load
+      created: null,
+      deadline: null,
+    };
+    // copy fields from the parent task, intentionally excluding some
+    // fields which might cause confusion if left unchanged
+    const exclude = [
+        'routes',
+        'taskGroupId',
+        'schedulerId',
+        'priority',
+        'created',
+        'deadline',
+        'dependencies',
+        'requires'
+    ];
+    _.keys(oldTask).forEach(key => {
+      if (!_.includes(exclude, key)) {
+        newTask[key] = oldTask[key];
+      }
+    });
+
+    // overwrite task-creator's local state with this new task
+    localStorage.setItem("task-creator/task", JSON.stringify(newTask));
+
+    // ..and go there
+    window.open(`${location.protocol}//${location.host}/task-creator`);
+
+    // it is currently not updating the list of tasks because creating a task
+    // because upon creation, it is not being redirected to push-inspector
+    // when it does, it will fire the component cycle methods and they will
+    // take care of refreshing the list
+
+    // Update modal message
+	return {
+		type: TASK_ACTIONS_SUCCESS,
+		payload: rendering.renderSuccess(successMessage)
+	};
+}
+
 // Create Task for One Click Loaner
 export function loanerCreateTask(list, id, toClone, successMessage) {	
 	const 	taskId = slugid.nice(),
