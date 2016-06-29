@@ -18,6 +18,31 @@ export default class TaskDetail extends Component {
 		super(props);
 	}
 
+	getDependenciesList(task) {
+		
+		const { dependencies } = task;
+		if(!dependencies.length) {
+			return;
+		}
+		return (
+			<div>
+			<ul className="dependencies-ul">
+				{
+					dependencies.map((dependency, index) => {
+						return (
+							<li key={index}>
+								<a target="_blank" href={'https://queue.taskcluster.net/v1/task/' + dependency}>{dependency}
+								&nbsp;<i className='fa fa-external-link'></i>
+								</a>
+							</li>
+						)
+					})
+				}
+			</ul>
+			</div>
+		);
+	}
+
 	render() {
 
 		if(!!!this.props.task || !!!this.props.status) {
@@ -25,6 +50,7 @@ export default class TaskDetail extends Component {
 		}
 
 		const { task, status, actions } = this.props;
+		const dependenciesList = this.getDependenciesList(task);
 		return (
 			<table className="detail-table">
 				<tbody>
@@ -83,6 +109,12 @@ export default class TaskDetail extends Component {
 									task={task}
 									taskId={status.taskId} />
 							</bs.ButtonToolbar>
+						</td>
+					</tr>
+					<tr>
+						<td><b>Dependencies</b></td>
+						<td>
+							{dependenciesList}
 						</td>
 					</tr>
 

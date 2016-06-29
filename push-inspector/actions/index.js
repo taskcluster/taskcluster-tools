@@ -239,11 +239,7 @@ export function editAndCreateTask(oldTask, successMessage) {
     // ..and go there
     window.open(`${location.protocol}//${location.host}/task-creator`);
 
-    // it is currently not updating the list of tasks because creating a task
-    // because upon creation, it is not being redirected to push-inspector
-    // when it does, it will fire the component cycle methods and they will
-    // take care of refreshing the list
-
+ 
     // Update modal message
 	return {
 		type: TASK_ACTIONS_SUCCESS,
