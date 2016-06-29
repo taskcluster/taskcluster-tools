@@ -81,7 +81,7 @@ export default class TaskDetail extends Component {
 					<tr>
 						<td><b>Actions</b></td>
 						<td>
-							<bs.ButtonToolbar>
+							<bs.ButtonToolbar className="toolbar-btn">
 								
 				          		<ScheduleTaskButton />
 								
@@ -103,7 +103,7 @@ export default class TaskDetail extends Component {
 					<tr>
 						<td><b>Debug</b></td>
 						<td>
-							<bs.ButtonToolbar>
+							<bs.ButtonToolbar className="toolbar-btn">
 								<EditAndCreateButton />
 								<OneClickLoanerButton
 									task={task}
