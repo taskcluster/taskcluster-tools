@@ -16,6 +16,7 @@ import slugid from 'slugid';
 import _ from 'lodash';
 import { hashHistory } from 'react-router';
 import { rendering } from '../lib/utils';
+import shellescape from 'shell-escape';
 
 
 
@@ -130,12 +131,11 @@ export function purge(provisionerId, workerType, selectedCaches, successMessage)
 
 // Retrigger a task
 export function retriggerTask(list, toClone, successMessage) {	
-	const taskId = slugid.nice(),
-    	task = _.cloneDeep(toClone),
-    	now = Date.now(),
-    	created = Date.parse(task.created);
+	const 	taskId = slugid.nice(),
+			task = _.cloneDeep(toClone),
+			now = Date.now(),
+			created = Date.parse(task.created);
 
-    console.log('Creating TaskId: ', taskId);
     task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
     task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
     task.created = new Date(now).toJSON();
@@ -149,10 +149,12 @@ export function retriggerTask(list, toClone, successMessage) {
 			let dataObj = { task, status: data.status };
 			hashHistory.push(task.taskGroupId + '/' + data.status.taskId);
 			
+			// Update current list of tasks
 			dispatch({
 				type: CREATE_TASK,
 				payload: list.concat(dataObj)
 			})
+			// Update modal message
 			dispatch({
 				type: TASK_ACTIONS_SUCCESS,
 				payload: rendering.renderSuccess(successMessage)
@@ -204,4 +206,87 @@ export function scheduleTask(taskId, successMessage) {
 		});
 	}
 
+}
+
+// Create Task for One Click Loaner
+export function loanerCreateTask(list, id, toClone, successMessage) {	
+	const 	taskId = slugid.nice(),
+			task = _.cloneDeep(toClone);
+
+	// Strip routes
+	delete task.routes;
+
+	// Construct message of the day
+	let msg = "\\nCreated by one-click-loaner based on taskId: " +
+              id + "\\n" +
+              "Original command was: " + shellescape(task.payload.command);
+
+  	task.payload.env = task.payload.env || {};
+    task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
+
+			
+
+    task.payload.env = task.payload.env || {};
+    task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
+
+    // Strip artifacts
+    delete task.payload.artifacts;
+
+    // Strip dependencies and requires
+    delete task.dependencies;
+    delete task.requires;
+
+    // Set interactive = true
+    task.payload.features = task.payload.features || {};
+    task.payload.features.interactive = true;
+
+    // Strip caches
+    delete task.payload.caches;
+
+    // Update maxRunTime
+    task.payload.maxRunTime = Math.max(
+      task.payload.maxRunTime,
+      3 * 60 * 60
+    );
+
+    // Update timestamps
+    task.deadline = taskcluster.fromNowJSON('12 hours');
+    task.created = taskcluster.fromNowJSON();
+    task.expires = taskcluster.fromNowJSON('7 days');
+
+    // Set task,retries to 0
+    task.retries = 0;
+
+    const request = queue.createTask(taskId, task);
+
+	return (dispatch) => {
+		request.then((data) => {			
+			const 	dataObj = { task, status: data.status },
+					location = window.location;
+
+			hashHistory.push(task.taskGroupId + '/' + data.status.taskId);			
+			window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${data.status.taskId}`);
+			
+			// Update current list of tasks
+			dispatch({
+				type: CREATE_TASK,
+				payload: list.concat(dataObj)
+			});
+			// Update modal message
+			dispatch({
+				type: TASK_ACTIONS_SUCCESS,
+				payload: rendering.renderSuccess(successMessage)
+			});
+			
+			
+				
+			
+		}, (err) => {
+			dispatch({
+				type: TASK_ACTIONS_ERROR,
+				payload: rendering.renderError(err)
+			})
+		});
+		
+	}	
 }

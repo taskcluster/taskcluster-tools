@@ -17,18 +17,26 @@ class OneClickLoaner extends Component {
     
     const glyph = "console",
     		  label = "One-Click Loaner",
-          successMsg = "abc abc abc";
+          successMsg = "You have successfully been redirected to One-Click loaner";
     
 
-    const { status, cancelTask } = this.props,
+    const { status, task, tasks, loanerCreateTask } = this.props,
           taskId = status.taskId;
 
     const oneClickLoanerContent = (
       <div>
-        <p>
-          Ready for One click loaner?
-        </p>
-      </div>
+        This will duplicate the task and create it under a different
+        <code>taskId</code>.<br/><br/>
+        The new task will be altered as to:
+        <ul>
+          <li>Set <code>task.payload.features.interactive = true</code>,</li>
+          <li>Strip <code>task.payload.caches</code> to avoid poisoning,</li>
+          <li>Ensures <code>task.payload.maxRunTime</code> is minimum 60 minutes,</li>
+          <li>Strip <code>task.routes</code> to avoid side-effects, and</li>
+          <li>Set the environment variable<code>TASKCLUSTER_INTERACTIVE=true</code>.</li>
+        </ul>
+        Note: this may not work with all tasks.
+        </div>
     );  
 
     
@@ -37,7 +45,7 @@ class OneClickLoaner extends Component {
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
-	      	action = {() => {console.log('one click loaner clicked')}} >
+	      	action = {() => {loanerCreateTask(tasks, taskId, task, successMsg)}} >
 	      	{oneClickLoanerContent}
     	</ConfirmAction>
           
@@ -49,6 +57,8 @@ class OneClickLoaner extends Component {
 function mapStateToProps(state) {
   return {
     status: state.status,
+    task: state.task,
+    tasks: state.tasks
   }
 }
 

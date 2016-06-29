@@ -79,7 +79,9 @@ export default class TaskDetail extends Component {
 						<td>
 							<bs.ButtonToolbar>
 								<EditAndCreateButton />
-								<OneClickLoanerButton />
+								<OneClickLoanerButton
+									task={task}
+									taskId={status.taskId} />
 							</bs.ButtonToolbar>
 						</td>
 					</tr>
@@ -91,23 +93,4 @@ export default class TaskDetail extends Component {
 	}
 }
 
-// <bs.ButtonToolbar>
-// 								<Modal
-// 				          label="Edit and Create"
-// 				          content="Text in a modal"
-// 				          glyph="edit"
-// 				          actionOnClick={() => console.log('action clicked')} />
-// 								<Modal
-// 				          label="One-Click Loaner"
-// 				          content="Text in a modal"
-// 				          glyph="console"
-// 				          actionOnClick={() => console.log('action clicked')} />
-// 							</bs.ButtonToolbar>
-
-// function mapStateToProps(state) {
-// 	return {
-// 		task: state.task,
-// 		status: state.status
-// 	}
-// }
 
