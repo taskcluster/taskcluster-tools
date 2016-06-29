@@ -7,6 +7,8 @@ import PurgeCacheButton from '../buttons/purgeCacheButton';
 import RetriggerButton from '../buttons/retriggerButton';
 import ScheduleTaskButton from '../buttons/scheduleTaskButton';
 import CancelTaskButton from '../buttons/cancelTaskButton';
+import EditAndCreateButton from '../buttons/editAndCreateButton';
+import OneClickLoanerButton from '../buttons/oneClickLoanerButton';
 import { beautify } from '../lib/utils';
 
 
@@ -75,7 +77,10 @@ export default class TaskDetail extends Component {
 					<tr>
 						<td><b>Debug</b></td>
 						<td>
-							edit and create and one click loaner
+							<bs.ButtonToolbar>
+								<EditAndCreateButton />
+								<OneClickLoanerButton />
+							</bs.ButtonToolbar>
 						</td>
 					</tr>
 

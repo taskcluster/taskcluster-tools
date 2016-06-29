@@ -40,23 +40,6 @@ class ConfirmAction extends Component {
         message = undefined;  
   }
 
-  // handleResult(result, message) {
-  //   debugger;
-    
-  //   //  Check if it is a promise
-  //   if(typeof result != "undefined" && typeof result.then === "function") {
-  //     result.then((value) => {
-  //       message = this.props.success;
-  //       this.setState({result: message});
-  //     }, (reason) => {
-  //       message = rendering.renderError(reason);
-  //       this.setState({result: message});
-  //     });
-
-  //   }
-
-  // }
-
   render() {
     
     const { label, glyph, action, children, disabled } = this.props;

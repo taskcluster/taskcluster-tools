@@ -10,15 +10,8 @@ import ConfirmAction from '../shared/confirmAction';
 class CancelTaskButton extends Component {
 
   constructor(props) {
-    super(props);
-  
-    this.cancel = this.cancel.bind(this);
+    super(props);  
   }
-
-  cancel() {
-  	console.log('cancelling');
-  }
-
 
   render() {
     

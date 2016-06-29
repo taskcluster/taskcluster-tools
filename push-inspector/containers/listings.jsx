@@ -25,7 +25,6 @@ class Listings extends Component {
   }
 
   startListening(taskGroupId, onMessageAction) {
-    
     this.webListener.startListening(taskGroupId, onMessageAction);
   }
 

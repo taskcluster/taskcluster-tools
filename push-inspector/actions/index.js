@@ -22,12 +22,14 @@ import { rendering } from '../lib/utils';
 //	Get task group list
 export function fetchTasks(id) {
 	let list = [];
+	const limit  = 200;
 	return (dispatch) => {
 		(function iteratePromises(token) {
 			let options = {};
 			if (token) {
-				options.continuationToken = token;
+				options.continuationToken = token;	
 			}
+			options.limit = limit;
 			const request = queue.listTaskGroup(id, options);
 			request.then(({tasks, continuationToken}) => {
 				list = list.concat(tasks);
