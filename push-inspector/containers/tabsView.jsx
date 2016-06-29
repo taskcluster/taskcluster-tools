@@ -10,10 +10,15 @@ class TabsView extends Component {
 
 	constructor(props) {
 		super(props);
+		this.state = {
+			tabIndex: 0
+		}
+
+		this.handleSelect = this.handleSelect.bind(this);
 	}
 
 	handleSelect(index, last) {
-
+		this.setState({tabIndex: index});
 	}
 
 	fetchTaskData() {
@@ -32,6 +37,7 @@ class TabsView extends Component {
 		//	This can happen when retriggering a task or clicking on a task
 		if(prevProps.params.taskId != this.props.params.taskId) {
 			this.fetchTaskData();
+			this.setState({tabIndex: 0});
 		}
 	}
 
@@ -39,13 +45,13 @@ class TabsView extends Component {
 
 	render() {
 		const { params, task, status, artifacts } = this.props;
-
+		const { tabIndex } = this.state;
 
 		return (
 
 	      <Tabs
 	        onSelect={this.handleSelect}
-	        selectedIndex={0}
+	        selectedIndex={tabIndex}
 	      >
 	        <TabList>
 	          <Tab>Task</Tab>
