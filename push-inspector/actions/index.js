@@ -9,7 +9,8 @@ import {
 	TASK_ACTIONS_ERROR,
 	TASK_ACTIONS_SUCCESS,
 	TASK_ACTIONS_IN_PROGRESS,
-	SET_DASHBOARD_BANNER
+	SET_DASHBOARD_BANNER,
+	TASKS_NOT_AVAILABLE
 } from './types';
 
 import { taskActionsInProgress } from './helper';
@@ -35,15 +36,26 @@ export function fetchTasks(id) {
 			}
 			options.limit = limit;
 			const request = queue.listTaskGroup(id, options);
+
+			dispatch({
+					type: TASKS_NOT_AVAILABLE,
+					payload: false
+			});
 			request.then(({tasks, continuationToken}) => {
 				list = list.concat(tasks);
 				dispatch({
 					type: FETCH_TASKS,
 					payload: list
 				});
+
 				if(continuationToken) {
 					iteratePromises(continuationToken);
 				}
+			}, (err) => {
+				dispatch({
+					type: TASKS_NOT_AVAILABLE,
+					payload: true
+				});
 			});
 		}());
 	}

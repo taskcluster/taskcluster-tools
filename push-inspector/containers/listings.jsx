@@ -16,11 +16,11 @@ class Listings extends Component {
     this.handleMessage = this.handleMessage.bind(this);
   }
 
-  // Close Listener connection
+  /** Close Listener connection */
   stopListening() {
     webListener.stopListening();
   }
-
+  /** Start Listener connection */
   startListening(taskGroupId, onMessageAction) {
     webListener.startListening(taskGroupId, onMessageAction);
   }
@@ -30,7 +30,7 @@ class Listings extends Component {
 
     // Handle Error
     if(message instanceof Error) { 
-      //set state to error true
+      // Set state to error true
       this.props.setDashboardBanner(true);
       return;
     }
@@ -56,25 +56,31 @@ class Listings extends Component {
   handleQueueMessage(message) {
     const { params, fetchArtifacts, fetchTasks, fetchTask, fetchStatus } = this.props;
     const { taskId, taskGroupId } = params;
-    if(message.exchange == queueEvents.artifactCreated().exchange) {
+    
+    fetchTasks(taskGroupId);
+
+    if(taskId) {
+      if(message.exchange == queueEvents.artifactCreated().exchange) {
       fetchArtifacts(taskId);
       return;
-    }
+      }
 
-    fetchTasks(taskGroupId);
-    fetchTask(taskId);
-    fetchStatus(taskId);
+    
+      fetchTask(taskId);
+      fetchStatus(taskId);
+    }
 
   }
 
 
 
-  //  Remove the list of tasks that were previously loaded
+  /** Remove the list of tasks that were previously loaded */
   componentWillUnmount() {
       this.props.removeTasks();
       this.stopListening();
   }
 
+  /** Handle case where taskGroupId is changed */
   componentDidUpdate(prevProps, prevState) {
     if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {
       webListener.stopListening();
@@ -83,6 +89,7 @@ class Listings extends Component {
     }
   }
 
+  /** Fetch list of tasks and start the web listener */
   componentWillMount() {
     const { taskGroupId, taskId } = this.props.params;
     this.props.fetchTasks(taskGroupId);

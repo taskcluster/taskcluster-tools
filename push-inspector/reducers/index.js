@@ -8,9 +8,11 @@ import artifactsReducer from './artifacts';
 import taskActionMessageReducer from './taskActionMessage';
 import taskActionInProgressReducer from './taskActionInProgress';
 import dashboardBannerReducer from './dashboardBanner';
+import tasksNotAvailableReducer from './tasksNotAvailable';
 
 const rootReducer = combineReducers({
   tasks: tasksReducer,
+  tasksNotAvailable: tasksNotAvailableReducer,
   task: taskReducer,
   status: statusReducer,
   activeTaskStatus: activeTaskStatusReducer,

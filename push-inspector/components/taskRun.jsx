@@ -33,6 +33,7 @@ export default class TaskRun extends Component {
     });
   }
 
+  
   renderLogView(taskId, runId, artifacts) {
     
 

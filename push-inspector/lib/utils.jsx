@@ -27,9 +27,7 @@ export const webListener =  {
       
       listener.on("message", (message) => {        
         console.log('Message: ', message.payload.status);
-      
         onMessageAction(message);
-
       });
  
       listener.on("error", function(err) {

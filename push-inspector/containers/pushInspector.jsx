@@ -8,20 +8,32 @@ import DashboardBanner from '../shared/dashboardBanner';
 
 class PushInspector extends Component {
 
+  handleLoadingAndError() {
+    const { tasks, tasksNotAvailable, params } = this.props;
+    const taskGroupId = params.taskGroupId;
+
+    if(tasksNotAvailable) {
+      return <div>No task-group with taskGroupId: {taskGroupId}</div>
+    }
+    if(!tasks.length && !!taskGroupId) {
+      return <Loading />
+    }
+  }
+
   render() {
     const { tasks, children, setActiveTaskStatus, params, bannerFlag, setDashboardBanner } = this.props;
     const { taskGroupId } = params;
+    const handleLoadingAndError = this.handleLoadingAndError();
     return (
       <div>
         <DashboardBanner showBanner={bannerFlag} setBanner={setDashboardBanner} />
-        <Search />
+        <Search
+          taskGroupId = {taskGroupId} />
         <ProgressBar
-            taskGroupId = {taskGroupId}
-            tasks={tasks}
-            setActiveTaskStatus={setActiveTaskStatus}/>
-        <div className={(!!tasks.length && !!taskGroupId) || (!!!tasks.length && !!!taskGroupId) ? "hideDisplay" : ""}>
-          <Loading />
-        </div>
+          taskGroupId = {taskGroupId}
+          tasks={tasks}
+          setActiveTaskStatus={setActiveTaskStatus}/>
+        {handleLoadingAndError}
         <div className={!!!tasks.length ? "hideDisplay" : ""}>
           {children}
         </div>
@@ -33,7 +45,8 @@ class PushInspector extends Component {
 function mapStateToProps(state) {
 	return {
 		tasks: state.tasks,
-    bannerFlag: state.dashboardBanner
+    bannerFlag: state.dashboardBanner,
+    tasksNotAvailable: state.tasksNotAvailable
 	}
 }
 

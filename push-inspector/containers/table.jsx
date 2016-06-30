@@ -14,6 +14,7 @@ class Table extends Component {
 
   
 
+  /** Navigate to appropriate route  */
   taskClicked(task) {
     const { taskId, taskGroupId } = task.status;
 		hashHistory.push(taskGroupId + '/' + taskId);
@@ -23,6 +24,7 @@ class Table extends Component {
     this.props.setActiveTaskStatus(null);
   }
 
+  /** Generate table columns */
   generateHeaders() {
       const { activeTaskStatus } = this.props;
       return (
@@ -38,6 +40,7 @@ class Table extends Component {
       );
   }
 
+  /** Generate table rows */
   generateRows() {
       var cols = ["Name", "State"],
           data = this.props.tasks;
@@ -64,7 +67,9 @@ class Table extends Component {
   		}
   }
 
+  /** Render list of tasks */
   renderList() {
+
         var headerComponents = this.generateHeaders();
         var rowComponents = this.generateRows();
 

@@ -1,11 +1,12 @@
 import {
-	FETCH_ARTIFACTS
+	TASKS_NOT_AVAILABLE
 } from '../actions/types';
 
-export default function(state = [], action) {
+export default function(state = false, action) {
 	switch(action.type) {
-		case FETCH_ARTIFACTS:
+		case TASKS_NOT_AVAILABLE:
 			return action.payload;
 	}
+
 	return state;
 }
