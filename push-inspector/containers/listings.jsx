@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import { Link, hashHistory } from 'react-router';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-//import ProgressBar from '../components/progressBar';
 import Table from './table';
-import taskcluster from 'taskcluster-client';
 import { queueEvents, webListener } from '../lib/utils';
 import _ from 'lodash';
 
@@ -14,22 +12,29 @@ class Listings extends Component {
   constructor(props) {
     super(props);
     this.listener = null;
-    this.webListener = webListener();
 
     this.handleMessage = this.handleMessage.bind(this);
   }
 
   // Close Listener connection
   stopListening() {
-    this.webListener.stopListening();
+    webListener.stopListening();
   }
 
   startListening(taskGroupId, onMessageAction) {
-    this.webListener.startListening(taskGroupId, onMessageAction);
+    webListener.startListening(taskGroupId, onMessageAction);
   }
 
   /** Handle message from listener */
   handleMessage(message) {
+
+    // Handle Error
+    if(message instanceof Error) { 
+      //set state to error true
+      this.props.setDashboardBanner(true);
+      return;
+    }
+
     // Find queue exchanges
     let queueExchanges = [
       queueEvents.taskDefined().exchange,
@@ -49,7 +54,6 @@ class Listings extends Component {
 
   /** Handle message from the queue */
   handleQueueMessage(message) {
-    console.log('handleQueueMessage: ', message);
     const { params, fetchArtifacts, fetchTasks, fetchTask, fetchStatus } = this.props;
     const { taskId, taskGroupId } = params;
     if(message.exchange == queueEvents.artifactCreated().exchange) {
@@ -73,7 +77,7 @@ class Listings extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {
-      this.webListener.stopListening();
+      webListener.stopListening();
       this.stopListening();
       this.startListening(this.props.params.taskGroupId, this.handleMessage);
     }
@@ -107,4 +111,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, actions )(Listings)
+export default connect(mapStateToProps, actions)(Listings)

@@ -1,7 +1,4 @@
-import React from 'react';
-import { Component } from 'react';
-import * as bs from 'react-bootstrap';
-import taskcluster from 'taskcluster-client';
+import React, { Component } from 'react';
 import _ from 'lodash';
 import LogView from './logView';
 import ArtifactList from './artifactList';

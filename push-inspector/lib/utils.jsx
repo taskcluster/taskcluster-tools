@@ -2,7 +2,7 @@ import format from '../../lib/format';
 import * as bs from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
-import _ from 'lodash';
+
 
 export const queue = new taskcluster.Queue({
     credentials: JSON.parse(localStorage.credentials)
@@ -10,11 +10,9 @@ export const queue = new taskcluster.Queue({
 
 export const queueEvents = new taskcluster.QueueEvents();
 
-export const webListener = () => {  
+let listener = new taskcluster.WebListener();
+export const webListener =  {  
   
-  let listener = new taskcluster.WebListener();
-
-  return {
     startListening : (taskGroupId, onMessageAction) => {
       let qkey = { taskGroupId: taskGroupId};
       
@@ -27,20 +25,24 @@ export const webListener = () => {
       listener.bind(queueEvents.taskException(qkey));
 
       
-      listener.on("message", (message) => {
-        console.log('MESSAGE: ', message.payload.status);
+      listener.on("message", (message) => {        
+        console.log('Message: ', message.payload.status);
+      
         onMessageAction(message);
-      });
 
-    
-      // Display error banner on top of dashboard
-      // happens when a user goes to sleep
-      // Logical way is to restart listening from scratch
-      // If you reconnect, make sure the is a limit.
-      // If more than 5 times in the 5 min interval
-      // then stop reconnection
+      });
+ 
       listener.on("error", function(err) {
-        console.log('ERROR Listener: ', err);
+        console.error('Error within the Listener: ', err);
+        if (!err) {
+            err = new Error("Unknown error");
+        }
+
+        listener.close();
+
+        // Show a banner
+        onMessageAction(err);
+
       });
 
       listener.resume();
@@ -50,8 +52,6 @@ export const webListener = () => {
     stopListening : () => {
       listener.close();
     }  
-
-  };
 
 }
 

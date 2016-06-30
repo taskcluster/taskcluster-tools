@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../actions';
 import * as bs from 'react-bootstrap';
-import taskcluster from 'taskcluster-client';
 import PurgeCacheButton from '../buttons/purgeCacheButton';
 import RetriggerButton from '../buttons/retriggerButton';
 import ScheduleTaskButton from '../buttons/scheduleTaskButton';
@@ -81,21 +79,15 @@ export default class TaskDetail extends Component {
 					<tr>
 						<td><b>Actions</b></td>
 						<td>
-							<bs.ButtonToolbar className="toolbar-btn">
-								
-				          		<ScheduleTaskButton />
-								
+							<bs.ButtonToolbar className="toolbar-btn">							
+				          		<ScheduleTaskButton />								
 				          		<RetriggerButton
-				          			task={task} />
-							
-								
+				          			task={task} />													
 								<CancelTaskButton />
-
 								<PurgeCacheButton 
 									caches = {_.keys(((task || {}).payload || {}).cache || {})}
 									provisionerId={task.provisionerId}
-	                            	workerType={task.workerType} />
-	                            		
+	                            	workerType={task.workerType} />	                            		
 							</bs.ButtonToolbar>						
 
 						</td>
@@ -117,7 +109,6 @@ export default class TaskDetail extends Component {
 							{dependenciesList}
 						</td>
 					</tr>
-
 				</tbody>
       		</table>
 		);

@@ -1,10 +1,6 @@
-import React from 'react';
-import { Component } from 'react';
-import * as bs from 'react-bootstrap';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import taskcluster from 'taskcluster-client';
-import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
 class ScheduleTaskButton extends Component {
@@ -13,7 +9,6 @@ class ScheduleTaskButton extends Component {
     super(props);  
   }
 
- 
   render() {
     
     const glyph = "play",
@@ -35,18 +30,14 @@ class ScheduleTaskButton extends Component {
       </div>
     );     
 
-    return (
-               
+    return (          
       <ConfirmAction 
           label = {label}
           glyph = {glyph}
           action = {() => { scheduleTask(taskId, successMsg)}}
-          disabled = {status.state !== 'unscheduled'} >
-          
+          disabled = {status.state !== 'unscheduled'} >          
           {scheduleContent}
-
-      </ConfirmAction>
-          
+      </ConfirmAction>          
     );
   }
 
@@ -58,4 +49,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, actions )(ScheduleTaskButton);
+export default connect(mapStateToProps, actions)(ScheduleTaskButton);

@@ -1,10 +1,7 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import * as bs from 'react-bootstrap';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import format from '../../lib/format';
-import { rendering } from '../lib/utils';
 import Loading from './loading';
 
 class ConfirmAction extends Component {
@@ -13,8 +10,7 @@ class ConfirmAction extends Component {
     super(props);
     this.state = {
       showDialog: false,
-      executing: false,
-      result: undefined
+      executing: false
     }
 
     this.open = this.open.bind(this);
@@ -26,8 +22,7 @@ class ConfirmAction extends Component {
   close() {
     this.setState({
       showDialog: false,
-      executing: false,
-      result: undefined
+      executing: false
     }); 
   }
 
@@ -87,7 +82,7 @@ class ConfirmAction extends Component {
           </bs.Modal.Body>
           <bs.Modal.Footer>
             {
-              !(this.state.executing || this.state.result) ? (  
+              !(this.state.executing) ? (  
                 <bs.Button onClick={this.executeAction}>
                   <bs.Glyphicon glyph={glyph} />
                   &nbsp;{label}

@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import * as bs from 'react-bootstrap';
-import _ from 'lodash';
 import { queue } from '../lib/utils';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
@@ -9,7 +7,7 @@ import auth from '../../lib/auth';
 
 // Matching patterns for finding an icon from a mimetype, most specific
 // mimetype are listed first as they are matched top down.
-var MIMETYPE_ICONS = [
+const MIMETYPE_ICONS = [
   {
     icon:       'file-pdf-o',
     matches:    ['application/pdf', 'application/postscript']
@@ -80,9 +78,9 @@ var MIMETYPE_ICONS = [
 ];
 
 /** Get icon from mimetype */
-var getIconFromMime = function(contentType) {
+const getIconFromMime = function(contentType) {
   for (var i =  0; i < MIMETYPE_ICONS.length; i++) {
-    var entry = MIMETYPE_ICONS[i];
+    const entry = MIMETYPE_ICONS[i];
     if (entry.matches.some(function(pattern) {
       if (pattern instanceof RegExp) {
         return pattern.test(contentType);

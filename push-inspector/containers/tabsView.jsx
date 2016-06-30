@@ -41,8 +41,6 @@ class TabsView extends Component {
 		}
 	}
 
-	
-
 	render() {
 		const { params, task, status, artifacts } = this.props;
 		const { tabIndex } = this.state;
@@ -56,7 +54,7 @@ class TabsView extends Component {
 	        <TabList>
 	          <Tab>Task</Tab>
 	          <Tab>Run</Tab>
-			  <Tab>Try</Tab>
+			  		<Tab>Try</Tab>
 	        </TabList>
 
 	        <TabPanel>
@@ -65,12 +63,12 @@ class TabsView extends Component {
 	        <TabPanel>
 	          <TaskRun task={task} status={status} artifacts={artifacts} />
 	        </TabPanel>
-		    <TabPanel>
+		    	<TabPanel>
 	          <h4>Try</h4>
 						Developers would come to this view to use the API that ahal is working on
 	        </TabPanel>
 	      </Tabs>
-	    )
+	    );
   	}
 }
 function mapStateToProps(state) {
@@ -82,4 +80,4 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, actions )(TabsView);
+export default connect(mapStateToProps, actions)(TabsView);

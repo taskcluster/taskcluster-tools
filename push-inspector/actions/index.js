@@ -8,8 +8,10 @@ import {
 	CREATE_TASK,
 	TASK_ACTIONS_ERROR,
 	TASK_ACTIONS_SUCCESS,
-	TASK_ACTIONS_IN_PROGRESS
+	TASK_ACTIONS_IN_PROGRESS,
+	SET_DASHBOARD_BANNER
 } from './types';
+
 import { taskActionsInProgress } from './helper';
 import taskcluster from 'taskcluster-client';
 import { queue } from '../lib/utils';
@@ -105,11 +107,11 @@ export function setActiveTaskStatus(status) {
 
 export function purge(provisionerId, workerType, selectedCaches, successMessage) {   
   
-  let purgeCache = new taskcluster.PurgeCache({
+  const purgeCache = new taskcluster.PurgeCache({
     credentials: JSON.parse(localStorage.credentials)
   });
   
-  let cachesPromise = Promise.all(selectedCaches.map(cache => {
+  const cachesPromise = Promise.all(selectedCaches.map(cache => {
     return purgeCache.purgeCache(
       provisionerId, workerType, {cacheName: cache});
   }));
@@ -345,4 +347,11 @@ export function loanerCreateTask(list, id, toClone, successMessage) {
 	}	
 }
 
+//	Schedule a task
+export function setDashboardBanner(hasErrored) {   
+	return {
+		type: SET_DASHBOARD_BANNER,
+		payload: hasErrored
+	}
+}
 

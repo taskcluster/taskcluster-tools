@@ -32,11 +32,13 @@ export default class TerminalView extends Component {
 	componentWillMount() {
 		this.open();
 	}
+
 	componentWillUnmount() {
     if (this.worker) {
       this.abortRequest();
     }
   }
+
   componentDidMount() {
     this.refs.scrollbar.addEventListener('mousedown', this.onMouseDown);
     window.addEventListener('mouseup', this.onMouseUp);
@@ -86,12 +88,15 @@ export default class TerminalView extends Component {
 	scrollbarHeight() {
     if (!this.refs.buffer) {
       return 0;
-    } 
-    var ratio = this.rows / this.state.lines.length;
+    }
+
+    let ratio = this.rows / this.state.lines.length,
+        height = ratio * this.refs.buffer.offsetHeight;
+
     if (ratio > 1) {
       ratio = 1;
     } 
-    var height = ratio * this.refs.buffer.offsetHeight;
+
     return Math.max(height, 10);
   }
 
@@ -99,7 +104,7 @@ export default class TerminalView extends Component {
     if (!this.refs.buffer) {
       return 0;
     }
-    var ratio = (this.state.lines.length - this.state.fromBottom - this.rows) / this.state.lines.length;
+    let ratio = (this.state.lines.length - this.state.fromBottom - this.rows) / this.state.lines.length;
     return ratio * (this.refs.buffer.offsetHeight - this.scrollbarHeight());
   }
 
@@ -158,6 +163,7 @@ export default class TerminalView extends Component {
     }
 
     let paddingRows = 0;
+    
     //Check if the log has less lines than the number of rows or if we are displaying the beggining of the log
     if (this.rows <= this.state.lines.length && this.state.lines[start] !== this.state.lines[0]) {
       paddingRows = 15;

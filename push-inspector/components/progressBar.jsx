@@ -78,12 +78,10 @@ export default class ProgressBar extends Component {
           <bs.ProgressBar title={`Pending (${pending.length})`} className="label-pending" striped  now={penPerc} key={6} label={!!penPerc ? `${penPerc.toFixed(0)}%` : loadingLabel} />
           <bs.ProgressBar title={`Unscheduled (${unscheduled.length})`} className="label-unscheduled" striped  now={unschPerc} key={4} label={!!unschPerc ? `${unschPerc.toFixed(0)}%` : loadingLabel} />
         </bs.ProgressBar>
-
 		);
   }
 
   render() {
-
     const { taskGroupId, tasks } = this.props;
     return (
       <div className={!!tasks.length ? "" : "hideVisibility"}>

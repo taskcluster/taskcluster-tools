@@ -1,11 +1,6 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import * as bs from 'react-bootstrap';
-import taskcluster from 'taskcluster-client';
-import slugid from 'slugid';
-import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
 class RetriggerButton extends Component {
@@ -60,4 +55,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, actions )(RetriggerButton);
+export default connect(mapStateToProps, actions)(RetriggerButton);

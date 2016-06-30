@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { hashHistory } from 'react-router';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import * as bs from 'react-bootstrap';
 import { beautify } from '../lib/utils';
 
 class Table extends Component {
@@ -26,7 +25,6 @@ class Table extends Component {
 
   generateHeaders() {
       const { activeTaskStatus } = this.props;
-
       return (
         <tr>
           <th className="tableColumnBaseline">Name</th>
@@ -70,7 +68,6 @@ class Table extends Component {
         var headerComponents = this.generateHeaders();
         var rowComponents = this.generateRows();
 
-
         return (
             <table id="tasks-list" className="table task-list-table">
                 <thead>{headerComponents}</thead>
@@ -95,4 +92,4 @@ function mapStateToProps(state) {
 	}
 }
 
-export default connect(mapStateToProps, actions )(Table)
+export default connect(mapStateToProps, actions)(Table)

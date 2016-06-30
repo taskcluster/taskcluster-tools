@@ -1,10 +1,6 @@
-import React from 'react';
-import { Component } from 'react';
-import * as bs from 'react-bootstrap';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import taskcluster from 'taskcluster-client';
-import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
 class OneClickLoaner extends Component {
@@ -36,19 +32,17 @@ class OneClickLoaner extends Component {
           <li>Set the environment variable<code>TASKCLUSTER_INTERACTIVE=true</code>.</li>
         </ul>
         Note: this may not work with all tasks.
-        </div>
+      </div>
     );  
 
     
-    return (
-               
+    return (         
   		<ConfirmAction 
 	      	label = {label}
 	      	glyph = {glyph}
 	      	action = {() => {loanerCreateTask(tasks, taskId, task, successMsg)}} >
 	      	{oneClickLoanerContent}
     	</ConfirmAction>
-          
     );
   }
 

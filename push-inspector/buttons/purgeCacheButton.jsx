@@ -1,7 +1,4 @@
-import React from 'react';
-import { Component } from 'react';
-import * as bs from 'react-bootstrap';
-import taskcluster from 'taskcluster-client';
+import React, { Component } from 'react';
 import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 import { connect } from 'react-redux';
@@ -21,7 +18,7 @@ class PurgeCacheButton extends Component {
 
   
   update(e) {	
-  	var caches = _.clone(this.state.selected);
+  	let caches = _.clone(this.state.selected);
     if (e.target.checked === true) {
       caches.push(e.target.value);
     } else if (e.target.checked === false) {
@@ -72,4 +69,4 @@ class PurgeCacheButton extends Component {
 }
 
 
-export default connect(null, actions )(PurgeCacheButton)
+export default connect(null, actions)(PurgeCacheButton)

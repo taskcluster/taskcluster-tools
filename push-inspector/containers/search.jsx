@@ -22,16 +22,13 @@ class Search extends Component {
     hashHistory.push(this.state.term);
     this.props.removeTasks();
     this.props.fetchTasks(this.state.term);
-
   }
 
   onInputChange(event) {
     this.setState({term: event.target.value});
   }
 
-
   render() {
-
     return (
       <div>
         <form onSubmit={this.onFormSubmit} className="input-group search-form">
@@ -47,7 +44,6 @@ class Search extends Component {
         </form>
       </div>
     );
-
   }
 }
 

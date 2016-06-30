@@ -42,18 +42,16 @@ export default class LogView extends Component {
 
 
   render() {
-  	const { runId, taskId } = this.props;
+  	const { runId, taskId } = this.props,
+          logUrl = this.createUrlForArtifact();
 
-    const logUrl = this.createUrlForArtifact();
-
-    let logs = this.props.logs.map(log => {
+  
+    const logs = this.props.logs.map(log => {
       return {value: log.name, label: log.name};
     });
     
-    
     return (
    		<span>
-        
         <label>Show Log</label>	   
         <div className="select-wrapper">
           <Select
@@ -68,7 +66,7 @@ export default class LogView extends Component {
             <i className="glyphicon glyphicon-refresh"></i>
           </bs.Button>
         </div>
-      <TerminalView ref="termView" url={logUrl} />
+        <TerminalView ref="termView" url={logUrl} />
       </span>
 
     );

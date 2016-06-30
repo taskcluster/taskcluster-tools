@@ -1,10 +1,6 @@
-import React from 'react';
-import { Component } from 'react';
-import * as bs from 'react-bootstrap';
+import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import taskcluster from 'taskcluster-client';
-import _ from 'lodash';
 import ConfirmAction from '../shared/confirmAction';
 
 class CancelTaskButton extends Component {
@@ -61,4 +57,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, actions )(CancelTaskButton);
+export default connect(mapStateToProps, actions)(CancelTaskButton);
