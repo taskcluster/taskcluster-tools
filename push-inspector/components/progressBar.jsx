@@ -45,7 +45,9 @@ export default class ProgressBar extends Component {
           unschPerc,
           runPerc,
           penPerc,
-          loadingLabel = '...';
+          loadingLabel = '...',
+          threshold = 5,
+          totWeighted;
 
 
 		tasks.map((task) => {
@@ -61,6 +63,7 @@ export default class ProgressBar extends Component {
 		});
 
 
+    // original percentages
     complPerc = completed.length / totLen * 100;
     failedPerc = failed.length / totLen * 100;
     excepPerc = exception.length / totLen * 100;
@@ -68,6 +71,32 @@ export default class ProgressBar extends Component {
     runPerc = running.length / totLen * 100;
     penPerc = pending.length / totLen * 100;
 
+
+    // intermediate values 
+    complPerc = (complPerc < threshold && complPerc > 0) ? threshold : complPerc;
+    failedPerc = (failedPerc < threshold && failedPerc > 0) ? threshold : failedPerc;
+    excepPerc = (excepPerc < threshold && excepPerc > 0) ? threshold : excepPerc;
+    unschPerc = (unschPerc < threshold && unschPerc > 0) ? threshold : unschPerc;
+    penPerc = (penPerc < threshold && penPerc > 0) ? threshold : penPerc;
+    runPerc = (runPerc < threshold && runPerc > 0) ? threshold : runPerc;
+
+
+    // common weighted denominator
+    totWeighted = complPerc + failedPerc + excepPerc + unschPerc + runPerc + penPerc;
+
+    const getWeightedPercentage = (value) => {
+        return value / totWeighted * 100;
+    };
+
+    // weighted percentages
+    complPerc = getWeightedPercentage(complPerc);
+    failedPerc = getWeightedPercentage(failedPerc);
+    excepPerc = getWeightedPercentage(excepPerc);
+    unschPerc = getWeightedPercentage(unschPerc);
+    penPerc = getWeightedPercentage(penPerc);
+    runPerc = getWeightedPercentage(runPerc);
+
+ 
 
 		return (
         <bs.ProgressBar onClick={this.progressBarClicked} style={{height: '35px'}}>

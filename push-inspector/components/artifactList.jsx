@@ -189,7 +189,8 @@ class ArtifactList extends Component {
 					}
 				</ul>
 			)      
-  	}
+  	} 
+
 	}
 
 

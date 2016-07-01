@@ -59,7 +59,7 @@ class Table extends Component {
 
             return (
                 <tr onClick={this.taskClicked.bind(this, task)} key={i}>
-                  <td>{task.task.metadata.name}</td>
+                  <td className="listings-table-labels-column">{task.task.metadata.name}</td>
                   <td className={state}>{task.status.state}</td>
                 </tr>
             );

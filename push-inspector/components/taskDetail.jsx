@@ -20,7 +20,7 @@ export default class TaskDetail extends Component {
 		
 		const { dependencies } = task;
 		if(!dependencies.length) {
-			return;
+			return <span>-</span>
 		}
 		return (
 			<div>
