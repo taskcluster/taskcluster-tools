@@ -5,7 +5,7 @@ import Search from './search';
 import ProgressBar from '../components/progressBar';
 import Loading from '../shared/loading';
 import DashboardBanner from '../shared/dashboardBanner';
-
+import { authentication } from '../lib/utils';
 class PushInspector extends Component {
 
   handleLoadingAndError() {
@@ -18,6 +18,20 @@ class PushInspector extends Component {
     if(!tasks.length && !!taskGroupId) {
       return <Loading />
     }
+  }
+
+  handleCredentialsChanged(e) {
+    console.log('e: ', e);
+    authentication.login(e.detail);
+  }
+
+  // Set up an event listener, listening for credential changes
+  componentWillMount() {
+    window.addEventListener(
+      'credentials-changed',
+      this.handleCredentialsChanged,
+      false
+    );
   }
 
   render() {

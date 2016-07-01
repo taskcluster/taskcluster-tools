@@ -3,12 +3,17 @@ import * as bs from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 
-
-export const queue = new taskcluster.Queue({
+export let queue = new taskcluster.Queue({
     credentials: JSON.parse(localStorage.credentials)
 });
-
 export const queueEvents = new taskcluster.QueueEvents();
+
+export const authentication = {
+  login : (credentials) => {
+    queue = new taskcluster.Queue({credentials});
+  }
+}
+
 
 let listener = new taskcluster.WebListener();
 export const webListener =  {  
