@@ -3,9 +3,16 @@ import * as bs from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 
-export let queue = new taskcluster.Queue({
+export let queue;
+if(localStorage.credentials) {
+  queue = new taskcluster.Queue({
     credentials: JSON.parse(localStorage.credentials)
-});
+  });
+} else{
+  queue = new taskcluster.Queue();
+}
+
+
 export const queueEvents = new taskcluster.QueueEvents();
 
 export const authentication = {
