@@ -74,7 +74,7 @@ class Listings extends Component {
 
   /** Handle message from the queue */
   handleQueueMessage(message) {
-    const { params, fetchArtifacts, fetchTasks, fetchTask, fetchStatus } = this.props;
+    const { params, fetchArtifacts, fetchTasks, updateTasks, fetchTask, fetchStatus } = this.props;
     const { taskId, taskGroupId } = params;
     const durationToWait = 5;
     let toExtract = 10;
@@ -83,10 +83,10 @@ class Listings extends Component {
     let that = this;
 
     //  Case where messages stop coming and won't be able to make the required calls
-    const edgeCase = () => {
+    const edgeCase = (() => {
       let flag = false;
       return function() {
-        if(flag = false) {
+        if(flag == false) {
           flag = true;
           console.log('setting a timer...');
           setTimeout(() => {            
@@ -97,7 +97,7 @@ class Listings extends Component {
           }, durationToWait * 1000);
         }
       }
-    }
+    }());
 
     const update = () => {
       // up to toExtract calls from the buffer
@@ -113,11 +113,11 @@ class Listings extends Component {
         // Update tasks list if and only if on the last turn of the loop
         if(!(that.bQueue.length > 0 && toExtract > 0)) {
           console.log('updating tasks lists');
-          updateTasksList();
+          updateTasksList(elem);
           return;  
         }      
       }
-    }
+    };
 
     const updateTask = (elem) => {
       if(elem.exchange == queueEvents.artifactCreated().exchange) {
@@ -127,11 +127,14 @@ class Listings extends Component {
 
       fetchTask(taskId);
       fetchStatus(taskId);
-    }
+    };
 
-    const updateTasksList = () => {
+    const updateTasksList = (elem) => {
+      // const status = elem.payload.status;
+      // const tasks = this.props.tasks;
       fetchTasks(taskGroupId);
-    }
+      //updateTasks(tasks, status);
+    };
 
 
     // Append message to buffer queue

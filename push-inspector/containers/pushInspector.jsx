@@ -21,7 +21,6 @@ class PushInspector extends Component {
   }
 
   handleCredentialsChanged(e) {
-    console.log('e: ', e);
     authentication.login(e.detail);
   }
 

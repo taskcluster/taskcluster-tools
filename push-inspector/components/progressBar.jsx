@@ -100,12 +100,12 @@ export default class ProgressBar extends Component {
 
 		return (
         <bs.ProgressBar onClick={this.progressBarClicked} style={{height: '35px'}}>
-          <bs.ProgressBar title={`Completed (${completed.length})`} className="label-completed" striped  now={complPerc} key={1} label={!!complPerc ? `${complPerc.toFixed(0)}%`: loadingLabel} />          
-          <bs.ProgressBar title={`Running (${running.length})`} className="label-running active"  striped now={runPerc} key={5} label={!!runPerc ? `${runPerc.toFixed(0)}%` : loadingLabel} />                    
-          <bs.ProgressBar title={`Pending (${pending.length})`} className="label-pending" striped  now={penPerc} key={6} label={!!penPerc ? `${penPerc.toFixed(0)}%` : loadingLabel} />
-          <bs.ProgressBar title={`Unscheduled (${unscheduled.length})`} className="label-unscheduled" striped  now={unschPerc} key={4} label={!!unschPerc ? `${unschPerc.toFixed(0)}%` : loadingLabel} />
-          <bs.ProgressBar title={`Exception (${exception.length})`} className="label-exception"  striped now={excepPerc} key={3} label={!!excepPerc ? `${excepPerc.toFixed(0)}%` : loadingLabel} />
-          <bs.ProgressBar title={`Failed (${failed.length})`} className="label-failed"  striped now={failedPerc} key={2} label={!!failedPerc ? `${failedPerc.toFixed(0)}%` : loadingLabel} />
+          <bs.ProgressBar title={`Completed (${completed.length})`} className="label-completed" striped  now={complPerc} key={1} label={!!completed.length ? `C (${completed.length})`: loadingLabel} />          
+          <bs.ProgressBar title={`Running (${running.length})`} className="label-running active"  striped now={runPerc} key={5} label={!!running.length ? `R (${running.length})` : loadingLabel} />                    
+          <bs.ProgressBar title={`Pending (${pending.length})`} className="label-pending" striped  now={penPerc} key={6} label={!!pending.length ? `P (${pending.length})` : loadingLabel} />
+          <bs.ProgressBar title={`Unscheduled (${unscheduled.length})`} className="label-unscheduled" striped  now={unschPerc} key={4} label={!!unschPerc ? `U (${unscheduled.length})` : loadingLabel} />
+          <bs.ProgressBar title={`Exception (${exception.length})`} className="label-exception"  striped now={excepPerc} key={3} label={!!exception.length ? `E (${exception.length})` : loadingLabel} />
+          <bs.ProgressBar title={`Failed (${failed.length})`} className="label-failed"  striped now={failedPerc} key={2} label={!!failed.length ? `F (${failed.length})` : loadingLabel} />
         </bs.ProgressBar>
 		);
   }

@@ -1,31 +1,37 @@
 import {
 	FETCH_TASKS,
+	REMOVE_TASKS,
 	FETCH_TASK,
 	FETCH_STATUS,
-	UPDATE_STATUS,
 	ACTIVE_TASK_STATUS,
 	FETCH_ARTIFACTS,
-	CREATE_TASK,
-	TASK_ACTIONS_ERROR,
-	TASK_ACTIONS_SUCCESS,
-	TASK_ACTIONS_IN_PROGRESS,
 	SET_DASHBOARD_BANNER,
-	TASKS_NOT_AVAILABLE
 } from './types';
 
-import { taskActionsInProgress } from './helper';
-import taskcluster from 'taskcluster-client';
+// Helper functions
+import { 
+	taskActionsInProgress,
+	taskGroupIdNotAvailable,
+	renderActionSuccess,
+	renderActionError,
+	createTask
+} from './helper';
+import { rendering } from '../lib/utils';
 import { queue } from '../lib/utils';
+
+
+// Modules
+import taskcluster from 'taskcluster-client';
 import slugid from 'slugid';
 import _ from 'lodash';
 import { hashHistory } from 'react-router';
-import { rendering } from '../lib/utils';
 import shellescape from 'shell-escape';
+import update from 'react-addons-update';
 
-
-
-//	Get task group list
-export function fetchTasks(id) {
+/**
+* Get the list of tasks
+*/
+export const fetchTasks = (id) => {
 	let list = [];
 	const limit  = 200;
 	return (dispatch) => {
@@ -36,11 +42,7 @@ export function fetchTasks(id) {
 			}
 			options.limit = limit;
 			const request = queue.listTaskGroup(id, options);
-
-			dispatch({
-					type: TASKS_NOT_AVAILABLE,
-					payload: false
-			});
+			dispatch(taskGroupIdNotAvailable(false));
 			request.then(({tasks, continuationToken}) => {
 				list = list.concat(tasks);
 				dispatch({
@@ -52,17 +54,16 @@ export function fetchTasks(id) {
 					iteratePromises(continuationToken);
 				}
 			}, (err) => {
-				dispatch({
-					type: TASKS_NOT_AVAILABLE,
-					payload: true
-				});
+				dispatch(taskGroupIdNotAvailable(true));
 			});
 		}());
 	}
 }
 
-//	Get task definition
-export function fetchTask(id) {
+/**	
+* Get task definition
+*/
+export const fetchTask = (id) => {
 	const request = queue.task(id);
 	return (dispatch) => {
 		request.then((task) => {
@@ -74,30 +75,36 @@ export function fetchTask(id) {
 	}
 }
 
-//	Fetch list of artifacts
-export function fetchArtifacts(id) {
+/**	
+* Get artifacts list
+*/
+export const fetchArtifacts = (id) => {
 	const request = queue.listLatestArtifacts(id);
 	return (dispatch) => {
 		request.then((data) => {
 			dispatch({
 				type: FETCH_ARTIFACTS,
 				payload: data.artifacts
-			})
+			});
 		});
 	}
 }
 
-//	Get task definition
-export function removeTasks() {
+/**
+* Remove list of tasks
+*/
+export const removeTasks = () => {
 	const empty = [];
 	return {
-		type: FETCH_TASKS,
+		type: REMOVE_TASKS,
 		payload: empty
 	}
 }
 
-//	Get task status
-export function fetchStatus(id) {
+/**
+* Get task status
+*/
+export const fetchStatus = (id) => {
 	const request = queue.status(id);
 	return (dispatch) => {
 		request.then(({status}) => {
@@ -109,15 +116,20 @@ export function fetchStatus(id) {
 	}
 }
 
-// Set Status to the 6 possible states (Completed, Pending, Running, etc.)
-export function setActiveTaskStatus(status) {
+/**
+* Set status of a task (e.g, pending)
+*/
+export const setActiveTaskStatus = (status) => {
 	return {
 		type: ACTIVE_TASK_STATUS,
 		payload: status
 	}
 }
 
-export function purge(provisionerId, workerType, selectedCaches, successMessage) {   
+/**
+* Purge a task
+*/
+export const purge = (provisionerId, workerType, selectedCaches, successMessage) => {   
   
   const purgeCache = new taskcluster.PurgeCache({
     credentials: JSON.parse(localStorage.credentials)
@@ -131,25 +143,19 @@ export function purge(provisionerId, workerType, selectedCaches, successMessage)
   return (dispatch) => {
 		dispatch(taskActionsInProgress(true));
 		cachesPromise.then((data) => {
-			dispatch({
-				type: TASK_ACTIONS_SUCCESS,
-				payload: rendering.renderSuccess(successMessage)
-			});
+			dispatch(renderActionSuccess(successMessage))
 			dispatch(taskActionsInProgress(false));
 		}, (err) => {		
-			dispatch({
-				type: TASK_ACTIONS_ERROR,
-				payload: rendering.renderError(err)
-			});
+			dispatch(renderActionError(err))
 			dispatch(taskActionsInProgress(false));
-		});
-		
+		});	
 	}
-
 }
 
-// Retrigger a task
-export function retriggerTask(list, toClone, successMessage) {	
+/**
+* Retrigger a task
+*/
+export const retriggerTask = (list, toClone, successMessage) => {	
 	const 	taskId = slugid.nice(),
 			task = _.cloneDeep(toClone),
 			now = Date.now(),
@@ -170,74 +176,57 @@ export function retriggerTask(list, toClone, successMessage) {
 			hashHistory.push(task.taskGroupId + '/' + data.status.taskId);
 			
 			// Update current list of tasks
-			dispatch({
-				type: CREATE_TASK,
-				payload: list.concat(dataObj)
-			})
+			dispatch(createTask(list, dataObj));
 			// Update modal message
-			dispatch({
-				type: TASK_ACTIONS_SUCCESS,
-				payload: rendering.renderSuccess(successMessage)
-			})
+			dispatch(renderActionSuccess(successMessage));
 			dispatch(taskActionsInProgress(false));
 			
 		}, (err) => {
-			dispatch({
-				type: TASK_ACTIONS_ERROR,
-				payload: rendering.renderError(err)
-			})
+			dispatch(renderActionError(err));
 			dispatch(taskActionsInProgress(false));
 		});
 		
 	}	
 }
 
-//	Cancel a task
-export function cancelTask(taskId, successMessage) {   
+/**
+* Cancel a task
+*/
+export const cancelTask = (taskId, successMessage) => {   
 	const request = queue.cancelTask(taskId);
 	return (dispatch) => {
 		dispatch(taskActionsInProgress(true));
 		request.then(({status}) => {
-			dispatch({
-				type: TASK_ACTIONS_SUCCESS,
-				payload: rendering.renderSuccess(successMessage)
-			});
+			dispatch(renderActionSuccess(successMessage));
 			dispatch(taskActionsInProgress(false));
 		}, (err) => {
-			dispatch({
-				type: TASK_ACTIONS_ERROR,
-				payload: rendering.renderError(err)
-			});
+			dispatch(renderActionError(err));
 			dispatch(taskActionsInProgress(false));
 		});
 	}
-
 }
 
-//	Schedule a task
-export function scheduleTask(taskId, successMessage) {   
+/**
+* Schedule a task
+*/
+export const scheduleTask = (taskId, successMessage) => {   
 	const request = queue.scheduleTask(taskId);
 	return (dispatch) => {
 		dispatch(taskActionsInProgress(true));
 		request.then((data) => {
-			dispatch({
-				type: TASK_ACTIONS_SUCCESS,
-				payload: data
-			});
+			dispatch(renderActionSuccess(data));
 			dispatch(taskActionsInProgress(false));
-		}, (err) => {
-			dispatch({
-				type: TASK_ACTIONS_ERROR,
-				payload: rendering.renderError(err)
-			});
+		}, (err) => {			
+			dispatch(renderActionError(err));
 			dispatch(taskActionsInProgress(false));
 		});
 	}
-
 }
 
-// Edit and create task
-export function editAndCreateTask(oldTask, successMessage) {
+/**
+* Edit and create task 
+*/
+export const editAndCreateTask = (oldTask, successMessage) => {
 	let newTask = {
       // filled in by task creator on load
       created: null,
@@ -269,14 +258,14 @@ export function editAndCreateTask(oldTask, successMessage) {
 
  
     // Update modal message
-	return {
-		type: TASK_ACTIONS_SUCCESS,
-		payload: rendering.renderSuccess(successMessage)
-	};
+    return renderActionSuccess(successMessage);
+
 }
 
-// Create Task for One Click Loaner
-export function loanerCreateTask(list, id, toClone, successMessage) {	
+/**
+* One Click Loaner action
+*/
+export const loanerCreateTask = (list, id, toClone, successMessage) => {	
 	const 	taskId = slugid.nice(),
 			task = _.cloneDeep(toClone);
 
@@ -336,34 +325,70 @@ export function loanerCreateTask(list, id, toClone, successMessage) {
 			window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${data.status.taskId}`);
 			
 			// Update current list of tasks
-			dispatch({
-				type: CREATE_TASK,
-				payload: list.concat(dataObj)
-			});
-			// Update modal message
-			dispatch({
-				type: TASK_ACTIONS_SUCCESS,
-				payload: rendering.renderSuccess(successMessage)
-			});
-			
+			dispatch(createTask(list, dataObj));
+			// Update modal message			
+			dispatch(renderActionSuccess(successMessage));		
 			dispatch(taskActionsInProgress(false));			
 			
 		}, (err) => {
-			dispatch({
-				type: TASK_ACTIONS_ERROR,
-				payload: rendering.renderError(err)
-			});
+			dispatch(renderActionError(err));
 			dispatch(taskActionsInProgress(false));
 		});
 		
 	}	
 }
 
-//	Schedule a task
-export function setDashboardBanner(hasErrored) {   
+/**
+* Set dashboard banner
+*/
+export const setDashboardBanner = (hasErrored) => {   
 	return {
 		type: SET_DASHBOARD_BANNER,
 		payload: hasErrored
 	}
 }
+
+//	Update entry in tasks list
+// export const updateTasks = (list, status) => {
+// 	const updatedTask = queue.task(status.taskId);
+// 	return (dispatch) => {
+// 		updatedTask.then((task) => {
+// 			console.log('before updating list is: ', list);
+			
+// 			// Check for a match
+// 			const match = _.findIndex(list, function(o) { return o.status.taskId == status.taskId; });
+
+// 			// update entry if match
+// 			if(match > -1) {
+				
+// 			    var updatedStatus = update(list[match], {status: {$set: status}}); 
+
+// 			    var newData = update(list, {
+// 			        $splice: [[match, 1, updatedStatus]]
+// 			    });
+
+// 				dispatch({
+// 					type: FETCH_TASKS,
+// 					payload: newData
+// 				});
+
+// 				// list[match].status = status;
+// 				// list = Object.assign({}, list);
+// 				console.log('update existing entry to list: ', list);
+// 			} else {
+// 				list = list.concat({task, status});
+// 				dispatch({
+// 					type: FETCH_TASKS,
+// 					payload: list
+// 				});
+
+// 			}
+
+
+// 			console.log('after updating list is: ', list);
+
+			
+// 		});
+// 	}
+// }
 
