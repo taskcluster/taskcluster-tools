@@ -22,7 +22,6 @@ export const taskActionsInProgress = (isExecuting) => {
 	}
 }
 
-
 /**
 * Will show a message to the user if set to true
 * Message will say that taskGroupId does not exist

@@ -18,18 +18,29 @@ class ConfirmAction extends Component {
     this.executeAction = this.executeAction.bind(this);
   }
 
-  
+  /**
+  * Close dialog and set executing to false
+  */
   close() {
     this.setState({
       showDialog: false,
       executing: false
     }); 
+
+    // Clear message
+    this.props.clearTaskActionsMessage();
   }
 
+  /**
+  * Open dialog
+  */
   open() {
     this.setState({showDialog: true});
   }
 
+  /**
+  * Execute action and set executing to true
+  */
   executeAction() {
     this.setState({executing: true});
     this.props.action();
@@ -41,7 +52,7 @@ class ConfirmAction extends Component {
     if(!!taskActionInProgress) {
       return <Loading />
     } else {
-      return taskActionMessage
+      return taskActionMessage ? taskActionMessage : undefined
     }
   }
 

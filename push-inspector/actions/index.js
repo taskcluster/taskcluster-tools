@@ -6,7 +6,8 @@ import {
 	ACTIVE_TASK_STATUS,
 	FETCH_ARTIFACTS,
 	SET_DASHBOARD_BANNER,
-	TASKS_RETRIEVED_FULLY
+	TASKS_RETRIEVED_FULLY,
+	CLEAR_TASKS_ACTIONS_MESSAGE
 } from './types';
 
 // Helper functions
@@ -144,9 +145,15 @@ export const setActiveTaskStatus = (status) => {
 */
 export const purge = (provisionerId, workerType, selectedCaches, successMessage) => {   
   
-  const purgeCache = new taskcluster.PurgeCache({
-    credentials: JSON.parse(localStorage.credentials)
-  });
+  let purgeCache;
+  if(localStorage.credentials) {
+	  purgeCache = new taskcluster.PurgeCache({
+	    credentials: JSON.parse(localStorage.credentials)
+	  });
+	} else{
+	  purgeCache = new taskcluster.PurgeCache();
+	}
+
   
   const cachesPromise = Promise.all(selectedCaches.map(cache => {
     return purgeCache.purgeCache(
@@ -370,6 +377,14 @@ export const tasksHaveBeenRetrieved = (bool) => {
 		payload: bool
 	}
 }
+
+export const clearTaskActionsMessage = () => {
+	return {	
+		type: CLEAR_TASKS_ACTIONS_MESSAGE,
+		payload: null
+	}
+}
+
 
 
 // //	Update entry in tasks list
