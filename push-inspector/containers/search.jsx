@@ -21,7 +21,9 @@ class Search extends Component {
 
   }
 
-  /** Handle search query */
+  /** 
+  * Handle search query 
+  */
   onFormSubmit(event) {
     event.preventDefault();
     if(!this.isInvalid()) {
@@ -35,6 +37,9 @@ class Search extends Component {
     this.setState({term: event.target.value});
   }
 
+  /**
+  * Text input validator
+  */
   isInvalid() {
     
     // Case 1: If search term is empty, it is valid

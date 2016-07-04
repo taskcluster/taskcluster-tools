@@ -17,12 +17,16 @@ class TabsView extends Component {
 		this.handleSelect = this.handleSelect.bind(this);
 	}
 
-	/**	handle active tab on select */
+	/**	
+	* Handle active tab on selection 
+	*/
 	handleSelect(index, last) {
 		this.setState({tabIndex: index});
 	}
 
-	/** Fetch task data */
+	/** 
+	* Fetch task data 
+	*/
 	fetchTaskData() {
 		const { params, fetchArtifacts, fetchTask, fetchStatus } = this.props;
 		fetchArtifacts(params.taskId);
@@ -34,8 +38,9 @@ class TabsView extends Component {
 		this.fetchTaskData();
 	}
 
-
-	/**	Handle case where user picks another task to show */
+	/**	
+	* Handle case where user picks another task to show 
+	*/
 	componentDidUpdate(prevProps, prevState) {
 		//	This can happen when retriggering a task or clicking on a task
 		if(prevProps.params.taskId != this.props.params.taskId) {

@@ -3,6 +3,9 @@ import * as bs from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 
+/**
+* Creation of queue. If credentials are available, we use them at the start of the application
+*/
 export let queue;
 if(localStorage.credentials) {
   queue = new taskcluster.Queue({
@@ -12,16 +15,24 @@ if(localStorage.credentials) {
   queue = new taskcluster.Queue();
 }
 
-
+/**
+* Creation of queueEvents
+*/
 export const queueEvents = new taskcluster.QueueEvents();
 
+/**
+* Authentication
+*/
 export const authentication = {
   login : (credentials) => {
     queue = new taskcluster.Queue({credentials});
   }
 }
 
-
+/**
+* WebListener
+* Setup bindings and event callbacks
+*/
 let listener = new taskcluster.WebListener();
 export const webListener =  {  
   
@@ -35,8 +46,7 @@ export const webListener =  {
       listener.bind(queueEvents.taskCompleted(qkey));
       listener.bind(queueEvents.taskFailed(qkey));
       listener.bind(queueEvents.taskException(qkey));
-
-      
+    
       listener.on("message", (message) => {        
         console.log('Message: ', message.payload.status);
         onMessageAction(message);
@@ -47,16 +57,12 @@ export const webListener =  {
         if (!err) {
             err = new Error("Unknown error");
         }
-
         listener.close();
-
         // Show a banner
         onMessageAction(err);
-
       });
 
       listener.resume();
-
     },
 
     stopListening : () => {
@@ -65,6 +71,9 @@ export const webListener =  {
 
 }
 
+/**
+* Rendering Erorr and Success messages
+*/
 export const rendering =  {
   renderError: (err) => {
     // Find some sort of summary or error code
@@ -102,6 +111,9 @@ export const rendering =  {
   }
 }
 
+/**
+* Beautify functions
+*/
 export const beautify = {
 
   labelClassName(state) {
@@ -121,8 +133,3 @@ export const beautify = {
     }
   }
 }
-
-
-
-
-

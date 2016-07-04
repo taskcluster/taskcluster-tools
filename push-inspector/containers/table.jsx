@@ -12,19 +12,24 @@ class Table extends Component {
     this.generateRows = this.generateRows.bind(this);
   }
 
-  
-
-  /** Navigate to appropriate route  */
+  /** 
+  * Navigate to appropriate route  
+  */
   taskClicked(task) {
     const { taskId, taskGroupId } = task.status;
 		hashHistory.push(taskGroupId + '/' + taskId);
 	}
 
+  /**
+  * Clear current status filter
+  */
   clearFilter() {
     this.props.setActiveTaskStatus(null);
   }
 
-  /** Generate table columns */
+  /** 
+  * Generate table columns 
+  */
   generateHeaders() {
       const { activeTaskStatus } = this.props;
       return (
@@ -40,7 +45,9 @@ class Table extends Component {
       );
   }
 
-  /** Generate table rows */
+  /** 
+  * Generate table rows 
+  */
   generateRows() {
       var cols = ["Name", "State"],
           data = this.props.tasks;
@@ -67,7 +74,9 @@ class Table extends Component {
   		}
   }
 
-  /** Render list of tasks */
+  /** 
+  * Render list of tasks 
+  */
   renderList() {
 
         var headerComponents = this.generateHeaders();

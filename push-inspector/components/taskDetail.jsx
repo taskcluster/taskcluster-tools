@@ -16,6 +16,9 @@ export default class TaskDetail extends Component {
 		super(props);
 	}
 
+	/**
+	* Render dependencies list
+	*/
 	getDependenciesList(task) {
 		
 		const { dependencies } = task;
@@ -24,19 +27,19 @@ export default class TaskDetail extends Component {
 		}
 		return (
 			<div>
-			<ul className="dependencies-ul">
-				{
-					dependencies.map((dependency, index) => {
-						return (
-							<li key={index}>
-								<a target="_blank" href={'https://queue.taskcluster.net/v1/task/' + dependency}>{dependency}
-								&nbsp;<i className='fa fa-external-link'></i>
-								</a>
-							</li>
-						)
-					})
-				}
-			</ul>
+				<ul className="dependencies-ul">
+					{
+						dependencies.map((dependency, index) => {
+							return (
+								<li key={index}>
+									<a target="_blank" href={'https://queue.taskcluster.net/v1/task/' + dependency}>{dependency}
+									&nbsp;<i className='fa fa-external-link'></i>
+									</a>
+								</li>
+							)
+						})
+					}
+				</ul>
 			</div>
 		);
 	}

@@ -21,6 +21,9 @@ export default class LogView extends Component {
     this.refreshLog = this.refreshLog.bind(this);
   }
 
+  /**
+  * Create url for Artifact
+  */
   createUrlForArtifact() {
     const { taskId, runId } = this.props;
     const { name } = this.state;
@@ -29,6 +32,9 @@ export default class LogView extends Component {
     }
   }
 
+  /**
+  * Handle log change
+  */
   handleLogChanged(log) {  
     if(this.state.name != log.value) {
       this.setState({name: log.value});
@@ -36,6 +42,9 @@ export default class LogView extends Component {
     }   
   }
 
+  /**
+  * Refresh terminal
+  */
 	refreshLog() {
     this.refs.termView.refresh();
 	}  

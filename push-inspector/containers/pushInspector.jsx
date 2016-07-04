@@ -8,6 +8,9 @@ import DashboardBanner from '../shared/dashboardBanner';
 import { authentication } from '../lib/utils';
 class PushInspector extends Component {
 
+  /**
+  * handleLoadingAndError handles error and show the loading icon
+  */
   handleLoadingAndError() {
     const { tasks, tasksNotAvailable, params } = this.props;
     const taskGroupId = params.taskGroupId;
@@ -20,11 +23,16 @@ class PushInspector extends Component {
     }
   }
 
+  /**
+  * Event handler for changed credentials
+  */
   handleCredentialsChanged(e) {
     authentication.login(e.detail);
   }
 
-  // Set up an event listener, listening for credential changes
+  /**
+  * Setup an event listener, listening for credential changes
+  */
   componentWillMount() {
     window.addEventListener(
       'credentials-changed',

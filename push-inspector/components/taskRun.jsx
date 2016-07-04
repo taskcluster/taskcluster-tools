@@ -10,6 +10,9 @@ export default class TaskRun extends Component {
     this.generateRows = this.generateRows.bind(this);
   }
 
+  /**
+  * Generate rows
+  */
   generateRows() {
     const { task, status } = this.props,
           runNumber = status.runs.length - 1;
@@ -33,10 +36,11 @@ export default class TaskRun extends Component {
     });
   }
 
-  
+  /**
+  * Render log view
+  */
   renderLogView(taskId, runId, artifacts) {
     
-
     const logs = artifacts.filter(function(artifact) {
       return /^public\/logs\//.test(artifact.name);
     });

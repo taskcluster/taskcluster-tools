@@ -9,6 +9,9 @@ export default class ProgressBar extends Component {
     this.progressBarClicked = this.progressBarClicked.bind(this);
   }
 
+  /**
+  * Progress bar on click handler
+  */
   progressBarClicked(event) {
     const title = event.target.title;
 
@@ -28,6 +31,9 @@ export default class ProgressBar extends Component {
 
   }
 
+  /**
+  * Render progress bar
+  */
   makeProgressBar() {
 
     let		completed = [],
