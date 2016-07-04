@@ -6,6 +6,7 @@ import {
 	ACTIVE_TASK_STATUS,
 	FETCH_ARTIFACTS,
 	SET_DASHBOARD_BANNER,
+	TASKS_RETRIEVED_FULLY
 } from './types';
 
 // Helper functions
@@ -29,9 +30,11 @@ import shellescape from 'shell-escape';
 import update from 'react-addons-update';
 
 /**
-* Get the list of tasks
+* Get the list of tasks in small steps
+* Set limitBool to true if you want to fetch in steps
+* Set to false otherwise
 */
-export const fetchTasks = (id) => {
+export const fetchTasksInSteps = (id, limitBool) => {
 	let list = [];
 	const limit  = 200;
 	return (dispatch) => {
@@ -40,18 +43,27 @@ export const fetchTasks = (id) => {
 			if (token) {
 				options.continuationToken = token;	
 			}
-			options.limit = limit;
+			
+			if(limitBool == true) {
+				options.limit = limit;	
+			}
+			
 			const request = queue.listTaskGroup(id, options);
 			dispatch(taskGroupIdNotAvailable(false));
 			request.then(({tasks, continuationToken}) => {
 				list = list.concat(tasks);
+				
 				dispatch({
 					type: FETCH_TASKS,
 					payload: list
 				});
 
 				if(continuationToken) {
+					dispatch(tasksHaveBeenRetrieved(false));
 					iteratePromises(continuationToken);
+				} else {
+					// Set a flag indicating list has been loaded
+					dispatch(tasksHaveBeenRetrieved(true));
 				}
 			}, (err) => {
 				dispatch(taskGroupIdNotAvailable(true));
@@ -59,6 +71,7 @@ export const fetchTasks = (id) => {
 		}());
 	}
 }
+
 
 /**	
 * Get task definition
@@ -348,13 +361,23 @@ export const setDashboardBanner = (hasErrored) => {
 	}
 }
 
-//	Update entry in tasks list
-// export const updateTasks = (list, status) => {
+/**
+* Set to true if tasks list has been loaded fully
+*/
+export const tasksHaveBeenRetrieved = (bool) => {
+	return {
+		type: TASKS_RETRIEVED_FULLY,
+		payload: bool
+	}
+}
+
+
+// //	Update entry in tasks list
+// export const updateListings = (list, status) => {
 // 	const updatedTask = queue.task(status.taskId);
 // 	return (dispatch) => {
 // 		updatedTask.then((task) => {
 // 			console.log('before updating list is: ', list);
-			
 // 			// Check for a match
 // 			const match = _.findIndex(list, function(o) { return o.status.taskId == status.taskId; });
 
@@ -376,6 +399,7 @@ export const setDashboardBanner = (hasErrored) => {
 // 				// list = Object.assign({}, list);
 // 				console.log('update existing entry to list: ', list);
 // 			} else {
+// 				console.log('creating new entry');
 // 				list = list.concat({task, status});
 // 				dispatch({
 // 					type: FETCH_TASKS,

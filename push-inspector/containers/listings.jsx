@@ -11,25 +11,30 @@ class Listings extends Component {
 
   constructor(props) {
     super(props);
-    this.listener = null;
-    
-    this.bTimer = null;
+    this.listener = null; 
     this.bQueue = [];
+    this.loop = null;
 
     this.handleMessage = this.handleMessage.bind(this);
-
   }
 
-  /** Close Listener connection */
+  /** 
+  * Close Listener connection 
+  */
   stopListening() {
     webListener.stopListening();
   }
-  /** Start Listener connection */
+
+  /** 
+  * Start Listener connection 
+  */
   startListening(taskGroupId, onMessageAction) {
     webListener.startListening(taskGroupId, onMessageAction);
   }
 
-  /** Handle message from listener */
+  /** 
+  * Handle message from listener 
+  */
   handleMessage(message) {
 
     // Handle Error
@@ -51,133 +56,98 @@ class Listings extends Component {
     ];
     // Dispatch to handleQueueMessage or handleSchedulerMessage
     if (_.includes(queueExchanges, message.exchange)) {
-      this.handleQueueMessage(message);
+      // Append message to buffer queue
+      this.bQueue.push(message);
+      // Handle edge cases that will increase UX
+      this.handleEdgeCases(message);     
     }
  
   }
 
-  getTimeRemaining(endtime) {
-    var t = Date.parse(endtime) - Date.parse(new Date());
-    var seconds = Math.floor( (t/1000) % 60 );
-    var minutes = Math.floor( (t/1000/60) % 60 );
-    var hours = Math.floor( (t/(1000*60*60)) % 24 );
-    var days = Math.floor( t/(1000*60*60*24) );
-    return {
-      'total': t,
-      'days': days,
-      'hours': hours,
-      'minutes': minutes,
-      'seconds': seconds
-    };
-  }
-
-
-  /** Handle message from the queue */
-  handleQueueMessage(message) {
-    const { params, fetchArtifacts, fetchTasks, updateTasks, fetchTask, fetchStatus } = this.props;
-    const { taskId, taskGroupId } = params;
-    const durationToWait = 5;
-    let toExtract = 10;
-
-    // babel makes 'this' to be undefined inside arrow functions, hence the use of 'that'
-    let that = this;
-
-    //  Case where messages stop coming and won't be able to make the required calls
-    const edgeCase = (() => {
-      let flag = false;
-      return function() {
-        if(flag == false) {
-          flag = true;
-          console.log('setting a timer...');
-          setTimeout(() => {            
-            if(that.bQueue.length > 0) {
-              update();
-              flag = false;
-            }
-          }, durationToWait * 1000);
-        }
-      }
-    }());
-
-    const update = () => {
-      // up to toExtract calls from the buffer
-      while(true) {
-        toExtract -= 1;
-        let elem = that.bQueue.shift();
-
-        // Update Task
-        if(taskId) {   
-          updateTask(elem);
-        }
-
-        // Update tasks list if and only if on the last turn of the loop
-        if(!(that.bQueue.length > 0 && toExtract > 0)) {
-          console.log('updating tasks lists');
-          updateTasksList(elem);
-          return;  
-        }      
-      }
-    };
-
-    const updateTask = (elem) => {
-      if(elem.exchange == queueEvents.artifactCreated().exchange) {
-        fetchArtifacts(taskId);
-        return;
-      }
-
+  /**
+  * Give priority to exceptions to show without waiting for loop to happen
+  */
+  handleEdgeCases(message) {
+    const { fetchTask, fetchStatus, params } = this.props;
+    const { taskId } = params;
+    if(message.exchange == queueEvents.taskException().exchange) {
       fetchTask(taskId);
       fetchStatus(taskId);
-    };
-
-    const updateTasksList = (elem) => {
-      // const status = elem.payload.status;
-      // const tasks = this.props.tasks;
-      fetchTasks(taskGroupId);
-      //updateTasks(tasks, status);
-    };
-
-
-    // Append message to buffer queue
-    this.bQueue.push(message);
-       
-    // Create a date with current time
-    if(this.bTimer == null) {
-      this.bTimer = new Date();
-
-    // Check if 'durationToWait' seconds has elapsed  
-    } else if(new Date(new Date() - this.bTimer).getSeconds() >= durationToWait) {
-      console.log('5 seconds have elapsed');
-      // Stop timer
-      this.bTimer = null;
-      update();    
     }
-    edgeCase();              
   }
 
-  /** Remove the list of tasks that were previously loaded */
+
+  /**
+  * Construct loop that will update the tasks when messages arrive from the web listener 
+  */
+  constructLoopForMessages() {
+
+    const { fetchArtifacts, fetchTask, fetchStatus, params, fetchTasksInSteps } = this.props;
+    const { taskId, taskGroupId } = params;
+  
+    this.loop = setInterval(() => {
+      if(this.bQueue.length > 0) {
+        this.bQueue = [];
+        fetchTasksInSteps(taskGroupId, false);  
+      }      
+    }, 5000);
+  }
+
+  /**
+  * Clear interval, stop weblistener, etc.
+  */
+  cleanup() {
+    console.log('CLEANING UP');
+    clearInterval(this.loop);
+    this.loop = null;
+    this.stopListening();
+  }
+
+  /**
+  * Make appropriate setup
+  */
+  setup() {
+    console.log('SETTING UP');
+    this.startListening(this.props.params.taskGroupId, this.handleMessage);
+  }
+
+  /** 
+  * Remove the list of tasks that were previously loaded 
+  */
   componentWillUnmount() {
       this.props.removeTasks();
-      this.stopListening();
+      this.cleanup();
   }
 
-  /** Handle case where taskGroupId is changed */
   componentDidUpdate(prevProps, prevState) {
-    if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {
-      webListener.stopListening();
-      this.stopListening();
-      this.startListening(this.props.params.taskGroupId, this.handleMessage);
+    
+    // Case when user change taskGroupId
+    if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {    
+      // Cleanup
+      this.cleanup();   
+      // Start listening
+      this.setup();
     }
+
+    // Setup loop
+    if(this.props.tasksRetrievedFully == true && !!!this.loop) {
+      console.log('constructLoopForMessages CALLED ');
+      this.constructLoopForMessages();
+    }
+
   }
 
   /** Fetch list of tasks and start the web listener */
   componentWillMount() {
     const { taskGroupId, taskId } = this.props.params;
-    this.props.fetchTasks(taskGroupId);
+    this.props.fetchTasksInSteps(taskGroupId, true);
     this.startListening(taskGroupId, this.handleMessage);
+    this.constructLoopForMessages();
   }
 
   render() {
     const tasks = this.props.tasks;
+
     return (
       <div>
         <div className="col-xs-6  ">
@@ -194,7 +164,8 @@ class Listings extends Component {
 function mapStateToProps(state) {
   return {
     tasks: state.tasks,
-    status: state.status
+    status: state.status,
+    tasksRetrievedFully: state.tasksRetrievedFully
   }
 }
 

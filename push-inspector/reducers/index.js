@@ -9,6 +9,7 @@ import taskActionMessageReducer from './taskActionMessage';
 import taskActionInProgressReducer from './taskActionInProgress';
 import dashboardBannerReducer from './dashboardBanner';
 import tasksNotAvailableReducer from './tasksNotAvailable';
+import tasksRetrievedFullyReducer from './tasksRetrievedFully';
 
 const rootReducer = combineReducers({
   tasks: tasksReducer,
@@ -19,7 +20,9 @@ const rootReducer = combineReducers({
   artifacts: artifactsReducer,
   taskActionMessage: taskActionMessageReducer,
   taskActionInProgress: taskActionInProgressReducer,
-  dashboardBanner: dashboardBannerReducer
+  dashboardBanner: dashboardBannerReducer,
+  tasksRetrievedFully: tasksRetrievedFullyReducer
+
 });
 
 export default rootReducer;

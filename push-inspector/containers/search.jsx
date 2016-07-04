@@ -27,7 +27,7 @@ class Search extends Component {
     if(!this.isInvalid()) {
       hashHistory.push(this.state.term);
       this.props.removeTasks();
-      this.props.fetchTasks(this.state.term);
+      this.props.fetchTasksInSteps(this.state.term, true);
     }  
   }
 
