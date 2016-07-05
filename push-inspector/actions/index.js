@@ -1,5 +1,6 @@
 import {
-	FETCH_TASKS,
+	FETCH_TASKS_IN_STEP,
+	FETCH_TASKS_FULLY,
 	REMOVE_TASKS,
 	FETCH_TASK,
 	FETCH_STATUS,
@@ -36,8 +37,7 @@ import update from 'react-addons-update';
 * Set to false otherwise
 */
 export const fetchTasksInSteps = (id, limitBool) => {
-	let list = [],
-			options = {},
+	let	options = {},
 			token = undefined,
 			res = undefined;
 
@@ -51,25 +51,33 @@ export const fetchTasksInSteps = (id, limitBool) => {
 			try {
 				res = await queue.listTaskGroup(id, options); 
 				let tasks = res.tasks;
-				list = list.concat(tasks);
-				dispatch({
-					type: FETCH_TASKS,
-					payload: list
-				});
+				if(limitBool == true) {
+					dispatch({
+						type: FETCH_TASKS_IN_STEP,
+						payload: tasks
+					});	
+				} else {
+					dispatch({
+						type: FETCH_TASKS_FULLY,
+						payload: tasks
+					});
+				}			
 
 				if(!!res.continuationToken) {
 					dispatch(tasksHaveBeenRetrieved(false));
 				} else {
 					// Set a flag indicating list has been loaded
 					dispatch(tasksHaveBeenRetrieved(true));
-					break;
 				}
 
 			} catch(err) {
 				dispatch(taskGroupIdNotAvailable(true));
 			} finally {
 				token = res.continuationToken;
-			}
+				if(!!!token) {
+					break;
+				}
+			}			
 		} 
 	}
 }
@@ -321,69 +329,64 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
 	// Strip routes
 	delete task.routes;
 
-	// Construct message of the day
-	let msg = "\\nCreated by one-click-loaner based on taskId: " +
-              id + "\\n" +
-              "Original command was: " + shellescape(task.payload.command);
+	task.payload.env = task.payload.env || {};
+  task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
 
-  	task.payload.env = task.payload.env || {};
-    task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
+		
 
+  task.payload.env = task.payload.env || {};
+  task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
+
+  // Strip artifacts
+  delete task.payload.artifacts;
+
+  // Strip dependencies and requires
+  delete task.dependencies;
+  delete task.requires;
+
+  // Set interactive = true
+  task.payload.features = task.payload.features || {};
+  task.payload.features.interactive = true;
+
+  // Strip caches
+  delete task.payload.caches;
+
+  // Update maxRunTime
+  task.payload.maxRunTime = Math.max(
+    task.payload.maxRunTime,
+    3 * 60 * 60
+  );
+
+  // Update timestamps
+  task.deadline = taskcluster.fromNowJSON('12 hours');
+  task.created = taskcluster.fromNowJSON();
+  task.expires = taskcluster.fromNowJSON('7 days');
+
+  // Set task,retries to 0
+  task.retries = 0;
+
+	return async (dispatch) => {
+
+		dispatch(taskActionsInProgress(true));
+
+		try {
+			let res = await queue.createTask(taskId, task);
+			const 	dataObj = { task, status: res.status },
+							location = window.location;
+
+			hashHistory.push(task.taskGroupId + '/' + res.status.taskId);			
+			window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${res.status.taskId}`);
 			
+			// Update current list of tasks
+			dispatch(createTask(list, dataObj));
 
-    task.payload.env = task.payload.env || {};
-    task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
-
-    // Strip artifacts
-    delete task.payload.artifacts;
-
-    // Strip dependencies and requires
-    delete task.dependencies;
-    delete task.requires;
-
-    // Set interactive = true
-    task.payload.features = task.payload.features || {};
-    task.payload.features.interactive = true;
-
-    // Strip caches
-    delete task.payload.caches;
-
-    // Update maxRunTime
-    task.payload.maxRunTime = Math.max(
-      task.payload.maxRunTime,
-      3 * 60 * 60
-    );
-
-    // Update timestamps
-    task.deadline = taskcluster.fromNowJSON('12 hours');
-    task.created = taskcluster.fromNowJSON();
-    task.expires = taskcluster.fromNowJSON('7 days');
-
-    // Set task,retries to 0
-    task.retries = 0;
-	
-		return async (dispatch) => {
-
-			dispatch(taskActionsInProgress(true));
-
-			try {
-				let res = await queue.createTask(taskId, task);
-				const 	dataObj = { task, status: res.status },
-								location = window.location;
-
-				hashHistory.push(task.taskGroupId + '/' + res.status.taskId);			
-				window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${res.status.taskId}`);
-				
-				// Update current list of tasks
-				dispatch(createTask(list, dataObj));
-
-				dispatch(renderActionSuccess(msg));
-			} catch(err) {
-				dispatch(renderActionError(err));
-			}	finally {
-				dispatch(taskActionsInProgress(false));
-			}	
-		}
+			dispatch(renderActionSuccess(msg));
+		} catch(err) {
+			dispatch(renderActionError(err));
+		}	finally {
+			dispatch(taskActionsInProgress(false));
+		}	
+	}
 
 }
 

@@ -65,8 +65,10 @@ export const webListener =  {
       listener.resume();
     },
 
+    // Stop listening and create a new instance for the next listener
     stopListening : () => {
       listener.close();
+      listener = new taskcluster.WebListener();
     }  
 
 }

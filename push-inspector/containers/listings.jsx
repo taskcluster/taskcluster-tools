@@ -97,17 +97,17 @@ class Listings extends Component {
   * Clear interval, stop weblistener, etc.
   */
   cleanup() {
-    console.log('CLEANING UP');
     clearInterval(this.loop);
     this.loop = null;
     this.stopListening();
+    this.props.removeTasks();
   }
 
   /**
   * Make appropriate setup
   */
   setup() {
-    console.log('SETTING UP');
+    console.log('starting to listen to taskGroupiD: ', this.props.params.taskGroupId);
     this.startListening(this.props.params.taskGroupId, this.handleMessage);
   }
 
@@ -115,8 +115,8 @@ class Listings extends Component {
   * Remove the list of tasks that were previously loaded 
   */
   componentWillUnmount() {
-      this.props.removeTasks();
       this.cleanup();
+      this.props.removeTasks();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -127,6 +127,7 @@ class Listings extends Component {
       this.cleanup();   
       // Start listening
       this.setup();
+
     }
 
     // Setup loop

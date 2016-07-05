@@ -59,7 +59,7 @@ export const renderActionSuccess = (successMessage) => {
 export const createTask = (list, dataObj) => {
 	return {	
 		type: CREATE_TASK,
-		payload: list.concat(dataObj)
+		payload: dataObj
 	}
 }
 
