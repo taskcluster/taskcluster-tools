@@ -37,37 +37,23 @@ var TaskView = React.createClass({
 
   // Render tabs and current tab
   render: function() {
+    let initialRuns = this.props.status.runs.slice(0, 6);
+    let extraRuns = this.props.status.runs.slice(6);
+
     return (
       <div className="task-view">
-        <bs.Nav bsStyle="tabs"
-                activeKey={'' + this.state.currentTab}
-                onSelect={this.setCurrentTab}>
+        <bs.Nav bsStyle="tabs" activeKey={`${this.state.currentTab}`} onSelect={this.setCurrentTab}>
           <bs.NavItem eventKey={''} key={''}>Task</bs.NavItem>
-          {
-            this.props.status.runs.slice(0, 6).map(function(run) {
-              return (
-                <bs.NavItem eventKey={'' + run.runId} key={'' + run.runId}>
-                  Run {run.runId}
-                </bs.NavItem>
-              );
-            })
-          }
-          {
-            this.props.status.runs.slice(6).length > 0 ? (
-              <bs.DropdownButton eventKey={'extra'}
-                                 title="More Runs" key={'extra'}
-                                 navItem={true}>
-                {
-                  this.props.status.runs.slice(6).map(function(run) {
-                    return (
-                      <bs.NavItem eventKey={'' + run.runId} key={'' + run.runId}>
-                        Run {run.runId}
-                      </bs.NavItem>
-                    );
-                  })
-                }
-              </bs.DropdownButton>
-            ) : undefined
+          {initialRuns.map(({ runId }) => <bs.NavItem eventKey={`${runId}`} key={`${runId}`}>Run {runId}</bs.NavItem>)}
+          {extraRuns.length &&
+            <bs.NavDropdown
+              id="more-runs-dropdown"
+              eventKey="extra"
+              title="More Runs"
+              key="extra"
+              navItem={true}>
+                {extraRuns.map(({ runId }) => <bs.MenuItem eventKey={`${runId}`} key={`${runId}`}>Run {runId}</bs.MenuItem>)}
+            </bs.NavDropdown>
           }
         </bs.Nav>
         <div className="tab-content">
@@ -81,17 +67,18 @@ var TaskView = React.createClass({
 
   /** Render current tab */
   renderCurrentTab: function() {
-    // Empty string is the task tab
+    // Empty string is the task tab, but zero is a possible value
     if (this.state.currentTab === '') {
-      return <TaskInfo status={this.props.status}/>;
+      return <TaskInfo status={this.props.status} />;
     }
     // Check if we have the run in current tab
-    var run = this.props.status.runs[this.state.currentTab];
+    let run = this.props.status.runs[this.state.currentTab];
+
     if (!run) {
       return (
         <div className="alert alert-danger">
           <strong>Run Not Found!</strong>&nbsp;
-          The task does not seem to have the requested run...
+          The task does not seem to have the requested run.
         </div>
       );
     }
@@ -101,7 +88,7 @@ var TaskView = React.createClass({
       <RunInfo
         status={this.props.status}
         run={run}
-        ref="runInfo"/>
+        ref="runInfo" />
     );
   },
 
@@ -109,7 +96,7 @@ var TaskView = React.createClass({
   setCurrentTab: function(tab) {
     // Update state
     this.setState({
-      currentTab:     tab
+      currentTab: tab
     });
   },
 
