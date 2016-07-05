@@ -82,7 +82,7 @@ export default class TaskDetail extends Component {
 					<tr>
 						<td><b>Actions</b></td>
 						<td>
-							<bs.ButtonToolbar className="toolbar-btn">							
+							<bs.ButtonToolbar className="toolbar-btn custom-btn">							
 				          		<ScheduleTaskButton />								
 				          		<RetriggerButton
 				          			task={task} />													
@@ -98,7 +98,7 @@ export default class TaskDetail extends Component {
 					<tr>
 						<td><b>Debug</b></td>
 						<td>
-							<bs.ButtonToolbar className="toolbar-btn">
+							<bs.ButtonToolbar className="toolbar-btn custom-btn">
 								<EditAndCreateButton />
 								<OneClickLoanerButton
 									task={task}
