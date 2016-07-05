@@ -37,6 +37,11 @@ module.exports = [
   'pulse-inspector/app.jsx',
   'pulse-inspector/app.less',
 
+  // Push Inspector
+  'push-inspector/index.jade',
+  'push-inspector/app.jsx',
+  'push-inspector/app.less',
+
   // Task Inspector
   'task-inspector/index.jade',
   'task-inspector/app.jsx',
