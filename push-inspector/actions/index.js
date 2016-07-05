@@ -36,56 +36,60 @@ import update from 'react-addons-update';
 * Set to false otherwise
 */
 export const fetchTasksInSteps = (id, limitBool) => {
-	let list = [];
+	let list = [],
+			options = {},
+			token = undefined,
+			res = undefined;
+
 	const limit  = 200;
-	return (dispatch) => {
-		(function iteratePromises(token) {
-			let options = {};
-			if (token) {
-				options.continuationToken = token;	
-			}
-			
-			if(limitBool == true) {
-				options.limit = limit;	
-			}
-			
-			const request = queue.listTaskGroup(id, options);
+	
+	return async (dispatch) => {
+		while (true) {	
 			dispatch(taskGroupIdNotAvailable(false));
-			request.then(({tasks, continuationToken}) => {
+			if (token) { options.continuationToken = token;	}
+			if (limitBool == true) { options.limit = limit;	}
+			try {
+				res = await queue.listTaskGroup(id, options); 
+				let tasks = res.tasks;
 				list = list.concat(tasks);
-				
 				dispatch({
 					type: FETCH_TASKS,
 					payload: list
 				});
 
-				if(continuationToken) {
+				if(!!res.continuationToken) {
 					dispatch(tasksHaveBeenRetrieved(false));
-					iteratePromises(continuationToken);
 				} else {
 					// Set a flag indicating list has been loaded
 					dispatch(tasksHaveBeenRetrieved(true));
+					break;
 				}
-			}, (err) => {
+
+			} catch(err) {
 				dispatch(taskGroupIdNotAvailable(true));
-			});
-		}());
+			} finally {
+				token = res.continuationToken;
+			}
+		} 
 	}
 }
-
 
 /**	
 * Get task definition
 */
 export const fetchTask = (id) => {
-	const request = queue.task(id);
-	return (dispatch) => {
-		request.then((task) => {
+	return async (dispatch) => {
+		let task;
+		try {
+			task = await queue.task(id);
 			dispatch({
 				type: FETCH_TASK,
 				payload: task
 			})
-		});
+		} catch(err) {
+
+		}
+			
 	}
 }
 
@@ -93,14 +97,18 @@ export const fetchTask = (id) => {
 * Get artifacts list
 */
 export const fetchArtifacts = (id) => {
-	const request = queue.listLatestArtifacts(id);
-	return (dispatch) => {
-		request.then((data) => {
+	let res;
+
+	return async (dispatch) => {
+		try {
+			res = await queue.listLatestArtifacts(id);
 			dispatch({
 				type: FETCH_ARTIFACTS,
-				payload: data.artifacts
+				payload: res.artifacts
 			});
-		});
+		} catch(err) {
+
+		}		
 	}
 }
 
@@ -119,14 +127,22 @@ export const removeTasks = () => {
 * Get task status
 */
 export const fetchStatus = (id) => {
-	const request = queue.status(id);
-	return (dispatch) => {
-		request.then(({status}) => {
+	let res,
+			status;
+
+	return async (dispatch) => {
+		try {
+			res = await queue.status(id);
+			status = res.status;
+
 			dispatch({
 				type: FETCH_STATUS,
 				payload: status
-			})
-		});
+			});
+
+		} catch(err) {
+
+		}		
 	}
 }
 
@@ -144,8 +160,9 @@ export const setActiveTaskStatus = (status) => {
 * Purge a task
 */
 export const purge = (provisionerId, workerType, selectedCaches, successMessage) => {   
-  
   let purgeCache;
+
+  // Setup purgeCache
   if(localStorage.credentials) {
 	  purgeCache = new taskcluster.PurgeCache({
 	    credentials: JSON.parse(localStorage.credentials)
@@ -170,6 +187,7 @@ export const purge = (provisionerId, workerType, selectedCaches, successMessage)
 			dispatch(taskActionsInProgress(false));
 		});	
 	}
+
 }
 
 /**
@@ -177,70 +195,81 @@ export const purge = (provisionerId, workerType, selectedCaches, successMessage)
 */
 export const retriggerTask = (list, toClone, successMessage) => {	
 	const 	taskId = slugid.nice(),
-			task = _.cloneDeep(toClone),
-			now = Date.now(),
-			created = Date.parse(task.created);
+					task = _.cloneDeep(toClone),
+					now = Date.now(),
+					created = Date.parse(task.created);
 
-    task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
-    task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
-    task.created = new Date(now).toJSON();
-    task.retries = 0;
+  task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
+  task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
+  task.created = new Date(now).toJSON();
+  task.retries = 0;
 
-    const request = queue.createTask(taskId, task);
+  
+  return async (dispatch) => {
+		let res,
+				dataObj;
 
-	return (dispatch) => {
 		dispatch(taskActionsInProgress(true));
-		request.then((data) => {			
-			
-			let dataObj = { task, status: data.status };
-			hashHistory.push(task.taskGroupId + '/' + data.status.taskId);
+
+		try {
+			res = await queue.createTask(taskId, task);
+			dataObj = { task, status: res.status };
+			hashHistory.push(task.taskGroupId + '/' + res.status.taskId);
 			
 			// Update current list of tasks
 			dispatch(createTask(list, dataObj));
 			// Update modal message
 			dispatch(renderActionSuccess(successMessage));
-			dispatch(taskActionsInProgress(false));
-			
-		}, (err) => {
+		} catch(err) {
 			dispatch(renderActionError(err));
+		}	finally {
 			dispatch(taskActionsInProgress(false));
-		});
-		
-	}	
+		}	
+	}
 }
 
 /**
 * Cancel a task
 */
 export const cancelTask = (taskId, successMessage) => {   
-	const request = queue.cancelTask(taskId);
-	return (dispatch) => {
+	let res;
+
+	return async (dispatch) => {
+
 		dispatch(taskActionsInProgress(true));
-		request.then(({status}) => {
+
+		try {
+			res = await queue.cancelTask(taskId);
 			dispatch(renderActionSuccess(successMessage));
-			dispatch(taskActionsInProgress(false));
-		}, (err) => {
+		} catch(err) {
 			dispatch(renderActionError(err));
+		}	finally {
 			dispatch(taskActionsInProgress(false));
-		});
+		}	
 	}
+
 }
 
 /**
 * Schedule a task
 */
 export const scheduleTask = (taskId, successMessage) => {   
-	const request = queue.scheduleTask(taskId);
-	return (dispatch) => {
+	let res;
+	
+	return async (dispatch) => {
+
 		dispatch(taskActionsInProgress(true));
-		request.then((data) => {
-			dispatch(renderActionSuccess(data));
-			dispatch(taskActionsInProgress(false));
-		}, (err) => {			
+
+		try {
+			res = await queue.scheduleTask(taskId);
+			dispatch(renderActionSuccess(successMessage));
+		} catch(err) {
 			dispatch(renderActionError(err));
+		}	finally {
 			dispatch(taskActionsInProgress(false));
-		});
+		}	
 	}
+
 }
 
 /**
@@ -287,7 +316,7 @@ export const editAndCreateTask = (oldTask, successMessage) => {
 */
 export const loanerCreateTask = (list, id, toClone, successMessage) => {	
 	const 	taskId = slugid.nice(),
-			task = _.cloneDeep(toClone);
+					task = _.cloneDeep(toClone);
 
 	// Strip routes
 	delete task.routes;
@@ -332,30 +361,30 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
 
     // Set task,retries to 0
     task.retries = 0;
+	
+		return async (dispatch) => {
 
-    const request = queue.createTask(taskId, task);
+			dispatch(taskActionsInProgress(true));
 
-	return (dispatch) => {
-		dispatch(taskActionsInProgress(true));
-		request.then((data) => {			
-			const 	dataObj = { task, status: data.status },
-					location = window.location;
+			try {
+				let res = await queue.createTask(taskId, task);
+				const 	dataObj = { task, status: res.status },
+								location = window.location;
 
-			hashHistory.push(task.taskGroupId + '/' + data.status.taskId);			
-			window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${data.status.taskId}`);
-			
-			// Update current list of tasks
-			dispatch(createTask(list, dataObj));
-			// Update modal message			
-			dispatch(renderActionSuccess(successMessage));		
-			dispatch(taskActionsInProgress(false));			
-			
-		}, (err) => {
-			dispatch(renderActionError(err));
-			dispatch(taskActionsInProgress(false));
-		});
-		
-	}	
+				hashHistory.push(task.taskGroupId + '/' + res.status.taskId);			
+				window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${res.status.taskId}`);
+				
+				// Update current list of tasks
+				dispatch(createTask(list, dataObj));
+
+				dispatch(renderActionSuccess(msg));
+			} catch(err) {
+				dispatch(renderActionError(err));
+			}	finally {
+				dispatch(taskActionsInProgress(false));
+			}	
+		}
+
 }
 
 /**
