@@ -45,7 +45,7 @@ var TaskView = React.createClass({
         <bs.Nav bsStyle="tabs" activeKey={`${this.state.currentTab}`} onSelect={this.setCurrentTab}>
           <bs.NavItem eventKey={''} key={''}>Task</bs.NavItem>
           {initialRuns.map(({ runId }) => <bs.NavItem eventKey={`${runId}`} key={`${runId}`}>Run {runId}</bs.NavItem>)}
-          {extraRuns.length &&
+          {extraRuns.length ?
             <bs.NavDropdown
               id="more-runs-dropdown"
               eventKey="extra"
@@ -53,7 +53,8 @@ var TaskView = React.createClass({
               key="extra"
               navItem={true}>
                 {extraRuns.map(({ runId }) => <bs.MenuItem eventKey={`${runId}`} key={`${runId}`}>Run {runId}</bs.MenuItem>)}
-            </bs.NavDropdown>
+            </bs.NavDropdown> :
+            null
           }
         </bs.Nav>
         <div className="tab-content">
