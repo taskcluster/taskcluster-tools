@@ -150,10 +150,10 @@ class Listings extends Component {
 
     return (
       <div>
-        <div className="col-xs-6  ">
+        <div className="col-md-6  ">
           <Table />
         </div>
-        <div className="col-xs-6">
+        <div className="col-md-6">
           {this.props.children}
         </div>
       </div>
