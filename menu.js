@@ -56,6 +56,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "AMI sets",
+    link:           '/ami-sets/',
+    icon:           'server',
+    display:        true,
+    description: [
+      "Manage AMI sets known to the AWS Provisioner",
+    ].join('\n')
+  },
+  {
     title:          "Client Manager ",
     link:           '/auth/clients/',
     icon:           'users',

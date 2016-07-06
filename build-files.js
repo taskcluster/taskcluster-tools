@@ -62,6 +62,11 @@ module.exports = [
   'aws-provisioner/app.jsx',
   'aws-provisioner/app.less',
 
+  // AMI set
+  'ami-sets/index.jade',
+  'ami-sets/app.jsx',
+  'ami-sets/app.less',
+
   // Index Browser
   'index/index.jade',
   'index/app.jsx',
