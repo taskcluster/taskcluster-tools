@@ -96,8 +96,7 @@ export const fetchTask = (id) => {
 			})
 		} catch(err) {
 
-		}
-			
+		}		
 	}
 }
 
