@@ -7,30 +7,27 @@ export default class DashboardBanner extends Component {
   constructor(props) {
     super(props);
     this.close = this.close.bind(this);
-    this.stopListening = this.stopListening.bind(this);
   }
 
+  /**
+  * Hide dashboard
+  */
   close() {
-    this.props.setBanner(false);
-  }
-
-  stopListening() {
-    webListener.stopListening();
+    this.props.setDashboardBanner(false);
   }
 
   render() {
-    if(this.props.showBanner) {
-      return (
-         <bs.Alert bsStyle="danger" onDismiss={this.close}>
-          <h4>Oh snap!</h4>
-          <p>The web listener has been put to sleep. Refresh the browser to see any updated changes.</p>
-          <p>
-            <bs.Button onClick={this.stopListening}>Stop listening</bs.Button> 
-          </p>
+    
+    const { bsStyle, dashboardMessage, action, actionText, dashboardHeaderMessage } = this.props;
 
-        </bs.Alert>
-      );  
-    }
-    return <span></span>;    
+    return (
+       <bs.Alert bsStyle={bsStyle} onDismiss={this.close}>
+        <h4>{dashboardHeaderMessage}</h4>
+        <p>{dashboardMessage}</p>
+        <p>
+          <bs.Button onClick={action}>{actionText}</bs.Button> 
+        </p>
+      </bs.Alert>
+    );   
   }
 }

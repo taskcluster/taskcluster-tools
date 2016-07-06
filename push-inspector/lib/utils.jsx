@@ -36,40 +36,40 @@ export const authentication = {
 let listener = new taskcluster.WebListener();
 export const webListener =  {  
   
-    startListening : (taskGroupId, onMessageAction) => {
-      let qkey = { taskGroupId: taskGroupId};
-      
-      listener.bind(queueEvents.taskDefined(qkey));
-      listener.bind(queueEvents.taskPending(qkey));
-      listener.bind(queueEvents.taskRunning(qkey));
-      listener.bind(queueEvents.artifactCreated(qkey));
-      listener.bind(queueEvents.taskCompleted(qkey));
-      listener.bind(queueEvents.taskFailed(qkey));
-      listener.bind(queueEvents.taskException(qkey));
+  startListening : (taskGroupId, onMessageAction) => {
+    let qkey = { taskGroupId: taskGroupId};
     
-      listener.on("message", (message) => {        
-        console.log('Message: ', message.payload.status);
-        onMessageAction(message);
-      });
- 
-      listener.on("error", function(err) {
-        console.error('Error within the Listener: ', err);
-        if (!err) {
-            err = new Error("Unknown error");
-        }
-        listener.close();
-        // Show a banner
-        onMessageAction(err);
-      });
+    listener.bind(queueEvents.taskDefined(qkey));
+    listener.bind(queueEvents.taskPending(qkey));
+    listener.bind(queueEvents.taskRunning(qkey));
+    listener.bind(queueEvents.artifactCreated(qkey));
+    listener.bind(queueEvents.taskCompleted(qkey));
+    listener.bind(queueEvents.taskFailed(qkey));
+    listener.bind(queueEvents.taskException(qkey));
 
-      listener.resume();
-    },
+    listener.on("message", (message) => {        
+      console.log('Message: ', message.payload.status);
+      onMessageAction(message);
+    });
 
-    // Stop listening and create a new instance for the next listener
-    stopListening : () => {
+    listener.on("error", function(err) {
+      console.error('Error within the Listener: ', err);
+      if (!err) {
+          err = new Error("Unknown error");
+      }
       listener.close();
-      listener = new taskcluster.WebListener();
-    }  
+      // Show a banner
+      onMessageAction(err);
+    });
+
+    listener.resume();
+  },
+
+  // Stop listening and create a new instance for the next listener
+  stopListening : () => {
+    listener.close();
+    listener = new taskcluster.WebListener();
+  }  
 
 }
 

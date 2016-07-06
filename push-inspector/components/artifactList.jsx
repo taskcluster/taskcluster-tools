@@ -193,7 +193,6 @@ class ArtifactList extends Component {
 
 	}
 
-
 	render() {
 	    
 	    const artifactList = this.renderArtifactList();

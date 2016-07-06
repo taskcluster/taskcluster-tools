@@ -95,7 +95,7 @@ export const fetchTask = (id) => {
 				payload: task
 			})
 		} catch(err) {
-
+			
 		}		
 	}
 }
@@ -392,10 +392,10 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
 /**
 * Set dashboard banner
 */
-export const setDashboardBanner = (hasErrored) => {   
+export const setDashboardBanner = (bool) => {   
 	return {
 		type: SET_DASHBOARD_BANNER,
-		payload: hasErrored
+		payload: bool
 	}
 }
 

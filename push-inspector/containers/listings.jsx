@@ -61,7 +61,6 @@ class Listings extends Component {
       // Handle edge cases that will increase UX
       this.handleEdgeCases(message);     
     }
- 
   }
 
   /**
@@ -75,7 +74,6 @@ class Listings extends Component {
       fetchStatus(taskId);
     }
   }
-
 
   /**
   * Construct loop that will update the tasks when messages arrive from the web listener 

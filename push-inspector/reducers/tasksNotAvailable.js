@@ -7,6 +7,5 @@ export default function(state = false, action) {
 		case TASKS_NOT_AVAILABLE:
 			return action.payload;
 	}
-
 	return state;
 }

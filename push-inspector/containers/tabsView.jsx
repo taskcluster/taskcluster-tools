@@ -54,30 +54,32 @@ class TabsView extends Component {
 		const { tabIndex } = this.state;
 
 		return (
+	    <Tabs
+	      onSelect={this.handleSelect}
+	      selectedIndex={tabIndex}
+	    >
+        <TabList>
+          <Tab>Task</Tab>
+          <Tab>Run</Tab>
+		  		<Tab>Try</Tab>
+        </TabList>
 
-	      <Tabs
-	        onSelect={this.handleSelect}
-	        selectedIndex={tabIndex}
-	      >
-	        <TabList>
-	          <Tab>Task</Tab>
-	          <Tab>Run</Tab>
-			  		<Tab>Try</Tab>
-	        </TabList>
+        <TabPanel>
+          <TaskDetail task={task} status={status} />
+        </TabPanel>
+        
+        <TabPanel>
+          <TaskRun task={task} status={status} artifacts={artifacts} />
+        </TabPanel>
 
-	        <TabPanel>
-	          <TaskDetail task={task} status={status} />
-	        </TabPanel>
-	        <TabPanel>
-	          <TaskRun task={task} status={status} artifacts={artifacts} />
-	        </TabPanel>
-		    	<TabPanel>
-	          <h4>Try</h4>
-						Developers would come to this view to use the API that ahal is working on
-	        </TabPanel>
-	      </Tabs>
-	    );
-  	}
+	    	<TabPanel>
+          <h4>Try</h4>
+					Developers would come to this view to use the API that ahal is working on
+        </TabPanel>
+        
+      </Tabs>
+    );
+	}
 }
 function mapStateToProps(state) {
 	return {

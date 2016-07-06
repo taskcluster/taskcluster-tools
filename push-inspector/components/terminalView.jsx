@@ -6,7 +6,6 @@ import _ from 'lodash';
 
 export default class TerminalView extends Component {
 
-
 	constructor(props) {
 		super(props);
 		
@@ -27,7 +26,6 @@ export default class TerminalView extends Component {
 		this.onMouseMove = this.onMouseMove.bind(this);
 		
 	}
-
 
 	componentWillMount() {
 		this.open();

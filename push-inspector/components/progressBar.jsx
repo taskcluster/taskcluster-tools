@@ -55,7 +55,6 @@ export default class ProgressBar extends Component {
           threshold = 5,
           totWeighted;
 
-
 		tasks.map((task) => {
 			status = task.status.state;
 			switch (status) {
@@ -68,7 +67,6 @@ export default class ProgressBar extends Component {
 			}
 		});
 
-
     // original percentages
     complPerc = completed.length / totLen * 100;
     failedPerc = failed.length / totLen * 100;
@@ -77,7 +75,6 @@ export default class ProgressBar extends Component {
     runPerc = running.length / totLen * 100;
     penPerc = pending.length / totLen * 100;
 
-
     // intermediate values 
     complPerc = (complPerc < threshold && complPerc > 0) ? threshold : complPerc;
     failedPerc = (failedPerc < threshold && failedPerc > 0) ? threshold : failedPerc;
@@ -85,7 +82,6 @@ export default class ProgressBar extends Component {
     unschPerc = (unschPerc < threshold && unschPerc > 0) ? threshold : unschPerc;
     penPerc = (penPerc < threshold && penPerc > 0) ? threshold : penPerc;
     runPerc = (runPerc < threshold && runPerc > 0) ? threshold : runPerc;
-
 
     // common weighted denominator
     totWeighted = complPerc + failedPerc + excepPerc + unschPerc + runPerc + penPerc;
@@ -101,8 +97,6 @@ export default class ProgressBar extends Component {
     unschPerc = getWeightedPercentage(unschPerc);
     penPerc = getWeightedPercentage(penPerc);
     runPerc = getWeightedPercentage(runPerc);
-
- 
 
 		return (
         <bs.ProgressBar onClick={this.progressBarClicked} style={{height: '35px'}}>

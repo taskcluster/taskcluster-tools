@@ -5,8 +5,13 @@ import Search from './search';
 import ProgressBar from '../components/progressBar';
 import Loading from '../shared/loading';
 import DashboardBanner from '../shared/dashboardBanner';
-import { authentication } from '../lib/utils';
+import { authentication, webListener } from '../lib/utils';
+
 class PushInspector extends Component {
+
+  constructor(props) {
+    super(props);
+  }
 
   /**
   * handleLoadingAndError handles error and show the loading icon
@@ -41,13 +46,36 @@ class PushInspector extends Component {
     );
   }
 
+  /**
+  * Stop web listener
+  */
+  stopListening() {
+    webListener.stopListening();
+  }
+
   render() {
-    const { tasks, children, setActiveTaskStatus, params, bannerFlag, setDashboardBanner } = this.props;
+    const { tasks, children, setActiveTaskStatus, params, dashboardBanner, setDashboardBanner } = this.props;
     const { taskGroupId } = params;
     const handleLoadingAndError = this.handleLoadingAndError();
+
+    const listenerSleepMessage = 'The web listener has been put to sleep. Refresh the browser to see any updated changes.';
+    const dashboardAction = this.stopListening;
+
     return (
       <div>
-        <DashboardBanner showBanner={bannerFlag} setBanner={setDashboardBanner} />
+        
+        {
+          dashboardBanner == true ? 
+          <DashboardBanner 
+            dashboardHeaderMessage="Oops!"
+            dashboardMessage={listenerSleepMessage} 
+            setDashboardBanner={setDashboardBanner}
+            action={dashboardAction}
+            actionText="Stop listening"
+            bsStyle="danger" /> :
+          undefined
+        }
+        
         <Search
           taskGroupId = {taskGroupId} />
         <ProgressBar
@@ -66,7 +94,7 @@ class PushInspector extends Component {
 function mapStateToProps(state) {
 	return {
 		tasks: state.tasks,
-    bannerFlag: state.dashboardBanner,
+    dashboardBanner: state.dashboardBanner,
     tasksNotAvailable: state.tasksNotAvailable
 	}
 }
