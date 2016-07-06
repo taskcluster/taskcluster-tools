@@ -379,7 +379,7 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
 			// Update current list of tasks
 			dispatch(createTask(list, dataObj));
 
-			dispatch(renderActionSuccess(msg));
+			dispatch(renderActionSuccess(successMessage));
 		} catch(err) {
 			dispatch(renderActionError(err));
 		}	finally {
