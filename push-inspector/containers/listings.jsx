@@ -3,7 +3,7 @@ import { Link, hashHistory } from 'react-router';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import Table from './table';
-import { queueEvents, webListener } from '../lib/utils';
+import { queueEvents, webListener, notifications } from '../lib/utils';
 import _ from 'lodash';
 
 
@@ -64,14 +64,19 @@ class Listings extends Component {
   }
 
   /**
-  * Give priority to exceptions to show without waiting for loop to happen
+  * Handle special cases
   */
   handleEdgeCases(message) {
     const { fetchTask, fetchStatus, params } = this.props;
     const { taskId } = params;
+    // Give priority to exceptions to show without waiting for loop to happen
     if(message.exchange == queueEvents.taskException().exchange) {
       fetchTask(taskId);
       fetchStatus(taskId);
+      notifications.notifyUser("Task exception");
+    }
+    if(message.exchange == queueEvents.taskFailed().exchange) {
+      notifications.notifyUser("Task failure");
     }
   }
 
@@ -105,7 +110,7 @@ class Listings extends Component {
   * Make appropriate setup
   */
   setup() {
-    console.log('starting to listen to taskGroupiD: ', this.props.params.taskGroupId);
+    notifications.requestPermission();
     this.startListening(this.props.params.taskGroupId, this.handleMessage);
   }
 
@@ -130,7 +135,6 @@ class Listings extends Component {
 
     // Setup loop
     if(this.props.tasksRetrievedFully == true && !!!this.loop) {
-      console.log('constructLoopForMessages CALLED ');
       this.constructLoopForMessages();
     }
 
@@ -140,7 +144,7 @@ class Listings extends Component {
   componentWillMount() {
     const { taskGroupId, taskId } = this.props.params;
     this.props.fetchTasksInSteps(taskGroupId, true);
-    this.startListening(taskGroupId, this.handleMessage);
+    this.setup();
     this.constructLoopForMessages();
   }
 

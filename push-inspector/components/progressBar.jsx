@@ -1,12 +1,39 @@
 import React from 'react';
 import { Component } from 'react';
 import * as bs from 'react-bootstrap';
+import { notifications } from '../lib/utils';
 
 export default class ProgressBar extends Component {
 
   constructor(props) {
     super(props);
+
+    this.completed = [];
+    this.failed = [];
+    this.exception = [];
+    this.unscheduled = [];
+    this.pending = [];
+    this.running = [];
+
+    // Flag used so that it doesn't notify users that open an already
+    // completed build
+    this.notifyFlag = false;
+
     this.progressBarClicked = this.progressBarClicked.bind(this);
+  }
+
+  /**
+  * Reset states
+  */
+  emptyStates() {
+    
+    this.completed = [];
+    this.failed = [];
+    this.exception = [];
+    this.unscheduled = [];
+    this.pending = [];
+    this.running = [];
+
   }
 
   /**
@@ -32,17 +59,57 @@ export default class ProgressBar extends Component {
   }
 
   /**
+  * Seperate tasks in different arrays based on their current status
+  */
+  seperateTasksByState() {
+    const { tasks } = this.props;
+
+    tasks.map((task) => {
+      status = task.status.state;
+      switch (status) {
+        case "completed": this.completed.push(task); break;
+        case "failed": this.failed.push(task); break;
+        case "exception": this.exception.push(task); break;
+        case "unscheduled": this.unscheduled.push(task); break;
+        case "pending": this.pending.push(task); break;
+        case "running": this.running.push(task); break;
+      }
+    });
+
+  }
+
+  /**
+  * Notify user if build is done
+  */
+  notifyCheck() {
+    
+    const uLength = this.unscheduled.length,
+          rLength = this.running.length,
+          pLength = this.pending.length,
+          cLength = this.completed.length,
+          eLength = this.exception.length,
+          fLength = this.failed.length;
+
+    // Having no unscheduled and no running and no pending tasks
+    // means build is done
+    if(uLength === 0 && rLength === 0 && pLength === 0) {
+      if(this.notifyFlag == true && (cLength > 0 || fLength > 0 || eLength > 0)) {
+        notifications.notifyUser('Build done');
+        // Stop notifying further
+        this.notifyFlag = false;  
+      }
+    // Set notify flag when build is not done  
+    } else {
+      this.notifyFlag = true;
+    }
+  }
+
+  /**
   * Render progress bar
   */
   makeProgressBar() {
 
-    let		completed = [],
-					failed = [],
-					exception = [],
-					unscheduled = [],
-					pending = [],
-					running = [],
-          tasks = this.props.tasks,
+    let		tasks = this.props.tasks,
           status,
           totLen = tasks.length,
           complPerc,
@@ -55,25 +122,24 @@ export default class ProgressBar extends Component {
           threshold = 5,
           totWeighted;
 
-		tasks.map((task) => {
-			status = task.status.state;
-			switch (status) {
-				case "completed": completed.push(task); break;
-				case "failed": failed.push(task); break;
-				case "exception": exception.push(task); break;
-				case "unscheduled": unscheduled.push(task); break;
-				case "pending": pending.push(task); break;
-				case "running": running.push(task); break;
-			}
-		});
+    // reset component statuses
+    this.emptyStates();
 
+    const { tasksRetrievedFully } = this.props;
+
+		this.seperateTasksByState();
+    
+    if(tasksRetrievedFully === true) {
+      this.notifyCheck();  
+    }
+    
     // original percentages
-    complPerc = completed.length / totLen * 100;
-    failedPerc = failed.length / totLen * 100;
-    excepPerc = exception.length / totLen * 100;
-    unschPerc = unscheduled.length / totLen * 100;
-    runPerc = running.length / totLen * 100;
-    penPerc = pending.length / totLen * 100;
+    complPerc = this.completed.length / totLen * 100;
+    failedPerc = this.failed.length / totLen * 100;
+    excepPerc = this.exception.length / totLen * 100;
+    unschPerc = this.unscheduled.length / totLen * 100;
+    runPerc = this.running.length / totLen * 100;
+    penPerc = this.pending.length / totLen * 100;
 
     // intermediate values 
     complPerc = (complPerc < threshold && complPerc > 0) ? threshold : complPerc;
@@ -100,12 +166,12 @@ export default class ProgressBar extends Component {
 
 		return (
         <bs.ProgressBar onClick={this.progressBarClicked} style={{height: '35px'}}>
-          <bs.ProgressBar title={`Completed (${completed.length})`} className="label-completed" striped  now={complPerc} key={1} label={!!completed.length ? `C (${completed.length})`: loadingLabel} />          
-          <bs.ProgressBar title={`Running (${running.length})`} className="label-running active"  striped now={runPerc} key={5} label={!!running.length ? `R (${running.length})` : loadingLabel} />                    
-          <bs.ProgressBar title={`Pending (${pending.length})`} className="label-pending" striped  now={penPerc} key={6} label={!!pending.length ? `P (${pending.length})` : loadingLabel} />
-          <bs.ProgressBar title={`Unscheduled (${unscheduled.length})`} className="label-unscheduled" striped  now={unschPerc} key={4} label={!!unschPerc ? `U (${unscheduled.length})` : loadingLabel} />
-          <bs.ProgressBar title={`Exception (${exception.length})`} className="label-exception"  striped now={excepPerc} key={3} label={!!exception.length ? `E (${exception.length})` : loadingLabel} />
-          <bs.ProgressBar title={`Failed (${failed.length})`} className="label-failed"  striped now={failedPerc} key={2} label={!!failed.length ? `F (${failed.length})` : loadingLabel} />
+          <bs.ProgressBar title={`Completed (${this.completed.length})`} className="label-completed" striped  now={complPerc} key={1} label={!!this.completed.length ? `C (${this.completed.length})`: loadingLabel} />          
+          <bs.ProgressBar title={`Running (${this.running.length})`} className="label-running active"  striped now={runPerc} key={5} label={!!this.running.length ? `R (${this.running.length})` : loadingLabel} />                    
+          <bs.ProgressBar title={`Pending (${this.pending.length})`} className="label-pending" striped  now={penPerc} key={6} label={!!this.pending.length ? `P (${this.pending.length})` : loadingLabel} />
+          <bs.ProgressBar title={`Unscheduled (${this.unscheduled.length})`} className="label-unscheduled" striped  now={unschPerc} key={4} label={!!this.unscheduled.length ? `U (${this.unscheduled.length})` : loadingLabel} />
+          <bs.ProgressBar title={`Exception (${this.exception.length})`} className="label-exception"  striped now={excepPerc} key={3} label={!!this.exception.length ? `E (${this.exception.length})` : loadingLabel} />
+          <bs.ProgressBar title={`Failed (${this.failed.length})`} className="label-failed"  striped now={failedPerc} key={2} label={!!this.failed.length ? `F (${this.failed.length})` : loadingLabel} />
         </bs.ProgressBar>
 		);
   }

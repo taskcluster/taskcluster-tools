@@ -54,7 +54,7 @@ class PushInspector extends Component {
   }
 
   render() {
-    const { tasks, children, setActiveTaskStatus, params, dashboardBanner, setDashboardBanner } = this.props;
+    const { tasks, children, setActiveTaskStatus, params, dashboardBanner, setDashboardBanner, tasksRetrievedFully } = this.props;
     const { taskGroupId } = params;
     const handleLoadingAndError = this.handleLoadingAndError();
 
@@ -81,7 +81,8 @@ class PushInspector extends Component {
         <ProgressBar
           taskGroupId = {taskGroupId}
           tasks={tasks}
-          setActiveTaskStatus={setActiveTaskStatus}/>
+          setActiveTaskStatus={setActiveTaskStatus}
+          tasksRetrievedFully={tasksRetrievedFully} />
         {handleLoadingAndError}
         <div className={!!!tasks.length ? "hideDisplay" : ""}>
           {children}
@@ -95,7 +96,8 @@ function mapStateToProps(state) {
 	return {
 		tasks: state.tasks,
     dashboardBanner: state.dashboardBanner,
-    tasksNotAvailable: state.tasksNotAvailable
+    tasksNotAvailable: state.tasksNotAvailable,
+    tasksRetrievedFully: state.tasksRetrievedFully
 	}
 }
 

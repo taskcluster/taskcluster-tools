@@ -26,9 +26,10 @@ class Search extends Component {
   onFormSubmit(event) {
     event.preventDefault();
     if(!this.isInvalid()) {
-      hashHistory.push(this.state.term);
+      this.props.tasksHaveBeenRetrieved(false);
       this.props.removeTasks();
       this.props.fetchTasksInSteps(this.state.term, true);
+      hashHistory.push(this.state.term);
     }  
   }
 

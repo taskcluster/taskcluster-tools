@@ -24,7 +24,7 @@ export const queueEvents = new taskcluster.QueueEvents();
 * Authentication
 */
 export const authentication = {
-  login : (credentials) => {
+  login: (credentials) => {
     queue = new taskcluster.Queue({credentials});
   }
 }
@@ -36,7 +36,7 @@ export const authentication = {
 let listener = new taskcluster.WebListener();
 export const webListener =  {  
   
-  startListening : (taskGroupId, onMessageAction) => {
+  startListening: (taskGroupId, onMessageAction) => {
     let qkey = { taskGroupId: taskGroupId};
     
     listener.bind(queueEvents.taskDefined(qkey));
@@ -66,7 +66,7 @@ export const webListener =  {
   },
 
   // Stop listening and create a new instance for the next listener
-  stopListening : () => {
+  stopListening: () => {
     listener.close();
     listener = new taskcluster.WebListener();
   }  
@@ -104,7 +104,7 @@ export const rendering =  {
     );
   },
 
-  renderSuccess(message) {
+  renderSuccess: (message) => {
     return (
       <bs.Alert bsStyle="success">
         {message}   
@@ -118,7 +118,7 @@ export const rendering =  {
 */
 export const beautify = {
 
-  labelClassName(state) {
+  labelClassName: (state) => {
     let cl = "my-label";
     if (state == 'completed') {
       return cl + " label-completed";
@@ -133,5 +133,17 @@ export const beautify = {
     } else if (state =="running") {
       return cl + " label-running";
     }
+  }
+}
+
+/**
+* Push notifications
+*/
+export const notifications = {
+  notifyUser: (message) => {
+    let e = new Notification(message);
+  },
+  requestPermission: () => {
+    Notification.requestPermission();
   }
 }
