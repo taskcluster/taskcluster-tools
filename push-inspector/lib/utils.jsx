@@ -141,7 +141,10 @@ export const beautify = {
 */
 export const notifications = {
   notifyUser: (message) => {
-    let e = new Notification(message);
+    const options = {
+      icon: '/lib/assets/taskcluster-36.png'
+    };
+    let e = new Notification(message, options);
   },
   requestPermission: () => {
     Notification.requestPermission();

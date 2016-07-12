@@ -78,6 +78,7 @@ class PushInspector extends Component {
         
         <Search
           taskGroupId = {taskGroupId} />
+    
         <ProgressBar
           taskGroupId = {taskGroupId}
           tasks={tasks}
