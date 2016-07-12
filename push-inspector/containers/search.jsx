@@ -67,7 +67,9 @@ class Search extends Component {
             bsStyle={invalidInput ? 'error' : null} />
 
           <div className="input-group-btn inspect-btn">
-              <input className="button btn btn-secondary" type="submit" value="Inspect" />
+              <button type="submit" className="button btn btn-secondary">
+                <i className='fa fa-search'></i> Inspect
+              </button>
           </div>
         </form>
       </div>

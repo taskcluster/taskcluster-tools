@@ -67,7 +67,7 @@ class Table extends Component {
             return (
                 <tr onClick={this.taskClicked.bind(this, task)} key={i}>
                   <td className="listings-table-labels-column">{task.task.metadata.name}</td>
-                  <td className={state}>{task.status.state}</td>
+                  <td><span className={state}>{task.status.state}</span></td>
                 </tr>
             );
         });
@@ -85,7 +85,7 @@ class Table extends Component {
         return (
             <table id="tasks-list" className="table task-list-table">
                 <thead>{headerComponents}</thead>
-                <tbody>{rowComponents}</tbody>
+                <tbody className="tasks-list-body">{rowComponents}</tbody>
             </table>
         );
   }
