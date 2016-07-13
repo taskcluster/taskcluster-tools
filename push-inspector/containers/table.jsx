@@ -34,9 +34,11 @@ class Table extends Component {
     const { activeTaskStatus } = this.props;
     return (
       <tr>
-        <th className="tableColumnBaseline">Name</th>
+        <th className="tableColumnBaseline">
+          <span className="table-header">Name</span>
+        </th>
         <th>
-          State&nbsp;
+          <span className="table-header">State</span>&nbsp;
           <button className={!!activeTaskStatus ? "" : "hideVisibility"} onClick={this.clearFilter.bind(this)}>
             Clear Filter
           </button>
