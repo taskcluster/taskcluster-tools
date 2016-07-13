@@ -67,7 +67,7 @@ class Table extends Component {
         let state = beautify.labelClassName(task.status.state);
 
         return (
-          <tr onClick={this.taskClicked.bind(this, task)} key={i}>
+          <tr className="listings-table-labels-row" onClick={this.taskClicked.bind(this, task)} key={i}>
             <td className="listings-table-labels-column">{task.task.metadata.name}</td>
             <td><span className={state}>{task.status.state}</span></td>
           </tr>
