@@ -22,7 +22,6 @@ import {
 import { rendering } from '../lib/utils';
 import { queue } from '../lib/utils';
 
-
 // Modules
 import taskcluster from 'taskcluster-client';
 import slugid from 'slugid';

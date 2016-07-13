@@ -35,11 +35,11 @@ class CancelTaskButton extends Component {
 
     return (           
       <ConfirmAction 
-          label = {label}
-          glyph = {glyph}
-          action = {() => { cancelTask(taskId, successMsg)}}
-          disabled = {isResolved} >
-          {cancelContent}
+        label = {label}
+        glyph = {glyph}
+        action = {() => { cancelTask(taskId, successMsg)}}
+        disabled = {isResolved} >
+        {cancelContent}
       </ConfirmAction>         
     );
   }

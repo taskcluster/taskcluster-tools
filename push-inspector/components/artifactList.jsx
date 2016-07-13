@@ -166,7 +166,6 @@ class ArtifactList extends Component {
       };
     }, this);
 
-
     this.setState({
       artifacts:   artifacts
     });
@@ -190,7 +189,6 @@ class ArtifactList extends Component {
         </ul>
       )      
     } 
-
   }
 
   render() {

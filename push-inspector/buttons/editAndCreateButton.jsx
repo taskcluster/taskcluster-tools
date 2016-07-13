@@ -14,7 +14,6 @@ class EditAndCreateButton extends Component {
     const glyph = "edit";
     const label = "Edit and Create";
     const successMsg = "Upon creation, you will need to refresh the page to see the new task";
-
     const { task, editAndCreateTask } = this.props;
 
     const editAndCreateContent = (
@@ -32,10 +31,10 @@ class EditAndCreateButton extends Component {
  
     return (          
       <ConfirmAction 
-          label = {label}
-          glyph = {glyph}
-          action = {() => {editAndCreateTask(task, successMsg)}} >
-          {editAndCreateContent}
+        label = {label}
+        glyph = {glyph}
+        action = {() => {editAndCreateTask(task, successMsg)}} >
+        {editAndCreateContent}
       </ConfirmAction>        
     );
   }

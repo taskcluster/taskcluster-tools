@@ -50,7 +50,7 @@ export default class TaskDetail extends Component {
       return <div>Loading...</div>;
     }
 
-    const   { task, status, actions } = this.props;
+    const { task, status, actions } = this.props;
     const dependenciesList = this.getDependenciesList(task);
 
     return (
@@ -115,7 +115,6 @@ export default class TaskDetail extends Component {
         </tbody>
       </table>
     );
-
   }
 }
 

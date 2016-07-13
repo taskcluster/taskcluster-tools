@@ -130,7 +130,6 @@ class Listings extends Component {
       this.cleanup();   
       // Start listening
       this.setup();
-
     }
 
     // Setup loop

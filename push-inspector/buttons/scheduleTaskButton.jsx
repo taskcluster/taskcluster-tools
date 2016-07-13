@@ -16,6 +16,7 @@ class ScheduleTaskButton extends Component {
     const successMsg = "Successfully scheduled task!";  
     const { status, scheduleTask } = this.props;
     const taskId = status.taskId;         
+    
     const scheduleContent = (
       <div>
         <p>
@@ -29,11 +30,11 @@ class ScheduleTaskButton extends Component {
 
     return (          
       <ConfirmAction 
-          label = {label}
-          glyph = {glyph}
-          action = {() => { scheduleTask(taskId, successMsg)}}
-          disabled = {status.state !== 'unscheduled'} >          
-          {scheduleContent}
+        label = {label}
+        glyph = {glyph}
+        action = {() => { scheduleTask(taskId, successMsg)}}
+        disabled = {status.state !== 'unscheduled'} >          
+        {scheduleContent}
       </ConfirmAction>          
     );
   }

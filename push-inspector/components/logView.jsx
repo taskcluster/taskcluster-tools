@@ -7,10 +7,9 @@ import Select from 'react-select';
 
 export default class LogView extends Component {
 
-
   constructor(props) {
     super(props);
-    var entry = _.find(this.props.logs, {name: 'public/logs/terminal.log'}) ||
+    let entry = _.find(this.props.logs, {name: 'public/logs/terminal.log'}) ||
                 _.find(this.props.logs, {name: 'public/logs/live.log'}) ||
                 this.props.logs[0];
     this.state = {

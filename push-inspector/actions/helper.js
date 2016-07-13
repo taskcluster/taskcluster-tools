@@ -9,7 +9,6 @@ import {
 
 import { rendering } from '../lib/utils';
 
-
 /**
 * Set to true when any of task actions are called
 * Task actions include Scheduling, Retriggering,

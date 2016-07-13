@@ -46,17 +46,18 @@ class PurgeCacheButton extends Component {
           <p>Select the caches to purge:</p>
           <ul>
             {(caches || []).map(cache => {
-               return (
-                 <li className="checkbox" key={cache}>
-                   <label>
-                     <input name="cache"
-                            type="checkbox"
-                            onChange={this.update}
-                            checked={this.state.selected === undefined ? false : this.state.selected.indexOf(cache) !== -1}
-                            value={cache}/>
-                     {cache}
-                   </label>
-                 </li>);
+              return (
+                <li className="checkbox" key={cache}>
+                  <label>
+                    <input 
+                      name="cache"
+                      type="checkbox"
+                      onChange={this.update}
+                      checked={this.state.selected === undefined ? false : this.state.selected.indexOf(cache) !== -1}
+                      value={cache}/>
+                      {cache}
+                 </label>
+               </li>);
               })}
           </ul>
         </div>

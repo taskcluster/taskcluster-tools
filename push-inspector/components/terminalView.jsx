@@ -187,7 +187,6 @@ export default class TerminalView extends Component {
         marginTop: this.scrollbarMargin()
         }} ref="scrollbar"/>
       </div>;
-
   }
 
 }

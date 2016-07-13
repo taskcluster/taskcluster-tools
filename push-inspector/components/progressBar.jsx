@@ -121,10 +121,10 @@ export default class ProgressBar extends Component {
     let threshold = 5;
     let totWeighted;
 
+    const { tasksRetrievedFully } = this.props;
+
     // reset component statuses
     this.emptyStates();
-
-    const { tasksRetrievedFully } = this.props;
 
     this.seperateTasksByState();
     

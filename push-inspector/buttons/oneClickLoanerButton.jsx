@@ -14,10 +14,8 @@ class OneClickLoaner extends Component {
     const glyph = "console";
     const label = "One-Click Loaner";
     const successMsg = "You have successfully been redirected to One-Click loaner";
-    
-
-    const { status, task, tasks, loanerCreateTask } = this.props,
-          taskId = status.taskId;
+    const { status, task, tasks, loanerCreateTask } = this.props;
+    const taskId = status.taskId;
 
     const oneClickLoanerContent = (
       <div>
@@ -37,10 +35,10 @@ class OneClickLoaner extends Component {
     
     return (         
   		<ConfirmAction 
-        	label = {label}
-        	glyph = {glyph}
-        	action = {() => {loanerCreateTask(tasks, taskId, task, successMsg)}} >
-        	{oneClickLoanerContent}
+      	label = {label}
+      	glyph = {glyph}
+      	action = {() => {loanerCreateTask(tasks, taskId, task, successMsg)}} >
+      	{oneClickLoanerContent}
     	</ConfirmAction>
     );
   }

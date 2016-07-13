@@ -14,7 +14,6 @@ class RetriggerButton extends Component {
     const glyph = "repeat";
     const label = "Retrigger";
     const successMsg = "Retrigger success";
-
     const { tasks, task, retriggerTask } = this.props;
   
     const retriggerContent = (
@@ -37,10 +36,10 @@ class RetriggerButton extends Component {
 
     return (
   		<ConfirmAction 
-	      	label = {label}
-	      	glyph = {glyph}
-	      	action = {() => retriggerTask(tasks,task, successMsg)} >
-	      	{retriggerContent}
+      	label = {label}
+      	glyph = {glyph}
+      	action = {() => retriggerTask(tasks,task, successMsg)} >
+      	{retriggerContent}
     	</ConfirmAction>
     );
   }
