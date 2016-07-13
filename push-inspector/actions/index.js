@@ -164,7 +164,7 @@ export const fetchStatus = (taskId) => {
 /**
 * Set status of a task (e.g, pending)
 */
-export const activeTaskStatus = (status) => {
+export const setActiveTaskStatus = (status) => {
   return {
     type: ACTIVE_TASK_STATUS,
     payload: status

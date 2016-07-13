@@ -55,17 +55,17 @@ class ProgressBar extends Component {
     const title = event.target.title;
 
     if(title.match(/Failed*/g)) {
-      this.props.activeTaskStatus("failed");
+      this.props.setActiveTaskStatus("failed");
     } else if (title.match(/Completed*/g)) {
-      this.props.activeTaskStatus("completed");
+      this.props.setActiveTaskStatus("completed");
     } else if (title.match(/Running*/g)) {
-      this.props.activeTaskStatus("running");
+      this.props.setActiveTaskStatus("running");
     } else if (title.match(/Pending*/g)) {
-      this.props.activeTaskStatus("pending");
+      this.props.setActiveTaskStatus("pending");
     } else if(title.match(/Exception*/g)) {
-      this.props.activeTaskStatus("exception");
+      this.props.setActiveTaskStatus("exception");
     } else if(title.match(/Unscheduled*/g)) {
-      this.props.activeTaskStatus("unscheduled");
+      this.props.setActiveTaskStatus("unscheduled");
     }
   }
 
