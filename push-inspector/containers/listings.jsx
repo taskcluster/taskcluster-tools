@@ -112,6 +112,7 @@ class Listings extends Component {
   setup() {
     notifications.requestPermission();
     this.startListening(this.props.params.taskGroupId, this.handleMessage);
+    this.props.activeTaskGroupId(this.props.params.taskGroupId);
   }
 
   /** 

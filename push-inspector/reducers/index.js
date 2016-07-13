@@ -10,6 +10,7 @@ import taskActionInProgressReducer from './taskActionInProgress';
 import dashboardBannerReducer from './dashboardBanner';
 import tasksNotAvailableReducer from './tasksNotAvailable';
 import tasksRetrievedFullyReducer from './tasksRetrievedFully';
+import taskGroupReducer from './taskGroup';
 
 const rootReducer = combineReducers({
   
@@ -42,7 +43,10 @@ const rootReducer = combineReducers({
   dashboardBanner: dashboardBannerReducer,
 
   // Boolean saying that the full list of tasks has been retrieved i.e., no more tokens
-  tasksRetrievedFully: tasksRetrievedFullyReducer
+  tasksRetrievedFully: tasksRetrievedFullyReducer,
+
+  // The active taskGroupId
+  taskGroup: taskGroupReducer
 
 });
 

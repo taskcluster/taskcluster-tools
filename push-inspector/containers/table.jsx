@@ -24,7 +24,7 @@ class Table extends Component {
   * Clear current status filter
   */
   clearFilter() {
-    this.props.setActiveTaskStatus(null);
+    this.props.activeTaskStatus(null);
   }
 
   /** 

@@ -8,7 +8,8 @@ import {
   FETCH_ARTIFACTS,
   SET_DASHBOARD_BANNER,
   TASKS_RETRIEVED_FULLY,
-  CLEAR_TASKS_ACTIONS_MESSAGE
+  CLEAR_TASKS_ACTIONS_MESSAGE,
+  ACTIVE_TASK_GROUP_ID
 } from './types';
 
 // Helper functions
@@ -35,7 +36,7 @@ import update from 'react-addons-update';
 * Set limitBool to true if you want to fetch in steps
 * Set to false otherwise
 */
-export const fetchTasksInSteps = (id, limitBool) => {
+export const fetchTasksInSteps = (taskGroupId, limitBool) => {
   
   let options = {};
   let token = undefined;
@@ -43,14 +44,21 @@ export const fetchTasksInSteps = (id, limitBool) => {
 
   const limit  = 200;
   
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     while (true) {  
       dispatch(taskGroupIdNotAvailable(false));
       if (token) { options.continuationToken = token; }
       if (limitBool == true) { options.limit = limit; }
       try {
-        res = await queue.listTaskGroup(id, options); 
+        res = await queue.listTaskGroup(taskGroupId, options); 
+                
         let tasks = res.tasks;
+        
+        // do not dispatch if taskGroupId changed sometime between the start and end of the async request
+        if(taskGroupId != getState().taskGroup) {
+          return;
+        }
+
         if(limitBool == true) {
           dispatch({
             type: FETCH_TASKS_IN_STEP,
@@ -85,11 +93,11 @@ export const fetchTasksInSteps = (id, limitBool) => {
 /** 
 * Get task definition
 */
-export const fetchTask = (id) => {
+export const fetchTask = (taskId) => {
   return async (dispatch) => {
     let task;
     try {
-      task = await queue.task(id);
+      task = await queue.task(taskId);
       dispatch({
         type: FETCH_TASK,
         payload: task
@@ -103,12 +111,12 @@ export const fetchTask = (id) => {
 /** 
 * Get artifacts list
 */
-export const fetchArtifacts = (id) => {
+export const fetchArtifacts = (taskId) => {
   let res;
 
   return async (dispatch) => {
     try {
-      res = await queue.listLatestArtifacts(id);
+      res = await queue.listLatestArtifacts(taskId);
       dispatch({
         type: FETCH_ARTIFACTS,
         payload: res.artifacts
@@ -133,13 +141,13 @@ export const removeTasks = () => {
 /**
 * Get task status
 */
-export const fetchStatus = (id) => {
+export const fetchStatus = (taskId) => {
   let res;
   let status;
 
   return async (dispatch) => {
     try {
-      res = await queue.status(id);
+      res = await queue.status(taskId);
       status = res.status;
 
       dispatch({
@@ -156,10 +164,20 @@ export const fetchStatus = (id) => {
 /**
 * Set status of a task (e.g, pending)
 */
-export const setActiveTaskStatus = (status) => {
+export const activeTaskStatus = (status) => {
   return {
     type: ACTIVE_TASK_STATUS,
     payload: status
+  }
+}
+
+/**
+* Set active taskGroupId
+*/
+export const activeTaskGroupId = (taskGroupId) => {
+  return {
+    type: ACTIVE_TASK_GROUP_ID,
+    payload: taskGroupId
   }
 }
 
