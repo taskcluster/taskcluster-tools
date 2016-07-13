@@ -87,7 +87,7 @@ class ConfirmAction extends Component {
           <bs.Modal.Header closeButton>
             <bs.Modal.Title>{label}</bs.Modal.Title>
           </bs.Modal.Header>
-          <bs.Modal.Body className="format-modal-text">
+          <bs.Modal.Body className="format-modal-text format-modal-body">
             {children}
             {this.state.executing ? ( dialogContent ) : undefined}              
           </bs.Modal.Body>
