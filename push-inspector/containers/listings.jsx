@@ -118,8 +118,8 @@ class Listings extends Component {
   * Remove the list of tasks that were previously loaded 
   */
   componentWillUnmount() {
-      this.cleanup();
-      this.props.removeTasks();
+    this.cleanup();
+    this.props.removeTasks();
   }
 
   componentDidUpdate(prevProps, prevState) {

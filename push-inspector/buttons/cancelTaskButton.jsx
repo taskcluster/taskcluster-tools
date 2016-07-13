@@ -11,14 +11,11 @@ class CancelTaskButton extends Component {
 
   render() {
     
-    const glyph = "stop",
-    		  label = "Cancel Task",
-          successMsg = "Successfully canceled task!";
-    
-
-    const { status, cancelTask } = this.props,
-          taskId = status.taskId;
-
+    const glyph = "stop";
+    const label = "Cancel Task";
+    const successMsg = "Successfully canceled task!"; 
+    const { status, cancelTask } = this.props;
+    const taskId = status.taskId;
     const cancelContent = (
       <div>
         <p>
@@ -30,22 +27,20 @@ class CancelTaskButton extends Component {
       </div>
     );  
 
-    var isResolved = [
+    let isResolved = [
       'completed',
       'failed',
       'exception'
     ].indexOf(status.state) !== -1;
 
-    return (
-               
-  		<ConfirmAction 
-	      	label = {label}
-	      	glyph = {glyph}
-	      	action = {() => { cancelTask(taskId, successMsg)}}
+    return (           
+      <ConfirmAction 
+          label = {label}
+          glyph = {glyph}
+          action = {() => { cancelTask(taskId, successMsg)}}
           disabled = {isResolved} >
-	      	{cancelContent}
-    	</ConfirmAction>
-          
+          {cancelContent}
+      </ConfirmAction>         
     );
   }
 

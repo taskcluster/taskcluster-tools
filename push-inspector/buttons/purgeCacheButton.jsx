@@ -10,15 +10,15 @@ class PurgeCacheButton extends Component {
     super(props);
     
     this.state = {
-    	selected: this.props.caches || []
+      selected: this.props.caches || []
     }
 
     this.update = this.update.bind(this);
   }
 
   
-  update(e) {	
-  	let caches = _.clone(this.state.selected);
+  update(e) { 
+    let caches = _.clone(this.state.selected);
     if (e.target.checked === true) {
       caches.push(e.target.value);
     } else if (e.target.checked === false) {
@@ -29,44 +29,40 @@ class PurgeCacheButton extends Component {
 
   render() {
     
-    const 	glyph = "trash",
-    		    label = "Purger Worker Cache",
-            successMsg = "Cache successfully purged!",
-            selectedCaches = this.state.selected,
-    		    { caches, provisionerId, workerType, purge } = this.props;
+    const glyph = "trash";
+    const label = "Purger Worker Cache";
+    const successMsg = "Cache successfully purged!";
+    const selectedCaches = this.state.selected;
+    const { caches, provisionerId, workerType, purge } = this.props;
 
     return (         
       <ConfirmAction 
-        	label = {label}
-        	glyph = {glyph}
-        	action = {() => { purge(provisionerId, workerType, selectedCaches, successMsg)}} >
-            
-        	<div>
-            <p>Are you sure you wish to purge caches used in this task across all
-              workers of this workerType?</p>
-            <p>Select the caches to purge:</p>
-            <ul>
-              {(caches || []).map(cache => {
-                 return (
-                   <li className="checkbox" key={cache}>
-                     <label>
-                       <input name="cache"
-                              type="checkbox"
-                              onChange={this.update}
-                              checked={this.state.selected === undefined ? false : this.state.selected.indexOf(cache) !== -1}
-                              value={cache}/>
-                       {cache}
-                     </label>
-                   </li>);
-                })}
-            </ul>
-          </div>
-
-    	</ConfirmAction>              
+        label = {label}
+        glyph = {glyph}
+        action = {() => { purge(provisionerId, workerType, selectedCaches, successMsg)}} >       
+        <div>
+          <p>Are you sure you wish to purge caches used in this task across all
+            workers of this workerType?</p>
+          <p>Select the caches to purge:</p>
+          <ul>
+            {(caches || []).map(cache => {
+               return (
+                 <li className="checkbox" key={cache}>
+                   <label>
+                     <input name="cache"
+                            type="checkbox"
+                            onChange={this.update}
+                            checked={this.state.selected === undefined ? false : this.state.selected.indexOf(cache) !== -1}
+                            value={cache}/>
+                     {cache}
+                   </label>
+                 </li>);
+              })}
+          </ul>
+        </div>
+      </ConfirmAction>              
     );
   }
-
 }
-
 
 export default connect(null, actions)(PurgeCacheButton)

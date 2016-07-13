@@ -95,25 +95,25 @@ const getIconFromMime = function(contentType) {
 
 class ArtifactList extends Component {
 
-	constructor(props) {
-		super(props);
-		this.state = {
-			artifacts: this.props.artifacts || []
-		}
-	}
+  constructor(props) {
+    super(props);
+    this.state = {
+      artifacts: this.props.artifacts || []
+    }
+  }
 
-	componentWillMount() {
-		this.load();
-	}
+  componentWillMount() {
+    this.load();
+  }
 
   handleArtifactCreatedMessage() {
     const { taskId, fetchArtifacts } = this.props;
     fetchArtifacts();
   }
-	
-	/** Build the right url for artifacts */
-	load() {
-		// Build the Urls where so that they'll be updated, if when people login
+  
+  /** Build the right url for artifacts */
+  load() {
+    // Build the Urls where so that they'll be updated, if when people login
     // with credentials
     let artifacts = this.props.artifacts.map(function(artifact) {
       let url, icon;
@@ -170,39 +170,39 @@ class ArtifactList extends Component {
     this.setState({
       artifacts:   artifacts
     });
-	}
+  }
 
-	renderArtifactList() {
-		const { artifacts } = this.state;
-		if(!!artifacts.length) {
-			return (
-				<ul className="artifact-ul">
-					{
-						artifacts.map((artifact,index) => {
-			        return (
-			          <li key={index}>
-			          	<i className={('fa fa-' + artifact.icon)}>&nbsp;</i>
-			          	<a href={artifact.url} target="_blank">{artifact.name}</a>
-		      			</li>
-			        )
-			      })		
-					}
-				</ul>
-			)      
-  	} 
+  renderArtifactList() {
+    const { artifacts } = this.state;
+    if(!!artifacts.length) {
+      return (
+        <ul className="artifact-ul">
+          {
+            artifacts.map((artifact,index) => {
+              return (
+                <li key={index}>
+                  <i className={('fa fa-' + artifact.icon)}>&nbsp;</i>
+                  <a href={artifact.url} target="_blank">{artifact.name}</a>
+                </li>
+              )
+            })    
+          }
+        </ul>
+      )      
+    } 
 
-	}
+  }
 
-	render() {
-	    
-	    const artifactList = this.renderArtifactList();
+  render() {
+      
+    const artifactList = this.renderArtifactList();
 
-	    return (
-	      <div>
-	        {artifactList}
-	      </div>
-	    );
-  	}
+    return (
+      <div>
+        {artifactList}
+      </div>
+    );
+  }
 
 }
 export default connect(null, actions)(ArtifactList)

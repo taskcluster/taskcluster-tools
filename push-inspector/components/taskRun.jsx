@@ -14,8 +14,8 @@ export default class TaskRun extends Component {
   * Generate rows
   */
   generateRows() {
-    const { task, status } = this.props,
-          runNumber = status.runs.length - 1;
+    const { task, status } = this.props;
+    const runNumber = status.runs.length - 1;
 
     const elemsToRender = {
       reasonCreated: status.runs[runNumber].reasonCreated,
@@ -51,17 +51,17 @@ export default class TaskRun extends Component {
 
     return (
       <LogView 
-          logs={logs}
-          taskId={taskId}
-          runId={runId} />
+        logs={logs}
+        taskId={taskId}
+        runId={runId} />
     )
   }
 
   render() {
 
-    const { task, status, artifacts } = this.props,
-          taskId = status.taskId,
-          runNumber = status.runs.length - 1;          
+    const { task, status, artifacts } = this.props;
+    const taskId = status.taskId;
+    const runNumber = status.runs.length - 1;          
 
     // Check if we have the run
     if (runNumber < 0) {
@@ -73,9 +73,9 @@ export default class TaskRun extends Component {
       );
     }
 
-    const rowComponents = this.generateRows(),
-          runId = status.runs[runNumber].runId,          
-          logView = this.renderLogView(taskId, runId, artifacts);
+    const rowComponents = this.generateRows();
+    const runId = status.runs[runNumber].runId;          
+    const logView = this.renderLogView(taskId, runId, artifacts);
 
     return (
       <div>

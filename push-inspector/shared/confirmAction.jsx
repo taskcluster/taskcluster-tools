@@ -109,9 +109,7 @@ class ConfirmAction extends Component {
         </bs.Modal>
       </div>
     );
-
   }
-
 }
 
 function mapStateToProps(state) {

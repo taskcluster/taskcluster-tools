@@ -6,32 +6,32 @@ import _ from 'lodash';
 
 export default class TerminalView extends Component {
 
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			lines: ['Loading log...'],
-			fromBottom: 0
-		};
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      lines: ['Loading log...'],
+      fromBottom: 0
+    };
 
-		this.rows = 40;
-		this.scrollDown = false;		
+    this.rows = 40;
+    this.scrollDown = false;    
 
-		this.onData = this.onData.bind(this);
-		this.scrollbarHeight = this.scrollbarHeight.bind(this);
-		this.scrollbarMargin = this.scrollbarMargin.bind(this);
-		this.onMouseWheel = this.onMouseWheel.bind(this);
-		this.onMouseDown = this.onMouseDown.bind(this);
-		this.onMouseUp = this.onMouseUp.bind(this);
-		this.onMouseMove = this.onMouseMove.bind(this);
-		
-	}
+    this.onData = this.onData.bind(this);
+    this.scrollbarHeight = this.scrollbarHeight.bind(this);
+    this.scrollbarMargin = this.scrollbarMargin.bind(this);
+    this.onMouseWheel = this.onMouseWheel.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    
+  }
 
-	componentWillMount() {
-		this.open();
-	}
+  componentWillMount() {
+    this.open();
+  }
 
-	componentWillUnmount() {
+  componentWillUnmount() {
     if (this.worker) {
       this.abortRequest();
     }
@@ -54,8 +54,8 @@ export default class TerminalView extends Component {
     this.open();
   }
 
-	open() {
-		
+  open() {
+    
     // Abort previous request if any
     if (this.worker) {
       this.abortRequest();
@@ -69,27 +69,27 @@ export default class TerminalView extends Component {
     this.worker = work(require('./log-fetcher.js'));
     this.worker.addEventListener('message', this.onData);
     this.worker.postMessage({ url: this.props.url });
-	}
+  }
 
-	onData(e) {	
-		const response = e.data,
-					newFromBottom = 0;
-		
-		if(response.data) {
-			this.setState({
+  onData(e) { 
+    const response = e.data;
+    const newFromBottom = 0;
+    
+    if(response.data) {
+      this.setState({
         lines: response.data,
         fromBottom: newFromBottom
       });
-		}
-	}
+    }
+  }
 
-	scrollbarHeight() {
+  scrollbarHeight() {
     if (!this.refs.buffer) {
       return 0;
     }
 
-    let ratio = this.rows / this.state.lines.length,
-        height = ratio * this.refs.buffer.offsetHeight;
+    let ratio = this.rows / this.state.lines.length;
+    let height = ratio * this.refs.buffer.offsetHeight;
 
     if (ratio > 1) {
       ratio = 1;
@@ -126,10 +126,10 @@ export default class TerminalView extends Component {
 
   onMouseMove(e) {
     if (this.dragging) {
-      let diff = e.pageY - this.startY,
-      		space = this.refs.buffer.offsetHeight,
-      		margin = this.margin + diff,
-      		currentTop = (margin + this.scrollbarHeight()) / space * this.state.lines.length;
+      let diff = e.pageY - this.startY;
+      let space = this.refs.buffer.offsetHeight;
+      let margin = this.margin + diff;
+      let currentTop = (margin + this.scrollbarHeight()) / space * this.state.lines.length;
 
       this.scrollbarSet(this.state.lines.length - currentTop);
     }
@@ -153,9 +153,9 @@ export default class TerminalView extends Component {
 
 
   render() {
-		const { state }  = this;
+    const { state }  = this;
 
-		let start = this.state.lines.length - this.state.fromBottom - this.rows;
+    let start = this.state.lines.length - this.state.fromBottom - this.rows;
     if (start < 0) {
       start = 0;
     }

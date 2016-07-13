@@ -11,14 +11,11 @@ class ScheduleTaskButton extends Component {
 
   render() {
     
-    const glyph = "play",
-          label = "Schedule Task",
-          successMsg = "Successfully scheduled task!";
-    
-
-    const { status, scheduleTask } = this.props,
-          taskId = status.taskId;
-          
+    const glyph = "play";
+    const label = "Schedule Task";
+    const successMsg = "Successfully scheduled task!";  
+    const { status, scheduleTask } = this.props;
+    const taskId = status.taskId;         
     const scheduleContent = (
       <div>
         <p>

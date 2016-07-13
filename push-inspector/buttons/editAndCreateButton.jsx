@@ -11,10 +11,9 @@ class EditAndCreateButton extends Component {
 
   render() {
     
-    const glyph = "edit",
-    		  label = "Edit and Create",
-          successMsg = "Upon creation, you will need to refresh the page to see the new task";
-    
+    const glyph = "edit";
+    const label = "Edit and Create";
+    const successMsg = "Upon creation, you will need to refresh the page to see the new task";
 
     const { task, editAndCreateTask } = this.props;
 
@@ -30,17 +29,14 @@ class EditAndCreateButton extends Component {
         </p>
       </div>
     );  
-
-    
-    return (
-               
-  		<ConfirmAction 
-	      	label = {label}
-	      	glyph = {glyph}
-	      	action = {() => {editAndCreateTask(task, successMsg)}} >
-	      	{editAndCreateContent}
-    	</ConfirmAction>
-          
+ 
+    return (          
+      <ConfirmAction 
+          label = {label}
+          glyph = {glyph}
+          action = {() => {editAndCreateTask(task, successMsg)}} >
+          {editAndCreateContent}
+      </ConfirmAction>        
     );
   }
 
