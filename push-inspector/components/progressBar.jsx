@@ -1,9 +1,10 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 import * as bs from 'react-bootstrap';
 import { notifications } from '../lib/utils';
 
-export default class ProgressBar extends Component {
+class ProgressBar extends Component {
 
   constructor(props) {
     super(props);
@@ -20,6 +21,17 @@ export default class ProgressBar extends Component {
     this.notifyFlag = false;
 
     this.progressBarClicked = this.progressBarClicked.bind(this);
+  }
+
+  /**
+  * Set notify flag to false when changing taskGroupId so that
+  * one does not get a web notification if a build is already done
+  */
+  componentDidUpdate(prevProps, prevState) {
+    
+    if(prevProps.taskGroupId !== this.props.taskGroupId) {
+      this.notifyFlag = false;
+    }    
   }
 
   /**
@@ -185,3 +197,6 @@ export default class ProgressBar extends Component {
   }
 
 }
+
+export default connect(null, actions)(ProgressBar)
+
