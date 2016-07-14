@@ -1,7 +1,7 @@
 let React         = require('react');
 let debug         = require('debug')('lib:utils');
 let assert        = require('assert');
-let marked        = require('marked');
+let markdown      = require('markdown-it');
 let bs            = require('react-bootstrap');
 let moment        = require('moment');
 let hljs          = require('highlight.js');
@@ -56,30 +56,19 @@ exports.Icon = Icon;
 
 /** Render Markdown and handle all the particularities */
 var Markdown = React.createClass({
-  /** Validate properties */
   propTypes: {
-    children:   React.PropTypes.string,
-    safe:       React.PropTypes.bool,
-    gfm:        React.PropTypes.bool
-  },
-
-  /** Get default properties */
-  getDefaultProperties() {
-    return {
-      safe:     true,
-      gfm:      true,
-      children: ''
-    };
+    children:   React.PropTypes.string
   },
 
   /** Render Markdown */
   render() {
-    var html = marked(this.props.children || '', {
-      sanitize:     this.props.safe,
-      gfm:          this.props.gfm
-    });
-    return <span className="markdown-view"
-                 dangerouslySetInnerHTML={{__html: html}}></span>
+    const html = markdown().render(this.props.children || '');
+
+    return (
+      <span
+        className="markdown-view"
+        dangerouslySetInnerHTML={{__html: html}} />
+    );
   }
 });
 

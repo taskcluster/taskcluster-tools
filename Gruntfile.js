@@ -18,7 +18,7 @@ var COMMON_MODULES = [
   'slugid',
   'debug',
   'lodash',
-  'marked',
+  'markdown-it',
   'moment',
   'rison',
   // global modules too
