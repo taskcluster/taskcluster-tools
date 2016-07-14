@@ -119,7 +119,7 @@ class ProgressBar extends Component {
   * Render progress bar
   */
   makeProgressBar() {
-
+    
     let tasks = this.props.tasks;
     let status;
     let totLen = tasks.length;
@@ -133,7 +133,7 @@ class ProgressBar extends Component {
     let threshold = 5;
     let totWeighted;
 
-    const { tasksRetrievedFully } = this.props;
+    const { tasksRetrievedFully, taskId } = this.props;
 
     // reset component statuses
     this.emptyStates();

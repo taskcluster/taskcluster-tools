@@ -1,3 +1,6 @@
+/**
+* This file is copy pasted from task group inspector project
+*/
 module.exports = function (self) {
   var request;
   var dataOffset = 0;

@@ -13,7 +13,7 @@ export default class LogView extends Component {
                 _.find(this.props.logs, {name: 'public/logs/live.log'}) ||
                 this.props.logs[0];
     this.state = {
-      name:       (entry ? entry.name : undefined)   // URL to show
+      name: (entry ? entry.name : undefined)   // URL to show
     }
 
     this.handleLogChanged = this.handleLogChanged.bind(this);

@@ -36,7 +36,7 @@ class Listings extends Component {
   * Handle message from listener 
   */
   handleMessage(message) {
-
+    const { taskId } = this.props.params;
     // Handle Error
     if(message instanceof Error) { 
       // Set state to error true
@@ -54,10 +54,18 @@ class Listings extends Component {
       queueEvents.taskFailed().exchange,
       queueEvents.taskException().exchange
     ];
+
     // Dispatch to handleQueueMessage or handleSchedulerMessage
     if (_.includes(queueExchanges, message.exchange)) {
       // Append message to buffer queue
       this.bQueue.push(message);
+
+      // Update active task if taskId match with message update
+      if(!!taskId && taskId === message.payload.status.taskId) {
+        this.props.fetchTask(taskId);
+        this.props.fetchStatus(taskId);  
+      }
+      
       // Handle edge cases that will increase UX
       this.handleEdgeCases(message);     
     }
@@ -71,8 +79,6 @@ class Listings extends Component {
     const { taskId } = params;
     // Give priority to exceptions to show without waiting for loop to happen
     if(message.exchange == queueEvents.taskException().exchange) {
-      fetchTask(taskId);
-      fetchStatus(taskId);
       notifications.notifyUser("Task exception");
     }
     if(message.exchange == queueEvents.taskFailed().exchange) {
@@ -91,7 +97,7 @@ class Listings extends Component {
     this.loop = setInterval(() => {
       if(this.bQueue.length > 0) {
         this.bQueue = [];
-        fetchTasksInSteps(taskGroupId, false);  
+        fetchTasksInSteps(taskGroupId, false);
       }      
     }, 5000);
   }
@@ -140,7 +146,9 @@ class Listings extends Component {
 
   }
 
-  /** Fetch list of tasks and start the web listener */
+  /** 
+  * Fetch list of tasks and start the web listener 
+  */
   componentWillMount() {
     const { taskGroupId, taskId } = this.props.params;
     this.props.fetchTasksInSteps(taskGroupId, true);
@@ -153,10 +161,10 @@ class Listings extends Component {
 
     return (
       <div>
-        <div className="col-xs-6  ">
+        <div className="col-xs-6 left-panel">
           <Table />
         </div>
-        <div className="col-xs-6">
+        <div className="col-xs-6 right-panel">
           {this.props.children}
         </div>
       </div>

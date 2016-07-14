@@ -54,8 +54,8 @@ class PushInspector extends Component {
   }
 
   render() {
-    const { tasks, children, setActiveTaskStatus, params, dashboardBanner, setDashboardBanner, tasksRetrievedFully } = this.props;
-    const { taskGroupId } = params;
+    const { tasks, status, children, setActiveTaskStatus, params, dashboardBanner, setDashboardBanner, tasksRetrievedFully } = this.props;
+    const { taskGroupId, taskId } = params;
     const handleLoadingAndError = this.handleLoadingAndError();
 
     const listenerSleepMessage = 'The web listener has been put to sleep. Refresh the browser to see any updated changes.';
@@ -81,7 +81,9 @@ class PushInspector extends Component {
     
         <ProgressBar
           taskGroupId = {taskGroupId}
+          taskId={taskId}
           tasks={tasks}
+          status={status}
           setActiveTaskStatus={setActiveTaskStatus}
           tasksRetrievedFully={tasksRetrievedFully} />
         {handleLoadingAndError}
@@ -96,6 +98,7 @@ class PushInspector extends Component {
 function mapStateToProps(state) {
   return {
     tasks: state.tasks,
+    status: state.status,
     dashboardBanner: state.dashboardBanner,
     tasksNotAvailable: state.tasksNotAvailable,
     tasksRetrievedFully: state.tasksRetrievedFully

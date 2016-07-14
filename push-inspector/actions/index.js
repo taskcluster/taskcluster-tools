@@ -28,7 +28,6 @@ import taskcluster from 'taskcluster-client';
 import slugid from 'slugid';
 import _ from 'lodash';
 import { hashHistory } from 'react-router';
-import shellescape from 'shell-escape';
 import update from 'react-addons-update';
 
 /**
@@ -46,12 +45,19 @@ export const fetchTasksInSteps = (taskGroupId, limitBool) => {
   
   return async (dispatch, getState) => {
     while (true) {  
+      
+      // Reset taskGroupId flag for each search loop
       dispatch(taskGroupIdNotAvailable(false));
+      
+      // Set continuationToken if there is a token 
       if (token) { options.continuationToken = token; }
-      if (limitBool == true) { options.limit = limit; }
+      
+      // Set limit on tasks if there is one
+      if (limitBool === true) { options.limit = limit; }
+      
       try {
-        res = await queue.listTaskGroup(taskGroupId, options); 
-                
+        
+        res = await queue.listTaskGroup(taskGroupId, options);              
         let tasks = res.tasks;
         
         // do not dispatch if taskGroupId changed sometime between the start and end of the async request
@@ -59,6 +65,7 @@ export const fetchTasksInSteps = (taskGroupId, limitBool) => {
           return;
         }
 
+        // Dispatch tasks
         if(limitBool == true) {
           dispatch({
             type: FETCH_TASKS_IN_STEP,
@@ -78,8 +85,10 @@ export const fetchTasksInSteps = (taskGroupId, limitBool) => {
           dispatch(tasksHaveBeenRetrieved(true));
         }
 
+      // taskGroupId not found  
       } catch(err) {
         dispatch(taskGroupIdNotAvailable(true));
+
       } finally {
         token = res.continuationToken;
         if(!!!token) {
