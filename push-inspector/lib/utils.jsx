@@ -6,14 +6,9 @@ import taskcluster from 'taskcluster-client';
 /**
 * Creation of queue. If credentials are available, we use them at the start of the application
 */
-export let queue;
-if(localStorage.credentials) {
-  queue = new taskcluster.Queue({
-    credentials: JSON.parse(localStorage.credentials)
-  });
-} else{
-  queue = new taskcluster.Queue();
-}
+export let queue = localStorage.credentials ? 
+  new taskcluster.Queue({ credentials: JSON.parse(localStorage.credentials) }) :
+  new taskcluster.Queue();
 
 /**
 * Creation of queueEvents
@@ -25,19 +20,19 @@ export const queueEvents = new taskcluster.QueueEvents();
 */
 export const authentication = {
   login: (credentials) => {
-    queue = new taskcluster.Queue({credentials});
+    queue = new taskcluster.Queue({ credentials });
   }
-}
+};
 
 /**
 * WebListener
 * Setup bindings and event callbacks
 */
 let listener = new taskcluster.WebListener();
-export const webListener =  {  
-  
+
+export const webListener = {  
   startListening: (taskGroupId, onMessageAction) => {
-    let qkey = { taskGroupId: taskGroupId};
+    const qkey = { taskGroupId: taskGroupId };
     
     listener.bind(queueEvents.taskDefined(qkey));
     listener.bind(queueEvents.taskPending(qkey));
@@ -47,18 +42,13 @@ export const webListener =  {
     listener.bind(queueEvents.taskFailed(qkey));
     listener.bind(queueEvents.taskException(qkey));
 
-    listener.on("message", (message) => {        
-      console.log('Message: ', message.payload.status);
+    listener.on('message', (message) => {        
       onMessageAction(message);
     });
 
-    listener.on("error", function(err) {
+    listener.on('error', (err = new Error("Unknown error")) => {
       console.error('Error within the Listener: ', err);
-      if (!err) {
-          err = new Error("Unknown error");
-      }
       listener.close();
-      // Show a banner
       onMessageAction(err);
     });
 
@@ -66,29 +56,26 @@ export const webListener =  {
   },
 
   // Stop listening and create a new instance for the next listener
-  stopListening: () => {
+  stopListening() {
     listener.close();
     listener = new taskcluster.WebListener();
   }  
-
-}
+};
 
 /**
 * Rendering Erorr and Success messages
 */
-export const rendering =  {
+export const rendering = {
   renderError: (err) => {
     // Find some sort of summary or error code
-    let code = err.code + ' Error!';
-    if (!err.code && err.statusCode) {
-      code = 'HTTP ' + err.statusCode;
-    }
-    code = code || 'Unknown Error';
+    const code = !err.code && err.statusCode ?
+      `HTTP ${err.statusCode}` :
+      `${err.code} Error`;
 
     // Find some sort of message
-    let message = err.message || '```\n' + err.stack + '\n```';
-
-    let title = <bs.Button bsStyle="link">Additional details...</bs.Button>;
+    const message = err.message || '```\n' + err.stack + '\n```';
+    const title = <bs.Button bsStyle="link">Additional details...</bs.Button>;
+    
     return (
       <bs.Alert bsStyle="danger">
         <strong>
@@ -109,44 +96,29 @@ export const rendering =  {
       <bs.Alert bsStyle="success">
         {message}   
       </bs.Alert>
-    )
+    );
   }
-}
+};
 
 /**
-* Beautify functions
+* beautified functions
 */
-export const beautify = {
-
+export const beautified = {
   labelClassName: (state) => {
-    let cl = "my-label";
-    if (state == 'completed') {
-      return cl + " label-completed";
-    } else if (state == 'failed') {
-      return cl + " label-failed";
-    } else if (state == "exception") {
-      return cl + " label-exception";
-    } else if (state =="unscheduled") {
-      return cl + " label-unscheduled";
-    } else if (state =="pending") {
-      return cl + " label-pending";
-    } else if (state =="running") {
-      return cl + " label-running";
-    }
+    return `status-label label-${state}`;  
   }
-}
+};
 
 /**
 * Push notifications
 */
 export const notifications = {
   notifyUser: (message) => {
-    const options = {
+    let e = new Notification(message, {
       icon: '/lib/assets/taskcluster-36.png'
-    };
-    let e = new Notification(message, options);
+    });
   },
   requestPermission: () => {
     Notification.requestPermission();
   }
-}
+};

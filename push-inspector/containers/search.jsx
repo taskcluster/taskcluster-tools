@@ -6,7 +6,6 @@ import * as bs from 'react-bootstrap';
 
 
 class Search extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -17,18 +16,25 @@ class Search extends Component {
 
     this.onFormSubmit = this.onFormSubmit.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
-
   }
 
   /** 
   * Handle search query 
   */
   onFormSubmit(event) {
+    const { setDashboardBanner, tasksHaveBeenRetrieved, removeTasks, fetchTasksInSteps } = this.props;
+
     event.preventDefault();
+
     if(!this.isInvalid()) {
-      this.props.tasksHaveBeenRetrieved(false);
-      this.props.removeTasks();
-      this.props.fetchTasksInSteps(this.state.term, true);
+      setDashboardBanner(null);
+      tasksHaveBeenRetrieved(false);
+      removeTasks();
+
+      if (!this.props.listTaskGroupInProgress) {
+        fetchTasksInSteps(this.state.term, true);  
+      }
+      
       hashHistory.push(this.state.term);
     }  
   }
@@ -40,8 +46,7 @@ class Search extends Component {
   /**
   * Text input validator
   */
-  isInvalid() {
-    
+  isInvalid() { 
     // Case 1: If search term is empty, it is valid
     if(!this.state.term) {
       return false;
@@ -77,4 +82,10 @@ class Search extends Component {
   }
 }
 
-export default connect(null, actions)(Search)
+function mapStateToProps(state) {
+  return {
+    listTaskGroupInProgress: state.listTaskGroupInProgress
+  };
+}
+
+export default connect(mapStateToProps, actions)(Search);

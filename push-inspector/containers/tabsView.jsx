@@ -7,12 +7,11 @@ import TaskDetail from '../components/taskDetail';
 import TaskRun from '../components/taskRun';
 
 class TabsView extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
       tabIndex: 0
-    }
+    };
 
     this.handleSelect = this.handleSelect.bind(this);
   }
@@ -29,6 +28,7 @@ class TabsView extends Component {
   */
   fetchTaskData() {
     const { params, fetchArtifacts, fetchTask, fetchStatus } = this.props;
+
     fetchArtifacts(params.taskId);
     fetchTask(params.taskId);
     fetchStatus(params.taskId);
@@ -43,9 +43,9 @@ class TabsView extends Component {
   */
   componentDidUpdate(prevProps, prevState) {
     //  This can happen when retriggering a task or clicking on a task
-    if(prevProps.params.taskId != this.props.params.taskId) {
+    if(prevProps.params.taskId !== this.props.params.taskId) {
       this.fetchTaskData();
-      this.setState({tabIndex: 0});
+      this.setState({ tabIndex: 0 });
     }
   }
 
@@ -54,33 +54,30 @@ class TabsView extends Component {
     const { tabIndex } = this.state;
 
     return (
-        <Tabs
-          onSelect={this.handleSelect}
-          selectedIndex={tabIndex}
-        >
-          <TabList>
-            <Tab>Task</Tab>
-            <Tab>Run</Tab>
-          </TabList>
+      <Tabs onSelect={this.handleSelect} selectedIndex={tabIndex}>
+        <TabList>
+          <Tab>Task</Tab>
+          <Tab>Run</Tab>
+        </TabList>
 
-          <TabPanel>
-            <TaskDetail task={task} status={status} />
-          </TabPanel>
-          
-          <TabPanel>
-            <TaskRun task={task} status={status} artifacts={artifacts} />
-          </TabPanel>     
-        </Tabs>
-      );
+        <TabPanel>
+          <TaskDetail task={task} status={status} />
+        </TabPanel>
+        
+        <TabPanel>
+          <TaskRun task={task} status={status} artifacts={artifacts} />
+        </TabPanel>     
+      </Tabs>
+    );
   }
 }
+
 function mapStateToProps(state) {
   return {
     task: state.task,
     status: state.status,
     artifacts: state.artifacts
-  }
+  };
 }
-
 
 export default connect(mapStateToProps, actions)(TabsView);

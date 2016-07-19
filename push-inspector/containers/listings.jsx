@@ -6,9 +6,7 @@ import Table from './table';
 import { queueEvents, webListener, notifications } from '../lib/utils';
 import _ from 'lodash';
 
-
 class Listings extends Component {
-
   constructor(props) {
     super(props);
     this.listener = null; 
@@ -37,10 +35,11 @@ class Listings extends Component {
   */
   handleMessage(message) {
     const { taskId } = this.props.params;
+    
     // Handle Error
     if(message instanceof Error) { 
       // Set state to error true
-      this.props.setDashboardBanner(true);
+      this.props.setDashboardBanner(message);
       return;
     }
 
@@ -77,6 +76,7 @@ class Listings extends Component {
   handleEdgeCases(message) {
     const { fetchTask, fetchStatus, params } = this.props;
     const { taskId } = params;
+
     // Give priority to exceptions to show without waiting for loop to happen
     if(message.exchange == queueEvents.taskException().exchange) {
       notifications.notifyUser("Task exception");
@@ -90,8 +90,7 @@ class Listings extends Component {
   * Construct loop that will update the tasks when messages arrive from the web listener 
   */
   constructLoopForMessages() {
-
-    const { fetchArtifacts, fetchTask, fetchStatus, params, fetchTasksInSteps } = this.props;
+    const { fetchTask, fetchStatus, params, fetchTasksInSteps } = this.props;
     const { taskId, taskGroupId } = params;
   
     this.loop = setInterval(() => {
@@ -130,9 +129,8 @@ class Listings extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    
     // Case when user change taskGroupId
-    if(prevProps.params.taskGroupId != this.props.params.taskGroupId) {    
+    if(prevProps.params.taskGroupId !== this.props.params.taskGroupId) {    
       // Cleanup
       this.cleanup();   
       // Start listening
@@ -140,10 +138,9 @@ class Listings extends Component {
     }
 
     // Setup loop
-    if(this.props.tasksRetrievedFully == true && !!!this.loop) {
+    if(this.props.tasksRetrievedFully == true && !this.loop) {
       this.constructLoopForMessages();
     }
-
   }
 
   /** 
@@ -151,7 +148,11 @@ class Listings extends Component {
   */
   componentWillMount() {
     const { taskGroupId, taskId } = this.props.params;
-    this.props.fetchTasksInSteps(taskGroupId, true);
+
+    if (!this.props.listTaskGroupInProgress) {
+      this.props.fetchTasksInSteps(taskGroupId, true);  
+    }
+    
     this.setup();
     this.constructLoopForMessages();
   }
@@ -176,8 +177,9 @@ function mapStateToProps(state) {
   return {
     tasks: state.tasks,
     status: state.status,
-    tasksRetrievedFully: state.tasksRetrievedFully
-  }
+    tasksRetrievedFully: state.tasksRetrievedFully,
+    listTaskGroupInProgress: state.listTaskGroupInProgress
+  };
 }
 
-export default connect(mapStateToProps, actions)(Listings)
+export default connect(mapStateToProps, actions)(Listings);

@@ -5,30 +5,26 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 
 class PurgeCacheButton extends Component {
-
   constructor(props) {
     super(props);
     
     this.state = {
       selected: this.props.caches || []
-    }
+    };
 
     this.update = this.update.bind(this);
   }
-
-  
+ 
   update(e) { 
     let caches = _.clone(this.state.selected);
-    if (e.target.checked === true) {
-      caches.push(e.target.value);
-    } else if (e.target.checked === false) {
+    e.target.checked == true ?
+      caches.push(e.target.value) :
       caches = caches.filter(i => i !== e.target.value);
-    }
+    
     this.setState({ selected: caches });
   }
 
   render() {
-    
     const glyph = "trash";
     const label = "Purger Worker Cache";
     const successMsg = "Cache successfully purged!";
@@ -66,4 +62,4 @@ class PurgeCacheButton extends Component {
   }
 }
 
-export default connect(null, actions)(PurgeCacheButton)
+export default connect(null, actions)(PurgeCacheButton);

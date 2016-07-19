@@ -4,13 +4,11 @@ import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
 class RetriggerButton extends Component {
-
   constructor(props) {
     super(props);
   }
 
   render() {
-    
     const glyph = "repeat";
     const label = "Retrigger";
     const successMsg = "Retrigger success";
@@ -48,8 +46,8 @@ class RetriggerButton extends Component {
 function mapStateToProps(state) {
   return {
     task: state.task,
-    tasks: state.tasks,
-  }
+    tasks: state.tasks
+  };
 }
 
 export default connect(mapStateToProps, actions)(RetriggerButton);

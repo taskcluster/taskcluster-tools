@@ -4,7 +4,6 @@ import LogView from './logView';
 import ArtifactList from './artifactList';
 
 export default class TaskRun extends Component {
-
   constructor(props) {
     super(props);
     this.generateRows = this.generateRows.bind(this);
@@ -39,8 +38,7 @@ export default class TaskRun extends Component {
   /**
   * Render log view
   */
-  renderLogView(taskId, runId, artifacts) {
-    
+  renderLogView(taskId, runId, artifacts) {  
     const logs = artifacts.filter(function(artifact) {
       return /^public\/logs\//.test(artifact.name);
     });
@@ -54,11 +52,10 @@ export default class TaskRun extends Component {
         logs={logs}
         taskId={taskId}
         runId={runId} />
-    )
+    );
   }
 
   render() {
-
     const { task, status, artifacts } = this.props;
     const taskId = status.taskId;
     const runNumber = status.runs.length - 1;          
@@ -96,5 +93,4 @@ export default class TaskRun extends Component {
       </div>
     );
   }
-
 }

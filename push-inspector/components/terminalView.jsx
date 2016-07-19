@@ -5,7 +5,6 @@ import ansiRegex from 'ansi-regex';
 import _ from 'lodash';
 
 export default class TerminalView extends Component {
-
   constructor(props) {
     super(props);
     
@@ -55,7 +54,6 @@ export default class TerminalView extends Component {
   }
 
   open() {
-    
     // Abort previous request if any
     if (this.worker) {
       this.abortRequest();
@@ -66,7 +64,7 @@ export default class TerminalView extends Component {
       return;
     }
 
-    this.worker = work(require('./log-fetcher.js'));
+    this.worker = work(require('../../lib/ui/log-fetcher.js'));
     this.worker.addEventListener('message', this.onData);
     this.worker.postMessage({ url: this.props.url });
   }
@@ -103,6 +101,7 @@ export default class TerminalView extends Component {
       return 0;
     }
     let ratio = (this.state.lines.length - this.state.fromBottom - this.rows) / this.state.lines.length;
+
     return ratio * (this.refs.buffer.offsetHeight - this.scrollbarHeight());
   }
 
@@ -110,7 +109,8 @@ export default class TerminalView extends Component {
     newState = Math.floor(newState);
     newState = Math.max(0, newState);
     newState = Math.min(this.state.lines.length - this.rows, newState);
-    if (newState != this.state.fromBottom) {
+    
+    if (newState !== this.state.fromBottom) {
       this.setState({ fromBottom: newState });
     }
   }
@@ -154,39 +154,39 @@ export default class TerminalView extends Component {
 
   render() {
     const { state }  = this;
-
     let start = this.state.lines.length - this.state.fromBottom - this.rows;
+    let paddingRows = 0;
+
     if (start < 0) {
       start = 0;
     }
 
-    let paddingRows = 0;
-    
     //Check if the log has less lines than the number of rows or if we are displaying the beggining of the log
     if (this.rows <= this.state.lines.length && this.state.lines[start] !== this.state.lines[0]) {
       paddingRows = 15;
     }
 
     let frame = this.state.lines.slice(start + paddingRows, start + this.rows + paddingRows);
-    return <div className="viewer" onWheel={this.onMouseWheel}>
-      <div className="buffer" ref="buffer">
-      {
-        frame.map(function(line) {
-          // Check if there are any ansi colors/styles
-          if (ansiRegex().test(line)) {
-            var new_line = ansi_up.ansi_to_html(line);
-            return <div key={start++} dangerouslySetInnerHTML={{__html: new_line}}></div>;
-          } else {
-            return <div key={start++}>{(line)}</div>;
-          };
-        })
-      }
-      </div>
-      <div className="scrollbar" style={{
-        height: this.scrollbarHeight(),
-        marginTop: this.scrollbarMargin()
-        }} ref="scrollbar"/>
-      </div>;
-  }
 
+    return (
+      <div className="viewer" onWheel={this.onMouseWheel}>
+        <div className="buffer" ref="buffer">
+          {
+            frame.map(function(line) {
+              // Check if there are any ansi colors/styles
+              if (ansiRegex().test(line)) {
+                var new_line = ansi_up.ansi_to_html(line);
+                return <div key={start++} dangerouslySetInnerHTML={{__html: new_line}}></div>;
+              } else {
+                return <div key={start++}>{(line)}</div>;
+              };
+            })
+          }
+        </div>
+        <div className="scrollbar" 
+          style={{ height: this.scrollbarHeight(), marginTop: this.scrollbarMargin() }} 
+          ref="scrollbar"/>
+      </div>
+    );
+  }
 }

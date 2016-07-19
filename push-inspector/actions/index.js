@@ -9,13 +9,13 @@ import {
   SET_DASHBOARD_BANNER,
   TASKS_RETRIEVED_FULLY,
   CLEAR_TASKS_ACTIONS_MESSAGE,
-  ACTIVE_TASK_GROUP_ID
+  ACTIVE_TASK_GROUP_ID,
+  LIST_TASKGROUP_IN_PROGRESS
 } from './types';
 
 // Helper functions
 import { 
   taskActionsInProgress,
-  taskGroupIdNotAvailable,
   renderActionSuccess,
   renderActionError,
   createTask
@@ -28,7 +28,6 @@ import taskcluster from 'taskcluster-client';
 import slugid from 'slugid';
 import _ from 'lodash';
 import { hashHistory } from 'react-router';
-import update from 'react-addons-update';
 
 /**
 * Get the list of tasks in small steps
@@ -36,139 +35,121 @@ import update from 'react-addons-update';
 * Set to false otherwise
 */
 export const fetchTasksInSteps = (taskGroupId, limitBool) => {
-  
   let options = {};
-  let token = undefined;
-  let res = undefined;
-
-  const limit  = 200;
+  let token = null;
+  let res = null;
+  const limit = 200;
   
   return async (dispatch, getState) => {
+    dispatch(listTaskGroup(true));
     while (true) {  
-      
-      // Reset taskGroupId flag for each search loop
-      dispatch(taskGroupIdNotAvailable(false));
-      
       // Set continuationToken if there is a token 
-      if (token) { options.continuationToken = token; }
+      if (token) { 
+        options.continuationToken = token; 
+      }
       
       // Set limit on tasks if there is one
-      if (limitBool === true) { options.limit = limit; }
+      if (limitBool == true) { 
+        options.limit = limit; 
+      }
       
-      try {
-        
+      try {   
         res = await queue.listTaskGroup(taskGroupId, options);              
         let tasks = res.tasks;
         
         // do not dispatch if taskGroupId changed sometime between the start and end of the async request
-        if(taskGroupId != getState().taskGroup) {
+        if (taskGroupId !== getState().taskGroup) {
           return;
         }
 
         // Dispatch tasks
-        if(limitBool == true) {
-          dispatch({
-            type: FETCH_TASKS_IN_STEP,
-            payload: tasks
-          }); 
-        } else {
-          dispatch({
-            type: FETCH_TASKS_FULLY,
-            payload: tasks
-          });
-        }     
+        dispatch({
+          type: limitBool ? FETCH_TASKS_IN_STEP : FETCH_TASKS_FULLY,
+          payload: tasks
+        });
 
-        if(!!res.continuationToken) {
-          dispatch(tasksHaveBeenRetrieved(false));
-        } else {
-          // Set a flag indicating list has been loaded
-          dispatch(tasksHaveBeenRetrieved(true));
-        }
+        // Flag to indicate whether list has been loaded
+        dispatch(tasksHaveBeenRetrieved(!res.continuationToken));
 
       // taskGroupId not found  
-      } catch(err) {
-        dispatch(taskGroupIdNotAvailable(true));
-
+      } catch (err) {
+        dispatch(setDashboardBanner(err));
       } finally {
-        token = res.continuationToken;
-        if(!!!token) {
+        if (res) {
+          token = res.continuationToken;  
+        }
+        
+        if (!token) {
+          dispatch(listTaskGroup(false));
           break;
         }
       }     
     } 
-  }
-}
+  };
+};
 
 /** 
 * Get task definition
 */
 export const fetchTask = (taskId) => {
   return async (dispatch) => {
-    let task;
     try {
-      task = await queue.task(taskId);
+      let task = await queue.task(taskId);
       dispatch({
         type: FETCH_TASK,
         payload: task
-      })
+      });
     } catch(err) {
-      
+      dispatch(setDashboardBanner(err));
     }   
-  }
-}
+  };
+};
 
 /** 
 * Get artifacts list
 */
 export const fetchArtifacts = (taskId) => {
-  let res;
-
   return async (dispatch) => {
     try {
-      res = await queue.listLatestArtifacts(taskId);
+      let res = await queue.listLatestArtifacts(taskId);
       dispatch({
         type: FETCH_ARTIFACTS,
         payload: res.artifacts
       });
     } catch(err) {
-
+      console.log(`Run Not Found!  The task ${taskId} does not seem to have the requested run...`);
     }   
-  }
-}
+  };
+};
 
 /**
 * Remove list of tasks
 */
 export const removeTasks = () => {
-  const empty = [];
   return {
     type: REMOVE_TASKS,
-    payload: empty
-  }
-}
+    payload: []
+  };
+};
 
 /**
 * Get task status
 */
 export const fetchStatus = (taskId) => {
-  let res;
-  let status;
-
   return async (dispatch) => {
     try {
-      res = await queue.status(taskId);
-      status = res.status;
+      let res = await queue.status(taskId);
+      let status = res.status;
 
       dispatch({
         type: FETCH_STATUS,
         payload: status
       });
-
     } catch(err) {
-
+      dispatch(setDashboardBanner(err));
     }   
-  }
-}
+  };
+};
 
 /**
 * Set status of a task (e.g, pending)
@@ -177,8 +158,8 @@ export const setActiveTaskStatus = (status) => {
   return {
     type: ACTIVE_TASK_STATUS,
     payload: status
-  }
-}
+  };
+};
 
 /**
 * Set active taskGroupId
@@ -187,8 +168,8 @@ export const activeTaskGroupId = (taskGroupId) => {
   return {
     type: ACTIVE_TASK_GROUP_ID,
     payload: taskGroupId
-  }
-}
+  };
+};
 
 /**
 * Purge a task
@@ -197,32 +178,30 @@ export const purge = (provisionerId, workerType, selectedCaches, successMessage)
   let purgeCache;
 
   // Setup purgeCache
-  if(localStorage.credentials) {
-    purgeCache = new taskcluster.PurgeCache({
-      credentials: JSON.parse(localStorage.credentials)
-    });
-  } else{
-    purgeCache = new taskcluster.PurgeCache();
-  }
+  purgeCache = new taskcluster.PurgeCache(
+    localStorage.credentials ? 
+    { credentials: JSON.parse(localStorage.credentials) }
+    : undefined
+  );
 
-  
-  const cachesPromise = Promise.all(selectedCaches.map(cache => {
-    return purgeCache.purgeCache(
-      provisionerId, workerType, {cacheName: cache});
-  }));
+  const cachesPromise = Promise
+    .all(selectedCaches.map(cacheName => {
+      return purgeCache.purgeCache(provisionerId, workerType, { cacheName });
+    }));
 
   return (dispatch) => {
     dispatch(taskActionsInProgress(true));
-    cachesPromise.then((data) => {
-      dispatch(renderActionSuccess(successMessage))
-      dispatch(taskActionsInProgress(false));
-    }, (err) => {   
-      dispatch(renderActionError(err))
-      dispatch(taskActionsInProgress(false));
-    }); 
-  }
-
-}
+    cachesPromise
+      .then((data) => {
+        dispatch(renderActionSuccess(successMessage))
+        dispatch(taskActionsInProgress(false));
+      })
+      .catch((err) => {
+        dispatch(renderActionError(err))
+        dispatch(taskActionsInProgress(false));
+      });
+  };
+};
 
 /**
 * Retrigger a task
@@ -238,73 +217,61 @@ export const retriggerTask = (list, toClone, successMessage) => {
   task.created = new Date(now).toJSON();
   task.retries = 0;
 
-  
   return async (dispatch) => {
-    let res;
-    let dataObj;
-
     dispatch(taskActionsInProgress(true));
 
     try {
-      res = await queue.createTask(taskId, task);
-      dataObj = { task, status: res.status };
-      hashHistory.push(task.taskGroupId + '/' + res.status.taskId);
+      let res = await queue.createTask(taskId, task);
+      let dataObj = { task, status: res.status };
       
+      hashHistory.push(`${task.taskGroupId}/${res.status.taskId}`);
       // Update current list of tasks
       dispatch(createTask(list, dataObj));
       // Update modal message
       dispatch(renderActionSuccess(successMessage));
-    } catch(err) {
+    } catch (err) {
       dispatch(renderActionError(err));
     } finally {
       dispatch(taskActionsInProgress(false));
     } 
-  }
-}
+  };
+};
 
 /**
 * Cancel a task
 */
 export const cancelTask = (taskId, successMessage) => {   
-  let res;
-
   return async (dispatch) => {
-
     dispatch(taskActionsInProgress(true));
 
     try {
-      res = await queue.cancelTask(taskId);
+      let res = await queue.cancelTask(taskId);
       dispatch(renderActionSuccess(successMessage));
-    } catch(err) {
+    } catch (err) {
       dispatch(renderActionError(err));
     } finally {
       dispatch(taskActionsInProgress(false));
     } 
-  }
-
-}
+  };
+};
 
 /**
 * Schedule a task
 */
-export const scheduleTask = (taskId, successMessage) => {   
-  let res;
-  
+export const scheduleTask = (taskId, successMessage) => {     
   return async (dispatch) => {
-
     dispatch(taskActionsInProgress(true));
 
     try {
-      res = await queue.scheduleTask(taskId);
+      let res = await queue.scheduleTask(taskId);
       dispatch(renderActionSuccess(successMessage));
-    } catch(err) {
+    } catch (err) {
       dispatch(renderActionError(err));
     } finally {
       dispatch(taskActionsInProgress(false));
     } 
-  }
-
-}
+  };
+};
 
 /**
 * Edit and create task 
@@ -334,15 +301,14 @@ export const editAndCreateTask = (oldTask, successMessage) => {
   });
 
   // overwrite task-creator's local state with this new task
-  localStorage.setItem("task-creator/task", JSON.stringify(newTask));
+  localStorage.setItem('task-creator/task', JSON.stringify(newTask));
 
   // ..and go there
   window.open(`${location.protocol}//${location.host}/task-creator`);
 
   // Update modal message
   return renderActionSuccess(successMessage);
-
-}
+};
 
 /**
 * One Click Loaner action
@@ -353,9 +319,6 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
 
   // Strip routes
   delete task.routes;
-
-  task.payload.env = task.payload.env || {};
-  task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
 
   task.payload.env = task.payload.env || {};
   task.payload.env.TASKCLUSTER_INTERACTIVE = 'true';
@@ -389,40 +352,36 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
   task.retries = 0;
 
   return async (dispatch) => {
-
     dispatch(taskActionsInProgress(true));
 
-    try {
-      
+    try {  
       let res = await queue.createTask(taskId, task);
       const dataObj = { task, status: res.status };
       const location = window.location;
-
-      hashHistory.push(task.taskGroupId + '/' + res.status.taskId);     
+     
+      hashHistory.push(`${task.taskGroupId}/${res.status.taskId}`);
       window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${res.status.taskId}`);
       
       // Update current list of tasks
       dispatch(createTask(list, dataObj));
-
       dispatch(renderActionSuccess(successMessage));
-    } catch(err) {
+    } catch (err) {
       dispatch(renderActionError(err));
     } finally {
       dispatch(taskActionsInProgress(false));
     } 
-  }
-
-}
+  };
+};
 
 /**
 * Set dashboard banner
 */
-export const setDashboardBanner = (bool) => {   
+export const setDashboardBanner = (msg) => {   
   return {
     type: SET_DASHBOARD_BANNER,
-    payload: bool
-  }
-}
+    payload: msg
+  };
+};
 
 /**
 * Set to true if tasks list has been loaded fully
@@ -431,58 +390,25 @@ export const tasksHaveBeenRetrieved = (bool) => {
   return {
     type: TASKS_RETRIEVED_FULLY,
     payload: bool
-  }
-}
+  };
+};
 
+/**
+* Clears the message of the action modal
+*/
 export const clearTaskActionsMessage = () => {
   return {  
     type: CLEAR_TASKS_ACTIONS_MESSAGE,
     payload: null
-  }
-}
+  };
+};
 
-
-
-// // Update entry in tasks list
-// export const updateListings = (list, status) => {
-//  const updatedTask = queue.task(status.taskId);
-//  return (dispatch) => {
-//    updatedTask.then((task) => {
-//      console.log('before updating list is: ', list);
-//      // Check for a match
-//      const match = _.findIndex(list, function(o) { return o.status.taskId == status.taskId; });
-
-//      // update entry if match
-//      if(match > -1) {
-        
-//          var updatedStatus = update(list[match], {status: {$set: status}}); 
-
-//          var newData = update(list, {
-//              $splice: [[match, 1, updatedStatus]]
-//          });
-
-//        dispatch({
-//          type: FETCH_TASKS,
-//          payload: newData
-//        });
-
-//        // list[match].status = status;
-//        // list = Object.assign({}, list);
-//        console.log('update existing entry to list: ', list);
-//      } else {
-//        console.log('creating new entry');
-//        list = list.concat({task, status});
-//        dispatch({
-//          type: FETCH_TASKS,
-//          payload: list
-//        });
-
-//      }
-
-
-//      console.log('after updating list is: ', list);
-
-      
-//    });
-//  }
-// }
+/**
+* Set to true if you are currently fetching 
+*/
+export const listTaskGroup = (bool) => {
+  return {
+    type: LIST_TASKGROUP_IN_PROGRESS,
+    payload: bool
+  };
+};

@@ -5,7 +5,6 @@ import * as bs from 'react-bootstrap';
 import { notifications } from '../lib/utils';
 
 class ProgressBar extends Component {
-
   constructor(props) {
     super(props);
 
@@ -27,9 +26,8 @@ class ProgressBar extends Component {
   * Set notify flag to false when changing taskGroupId so that
   * one does not get a web notification if a build is already done
   */
-  componentDidUpdate(prevProps, prevState) {
-    
-    if(prevProps.taskGroupId !== this.props.taskGroupId) {
+  componentDidUpdate(prevProps, prevState) { 
+    if (prevProps.taskGroupId !== this.props.taskGroupId) {
       this.notifyFlag = false;
     }    
   }
@@ -38,14 +36,12 @@ class ProgressBar extends Component {
   * Reset states
   */
   emptyStates() {
-    
     this.completed = [];
     this.failed = [];
     this.exception = [];
     this.unscheduled = [];
     this.pending = [];
     this.running = [];
-
   }
 
   /**
@@ -62,9 +58,9 @@ class ProgressBar extends Component {
       this.props.setActiveTaskStatus("running");
     } else if (title.match(/Pending*/g)) {
       this.props.setActiveTaskStatus("pending");
-    } else if(title.match(/Exception*/g)) {
+    } else if (title.match(/Exception*/g)) {
       this.props.setActiveTaskStatus("exception");
-    } else if(title.match(/Unscheduled*/g)) {
+    } else if (title.match(/Unscheduled*/g)) {
       this.props.setActiveTaskStatus("unscheduled");
     }
   }
@@ -86,14 +82,12 @@ class ProgressBar extends Component {
         case "running": this.running.push(task); break;
       }
     });
-
   }
 
   /**
   * Notify user if build is done
   */
-  notifyCheck() {
-    
+  notifyCheck() { 
     const uLength = this.unscheduled.length;
     const rLength = this.running.length;
     const pLength = this.pending.length;
@@ -103,8 +97,8 @@ class ProgressBar extends Component {
 
     // Having no unscheduled and no running and no pending tasks
     // means build is done
-    if(uLength === 0 && rLength === 0 && pLength === 0) {
-      if(this.notifyFlag == true && (cLength > 0 || fLength > 0 || eLength > 0)) {
+    if (uLength === 0 && rLength === 0 && pLength === 0) {
+      if (this.notifyFlag == true && (cLength > 0 || fLength > 0 || eLength > 0)) {
         notifications.notifyUser('Build done');
         // Stop notifying further
         this.notifyFlag = false;  
@@ -118,8 +112,7 @@ class ProgressBar extends Component {
   /**
   * Render progress bar
   */
-  makeProgressBar() {
-    
+  makeProgressBar() { 
     let tasks = this.props.tasks;
     let status;
     let totLen = tasks.length;
@@ -189,14 +182,13 @@ class ProgressBar extends Component {
 
   render() {
     const { taskGroupId, tasks } = this.props;
+
     return (
       <div className={!!tasks.length ? "" : "hideVisibility"}>
         {this.makeProgressBar()}
       </div>
     );
   }
-
 }
 
-export default connect(null, actions)(ProgressBar)
-
+export default connect(null, actions)(ProgressBar);

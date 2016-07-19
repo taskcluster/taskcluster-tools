@@ -4,13 +4,11 @@ import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
 class CancelTaskButton extends Component {
-
   constructor(props) {
     super(props);  
   }
 
-  render() {
-    
+  render() { 
     const glyph = "stop";
     const label = "Cancel Task";
     const successMsg = "Successfully canceled task!"; 
@@ -43,13 +41,12 @@ class CancelTaskButton extends Component {
       </ConfirmAction>         
     );
   }
-
 }
 
 function mapStateToProps(state) {
   return {
-    status: state.status,
-  }
+    status: state.status
+  };
 }
 
 export default connect(mapStateToProps, actions)(CancelTaskButton);

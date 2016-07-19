@@ -4,13 +4,11 @@ import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
 class EditAndCreateButton extends Component {
-
   constructor(props) {
     super(props);  
   }
 
-  render() {
-    
+  render() { 
     const glyph = "edit";
     const label = "Edit and Create";
     const successMsg = "Upon creation, you will need to refresh the page to see the new task";
@@ -38,13 +36,12 @@ class EditAndCreateButton extends Component {
       </ConfirmAction>        
     );
   }
-
 }
 
 function mapStateToProps(state) {
   return {
     task: state.task
-  }
+  };
 }
 
 export default connect(mapStateToProps, actions)(EditAndCreateButton);

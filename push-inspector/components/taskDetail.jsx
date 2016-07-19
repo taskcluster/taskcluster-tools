@@ -7,11 +7,10 @@ import ScheduleTaskButton from '../buttons/scheduleTaskButton';
 import CancelTaskButton from '../buttons/cancelTaskButton';
 import EditAndCreateButton from '../buttons/editAndCreateButton';
 import OneClickLoanerButton from '../buttons/oneClickLoanerButton';
-import { beautify } from '../lib/utils';
+import { beautified } from '../lib/utils';
 
 
 export default class TaskDetail extends Component {
-
   constructor(props) {
     super(props);
   }
@@ -19,12 +18,12 @@ export default class TaskDetail extends Component {
   /**
   * Render dependencies list
   */
-  getDependenciesList(task) {
-    
+  getDependenciesList(task) { 
     const { dependencies } = task;
     if(!dependencies.length) {
       return <span>-</span>
     }
+
     return (
       <div>
         <ul className="dependencies-ul">
@@ -45,8 +44,7 @@ export default class TaskDetail extends Component {
   }
 
   render() {
-
-    if(!!!this.props.task || !!!this.props.status) {
+    if (!this.props.task || !this.props.status) {
       return <div>Loading...</div>;
     }
 
@@ -78,7 +76,7 @@ export default class TaskDetail extends Component {
           </tr>
           <tr>
             <td><b>State</b></td>
-            <td className={beautify.labelClassName(status.state)}>{status.state}</td>
+            <td className={beautified.labelClassName(status.state)}>{status.state}</td>
           </tr>
           <tr>
             <td><b>Actions</b></td>
@@ -116,6 +114,4 @@ export default class TaskDetail extends Component {
       </table>
     );
   }
-}
-
-
+};

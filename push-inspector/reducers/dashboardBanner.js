@@ -1,11 +1,7 @@
-import {
-  SET_DASHBOARD_BANNER
-} from '../actions/types';
+import { SET_DASHBOARD_BANNER } from '../actions/types';
 
 export default function(state = false, action) {
-  switch(action.type) {
-    case SET_DASHBOARD_BANNER:
-      return action.payload;
-  }
-  return state;
-}
+  return action.type === SET_DASHBOARD_BANNER ?
+  	action.payload :
+  	state;
+};

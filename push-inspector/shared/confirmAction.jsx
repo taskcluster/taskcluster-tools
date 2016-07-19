@@ -5,13 +5,12 @@ import * as actions from '../actions';
 import Loading from './loading';
 
 class ConfirmAction extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
       showDialog: false,
       executing: false
-    }
+    };
 
     this.open = this.open.bind(this);
     this.close = this.close.bind(this);
@@ -35,31 +34,28 @@ class ConfirmAction extends Component {
   * Open dialog
   */
   open() {
-    this.setState({showDialog: true});
+    this.setState({ showDialog: true });
   }
 
   /**
   * Execute action and set executing to true
   */
   executeAction() {
-    this.setState({executing: true});
+    this.setState({ executing: true });
     this.props.action();
   }
 
-
   message() {
     const { taskActionInProgress, taskActionMessage } = this.props;
-    if(!!taskActionInProgress) {
-      return <Loading />
+    
+    if (!!taskActionInProgress) {
+      return <Loading />;
     } else {
-      return taskActionMessage ? taskActionMessage : undefined
+      return taskActionMessage;
     }
   }
 
-  
-
   render() {
-
     const { label, glyph, action, children, disabled } = this.props;
     const message = this.message();
     const dialogContent = (
@@ -77,8 +73,7 @@ class ConfirmAction extends Component {
         <bs.Button          
           bsSize="small"
           onClick={this.open}
-          disabled = {disabled}
-        >
+          disabled={disabled}>
           <bs.Glyphicon glyph={glyph} />
           &nbsp;{label}
         </bs.Button>
@@ -89,21 +84,24 @@ class ConfirmAction extends Component {
           </bs.Modal.Header>
           <bs.Modal.Body className="format-modal-text format-modal-body">
             {children}
-            {this.state.executing ? ( dialogContent ) : undefined}              
+            {(() => {
+              if(this.state.executing) {
+                return dialogContent;
+              }
+            }())}              
           </bs.Modal.Body>
           <bs.Modal.Footer>
-            {
-              !(this.state.executing) ? (  
-                <bs.Button onClick={this.executeAction}>
-                  <bs.Glyphicon glyph={glyph} />
-                  &nbsp;{label}
-                </bs.Button>
-              ) : undefined
-            }
-              
+            {(() => {
+              if (!this.state.executing) {
+                return (
+                  <bs.Button onClick={this.executeAction}>
+                    <bs.Glyphicon glyph={glyph} /> {label}
+                  </bs.Button>
+                );
+              }
+            }())}
             <bs.Button onClick={this.close}>
-              <bs.Glyphicon glyph="remove"/>&nbsp;
-              Close
+              <bs.Glyphicon glyph="remove"/> Close
             </bs.Button>
           </bs.Modal.Footer>
         </bs.Modal>
@@ -116,7 +114,7 @@ function mapStateToProps(state) {
   return {
     taskActionMessage: state.taskActionMessage,
     taskActionInProgress: state.taskActionInProgress
-  }
+  };
 }
 
-export default connect(mapStateToProps, actions )(ConfirmAction)
+export default connect(mapStateToProps, actions)(ConfirmAction);

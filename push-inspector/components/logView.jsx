@@ -6,7 +6,6 @@ import { queue } from '../lib/utils';
 import Select from 'react-select';
 
 export default class LogView extends Component {
-
   constructor(props) {
     super(props);
     let entry = _.find(this.props.logs, {name: 'public/logs/terminal.log'}) ||
@@ -14,7 +13,7 @@ export default class LogView extends Component {
                 this.props.logs[0];
     this.state = {
       name: (entry ? entry.name : undefined)   // URL to show
-    }
+    };
 
     this.handleLogChanged = this.handleLogChanged.bind(this);
     this.refreshLog = this.refreshLog.bind(this);
@@ -26,6 +25,7 @@ export default class LogView extends Component {
   createUrlForArtifact() {
     const { taskId, runId } = this.props;
     const { name } = this.state;
+
     if (this.state.name) {
       return queue.buildUrl(queue.getArtifact, taskId, runId, name);
     }
@@ -35,8 +35,8 @@ export default class LogView extends Component {
   * Handle log change
   */
   handleLogChanged(log) {  
-    if(this.state.name != log.value) {
-      this.setState({name: log.value});
+    if(this.state.name !== log.value) {
+      this.setState({ name: log.value });
       this.refreshLog();  
     }   
   }
@@ -48,13 +48,11 @@ export default class LogView extends Component {
     this.refs.termView.refresh();
   }  
 
-
   render() {
     const { runId, taskId } = this.props;
     const logUrl = this.createUrlForArtifact();
-
     const logs = this.props.logs.map(log => {
-      return {value: log.name, label: log.name};
+      return { value: log.name, label: log.name };
     });
     
     return (
@@ -78,5 +76,4 @@ export default class LogView extends Component {
       </span>
     );
   }
-
 }

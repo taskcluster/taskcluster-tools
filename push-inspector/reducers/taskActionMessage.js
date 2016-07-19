@@ -5,16 +5,12 @@ import {
 } from '../actions/types';
 
 export default function(state = null, action) {
-  
-  switch(action.type) {
+  switch (action.type) {
     case TASK_ACTIONS_ERROR:
-      return action.payload;
-
     case TASK_ACTIONS_SUCCESS:
-      return action.payload;
-
     case CLEAR_TASKS_ACTIONS_MESSAGE:
       return action.payload
+    default:
+      return state;
   }
-  return state;
-}
+};

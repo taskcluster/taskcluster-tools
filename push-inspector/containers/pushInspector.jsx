@@ -5,10 +5,9 @@ import Search from './search';
 import ProgressBar from '../components/progressBar';
 import Loading from '../shared/loading';
 import DashboardBanner from '../shared/dashboardBanner';
-import { authentication, webListener } from '../lib/utils';
+import { authentication, webListener, rendering } from '../lib/utils';
 
 class PushInspector extends Component {
-
   constructor(props) {
     super(props);
   }
@@ -17,12 +16,9 @@ class PushInspector extends Component {
   * handleLoadingAndError handles error and show the loading icon
   */
   handleLoadingAndError() {
-    const { tasks, tasksNotAvailable, params } = this.props;
+    const { tasks, params } = this.props;
     const taskGroupId = params.taskGroupId;
 
-    if(tasksNotAvailable) {
-      return <div>No task-group with taskGroupId: {taskGroupId}</div>
-    }
     if(!tasks.length && !!taskGroupId) {
       return <Loading />
     }
@@ -58,24 +54,21 @@ class PushInspector extends Component {
     const { taskGroupId, taskId } = params;
     const handleLoadingAndError = this.handleLoadingAndError();
 
-    const listenerSleepMessage = 'The web listener has been put to sleep. Refresh the browser to see any updated changes.';
-    const dashboardAction = this.stopListening;
+    if (dashboardBanner) {
+      return (
+        <div>
+          <DashboardBanner 
+            title="Error"
+            bsStyle="danger"
+            message={rendering.renderError(dashboardBanner)} />
+          <Search
+            taskGroupId={taskGroupId} />  
+        </div>    
+      );
+    }
 
     return (
-      <div>
-        
-        {
-          dashboardBanner == true ? 
-          <DashboardBanner 
-            dashboardHeaderMessage="Oops!"
-            dashboardMessage={listenerSleepMessage} 
-            setDashboardBanner={setDashboardBanner}
-            action={dashboardAction}
-            actionText="Stop listening"
-            bsStyle="danger" /> :
-          undefined
-        }
-        
+      <div>     
         <Search
           taskGroupId = {taskGroupId} />
     
@@ -86,8 +79,10 @@ class PushInspector extends Component {
           status={status}
           setActiveTaskStatus={setActiveTaskStatus}
           tasksRetrievedFully={tasksRetrievedFully} />
+
         {handleLoadingAndError}
-        <div className={!!!tasks.length ? "hideDisplay" : ""}>
+
+        <div className={!tasks.length ? "hideDisplay" : ""}>
           {children}
         </div>
       </div>
@@ -100,9 +95,8 @@ function mapStateToProps(state) {
     tasks: state.tasks,
     status: state.status,
     dashboardBanner: state.dashboardBanner,
-    tasksNotAvailable: state.tasksNotAvailable,
-    tasksRetrievedFully: state.tasksRetrievedFully
-  }
+    tasksRetrievedFully: state.tasksRetrievedFully,
+  };
 }
 
-export default connect(mapStateToProps, actions)(PushInspector)
+export default connect(mapStateToProps, actions)(PushInspector);

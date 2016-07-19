@@ -4,13 +4,11 @@ import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
 class OneClickLoaner extends Component {
-
   constructor(props) {
     super(props);  
   }
 
-  render() {
-    
+  render() {  
     const glyph = "console";
     const label = "One-Click Loaner";
     const successMsg = "You have successfully been redirected to One-Click loaner";
@@ -42,7 +40,6 @@ class OneClickLoaner extends Component {
     	</ConfirmAction>
     );
   }
-
 }
 
 function mapStateToProps(state) {
@@ -50,7 +47,7 @@ function mapStateToProps(state) {
     status: state.status,
     task: state.task,
     tasks: state.tasks
-  }
+  };
 }
 
-export default connect(mapStateToProps, actions )(OneClickLoaner);
+export default connect(mapStateToProps, actions)(OneClickLoaner);

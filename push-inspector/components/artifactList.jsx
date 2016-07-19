@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 import auth from '../../lib/auth';
 
-
 // Matching patterns for finding an icon from a mimetype, most specific
 // mimetype are listed first as they are matched top down.
 const MIMETYPE_ICONS = [
@@ -94,12 +93,11 @@ const getIconFromMime = function(contentType) {
 };
 
 class ArtifactList extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
       artifacts: this.props.artifacts || []
-    }
+    };
   }
 
   componentWillMount() {
@@ -150,7 +148,7 @@ class ArtifactList extends Component {
               artifact.name
             );
           }
-          icon = getIconFromMime(artifact.contentType)
+          icon = getIconFromMime(artifact.contentType);
         } else {
           // If don't have credentials we don't provide a URL and set icon
           // to lock
@@ -173,6 +171,7 @@ class ArtifactList extends Component {
 
   renderArtifactList() {
     const { artifacts } = this.state;
+    
     if(!!artifacts.length) {
       return (
         <ul className="artifact-ul">
@@ -187,12 +186,11 @@ class ArtifactList extends Component {
             })    
           }
         </ul>
-      )      
+      );      
     } 
   }
 
-  render() {
-      
+  render() {    
     const artifactList = this.renderArtifactList();
 
     return (
@@ -201,6 +199,6 @@ class ArtifactList extends Component {
       </div>
     );
   }
-
 }
-export default connect(null, actions)(ArtifactList)
+
+export default connect(null, actions)(ArtifactList);

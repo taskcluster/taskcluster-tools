@@ -4,13 +4,11 @@ import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
 class ScheduleTaskButton extends Component {
-
   constructor(props) {
     super(props);  
   }
 
-  render() {
-    
+  render() {  
     const glyph = "play";
     const label = "Schedule Task";
     const successMsg = "Successfully scheduled task!";  
@@ -43,8 +41,8 @@ class ScheduleTaskButton extends Component {
 
 function mapStateToProps(state) {
   return {
-    status: state.status,
-  }
+    status: state.status
+  };
 }
 
 export default connect(mapStateToProps, actions)(ScheduleTaskButton);

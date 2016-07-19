@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-
 import tasksReducer from './tasks';
 import taskReducer from './task';
 import statusReducer from './status';
@@ -8,18 +7,13 @@ import artifactsReducer from './artifacts';
 import taskActionMessageReducer from './taskActionMessage';
 import taskActionInProgressReducer from './taskActionInProgress';
 import dashboardBannerReducer from './dashboardBanner';
-import tasksNotAvailableReducer from './tasksNotAvailable';
 import tasksRetrievedFullyReducer from './tasksRetrievedFully';
 import taskGroupReducer from './taskGroup';
+import listTaskGroupInProgressReducer from './listTaskGroupInProgress';
 
 const rootReducer = combineReducers({
-  
   // List of tasks
   tasks: tasksReducer,
-
-  // Boolean set when the result of the first call to listTaskGroup has returned
-  // so that the global loading screen is removed
-  tasksNotAvailable: tasksNotAvailableReducer,
 
   // The task property of a "task"
   task: taskReducer,
@@ -46,8 +40,10 @@ const rootReducer = combineReducers({
   tasksRetrievedFully: tasksRetrievedFullyReducer,
 
   // The active taskGroupId
-  taskGroup: taskGroupReducer
+  taskGroup: taskGroupReducer,
 
+  // Boolean set to true if application is currently fetch the list task group
+  listTaskGroupInProgress: listTaskGroupInProgressReducer
 });
 
 export default rootReducer;

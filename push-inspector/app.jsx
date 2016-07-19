@@ -10,7 +10,6 @@ import reducers from './reducers';
 import thunk from 'redux-thunk';
 import routes from './routes';
 
-
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 
 // Render component
