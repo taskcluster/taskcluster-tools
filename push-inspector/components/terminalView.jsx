@@ -22,8 +22,7 @@ export default class TerminalView extends Component {
     this.onMouseWheel = this.onMouseWheel.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
-    this.onMouseMove = this.onMouseMove.bind(this);
-    
+    this.onMouseMove = this.onMouseMove.bind(this);  
   }
 
   componentWillMount() {
@@ -151,7 +150,6 @@ export default class TerminalView extends Component {
     }
   }
 
-
   render() {
     const { state }  = this;
     let start = this.state.lines.length - this.state.fromBottom - this.rows;
@@ -180,7 +178,7 @@ export default class TerminalView extends Component {
               } else {
                 return <div key={start++}>{(line)}</div>;
               };
-            })
+            });
           }
         </div>
         <div className="scrollbar" 

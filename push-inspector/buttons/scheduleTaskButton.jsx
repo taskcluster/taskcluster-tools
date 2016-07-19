@@ -36,7 +36,6 @@ class ScheduleTaskButton extends Component {
       </ConfirmAction>          
     );
   }
-
 }
 
 function mapStateToProps(state) {
