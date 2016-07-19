@@ -4,7 +4,6 @@ import * as actions from '../actions';
 import { Link, hashHistory } from 'react-router';
 import * as bs from 'react-bootstrap';
 
-
 class Search extends Component {
   constructor(props) {
     super(props);

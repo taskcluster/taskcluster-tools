@@ -5,7 +5,7 @@ import Search from './search';
 import ProgressBar from '../components/progressBar';
 import Loading from '../shared/loading';
 import DashboardBanner from '../shared/dashboardBanner';
-import { authentication, webListener, rendering } from '../lib/utils';
+import { authentication, rendering } from '../lib/utils';
 
 class PushInspector extends Component {
   constructor(props) {
@@ -40,13 +40,6 @@ class PushInspector extends Component {
       this.handleCredentialsChanged,
       false
     );
-  }
-
-  /**
-  * Stop web listener
-  */
-  stopListening() {
-    webListener.stopListening();
   }
 
   render() {

@@ -178,7 +178,7 @@ export default class TerminalView extends Component {
               } else {
                 return <div key={start++}>{(line)}</div>;
               };
-            });
+            })
           }
         </div>
         <div className="scrollbar" 
