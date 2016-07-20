@@ -39,7 +39,6 @@ export const fetchTasksInSteps = (taskGroupId, limitBool) => {
   let token = null;
   let res = null;
   const limit = 200;
-  console.log('will start fetching...');
   
   return async (dispatch, getState) => {
     dispatch(listTaskGroup(true));
