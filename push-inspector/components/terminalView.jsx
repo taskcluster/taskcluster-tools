@@ -183,7 +183,7 @@ export default class TerminalView extends Component {
         </div>
         <div className="scrollbar" 
           style={{ height: this.scrollbarHeight(), marginTop: this.scrollbarMargin() }} 
-          ref="scrollbar"/>
+          ref="scrollbar" />
       </div>
     );
   }

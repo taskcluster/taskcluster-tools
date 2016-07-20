@@ -169,7 +169,7 @@ class ProgressBar extends Component {
     runPerc = getWeightedPercentage(runPerc);
 
     return (
-      <bs.ProgressBar className="progressBar" onClick={this.progressBarClicked} >
+      <bs.ProgressBar className="progressBar" onClick={this.progressBarClicked}>
         <bs.ProgressBar title={`Completed (${this.completed.length})`} className="label-completed"   now={complPerc} key={1} label={!!this.completed.length ? `C (${this.completed.length})`: loadingLabel} />          
         <bs.ProgressBar title={`Running (${this.running.length})`} className="label-running active"  striped now={runPerc} key={2} label={!!this.running.length ? `R (${this.running.length})` : loadingLabel} />                    
         <bs.ProgressBar title={`Pending (${this.pending.length})`} className="label-pending"   now={penPerc} key={3} label={!!this.pending.length ? `P (${this.pending.length})` : loadingLabel} />

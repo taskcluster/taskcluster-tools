@@ -10,7 +10,7 @@ export default class DashboardBanner extends Component {
     const { bsStyle, dashboardMessage, action, actionText, title, message } = this.props;
 
     return (
-      <bs.Alert bsStyle={bsStyle} >
+      <bs.Alert bsStyle={bsStyle}>
         <h4>{title}</h4>
         <p>{message}</p>
       </bs.Alert>

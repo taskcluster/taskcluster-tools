@@ -17,6 +17,7 @@ class PurgeCacheButton extends Component {
  
   update(e) { 
     let caches = _.clone(this.state.selected);
+
     e.target.checked == true ?
       caches.push(e.target.value) :
       caches = caches.filter(i => i !== e.target.value);
@@ -25,36 +26,32 @@ class PurgeCacheButton extends Component {
   }
 
   render() {
-    const glyph = "trash";
-    const label = "Purger Worker Cache";
-    const successMsg = "Cache successfully purged!";
+    const glyph = 'trash';
+    const label = 'Purger Worker Cache';
+    const successMsg = 'Cache successfully purged!';
+    const { caches = [], provisionerId, workerType, purge } = this.props;
     const selectedCaches = this.state.selected;
-    const { caches, provisionerId, workerType, purge } = this.props;
-
+    const action = () => purge(provisionerId, workerType, selectedCaches, successMsg);
+    
     return (         
-      <ConfirmAction 
-        label = {label}
-        glyph = {glyph}
-        action = {() => { purge(provisionerId, workerType, selectedCaches, successMsg)}} >       
+      <ConfirmAction label={label} glyph={glyph} action={action}>       
         <div>
           <p>Are you sure you wish to purge caches used in this task across all
             workers of this workerType?</p>
           <p>Select the caches to purge:</p>
           <ul>
-            {(caches || []).map(cache => {
-              return (
-                <li className="checkbox" key={cache}>
+            {caches.map((cache) => {
+              
+              return ( 
+                 <li className="checkbox" key={cache}>
                   <label>
-                    <input 
-                      name="cache"
-                      type="checkbox"
-                      onChange={this.update}
-                      checked={this.state.selected === undefined ? false : this.state.selected.indexOf(cache) !== -1}
-                      value={cache}/>
-                      {cache}
-                 </label>
-               </li>);
-              })}
+                    <input name="cache" type="checkbox" onChange={this.update} value={cache}
+                      checked={!this.state.selected ? false : this.state.selected.includes(cache)} />
+                    {cache}
+                  </label>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </ConfirmAction>              

@@ -9,30 +9,23 @@ class ScheduleTaskButton extends Component {
   }
 
   render() {  
-    const glyph = "play";
-    const label = "Schedule Task";
-    const successMsg = "Successfully scheduled task!";  
+    const glyph = 'play';
+    const label = 'Schedule Task';
+    const successMsg = 'Successfully scheduled task!';  
     const { status, scheduleTask } = this.props;
     const taskId = status.taskId;         
-    
-    const scheduleContent = (
-      <div>
-        <p>
-          Are you sure you wish to schedule the task?
-          This will <b>overwrite any scheduling process</b> taking place,
-          if this task is part of a continous integration process scheduling
-          this task may cause your code to land with broken tests.
-        </p>
-      </div>
-    );     
+    const action = () => scheduleTask(taskId, successMsg);
 
     return (          
-      <ConfirmAction 
-        label = {label}
-        glyph = {glyph}
-        action = {() => { scheduleTask(taskId, successMsg)}}
-        disabled = {status.state !== 'unscheduled'} >          
-        {scheduleContent}
+      <ConfirmAction label={label} glyph={glyph} action={action} disabled={status.state !== 'unscheduled'}>          
+        <div>
+          <p>
+            Are you sure you wish to schedule the task?
+            This will <b>overwrite any scheduling process</b> taking place,
+            if this task is part of a continous integration process scheduling
+            this task may cause your code to land with broken tests.
+          </p>
+        </div>
       </ConfirmAction>          
     );
   }

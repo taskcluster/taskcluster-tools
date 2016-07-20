@@ -1,7 +1,7 @@
-let React = require('react');
-let ReactDOM = require('react-dom');
-let $ = require('jquery');
-let bs = require('react-bootstrap');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import $ from 'jquery';
+import bs from 'react-bootstrap';
 import Search from './containers/search';
 import { Provider } from 'react-redux';
 import { Router, hashHistory } from 'react-router';

@@ -101,7 +101,7 @@ class ConfirmAction extends Component {
               }
             }())}
             <bs.Button onClick={this.close}>
-              <bs.Glyphicon glyph="remove"/> Close
+              <bs.Glyphicon glyph="remove" /> Close
             </bs.Button>
           </bs.Modal.Footer>
         </bs.Modal>

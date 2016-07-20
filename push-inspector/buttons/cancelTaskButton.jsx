@@ -9,35 +9,29 @@ class CancelTaskButton extends Component {
   }
 
   render() { 
-    const glyph = "stop";
-    const label = "Cancel Task";
-    const successMsg = "Successfully canceled task!"; 
+    const glyph = 'stop';
+    const label = 'Cancel Task';
+    const successMsg = 'Successfully canceled task!'; 
     const { status, cancelTask } = this.props;
     const taskId = status.taskId;
-    const cancelContent = (
-      <div>
-        <p>
-          Are you sure you wish to cancel this task?
-          Notice that another process or developer may still be able to
-          schedule a rerun. But all existing runs will be aborted and any
-          scheduling process will not be able to schedule the task.
-        </p>
-      </div>
-    );  
-
+    const action = () => cancelTask(taskId, successMsg);
+    
     let isResolved = [
       'completed',
       'failed',
       'exception'
-    ].indexOf(status.state) !== -1;
+    ].includes(status.state);
 
     return (           
-      <ConfirmAction 
-        label = {label}
-        glyph = {glyph}
-        action = {() => { cancelTask(taskId, successMsg)}}
-        disabled = {isResolved} >
-        {cancelContent}
+      <ConfirmAction label={label} glyph={glyph} action={action} disabled={isResolved}>
+        <div>
+          <p>
+            Are you sure you wish to cancel this task?<br />
+            Notice that another process or developer may still be able to
+            schedule a rerun. All existing runs will be aborted and any
+            scheduling process will not be able to schedule the task.
+          </p>
+        </div>
       </ConfirmAction>         
     );
   }
