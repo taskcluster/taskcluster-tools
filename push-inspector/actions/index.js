@@ -79,10 +79,11 @@ export const fetchTasksInSteps = (taskGroupId, limitBool) => {
           token = res.continuationToken;  
         }
         
-        if (!token) {
-          dispatch(listTaskGroup(false));
+        if (!token) {          
           break;
         }
+
+        dispatch(listTaskGroup(false));
       }     
     } 
   };
