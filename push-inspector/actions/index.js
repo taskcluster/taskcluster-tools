@@ -295,6 +295,7 @@ export const editAndCreateTask = (oldTask, successMessage) => {
     'dependencies',
     'requires'
   ];
+  
   _.keys(oldTask).forEach(key => {
     if (!_.includes(exclude, key)) {
       newTask[key] = oldTask[key];

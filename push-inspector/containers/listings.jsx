@@ -9,6 +9,7 @@ import _ from 'lodash';
 class Listings extends Component {
   constructor(props) {
     super(props);
+    
     this.listener = null; 
     this.bQueue = [];
     this.loop = null;
@@ -37,7 +38,7 @@ class Listings extends Component {
     const { taskId } = this.props.params;
     
     // Handle Error
-    if(message instanceof Error) { 
+    if (message instanceof Error) { 
       // Set state to error true
       this.props.setDashboardBanner(message);
       return;
@@ -60,7 +61,7 @@ class Listings extends Component {
       this.bQueue.push(message);
 
       // Update active task if taskId match with message update
-      if(!!taskId && taskId === message.payload.status.taskId) {
+      if (!!taskId && taskId === message.payload.status.taskId) {
         this.props.fetchTask(taskId);
         this.props.fetchStatus(taskId);  
       }
@@ -78,10 +79,10 @@ class Listings extends Component {
     const { taskId } = params;
 
     // Give priority to exceptions to show without waiting for loop to happen
-    if(message.exchange == queueEvents.taskException().exchange) {
+    if (message.exchange === queueEvents.taskException().exchange) {
       notifications.notifyUser("Task exception");
     }
-    if(message.exchange == queueEvents.taskFailed().exchange) {
+    if (message.exchange === queueEvents.taskFailed().exchange) {
       notifications.notifyUser("Task failure");
     }
   }
@@ -94,7 +95,7 @@ class Listings extends Component {
     const { taskId, taskGroupId } = params;
   
     this.loop = setInterval(() => {
-      if(this.bQueue.length > 0) {
+      if (this.bQueue.length) {
         this.bQueue = [];
         fetchTasksInSteps(taskGroupId, false);
       }      
@@ -130,7 +131,7 @@ class Listings extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     // Case when user change taskGroupId
-    if(prevProps.params.taskGroupId !== this.props.params.taskGroupId) {    
+    if (prevProps.params.taskGroupId !== this.props.params.taskGroupId) {    
       // Cleanup
       this.cleanup();   
       // Start listening
@@ -138,7 +139,7 @@ class Listings extends Component {
     }
 
     // Setup loop
-    if(this.props.tasksRetrievedFully == true && !this.loop) {
+    if (this.props.tasksRetrievedFully && !this.loop) {
       this.constructLoopForMessages();
     }
   }
@@ -158,8 +159,6 @@ class Listings extends Component {
   }
 
   render() {
-    const tasks = this.props.tasks;
-
     return (
       <div>
         <div className="col-xs-6 left-panel">
@@ -176,7 +175,6 @@ class Listings extends Component {
 function mapStateToProps(state) {
   return {
     tasks: state.tasks,
-    status: state.status,
     tasksRetrievedFully: state.tasksRetrievedFully,
     listTaskGroupInProgress: state.listTaskGroupInProgress
   };

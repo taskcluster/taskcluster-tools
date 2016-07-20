@@ -9,6 +9,7 @@ import TaskRun from '../components/taskRun';
 class TabsView extends Component {
   constructor(props) {
     super(props);
+    
     this.state = {
       tabIndex: 0
     };
@@ -20,7 +21,7 @@ class TabsView extends Component {
   * Handle active tab on selection 
   */
   handleSelect(index, last) {
-    this.setState({tabIndex: index});
+    this.setState({ tabIndex: index });
   }
 
   /** 
@@ -43,7 +44,7 @@ class TabsView extends Component {
   */
   componentDidUpdate(prevProps, prevState) {
     //  This can happen when retriggering a task or clicking on a task
-    if(prevProps.params.taskId !== this.props.params.taskId) {
+    if (prevProps.params.taskId !== this.props.params.taskId) {
       this.fetchTaskData();
       this.setState({ tabIndex: 0 });
     }

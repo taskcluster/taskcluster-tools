@@ -26,8 +26,7 @@ const MIMETYPE_ICONS = [
       'application/x-apple-diskimage',
       'application/vnd.ms-cab-compressed',
       'application/vnd.android.package-archive',
-      'application/x-gtar',
-
+      'application/x-gtar'
     ]
   }, {
     icon:       'file-word-o',
@@ -77,24 +76,24 @@ const MIMETYPE_ICONS = [
 ];
 
 /** Get icon from mimetype */
-const getIconFromMime = function(contentType) {
-  for (var i =  0; i < MIMETYPE_ICONS.length; i++) {
-    const entry = MIMETYPE_ICONS[i];
-    if (entry.matches.some(function(pattern) {
-      if (pattern instanceof RegExp) {
-        return pattern.test(contentType);
-      }
-      return pattern === contentType;
+const getIconFromMime = (contentType) => {
+  const entry = MIMETYPE_ICONS.find(entry => {
+    if (entry.matches.some((pattern) => {
+      return pattern instanceof RegExp ?
+        pattern.test(contentType) :
+        pattern === contentType;
     })) {
       return entry.icon;
     }
-  };
-  return 'file-o';
+  });
+
+  return entry.icon || 'file-o';
 };
 
 class ArtifactList extends Component {
   constructor(props) {
     super(props);
+    
     this.state = {
       artifacts: this.props.artifacts || []
     };
@@ -105,99 +104,62 @@ class ArtifactList extends Component {
   }
 
   handleArtifactCreatedMessage() {
-    const { taskId, fetchArtifacts } = this.props;
     fetchArtifacts();
   }
   
   /** Build the right url for artifacts */
   load() {
-    // Build the Urls where so that they'll be updated, if when people login
-    // with credentials
-    let artifacts = this.props.artifacts.map(function(artifact) {
-      let url, icon;
-      if (/^public\//.test(artifact.name)) {
-        if (this.props.runId !== undefined) {
-          url = queue.buildUrl(
-            queue.getArtifact,
-            this.props.taskId,
-            this.props.runId,
-            artifact.name
-          );
-        } else {
-          url = queue.buildUrl(
-            queue.getLatestArtifact,
-            this.props.taskId,
-            artifact.name
-          );
-        }
-        icon = getIconFromMime(artifact.contentType);
-      } else {
-        // If we have credentials we create a signed URL
-        if (auth.hasCredentials()) {
-          if (this.props.runId !== undefined) {
-            url = queue.buildSignedUrl(
-              queue.getArtifact,
-              this.props.taskId,
-              this.props.runId,
-              artifact.name
-            );
-          } else {
-            url = queue.buildSignedUrl(
-              queue.getLatestArtifact,
-              this.props.taskId,
-              artifact.name
-            );
-          }
-          icon = getIconFromMime(artifact.contentType);
-        } else {
-          // If don't have credentials we don't provide a URL and set icon
-          // to lock
-          url   = undefined;
-          icon  = 'lock';
-        }
+    const artifacts = this.props.artifacts.map((artifact) => {
+      const isPublic = /^public\//.test(artifact.name);
+      const hasCredentials = auth.hasCredentials();
+
+      if (!isPublic && !hasCredentials) {
+        return {
+          name: artifact.name,
+          icon: 'lock'
+        };
       }
 
+      const method = hasCredentials ? 'buildSignedUrl' : 'buildUrl';
+      const args = this.props.runId ?
+        [queue.getArtifact, this.props.taskId, this.props.runId, artifact.name] :
+        [queue.getLatestArtifact, this.props.taskId, artifact.name];
+
       return {
-        name:     artifact.name,
-        url:      url,
-        icon:     icon
+        name: artifact.name,
+        icon: getIconFromMime(artifact.contentType),
+        url: queue[method](...args)
       };
-    }, this);
+    });
 
     this.setState({
-      artifacts:   artifacts
+      artifacts: artifacts
     });
   }
 
-  renderArtifactList() {
+  render() {    
     const { artifacts } = this.state;
     
-    if(!!artifacts.length) {
-      return (
-        <ul className="artifact-ul">
-          {
-            artifacts.map((artifact,index) => {
-              return (
-                <li key={index}>
-                  <i className={('fa fa-' + artifact.icon)}>&nbsp;</i>
-                  <a href={artifact.url} target="_blank">{artifact.name}</a>
-                </li>
-              )
-            })    
-          }
-        </ul>
-      );      
-    } 
-  }
-
-  render() {    
-    const artifactList = this.renderArtifactList();
-
     return (
       <div>
-        {artifactList}
+        {(() => {
+          if (artifacts.length) {
+            return (
+              <ul className="artifact-ul">
+                {artifacts.map((artifact, index) => {
+                  return (
+                    <li key={index}>
+                      <i className={`fa fa-${artifact.icon}`} />
+                      <a href={artifact.url} target="_blank"> {artifact.name}</a>
+                    </li>
+                  ); 
+                })}
+              </ul>
+            );      
+          }
+        }())}
       </div>
-    );
+    );   
   }
 }
 

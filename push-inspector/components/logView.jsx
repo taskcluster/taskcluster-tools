@@ -8,20 +8,19 @@ import Select from 'react-select';
 export default class LogView extends Component {
   constructor(props) {
     super(props);
-    let entry = _.find(this.props.logs, {name: 'public/logs/terminal.log'}) ||
-                _.find(this.props.logs, {name: 'public/logs/live.log'}) ||
-                this.props.logs[0];
+    
+    const entry = this.props.logs.find(({ name }) => name === 'public/logs/terminal.log' ||
+      name === 'public/logs/live.log') ||
+      this.props.logs[0];
+
     this.state = {
-      name: (entry ? entry.name : undefined)   // URL to show
+      name: entry ? entry.name : ''
     };
 
     this.handleLogChanged = this.handleLogChanged.bind(this);
     this.refreshLog = this.refreshLog.bind(this);
   }
 
-  /**
-  * Create url for Artifact
-  */
   createUrlForArtifact() {
     const { taskId, runId } = this.props;
     const { name } = this.state;
@@ -35,10 +34,10 @@ export default class LogView extends Component {
   * Handle log change
   */
   handleLogChanged(log) {  
-    if(this.state.name !== log.value) {
+    if (this.state.name !== log.value) {
       this.setState({ name: log.value });
       this.refreshLog();  
-    }   
+    }
   }
 
   /**
@@ -51,9 +50,7 @@ export default class LogView extends Component {
   render() {
     const { runId, taskId } = this.props;
     const logUrl = this.createUrlForArtifact();
-    const logs = this.props.logs.map(log => {
-      return { value: log.name, label: log.name };
-    });
+    const logs = this.props.logs.map(({ name }) => ({ value: name, label: name }));
     
     return (
       <span>
@@ -63,13 +60,13 @@ export default class LogView extends Component {
             value={this.state.name}
             onChange={this.handleLogChanged}
             options={logs}
-            clearable={false}/>
+            clearable={false} />
         
           <bs.Button  
             type="button"
             className="btn btn-sm btn-default"
             onClick={this.refreshLog}>
-            <i className="glyphicon glyphicon-refresh"></i>
+            <i className="glyphicon glyphicon-refresh" />
           </bs.Button>
         </div>
         <TerminalView ref="termView" url={logUrl} />

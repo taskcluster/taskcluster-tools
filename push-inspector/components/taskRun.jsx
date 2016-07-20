@@ -6,6 +6,7 @@ import ArtifactList from './artifactList';
 export default class TaskRun extends Component {
   constructor(props) {
     super(props);
+    
     this.generateRows = this.generateRows.bind(this);
   }
 
@@ -15,43 +16,41 @@ export default class TaskRun extends Component {
   generateRows() {
     const { task, status } = this.props;
     const runNumber = status.runs.length - 1;
+    const run = status.runs[runNumber];
 
-    const elemsToRender = {
-      reasonCreated: status.runs[runNumber].reasonCreated,
-      reasonResolved: status.runs[runNumber].reasonResolved,
-      state: status.runs[runNumber].state,
-      scheduled: status.runs[runNumber].scheduled,
-      started: status.runs[runNumber].started,
-      resolved: status.runs[runNumber].resolved,
+    const elems = {
+      reasonCreated: run.reasonCreated,
+      reasonResolved: run.reasonResolved,
+      state: run.state,
+      scheduled: run.scheduled,
+      started: run.started,
+      resolved: run.resolved,
     };
 
-    return Object.keys(elemsToRender).map(function(key, index) {
-      return (
-        <tr key={index}>
-          <td><b>{ _.capitalize(key) }</b></td>
-          <td>{elemsToRender[key]}</td>
-        </tr>
-      );
+    return Object
+      .keys(elems)
+      .map((key, index) => {
+        return (
+          <tr key={index}>
+            <td><strong>{ _.capitalize(key) }</strong></td>
+            <td>{elems[key]}</td>
+          </tr>
+        );      
     });
   }
 
   /**
   * Render log view
   */
-  renderLogView(taskId, runId, artifacts) {  
-    const logs = artifacts.filter(function(artifact) {
-      return /^public\/logs\//.test(artifact.name);
-    });
+  renderLogView(taskId, runId, artifacts) { 
+    const logs = artifacts.filter(({ name }) => /^public\/logs\//.test(name));
 
     if (logs.length === 0) {
-      return undefined;
+      return;
     }
 
     return (
-      <LogView 
-        logs={logs}
-        taskId={taskId}
-        runId={runId} />
+      <LogView logs={logs} taskId={taskId} runId={runId} />
     );
   }
 
@@ -81,7 +80,7 @@ export default class TaskRun extends Component {
             {rowComponents}
             <tr>
               <td>
-                <b>Artifacts</b>
+                <strong>Artifacts</strong>
               </td>
               <td>                
                 <ArtifactList ref="artifactList" artifacts={artifacts} taskId={taskId} runId={runId} />

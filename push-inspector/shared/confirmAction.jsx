@@ -85,7 +85,7 @@ class ConfirmAction extends Component {
           <bs.Modal.Body className="format-modal-text format-modal-body">
             {children}
             {(() => {
-              if(this.state.executing) {
+              if (this.state.executing) {
                 return dialogContent;
               }
             }())}              

@@ -4,14 +4,15 @@ import * as actions from '../actions';
 import { Link, hashHistory } from 'react-router';
 import * as bs from 'react-bootstrap';
 
+const VALID_SLUG_ID = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
+
 class Search extends Component {
   constructor(props) {
     super(props);
+    
     this.state = {
       term: ''
     };
-
-    this.VALID_SLUG_ID = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
 
     this.onFormSubmit = this.onFormSubmit.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
@@ -25,7 +26,7 @@ class Search extends Component {
 
     event.preventDefault();
 
-    if(!this.isInvalid()) {
+    if (!this.isInvalid()) {
       setDashboardBanner(null);
       tasksHaveBeenRetrieved(false);
       removeTasks();
@@ -39,7 +40,7 @@ class Search extends Component {
   }
 
   onInputChange(event) {
-    this.setState({term: event.target.value});
+    this.setState({ term: event.target.value });
   }
 
   /**
@@ -47,16 +48,16 @@ class Search extends Component {
   */
   isInvalid() { 
     // Case 1: If search term is empty, it is valid
-    if(!this.state.term) {
+    if (!this.state.term) {
       return false;
     }
 
     // Case 2: Check against regex expression
-    return !this.VALID_SLUG_ID.test(this.state.term);
+    return !VALID_SLUG_ID.test(this.state.term);
   }
 
   render() {
-    let invalidInput = this.isInvalid();
+    const invalidInput = this.isInvalid();
     
     return (
       <div>
@@ -71,9 +72,9 @@ class Search extends Component {
             bsStyle={invalidInput ? 'error' : null} />
 
           <div className="input-group-btn inspect-btn">
-              <button type="submit" className="button btn btn-secondary">
-                <i className='fa fa-search'></i> Inspect
-              </button>
+            <button type="submit" className="button btn btn-secondary">
+              <i className="fa fa-search"></i> Inspect
+            </button>
           </div>
         </form>
       </div>

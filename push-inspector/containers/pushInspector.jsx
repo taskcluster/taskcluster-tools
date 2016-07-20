@@ -19,8 +19,8 @@ class PushInspector extends Component {
     const { tasks, params } = this.props;
     const taskGroupId = params.taskGroupId;
 
-    if(!tasks.length && !!taskGroupId) {
-      return <Loading />
+    if (!tasks.length && !!taskGroupId) {
+      return <Loading />;
     }
   }
 
@@ -43,7 +43,8 @@ class PushInspector extends Component {
   }
 
   render() {
-    const { tasks, status, children, setActiveTaskStatus, params, dashboardBanner, setDashboardBanner, tasksRetrievedFully } = this.props;
+    const { tasks, status, children, setActiveTaskStatus, 
+      params, dashboardBanner, tasksRetrievedFully } = this.props;
     const { taskGroupId, taskId } = params;
     const handleLoadingAndError = this.handleLoadingAndError();
 
@@ -62,11 +63,9 @@ class PushInspector extends Component {
 
     return (
       <div>     
-        <Search
-          taskGroupId = {taskGroupId} />
-    
+        <Search taskGroupId={taskGroupId} /> 
         <ProgressBar
-          taskGroupId = {taskGroupId}
+          taskGroupId={taskGroupId}
           taskId={taskId}
           tasks={tasks}
           status={status}
@@ -75,7 +74,7 @@ class PushInspector extends Component {
 
         {handleLoadingAndError}
 
-        <div className={!tasks.length ? "hideDisplay" : ""}>
+        <div className={!tasks.length ? 'hideDisplay' : ''}>
           {children}
         </div>
       </div>

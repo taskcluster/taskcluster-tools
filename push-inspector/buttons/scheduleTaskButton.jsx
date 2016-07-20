@@ -21,8 +21,8 @@ class ScheduleTaskButton extends Component {
         <div>
           <p>
             Are you sure you wish to schedule the task?
-            This will <b>overwrite any scheduling process</b> taking place,
-            if this task is part of a continous integration process scheduling
+            This will <strong>overwrite any scheduling process</strong> taking place,
+            if this task is part of a continuous integration process scheduling
             this task may cause your code to land with broken tests.
           </p>
         </div>

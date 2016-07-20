@@ -7,6 +7,7 @@ import { beautified } from '../lib/utils';
 class Table extends Component {
   constructor(props) {
     super(props);
+    
     this.generateHeaders = this.generateHeaders.bind(this);
     this.generateRows = this.generateRows.bind(this);
   }

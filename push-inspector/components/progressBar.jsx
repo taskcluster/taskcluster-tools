@@ -14,9 +14,7 @@ class ProgressBar extends Component {
     this.unscheduled = [];
     this.pending = [];
     this.running = [];
-
-    // Flag used so that it doesn't notify users that open an already
-    // completed build
+    // Not notify users that open an already completed build
     this.notifyFlag = false;
 
     this.progressBarClicked = this.progressBarClicked.bind(this);
@@ -49,19 +47,11 @@ class ProgressBar extends Component {
   */
   progressBarClicked(event) {
     const title = event.target.title;
-
-    if(title.match(/Failed*/g)) {
-      this.props.setActiveTaskStatus("failed");
-    } else if (title.match(/Completed*/g)) {
-      this.props.setActiveTaskStatus("completed");
-    } else if (title.match(/Running*/g)) {
-      this.props.setActiveTaskStatus("running");
-    } else if (title.match(/Pending*/g)) {
-      this.props.setActiveTaskStatus("pending");
-    } else if (title.match(/Exception*/g)) {
-      this.props.setActiveTaskStatus("exception");
-    } else if (title.match(/Unscheduled*/g)) {
-      this.props.setActiveTaskStatus("unscheduled");
+    const status = ['failed', 'completed', 'running', 'pending', 'exception', 'unscheduled']
+      .find(status => title.match(new RegExp(status + '*', 'ig')));
+    
+    if (status) {
+      this.props.setActiveTaskStatus(status);
     }
   }
 
@@ -69,17 +59,11 @@ class ProgressBar extends Component {
   * Seperate tasks in different arrays based on their current status
   */
   seperateTasksByState() {
-    const { tasks } = this.props;
+    this.props.tasks.forEach((task) => {
+      const status = task.status.state;
 
-    tasks.map((task) => {
-      status = task.status.state;
-      switch (status) {
-        case "completed": this.completed.push(task); break;
-        case "failed": this.failed.push(task); break;
-        case "exception": this.exception.push(task); break;
-        case "unscheduled": this.unscheduled.push(task); break;
-        case "pending": this.pending.push(task); break;
-        case "running": this.running.push(task); break;
+      if (this[status]) {
+        this[status].push(task);
       }
     });
   }
@@ -88,17 +72,11 @@ class ProgressBar extends Component {
   * Notify user if build is done
   */
   notifyCheck() { 
-    const uLength = this.unscheduled.length;
-    const rLength = this.running.length;
-    const pLength = this.pending.length;
-    const cLength = this.completed.length;
-    const eLength = this.exception.length;
-    const fLength = this.failed.length;
+    const isBuildDone = !this.unscheduled.length && !this.running.length && !this.pending.length;
+    const doNotify = this.notifyFlag && (this.completed.length || this.failed.length || this.exception.length);
 
-    // Having no unscheduled and no running and no pending tasks
-    // means build is done
-    if (uLength === 0 && rLength === 0 && pLength === 0) {
-      if (this.notifyFlag == true && (cLength > 0 || fLength > 0 || eLength > 0)) {
+    if(isBuildDone) {
+      if(doNotify) {
         notifications.notifyUser('Build done');
         // Stop notifying further
         this.notifyFlag = false;  
@@ -133,7 +111,7 @@ class ProgressBar extends Component {
 
     this.seperateTasksByState();
     
-    if(tasksRetrievedFully === true) {
+    if (tasksRetrievedFully === true) {
       this.notifyCheck();  
     }
     
@@ -181,10 +159,8 @@ class ProgressBar extends Component {
   }
 
   render() {
-    const { taskGroupId, tasks } = this.props;
-
     return (
-      <div className={!!tasks.length ? "" : "hideVisibility"}>
+      <div className={this.props.tasks.length ? '' : 'hideVisibility'}>
         {this.makeProgressBar()}
       </div>
     );

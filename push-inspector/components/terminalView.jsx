@@ -72,7 +72,7 @@ export default class TerminalView extends Component {
     const response = e.data;
     const newFromBottom = 0;
     
-    if(response.data) {
+    if (response.data) {
       this.setState({
         lines: response.data,
         fromBottom: newFromBottom
@@ -99,6 +99,7 @@ export default class TerminalView extends Component {
     if (!this.refs.buffer) {
       return 0;
     }
+    
     let ratio = (this.state.lines.length - this.state.fromBottom - this.rows) / this.state.lines.length;
 
     return ratio * (this.refs.buffer.offsetHeight - this.scrollbarHeight());
@@ -124,19 +125,21 @@ export default class TerminalView extends Component {
   }
 
   onMouseMove(e) {
-    if (this.dragging) {
-      let diff = e.pageY - this.startY;
-      let space = this.refs.buffer.offsetHeight;
-      let margin = this.margin + diff;
-      let currentTop = (margin + this.scrollbarHeight()) / space * this.state.lines.length;
-
-      this.scrollbarSet(this.state.lines.length - currentTop);
+    if (!this.dragging) {
+      return;
     }
+
+    let diff = e.pageY - this.startY;
+    let space = this.refs.buffer.offsetHeight;
+    let margin = this.margin + diff;
+    let currentTop = (margin + this.scrollbarHeight()) / space * this.state.lines.length;
+
+    this.scrollbarSet(this.state.lines.length - currentTop);
   }
 
   onMouseDown(e) {
     e.preventDefault();
-    if (e.button == 0) {
+    if (e.button === 0) {
       this.dragging = true;
       this.startY = e.pageY;
       this.margin = this.scrollbarMargin();
@@ -145,7 +148,7 @@ export default class TerminalView extends Component {
   }
 
   onMouseUp(e) {
-    if (e.button == 0) {
+    if (e.button === 0) {
       this.dragging = false;
     }
   }
@@ -164,7 +167,7 @@ export default class TerminalView extends Component {
       paddingRows = 15;
     }
 
-    let frame = this.state.lines.slice(start + paddingRows, start + this.rows + paddingRows);
+    const frame = this.state.lines.slice(start + paddingRows, start + this.rows + paddingRows);
 
     return (
       <div className="viewer" onWheel={this.onMouseWheel}>
