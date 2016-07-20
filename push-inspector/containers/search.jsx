@@ -30,11 +30,7 @@ class Search extends Component {
       setDashboardBanner(null);
       tasksHaveBeenRetrieved(false);
       removeTasks();
-
-      if (!this.props.listTaskGroupInProgress) {
-        fetchTasksInSteps(this.state.term, true);  
-      }
-      
+      fetchTasksInSteps(this.state.term, true);
       hashHistory.push(this.state.term);
     }  
   }
@@ -82,10 +78,4 @@ class Search extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    listTaskGroupInProgress: state.listTaskGroupInProgress
-  };
-}
-
-export default connect(mapStateToProps, actions)(Search);
+export default connect(null, actions)(Search);
