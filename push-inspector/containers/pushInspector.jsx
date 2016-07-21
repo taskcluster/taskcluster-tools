@@ -19,7 +19,7 @@ class PushInspector extends Component {
     const { tasks, params } = this.props;
     const taskGroupId = params.taskGroupId;
 
-    if (!tasks.length && !!taskGroupId) {
+    if (!tasks.length && taskGroupId) {
       return <Loading />;
     }
   }

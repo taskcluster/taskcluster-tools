@@ -48,7 +48,7 @@ class ConfirmAction extends Component {
   message() {
     const { taskActionInProgress, taskActionMessage } = this.props;
     
-    if (!!taskActionInProgress) {
+    if (taskActionInProgress) {
       return <Loading />;
     } else {
       return taskActionMessage;

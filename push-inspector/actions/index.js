@@ -42,6 +42,7 @@ export const fetchTasksInSteps = (taskGroupId, limitBool) => {
   
   return async (dispatch, getState) => {
     dispatch(listTaskGroup(true));
+    
     while (true) {  
       // Set continuationToken if there is a token 
       if (token) { 

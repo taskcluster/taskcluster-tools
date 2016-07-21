@@ -39,7 +39,7 @@ class Table extends Component {
         </th>
         <th>
           <span className="table-header">State</span>&nbsp;
-          <button className={!!activeTaskStatus ? '' : 'hideVisibility'} onClick={this.clearFilter.bind(this)}>
+          <button className={activeTaskStatus ? '' : 'hideVisibility'} onClick={this.clearFilter.bind(this)}>
             Clear Filter
           </button>
         </th>

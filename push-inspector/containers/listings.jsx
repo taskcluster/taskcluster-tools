@@ -61,7 +61,7 @@ class Listings extends Component {
       this.bQueue.push(message);
 
       // Update active task if taskId match with message update
-      if (!!taskId && taskId === message.payload.status.taskId) {
+      if (taskId && taskId === message.payload.status.taskId) {
         this.props.fetchTask(taskId);
         this.props.fetchStatus(taskId);  
       }
@@ -130,11 +130,9 @@ class Listings extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // Case when user change taskGroupId
+    // Cleaup + setup when user changes taskGroupId
     if (prevProps.params.taskGroupId !== this.props.params.taskGroupId) {    
-      // Cleanup
-      this.cleanup();   
-      // Start listening
+      this.cleanup();         
       this.setup();
     }
 

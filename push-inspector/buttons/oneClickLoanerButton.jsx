@@ -11,7 +11,7 @@ class OneClickLoaner extends Component {
   render() {  
     const glyph = 'console';
     const label = 'One-Click Loaner';
-    const successMsg = 'You have successfully been redirected to One-Click loaner';
+    const successMsg = 'Your browser has been redirected to One-Click loaner';
     const { status, task, tasks, loanerCreateTask } = this.props;
     const taskId = status.taskId;
     const action = () => loanerCreateTask(tasks, taskId, task, successMsg);
