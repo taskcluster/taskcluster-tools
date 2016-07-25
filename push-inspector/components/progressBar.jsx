@@ -14,7 +14,7 @@ class ProgressBar extends Component {
     this.unscheduled = [];
     this.pending = [];
     this.running = [];
-    // Not notify users that open an already completed build
+    // Don't notify users that open an already completed build
     this.notifyFlag = false;
 
     this.progressBarClicked = this.progressBarClicked.bind(this);
@@ -48,7 +48,7 @@ class ProgressBar extends Component {
   progressBarClicked(event) {
     const title = event.target.title;
     const status = ['failed', 'completed', 'running', 'pending', 'exception', 'unscheduled']
-      .find(status => title.match(new RegExp(status + '*', 'ig')));
+      .find(status => new RegExp(status, 'ig').exec(title));
     
     if (status) {
       this.props.setActiveTaskStatus(status);
@@ -75,8 +75,8 @@ class ProgressBar extends Component {
     const isBuildDone = !this.unscheduled.length && !this.running.length && !this.pending.length;
     const doNotify = this.notifyFlag && (this.completed.length || this.failed.length || this.exception.length);
 
-    if(isBuildDone) {
-      if(doNotify) {
+    if (isBuildDone) {
+      if (doNotify) {
         notifications.notifyUser('Build done');
         // Stop notifying further
         this.notifyFlag = false;  
@@ -91,69 +91,57 @@ class ProgressBar extends Component {
   * Render progress bar
   */
   makeProgressBar() { 
-    let tasks = this.props.tasks;
-    let status;
-    let totLen = tasks.length;
-    let complPerc;
-    let failedPerc;
-    let excepPerc;
-    let unschPerc;
-    let runPerc;
-    let penPerc;
-    let loadingLabel = '...';
-    let threshold = 5;
-    let totWeighted;
+    const { tasks, taskId, tasksRetrievedFully } = this.props;
+    const total = tasks.length;
+    const threshold = 5;
 
-    const { tasksRetrievedFully, taskId } = this.props;
-
-    // reset component statuses
     this.emptyStates();
-
     this.seperateTasksByState();
-    
-    if (tasksRetrievedFully === true) {
-      this.notifyCheck();  
+
+    if (tasksRetrievedFully) {
+      this.notifyCheck();
     }
-    
-    // original percentages
-    complPerc = this.completed.length / totLen * 100;
-    failedPerc = this.failed.length / totLen * 100;
-    excepPerc = this.exception.length / totLen * 100;
-    unschPerc = this.unscheduled.length / totLen * 100;
-    runPerc = this.running.length / totLen * 100;
-    penPerc = this.pending.length / totLen * 100;
 
-    // intermediate values 
-    complPerc = (complPerc < threshold && complPerc > 0) ? threshold : complPerc;
-    failedPerc = (failedPerc < threshold && failedPerc > 0) ? threshold : failedPerc;
-    excepPerc = (excepPerc < threshold && excepPerc > 0) ? threshold : excepPerc;
-    unschPerc = (unschPerc < threshold && unschPerc > 0) ? threshold : unschPerc;
-    penPerc = (penPerc < threshold && penPerc > 0) ? threshold : penPerc;
-    runPerc = (runPerc < threshold && runPerc > 0) ? threshold : runPerc;
+    const groups = [
+      'completed',
+      'failed',
+      'exception',
+      'unscheduled',
+      'running',
+      'pending'
+    ];
 
-    // common weighted denominator
-    totWeighted = complPerc + failedPerc + excepPerc + unschPerc + runPerc + penPerc;
+    const percents = groups.map((group) => {
+      const percent = this[group].length / total * 100;
 
-    const getWeightedPercentage = (value) => {
-      return value / totWeighted * 100;
+      return percent < threshold && percent > 0 ? threshold : percent;
+    });
+
+    const weightedTotal = percents.reduce((total, current) => total + current, 0);
+    const getWeightedPercent = (value) => value / weightedTotal * 100;
+    const toTitle = (group) => {
+      const name = group.charAt(0).toUpperCase() + group.slice(1);
+
+      return `${name} (${this[group].length})`;
     };
-
-    // weighted percentages
-    complPerc = getWeightedPercentage(complPerc);
-    failedPerc = getWeightedPercentage(failedPerc);
-    excepPerc = getWeightedPercentage(excepPerc);
-    unschPerc = getWeightedPercentage(unschPerc);
-    penPerc = getWeightedPercentage(penPerc);
-    runPerc = getWeightedPercentage(runPerc);
 
     return (
       <bs.ProgressBar className="progressBar" onClick={this.progressBarClicked}>
-        <bs.ProgressBar title={`Completed (${this.completed.length})`} className="label-completed"   now={complPerc} key={1} label={!!this.completed.length ? `C (${this.completed.length})`: loadingLabel} />          
-        <bs.ProgressBar title={`Running (${this.running.length})`} className="label-running active"  striped now={runPerc} key={2} label={!!this.running.length ? `R (${this.running.length})` : loadingLabel} />                    
-        <bs.ProgressBar title={`Pending (${this.pending.length})`} className="label-pending"   now={penPerc} key={3} label={!!this.pending.length ? `P (${this.pending.length})` : loadingLabel} />
-        <bs.ProgressBar title={`Unscheduled (${this.unscheduled.length})`} className="label-unscheduled"   now={unschPerc} key={4} label={!!this.unscheduled.length ? `U (${this.unscheduled.length})` : loadingLabel} />
-        <bs.ProgressBar title={`Exception (${this.exception.length})`} className="label-exception"   now={excepPerc} key={5} label={!!this.exception.length ? `E (${this.exception.length})` : loadingLabel} />
-        <bs.ProgressBar title={`Failed (${this.failed.length})`} className="label-failed"   now={failedPerc} key={6} label={!!this.failed.length ? `F (${this.failed.length})` : loadingLabel} />
+        {groups.map((group, index) => {
+          const subtasks = this[group];
+          const className = group === 'running' ? `label-${group} active` : `label-${group}`;
+          const title = toTitle(group);
+          const label = subtasks.length ? `${title[0]}(${subtasks.length})` : '...';
+
+          return (
+            <bs.ProgressBar
+              key={index}
+              title={title}
+              className={className}
+              now={getWeightedPercent(percents[index])}
+              label={label} />
+          );
+        })}
       </bs.ProgressBar>
     );
   }

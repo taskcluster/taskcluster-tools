@@ -16,8 +16,8 @@ class RetriggerButton extends Component {
     const action = () => retriggerTask(tasks,task, successMsg);
 
     return (
-  		<ConfirmAction label={label} glyph={glyph} action={action}>
-      	<div>
+      <ConfirmAction label={label} glyph={glyph} action={action}>
+        <div>
           <p>
             This will duplicate the task and create it under a different
             <code>taskId</code>.<br/><br/>
@@ -32,7 +32,7 @@ class RetriggerButton extends Component {
             Note: this may not work with all tasks.
           </p>
         </div>
-    	</ConfirmAction>
+      </ConfirmAction>
     );
   }
 }

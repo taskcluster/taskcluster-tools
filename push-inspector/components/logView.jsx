@@ -9,9 +9,12 @@ export default class LogView extends Component {
   constructor(props) {
     super(props);
     
-    const entry = this.props.logs.find(({ name }) => name === 'public/logs/terminal.log' ||
-      name === 'public/logs/live.log') ||
-      this.props.logs[0];
+    const log = this.props.logs.find(({ name }) => (
+      name === 'public/logs/terminal.log' ||
+      name === 'public/logs/live.log')
+    );
+
+    const entry = log || this.props.logs;
 
     this.state = {
       name: entry ? entry.name : ''

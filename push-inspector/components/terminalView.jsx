@@ -148,7 +148,7 @@ export default class TerminalView extends Component {
   }
 
   onMouseUp(e) {
-    if (e.button === 0) {
+    if (!e.button) {
       this.dragging = false;
     }
   }
@@ -177,9 +177,9 @@ export default class TerminalView extends Component {
               // Check if there are any ansi colors/styles
               if (ansiRegex().test(line)) {
                 var new_line = ansi_up.ansi_to_html(line);
-                return <div key={start++} dangerouslySetInnerHTML={{__html: new_line}}></div>;
+                return <div key={start++} dangerouslySetInnerHTML={{ __html: new_line }}></div>;
               } else {
-                return <div key={start++}>{(line)}</div>;
+                return <div key={start++}>{line}</div>;
               };
             })
           }

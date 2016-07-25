@@ -32,7 +32,7 @@ export default class TaskDetail extends Component {
               return (
                 <li key={index}>
                   <a href={`https://queue.taskcluster.net/v1/task/${dependency}`} target="_blank">
-                  {dependency} <i className='fa fa-external-link' />
+                    {dependency} <i className='fa fa-external-link' />
                   </a>
                 </li>
               );

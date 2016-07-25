@@ -114,7 +114,7 @@ export const beautified = {
 */
 export const notifications = {
   notifyUser: (message) => {
-    let e = new Notification(message, {
+    new Notification(message, {
       icon: '/lib/assets/taskcluster-36.png'
     });
   },

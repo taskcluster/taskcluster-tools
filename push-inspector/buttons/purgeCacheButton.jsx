@@ -37,11 +37,11 @@ class PurgeCacheButton extends Component {
       <ConfirmAction label={label} glyph={glyph} action={action}>       
         <div>
           <p>Are you sure you wish to purge caches used in this task across all
-            workers of this workerType?</p>
+            workers of this workerType?
+          </p>
           <p>Select the caches to purge:</p>
           <ul>
-            {caches.map((cache) => {
-              
+            {caches.map((cache) => {  
               return ( 
                  <li className="checkbox" key={cache}>
                   <label>

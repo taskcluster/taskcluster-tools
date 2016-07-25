@@ -10,42 +10,29 @@ export default class TaskRun extends Component {
     this.generateRows = this.generateRows.bind(this);
   }
 
-  /**
-  * Generate rows
-  */
   generateRows() {
     const { task, status } = this.props;
     const runNumber = status.runs.length - 1;
     const run = status.runs[runNumber];
 
-    const elems = {
-      reasonCreated: run.reasonCreated,
-      reasonResolved: run.reasonResolved,
-      state: run.state,
-      scheduled: run.scheduled,
-      started: run.started,
-      resolved: run.resolved,
-    };
+    const elements = _.pick(run, ['reasonCreated', 'reasonResolved', 'state', 'scheduled', 'started', 'resolved']);
 
     return Object
-      .keys(elems)
+      .keys(elements)
       .map((key, index) => {
         return (
           <tr key={index}>
             <td><strong>{ _.capitalize(key) }</strong></td>
-            <td>{elems[key]}</td>
+            <td>{elements[key]}</td>
           </tr>
         );      
     });
   }
 
-  /**
-  * Render log view
-  */
   renderLogView(taskId, runId, artifacts) { 
     const logs = artifacts.filter(({ name }) => /^public\/logs\//.test(name));
 
-    if (logs.length === 0) {
+    if (!logs.length) {
       return;
     }
 
@@ -64,7 +51,7 @@ export default class TaskRun extends Component {
       return (
         <div className="alert alert-danger">
           <strong>Run Not Found!</strong>&nbsp;
-          The task does not seem to have the requested run...
+          The task does not seem to have the requested run.
         </div>
       );
     }

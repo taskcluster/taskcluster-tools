@@ -36,7 +36,7 @@ class Listings extends Component {
   */
   handleMessage(message) {
     const { taskId } = this.props.params;
-    
+
     // Handle Error
     if (message instanceof Error) { 
       // Set state to error true
@@ -55,7 +55,6 @@ class Listings extends Component {
       queueEvents.taskException().exchange
     ];
 
-    // Dispatch to handleQueueMessage or handleSchedulerMessage
     if (_.includes(queueExchanges, message.exchange)) {
       // Append message to buffer queue
       this.bQueue.push(message);
@@ -63,7 +62,11 @@ class Listings extends Component {
       // Update active task if taskId match with message update
       if (taskId && taskId === message.payload.status.taskId) {
         this.props.fetchTask(taskId);
-        this.props.fetchStatus(taskId);  
+        this.props.fetchStatus(taskId);
+
+        if (message.exchange === queueEvents.artifactCreated().exchange) {
+          this.props.fetchArtifacts(taskId);
+        }
       }
       
       // Handle edge cases that will increase UX
@@ -82,6 +85,7 @@ class Listings extends Component {
     if (message.exchange === queueEvents.taskException().exchange) {
       notifications.notifyUser("Task exception");
     }
+    
     if (message.exchange === queueEvents.taskFailed().exchange) {
       notifications.notifyUser("Task failure");
     }

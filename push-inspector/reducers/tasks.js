@@ -7,14 +7,15 @@ import {
 
 export default function(state = [], action) {
   switch(action.type) {
-    
     case FETCH_TASKS_IN_STEP:
     case CREATE_TASK:
       return [ ...state, ...action.payload ];  
 
     case FETCH_TASKS_FULLY:
+      return action.payload;
+      
     case REMOVE_TASKS:
-      return action.payload;  
+      return [];  
 
     default:
       return state;

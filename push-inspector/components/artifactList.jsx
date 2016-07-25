@@ -5,7 +5,7 @@ import * as actions from '../actions';
 import auth from '../../lib/auth';
 
 // Matching patterns for finding an icon from a mimetype, most specific
-// mimetype are listed first as they are matched top down.
+// mimetypes are listed first as they are matched top down.
 const MIMETYPE_ICONS = [
   {
     icon:       'file-pdf-o',
@@ -78,13 +78,13 @@ const MIMETYPE_ICONS = [
 /** Get icon from mimetype */
 const getIconFromMime = (contentType) => {
   const entry = MIMETYPE_ICONS.find(entry => {
-    if (entry.matches.some((pattern) => {
+    const hasPattern = entry.matches.some((pattern) => {
       return pattern instanceof RegExp ?
         pattern.test(contentType) :
-        pattern === contentType;
-    })) {
-      return entry.icon;
-    }
+        pattern === contentType
+    });
+    
+    return hasPattern
   });
 
   return entry.icon || 'file-o';
@@ -103,8 +103,8 @@ class ArtifactList extends Component {
     this.load();
   }
 
-  handleArtifactCreatedMessage() {
-    fetchArtifacts();
+  componentWillReceiveProps(nextProps) {
+    this.load();
   }
   
   /** Build the right url for artifacts */
@@ -132,34 +132,28 @@ class ArtifactList extends Component {
       };
     });
 
-    this.setState({
-      artifacts: artifacts
-    });
+    this.setState({ artifacts });
   }
 
   render() {    
     const { artifacts } = this.state;
     
+    if (!artifacts.length) {
+      return <div></div>
+    }
+ 
     return (
-      <div>
-        {(() => {
-          if (artifacts.length) {
-            return (
-              <ul className="artifact-ul">
-                {artifacts.map((artifact, index) => {
-                  return (
-                    <li key={index}>
-                      <i className={`fa fa-${artifact.icon}`} />
-                      <a href={artifact.url} target="_blank"> {artifact.name}</a>
-                    </li>
-                  ); 
-                })}
-              </ul>
-            );      
-          }
-        }())}
-      </div>
-    );   
+      <ul className="artifact-ul">
+        {artifacts.map((artifact, index) => {
+          return (
+            <li key={index}>
+              <i className={`fa fa-${artifact.icon}`} />
+              <a href={artifact.url} target="_blank"> {artifact.name}</a>
+            </li>
+          ); 
+        })}
+      </ul>
+    );            
   }
 }
 

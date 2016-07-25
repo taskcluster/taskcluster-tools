@@ -71,9 +71,7 @@ class PushInspector extends Component {
           status={status}
           setActiveTaskStatus={setActiveTaskStatus}
           tasksRetrievedFully={tasksRetrievedFully} />
-
         {handleLoadingAndError}
-
         <div className={!tasks.length ? 'hideDisplay' : ''}>
           {children}
         </div>
