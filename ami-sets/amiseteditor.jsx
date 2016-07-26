@@ -1,13 +1,13 @@
-var React             = require('react');
-var bs                = require('react-bootstrap');
-var utils             = require('../lib/utils');
-var taskcluster       = require('taskcluster-client');
-var _                 = require('lodash');
-var CodeMirror        = require('react-code-mirror');
-var ConfirmAction     = require('../lib/ui/confirmaction');
+var React = require('react');
+var bs = require('react-bootstrap');
+var utils = require('../lib/utils');
+var taskcluster = require('taskcluster-client');
+var _ = require('lodash');
+var CodeMirror = require('react-code-mirror');
+var ConfirmAction = require('../lib/ui/confirmaction');
 
 // temporary until we have an updated taskcluster-client with the new methods in it
-var reference        = require('./temp-aws-prov-reference');
+var reference = require('./temp-aws-prov-reference');
 
 require('codemirror/mode/javascript/javascript');
 require('../lib/codemirror/json-lint');
@@ -25,24 +25,23 @@ var decodeUserData = (obj) => {
 };
 
 var initialAmiSet ={
-  "amis": [{
-    "region": "...",
-    "hvm": "...",
-    "pv": "..."
+  amis: [{
+    region: "...",
+    hvm: "...",
+    pv: "..."
   }]
 };
 
 /** Create amiSet editor/viewer (same thing) */
 var AmiSetEditor = React.createClass({
-  /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner:       taskcluster.createClient(reference)
+        awsProvisioner: taskcluster.createClient(reference)
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://aws-provisioner.taskcluster.net/v1'
+          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
         }
       },
       reloadOnProps: ['currentAmiSet']
@@ -51,64 +50,51 @@ var AmiSetEditor = React.createClass({
 
   propTypes: {
     // AmiSet to update, null of none
-    amiSet:             React.PropTypes.string,
+    amiSet: React.PropTypes.string,
     refreshAmiSetsList: React.PropTypes.func.isRequired,
-    selectAmiSet:       React.PropTypes.func.isRequired,
+    selectAmiSet: React.PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
     return {
-      currentAmiSet:  ''     // '' implies. "Create AMI Set"
+      currentAmiSet: ''
     };
   },
 
   getInitialState() {
-
     return {
-      // Loading amiSet or loaded amiSet
       amiSetLoaded: false,
-      amiSetError:  undefined,
+      amiSetError: null,
       amiSet: '',
       amis: initialAmiSet,
-
-      // Edit or viewing current state
-      editing:          true,
-
-      // Operation details, if currently doing anything
-      working:          false,
-      error:            null,
-      showAmiSet:       false
+      editing: true,
+      working: false,
+      error: null
     };
   },
 
-  /** Load initial state */
   load() {
     // If there is no currentAmiSet, we're creating a new AMI Set
-    if (this.props.currentAmiSet === '') {
+    if (!this.props.currentAmiSet) {
       return {
-        amiSet:           '',
-        amis:             initialAmiSet,
-        editing:          true,
-        working:          false,
-        error:            null
+        amiSet: '',
+        amis: initialAmiSet,
+        editing: true,
+        working: false,
+        error: null
       };
     } else {
-      // Load currentAmiSet
-
-      //var amisObject = this.awsProvisioner.amiSet(this.props.currentAmiSet);
       return {
-        amiSet:           this.props.currentAmiSet,
-        amis:             this.awsProvisioner.amiSet(this.props.currentAmiSet),
-        editing:          false,
-        working:          false,
-        error:            null,
-        showAmiSet:       false
+        amiSet: this.props.currentAmiSet,
+        amis: this.awsProvisioner.amiSet(this.props.currentAmiSet),
+        editing: false,
+        working: false,
+        error: null
       };
     }
   },
 
   render() {
-
     let isEditing = this.state.editing;
     let isCreating = isEditing && !this.props.currentAmiSet;
 
@@ -121,17 +107,18 @@ var AmiSetEditor = React.createClass({
               {
                 isEditing ?(
                   <div>
-                      {this.renderCodeEditor()}
-                      <br/>
-                      {this.renderEditingToolbar()}
-                    </div>
+                    {this.renderCodeEditor()}
+                    <br/>
+                    {this.renderEditingToolbar()}
+                  </div>
                   ) : (
                   <span>
-                    <pre>{ JSON.stringify(_.pick(this.state.amis, ['amis']), null, 2) }</pre>
+                    <pre>{JSON.stringify(_.pick(this.state.amis, ['amis']), null, 2)}</pre>
                     <bs.ButtonToolbar>
-                      <bs.Button bsStyle="success"
+                      <bs.Button
+                        bsStyle="success"
                         onClick={this.startEditing}>
-                        <bs.Glyphicon glyph="pencil"/>&nbsp;Edit AMI Set
+                        <bs.Glyphicon glyph="pencil"/> Edit AMI Set
                       </bs.Button>
                     </bs.ButtonToolbar>
                   </span>
@@ -140,28 +127,28 @@ var AmiSetEditor = React.createClass({
             </div>
           ) : (
             <div>
-            <bs.Input
-              type='text'
-              value={this.state.amiSet}
-              placeholder="amiSet"
-              label='AmiSet'
-              hasFeedback
-              ref='amiSet'
-              onChange={this.amiSetChange}/>
-            {this.renderCodeEditor()}
-            <br/>
-            <bs.ButtonToolbar>
-              <ConfirmAction
-                buttonStyle='primary'
-                glyph='ok'
-                label={this.props.amiSet ? 'Update AmiSet' : 'Create AmiSet'}
-                action={this.props.amiSet ? this.save : this.create}
-                success='Saved AMI Set'>
-                Are you sure that you would like to&nbsp;
-                {this.props.amiSet ? 'update' : 'create'}
-                &nbsp;the <code>{this.state.amiSet}</code> amiSet?
-              </ConfirmAction>
-            </bs.ButtonToolbar>
+              <bs.Input
+                type='text'
+                value={this.state.amiSet}
+                placeholder="amiSet"
+                label='AmiSet'
+                hasFeedback
+                ref='amiSet'
+                onChange={this.amiSetChange} />
+              {this.renderCodeEditor()}
+              <br/>
+              <bs.ButtonToolbar>
+                <ConfirmAction
+                  buttonStyle='primary'
+                  glyph='ok'
+                  label={this.props.amiSet ? 'Update AmiSet' : 'Create AmiSet'}
+                  action={this.props.amiSet ? this.save : this.create}
+                  success='Saved AMI Set'>
+                  Are you sure that you would like to
+                  {this.props.amiSet ? 'update' : 'create'}
+                  the <code>{this.state.amiSet}</code> AMI Set?
+                </ConfirmAction>
+              </bs.ButtonToolbar>
             </div>
           )
         }
@@ -169,33 +156,32 @@ var AmiSetEditor = React.createClass({
     );
   },
 
-  /** Render editing toolbar */
   renderCodeEditor() {
     return (
       <CodeMirror
         ref="amis"
         lineNumbers={true}
         mode="application/json"
-        textAreaClassName={'form-control'}
-        textAreaStyle={{minHeight: '20em'}}
+        textAreaClassName='form-control'
+        textAreaStyle={{ minHeight: '20em' }}
         value={JSON.stringify(_.pick(this.state.amis, ['amis']), null, 2)}
         onChange={this.onAmiSetChange}
         indentWithTabs={true}
         tabSize={2}
         lint={true}
-        gutters={["CodeMirror-lint-markers"]}
-        theme="ambiance"/>
+        gutters={['CodeMirror-lint-markers']}
+        theme="ambiance" />
     );
   },
 
-  /** Render editing toolbar */
   renderEditingToolbar() {
     return (
       <bs.ButtonToolbar>
-        <bs.Button bsStyle="success"
-                   onClick={this.saveAmiSet}
-                   disabled={this.state.working}>
-          <bs.Glyphicon glyph="ok"/>&nbsp;Save Changes
+        <bs.Button
+          bsStyle="success"
+          onClick={this.saveAmiSet}
+          disabled={this.state.working}>
+          <bs.Glyphicon glyph="ok"/> Save Changes
         </bs.Button>
         <ConfirmAction
           buttonStyle='danger'
@@ -204,7 +190,7 @@ var AmiSetEditor = React.createClass({
           label="Delete AMI Set"
           action={this.deleteAmiSet}
           success="AMI Set deleted">
-          Are you sure you want to delete AMI Set &nbsp;
+          Are you sure you want to delete AMI Set
           <code>{this.state.amiSet}</code>?
         </ConfirmAction>
       </bs.ButtonToolbar>
@@ -212,17 +198,15 @@ var AmiSetEditor = React.createClass({
   },
 
   startEditing() {
-    this.setState({editing: true});
+    this.setState({ editing: true });
   },
 
   onAmiSetChange(e) {
-    this.setState({amis: JSON.parse(e.target.value)});
+    this.setState({ amis: JSON.parse(e.target.value) });
   },
 
   amiSetChange() {
-    this.setState({
-      amiSet: this.refs.amiSet.getValue()
-    });
+    this.setState({ amiSet: this.refs.amiSet.getValue() });
   },
 
   async saveAmiSet() {
@@ -230,10 +214,10 @@ var AmiSetEditor = React.createClass({
       await this.awsProvisioner.updateAmiSet(this.state.amiSet, this.state.amis);
       this.setState({
         editing: false,
-        error:   null
+        error: null
       });
     } catch(err) {
-      this.setState({error: err});
+      this.setState({ error: err });
     }
   },
 
@@ -242,22 +226,20 @@ var AmiSetEditor = React.createClass({
       await this.awsProvisioner.createAmiSet(this.state.amiSet, this.state.amis);
       this.setState({
         editing: false,
-        error:   null
+        error: null
       });
       this.props.selectAmiSet(this.state.amiSet);
       this.props.refreshAmiSetsList();
     } catch(err) {
-    this.setState({error: err});
+      this.setState({ error: err });
     }
   },
 
   async deleteAmiSet() {
     await this.awsProvisioner.removeAmiSet(this.state.amiSet);
-    this.props.selectAmiSet(undefined);
+    this.props.selectAmiSet();
     this.props.refreshAmiSetsList();
   }
-
 });
 
-// Export AmiSetEditor
 module.exports = AmiSetEditor;
