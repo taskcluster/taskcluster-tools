@@ -81,8 +81,8 @@ class ProgressBar extends Component {
         // Stop notifying further
         this.notifyFlag = false;  
       }
-    // Set notify flag when build is not done  
     } else {
+      // Set notify flag when build is not done  
       this.notifyFlag = true;
     }
   }

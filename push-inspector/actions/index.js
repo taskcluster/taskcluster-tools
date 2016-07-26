@@ -203,9 +203,7 @@ export const retriggerTask = (list, toClone, successMessage) => {
 
       hashHistory.push(`${task.taskGroupId}/${response.status.taskId}`);
       // Update current list of tasks
-      dispatch(createTask(list, { 
-        task, status: response.status 
-      }));
+      dispatch(createTask(list, { task, status: response.status }));
       // Update modal message
       dispatch(renderActionSuccess(successMessage));
     } catch (err) {
@@ -248,9 +246,6 @@ export const scheduleTask = (taskId, successMessage) => {
   };
 };
 
-/**
-* Edit and create task
-*/
 export const editAndCreateTask = (oldTask, successMessage) => {
   // filled in by task creator on load
   let newTask = {};
@@ -329,9 +324,7 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
       window.open(`${window.location.protocol}//${window.location.host}/one-click-loaner/connect/#${response.status.taskId}`);
 
       // Update current list of tasks
-      dispatch(createTask(list, { 
-        task, status: response.status 
-      }));
+      dispatch(createTask(list, { task, status: response.status }));
       dispatch(renderActionSuccess(successMessage));
     } catch (err) {
       dispatch(renderActionError(err));
