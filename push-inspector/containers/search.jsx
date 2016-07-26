@@ -11,7 +11,8 @@ class Search extends Component {
     super(props);
     
     this.state = {
-      term: ''
+      term: '',
+      prevTerm: ''
     };
 
     this.onFormSubmit = this.onFormSubmit.bind(this);
@@ -23,15 +24,17 @@ class Search extends Component {
   */
   onFormSubmit(event) {
     const { setDashboardBanner, tasksHaveBeenRetrieved, removeTasks, fetchTasksInSteps } = this.props;
+    const { term, prevTerm } = this.state;
 
     event.preventDefault();
 
-    if (!this.isInvalid()) {
+    if (!this.isInvalid() && prevTerm !== term) {
       setDashboardBanner(null);
       tasksHaveBeenRetrieved(false);
       removeTasks();
-      fetchTasksInSteps(this.state.term, true);
-      hashHistory.push(this.state.term);
+      fetchTasksInSteps(term, true);
+      hashHistory.push(term);
+      this.setState({ prevTerm: term });
     }  
   }
 
