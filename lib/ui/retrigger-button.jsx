@@ -31,17 +31,8 @@ let RetriggerButton = React.createClass({
   },
 
   valid() {
-    let payload = this.props.task.payload;
-    if (!payload || !payload.image) {
-      return false;
-    }
-    if (!(payload.command instanceof Array)) {
-      return false;
-    }
-    if (typeof(payload.maxRunTime) !== 'number') {
-      return false;
-    }
-    return true;
+    // Simple sanity check
+    return !!(this.props.task && this.props.task.payload);
   },
 
   render() {
