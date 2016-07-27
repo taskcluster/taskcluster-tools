@@ -32,7 +32,7 @@ let RetriggerButton = React.createClass({
 
   valid() {
     // Simple sanity check
-    return this.props.task && this.props.task.payload;
+    return !!(this.props.task && this.props.task.payload);
   },
 
   render() {
