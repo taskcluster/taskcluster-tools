@@ -144,7 +144,7 @@ let LoanerButton = React.createClass({
     let task = this.parameterizeTask();
 
     // overwrite task-creator's local state with this new task
-    localStorage.setItem("task-creator/task", JSON.stringify(task));
+    localStorage.setItem('task-creator/task', JSON.stringify(task));
 
     // ..and go there
     window.location.href = '/task-creator/';
