@@ -61,6 +61,7 @@ let LoanerButton = React.createClass({
           <li>Set <code>task.payload.features.interactive = true</code>,</li>
           <li>Strip <code>task.payload.caches</code> to avoid poisoning,</li>
           <li>Ensures <code>task.payload.maxRunTime</code> is minimum 60 minutes,</li>
+          <li>Set <code>task.priority='high'</code>,</li>
           <li>Strip <code>task.routes</code> to avoid side-effects, and</li>
           <li>Set the environment variable<code>TASKCLUSTER_INTERACTIVE=true</code>.</li>
         </ul>
@@ -111,6 +112,9 @@ let LoanerButton = React.createClass({
 
     // Set task,retries to 0
     task.retries = 0;
+
+    // Set high priority as a developer is waiting for it in real time
+    task.priority = 'high'
 
     await this.queue.createTask(taskId, task);
     window.location = '/one-click-loaner/connect/#' + taskId;
