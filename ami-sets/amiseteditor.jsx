@@ -24,11 +24,11 @@ var decodeUserData = (obj) => {
   }
 };
 
-var initialAmiSet ={
+var initialAmiSet = {
   amis: [{
-    region: "...",
-    hvm: "...",
-    pv: "..."
+    region: '...',
+    hvm: '...',
+    pv: '...'
   }]
 };
 
@@ -116,7 +116,7 @@ var AmiSetEditor = React.createClass({
             <div>
               <h3>Update <code>{this.props.currentAmiSet}</code></h3>
               {
-                isEditing ?(
+                isEditing ? (
                   <div>
                     {this.renderCodeEditor()}
                     <br/>
@@ -139,26 +139,26 @@ var AmiSetEditor = React.createClass({
           ) : (
             <div>
               <bs.Input
-                type='text'
+                type="text"
                 value={this.state.amiSet}
                 placeholder="amiSet"
-                label='AmiSet'
+                label="AmiSet"
                 hasFeedback
-                ref='amiSet'
+                ref="amiSet"
                 onChange={this.amiSetChange} />
               {this.renderCodeEditor()}
               <br/>
               <bs.ButtonToolbar>
                 <ConfirmAction
-                  buttonStyle='primary'
-                  glyph='ok'
+                  buttonStyle="primary"
+                  glyph="ok"
                   label={this.props.amiSet ? 'Update AmiSet' : 'Create AmiSet'}
                   action={this.props.amiSet ? this.save : this.create}
-                  success='Saved AMI Set'
+                  success="Saved AMI Set"
                   disabled={!this.state.amiSet}>
-                  Are you sure that you would like to
-                  {this.props.amiSet ? 'update' : 'create'}
-                  the <code>{this.state.amiSet}</code> AMI Set?
+                    Are you sure that you would like to
+                    {this.props.amiSet ? 'update' : 'create'}
+                    the <code>{this.state.amiSet}</code> AMI Set?
                 </ConfirmAction>
               </bs.ButtonToolbar>
             </div>
@@ -174,7 +174,7 @@ var AmiSetEditor = React.createClass({
         ref="amis"
         lineNumbers={true}
         mode="application/json"
-        textAreaClassName='form-control'
+        textAreaClassName="form-control"
         textAreaStyle={{ minHeight: '20em' }}
         value={JSON.stringify(_.pick(this.state.amis, ['amis']), null, 2)}
         onChange={this.onAmiSetChange}
@@ -196,8 +196,8 @@ var AmiSetEditor = React.createClass({
           <bs.Glyphicon glyph="ok"/> Save Changes
         </bs.Button>
         <ConfirmAction
-          buttonStyle='danger'
-          glyph='trash'
+          buttonStyle="danger"
+          glyph="trash"
           disabled={this.state.working}
           label="Delete AMI Set"
           action={this.deleteAmiSet}
