@@ -113,11 +113,8 @@ class ConfirmAction extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    taskActionMessage: state.taskActionMessage,
-    taskActionInProgress: state.taskActionInProgress
-  };
-}
+const mapStateToProps = ({ taskActionMessage, taskActionInProgress }) => (
+  { taskActionMessage, taskActionInProgress }
+);
 
 export default connect(mapStateToProps, actions)(ConfirmAction);
