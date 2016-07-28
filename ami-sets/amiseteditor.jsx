@@ -98,6 +98,17 @@ var AmiSetEditor = React.createClass({
     let isEditing = this.state.editing;
     let isCreating = isEditing && !this.props.currentAmiSet;
 
+    if (this.state.error) {
+      return (
+        <bs.Alert bsStyle="danger" onDismiss={this.dismissError}>
+          <strong>Error executing operation</strong>&nbsp;
+          <p>
+            {this.state.error.toString()}
+          </p>
+        </bs.Alert>
+      );
+    }
+
     return (
       <span>
         {
@@ -143,7 +154,8 @@ var AmiSetEditor = React.createClass({
                   glyph='ok'
                   label={this.props.amiSet ? 'Update AmiSet' : 'Create AmiSet'}
                   action={this.props.amiSet ? this.save : this.create}
-                  success='Saved AMI Set'>
+                  success='Saved AMI Set'
+                  disabled={!this.state.amiSet}>
                   Are you sure that you would like to
                   {this.props.amiSet ? 'update' : 'create'}
                   the <code>{this.state.amiSet}</code> AMI Set?
