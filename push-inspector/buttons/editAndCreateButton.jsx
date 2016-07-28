@@ -32,10 +32,6 @@ class EditAndCreateButton extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    task: state.task
-  };
-}
+const mapStateToProps = ({ task }) => ({ task });
 
 export default connect(mapStateToProps, actions)(EditAndCreateButton);

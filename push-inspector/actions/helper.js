@@ -26,7 +26,7 @@ export const taskActionsInProgress = (isExecuting) => {
 export const renderActionError = (err) => {
   return {  
     type: TASK_ACTIONS_ERROR,
-    payload: rendering.renderError(err)
+    payload: err
   };
 };
 
@@ -36,16 +36,16 @@ export const renderActionError = (err) => {
 export const renderActionSuccess = (successMessage) => {
   return {  
     type: TASK_ACTIONS_SUCCESS,
-    payload: rendering.renderSuccess(successMessage)
+    payload: successMessage
   };
 };
 
 /**
 * Create a task and append to list
 */
-export const createTask = (list, dataObj) => {
+export const createTask = (list, task) => {
   return {  
     type: CREATE_TASK,
-    payload: dataObj
+    payload: task
   };
 };

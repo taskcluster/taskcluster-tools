@@ -22,7 +22,7 @@ export default class TaskRun extends Component {
       .map((key, index) => {
         return (
           <tr key={index}>
-            <td><strong>{ _.capitalize(key) }</strong></td>
+            <td><strong>{_.capitalize(key)}</strong></td>
             <td>{elements[key]}</td>
           </tr>
         );      

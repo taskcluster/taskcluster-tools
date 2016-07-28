@@ -16,13 +16,11 @@ class PurgeCacheButton extends Component {
   }
  
   update(e) { 
-    let caches = _.clone(this.state.selected);
-
-    e.target.checked == true ?
-      caches.push(e.target.value) :
-      caches = caches.filter(i => i !== e.target.value);
-    
-    this.setState({ selected: caches });
+    this.setState({
+      selected: e.target.checked ?
+        [...this.state.selected, e.target.value] :
+        this.state.selected.filter(c => c !== e.target.value)
+    });
   }
 
   render() {
@@ -46,7 +44,7 @@ class PurgeCacheButton extends Component {
                  <li className="checkbox" key={cache}>
                   <label>
                     <input name="cache" type="checkbox" onChange={this.update} value={cache}
-                      checked={!this.state.selected ? false : this.state.selected.includes(cache)} />
+                      checked={this.state.selected.length ? this.state.selected.includes(cache) : false} />
                     {cache}
                   </label>
                 </li>

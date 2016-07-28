@@ -20,6 +20,6 @@ $(function() {
         <Router history={hashHistory} routes={routes} />
       </Provider>
     ),
-    $("#container")[0]
+    $('#container')[0]
   );
 });

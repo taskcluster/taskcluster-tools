@@ -14,7 +14,7 @@ export default class LogView extends Component {
       name === 'public/logs/live.log')
     );
 
-    const entry = log || this.props.logs;
+    const entry = log || this.props.logs[0];
 
     this.state = {
       name: entry ? entry.name : ''

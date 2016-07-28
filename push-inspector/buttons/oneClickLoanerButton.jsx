@@ -36,12 +36,6 @@ class OneClickLoaner extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    status: state.status,
-    task: state.task,
-    tasks: state.tasks
-  };
-}
+const mapStateToProps = ({ status, task, tasks}) => ({ status, task, tasks});
 
 export default connect(mapStateToProps, actions)(OneClickLoaner);

@@ -78,13 +78,11 @@ const MIMETYPE_ICONS = [
 /** Get icon from mimetype */
 const getIconFromMime = (contentType) => {
   const entry = MIMETYPE_ICONS.find(entry => {
-    const hasPattern = entry.matches.some((pattern) => {
-      return pattern instanceof RegExp ?
+    return entry.matches
+      .some(pattern => pattern instanceof RegExp ?
         pattern.test(contentType) :
         pattern === contentType
-    });
-    
-    return hasPattern
+      );    
   });
 
   return entry.icon || 'file-o';
@@ -109,25 +107,25 @@ class ArtifactList extends Component {
   
   /** Build the right url for artifacts */
   load() {
-    const artifacts = this.props.artifacts.map((artifact) => {
-      const isPublic = /^public\//.test(artifact.name);
+    const artifacts = this.props.artifacts.map(({ name, contentType }) => {
+      const isPublic = /^public\//.test(name);
       const hasCredentials = auth.hasCredentials();
 
       if (!isPublic && !hasCredentials) {
         return {
-          name: artifact.name,
+          name,
           icon: 'lock'
         };
       }
 
       const method = hasCredentials ? 'buildSignedUrl' : 'buildUrl';
       const args = this.props.runId ?
-        [queue.getArtifact, this.props.taskId, this.props.runId, artifact.name] :
-        [queue.getLatestArtifact, this.props.taskId, artifact.name];
+        [queue.getArtifact, this.props.taskId, this.props.runId, name] :
+        [queue.getLatestArtifact, this.props.taskId, name];
 
       return {
-        name: artifact.name,
-        icon: getIconFromMime(artifact.contentType),
+        name,
+        icon: getIconFromMime(contentType),
         url: queue[method](...args)
       };
     });
@@ -139,7 +137,7 @@ class ArtifactList extends Component {
     const { artifacts } = this.state;
     
     if (!artifacts.length) {
-      return <div></div>
+      return <div></div>;
     }
  
     return (

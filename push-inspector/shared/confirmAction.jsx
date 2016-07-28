@@ -3,6 +3,7 @@ import * as bs from 'react-bootstrap';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import Loading from './loading';
+import { rendering } from '../lib/utils';
 
 class ConfirmAction extends Component {
   constructor(props) {
@@ -50,9 +51,11 @@ class ConfirmAction extends Component {
     
     if (taskActionInProgress) {
       return <Loading />;
-    } else {
-      return taskActionMessage;
     }
+    
+    return taskActionMessage && taskActionMessage instanceof Error ?
+      rendering.renderError(taskActionMessage) :
+      rendering.renderSuccess(taskActionMessage);
   }
 
   render() {

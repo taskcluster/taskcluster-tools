@@ -16,7 +16,7 @@ class CancelTaskButton extends Component {
     const taskId = status.taskId;
     const action = () => cancelTask(taskId, successMsg);
     
-    let isResolved = [
+    const isResolved = [
       'completed',
       'failed',
       'exception'
@@ -37,10 +37,6 @@ class CancelTaskButton extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    status: state.status
-  };
-}
+const mapStateToProps = ({ status }) => ({ status });
 
 export default connect(mapStateToProps, actions)(CancelTaskButton);

@@ -46,9 +46,9 @@ class ProgressBar extends Component {
   * Progress bar on click handler
   */
   progressBarClicked(event) {
-    const title = event.target.title;
+    const title = event.target.title.toLowerCase();
     const status = ['failed', 'completed', 'running', 'pending', 'exception', 'unscheduled']
-      .find(status => new RegExp(status, 'ig').exec(title));
+      .find(status => title.includes(status));
     
     if (status) {
       this.props.setActiveTaskStatus(status);
@@ -56,9 +56,9 @@ class ProgressBar extends Component {
   }
 
   /**
-  * Seperate tasks in different arrays based on their current status
+  * Separate tasks in different arrays based on their current status
   */
-  seperateTasksByState() {
+  separateTasksByState() {
     this.props.tasks.forEach((task) => {
       const status = task.status.state;
 
@@ -96,7 +96,7 @@ class ProgressBar extends Component {
     const threshold = 5;
 
     this.emptyStates();
-    this.seperateTasksByState();
+    this.separateTasksByState();
 
     if (tasksRetrievedFully) {
       this.notifyCheck();

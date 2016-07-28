@@ -87,7 +87,7 @@ export const fetchTasksInSteps = (taskGroupId, isLimited) => {
 export const fetchTask = (taskId) => {
   return async (dispatch) => {
     try {
-      let task = await queue.task(taskId);
+      const task = await queue.task(taskId);
 
       dispatch({
         type: FETCH_TASK,
@@ -101,16 +101,12 @@ export const fetchTask = (taskId) => {
 
 export const fetchArtifacts = (taskId) => {
   return async (dispatch) => {
-    try {
-      let response = await queue.listLatestArtifacts(taskId);
+    const response = await queue.listLatestArtifacts(taskId);
 
-      dispatch({
-        type: FETCH_ARTIFACTS,
-        payload: response.artifacts
-      });
-    } catch (err) {
-      return;
-    }
+    dispatch({
+      type: FETCH_ARTIFACTS,
+      payload: response.artifacts
+    });
   };
 };
 
@@ -123,7 +119,7 @@ export const removeTasks = () => {
 export const fetchStatus = (taskId) => {
   return async (dispatch) => {
     try {
-      let response = await queue.status(taskId);
+      const response = await queue.status(taskId);
 
       dispatch({
         type: FETCH_STATUS,
@@ -159,28 +155,24 @@ export const activeTaskGroupId = (taskGroupId) => {
 */
 export const purge = (provisionerId, workerType, selectedCaches, successMessage) => {
   // Setup purgeCache
-  const purgeCache = new taskcluster.PurgeCache(
-    localStorage.credentials ?
-    { credentials: JSON.parse(localStorage.credentials) }
-    : undefined
-  );
+  const purgeCache = localStorage.credentials ?
+    new taskcluster.PurgeCache({ credentials: JSON.parse(localStorage.credentials) }) :
+    new taskcluster.PurgeCache();
 
-  const cachesPromise = Promise
-    .all(selectedCaches.map(cacheName => {
-      return purgeCache.purgeCache(provisionerId, workerType, { cacheName });
-    }));
-
-  return (dispatch) => {
+  return async (dispatch) => {
     dispatch(taskActionsInProgress(true));
-    cachesPromise
-      .then (() => {
-        dispatch(renderActionSuccess(successMessage))
-        dispatch(taskActionsInProgress(false));
-      })
-      .catch ((err) => {
-        dispatch(renderActionError(err))
-        dispatch(taskActionsInProgress(false));
-      });
+
+    try {
+      const promises = selectedCaches
+        .map(cacheName => purgeCache.purgeCache(provisionerId, workerType, { cacheName }));
+
+      await Promise.all(promises);
+      dispatch(renderActionSuccess(successMessage));
+      dispatch(taskActionsInProgress(false));
+    } catch (err) {
+      dispatch(renderActionError(err));
+      dispatch(taskActionsInProgress(false));
+    }
   };
 };
 
@@ -199,7 +191,7 @@ export const retriggerTask = (list, toClone, successMessage) => {
     dispatch(taskActionsInProgress(true));
 
     try {
-      let response = await queue.createTask(taskId, task);
+      const response = await queue.createTask(taskId, task);
 
       hashHistory.push(`${task.taskGroupId}/${response.status.taskId}`);
       // Update current list of tasks
@@ -220,7 +212,6 @@ export const cancelTask = (taskId, successMessage) => {
 
     try {
       await queue.cancelTask(taskId);
-
       dispatch(renderActionSuccess(successMessage));
     } catch (err) {
       dispatch(renderActionError(err));
@@ -236,7 +227,6 @@ export const scheduleTask = (taskId, successMessage) => {
 
     try {
       await queue.scheduleTask(taskId);
-
       dispatch(renderActionSuccess(successMessage));
     } catch (err) {
       dispatch(renderActionError(err));
@@ -247,8 +237,6 @@ export const scheduleTask = (taskId, successMessage) => {
 };
 
 export const editAndCreateTask = (oldTask, successMessage) => {
-  // filled in by task creator on load
-  let newTask = {};
   // copy fields from the parent task, intentionally excluding some
   // fields which might cause confusion if left unchanged
   const exclude = [
@@ -262,9 +250,7 @@ export const editAndCreateTask = (oldTask, successMessage) => {
     'requires'
   ];
 
-  _.keys(oldTask).forEach(key => {
-    newTask = _.omit(oldTask, exclude);
-  });
+  const newTask = _.omit(oldTask, exclude);
 
   // overwrite task-creator's local state with this new task
   localStorage.setItem('task-creator/task', JSON.stringify(newTask));
@@ -356,7 +342,7 @@ export const tasksHaveBeenRetrieved = (isRetrieved) => {
 */
 export const clearTaskActionsMessage = () => {
   return {
-    type: CLEAR_TASKS_ACTIONS_MESSAGE,
+    type: CLEAR_TASKS_ACTIONS_MESSAGE
   };
 };
 

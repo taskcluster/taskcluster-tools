@@ -37,11 +37,6 @@ class RetriggerButton extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    task: state.task,
-    tasks: state.tasks
-  };
-}
+const mapStateToProps = ({ task, tasks }) => ({ task, tasks });
 
 export default connect(mapStateToProps, actions)(RetriggerButton);
