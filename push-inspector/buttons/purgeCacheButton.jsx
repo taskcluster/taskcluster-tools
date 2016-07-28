@@ -44,7 +44,7 @@ class PurgeCacheButton extends Component {
                  <li className="checkbox" key={cache}>
                   <label>
                     <input name="cache" type="checkbox" onChange={this.update} value={cache}
-                      checked={this.state.selected.length ? this.state.selected.includes(cache) : false} />
+                      checked={this.state.selected.includes(cache)} />
                     {cache}
                   </label>
                 </li>
