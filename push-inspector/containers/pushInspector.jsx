@@ -80,13 +80,8 @@ class PushInspector extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    tasks: state.tasks,
-    status: state.status,
-    dashboardBanner: state.dashboardBanner,
-    tasksRetrievedFully: state.tasksRetrievedFully,
-  };
-}
+const mapStateToProps = ({ tasks, status, dashboardBanner, tasksRetrievedFully }) => (
+  { tasks, status, dashboardBanner, tasksRetrievedFully }
+);
 
 export default connect(mapStateToProps, actions)(PushInspector);

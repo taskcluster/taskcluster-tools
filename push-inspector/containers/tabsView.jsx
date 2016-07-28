@@ -73,12 +73,6 @@ class TabsView extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    task: state.task,
-    status: state.status,
-    artifacts: state.artifacts
-  };
-}
+const mapStateToProps = ({ task, status, artifacts }) => ({ task, status, artifacts });
 
 export default connect(mapStateToProps, actions)(TabsView);

@@ -97,11 +97,6 @@ class Table extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    tasks: state.tasks,
-    activeTaskStatus: state.activeTaskStatus
-  };
-}
+const mapStateToProps = ({ tasks, activeTaskStatus }) => ({ tasks, activeTaskStatus });
 
 export default connect(mapStateToProps, actions)(Table);

@@ -174,12 +174,8 @@ class Listings extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    tasks: state.tasks,
-    tasksRetrievedFully: state.tasksRetrievedFully,
-    listTaskGroupInProgress: state.listTaskGroupInProgress
-  };
-}
+const mapStateToProps = ({ tasks, tasksRetrievedFully, listTaskGroupInProgress }) => (
+  { tasks, tasksRetrievedFully, listTaskGroupInProgress }
+);
 
 export default connect(mapStateToProps, actions)(Listings);
