@@ -62,14 +62,14 @@ class Search extends Component {
       <div>
         <form horizontal onSubmit={this.onFormSubmit} className="input-group search-form">
           <div className="searchLabel">Enter <code>taskGroupId</code></div>
-          <bs.Input
-            type="text"
-            placeholder="taskGroupId"
-            className="form-control"
-            value={this.state.term}            
-            onChange={this.onInputChange}
-            bsStyle={invalidInput ? 'error' : null} />
-
+          <bs.FormGroup validationState={invalidInput ? 'error' : null}>
+            <bs.FormControl
+              type="text"
+              placeholder="taskGroupId"
+              bsClass="form-control"
+              value={this.state.term}            
+              onChange={this.onInputChange} />
+          </bs.FormGroup>
           <div className="input-group-btn inspect-btn">
             <button type="submit" className="button btn btn-secondary">
               <i className="fa fa-search"></i> Inspect
