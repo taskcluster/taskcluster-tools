@@ -34,7 +34,8 @@ class PurgeCacheButton extends Component {
     return (         
       <ConfirmAction label={label} glyph={glyph} action={action}>       
         <div>
-          <p>Are you sure you wish to purge caches used in this task across all
+          <p>
+            Are you sure you wish to purge caches used in this task across all
             workers of this workerType?
           </p>
           <p>Select the caches to purge:</p>
