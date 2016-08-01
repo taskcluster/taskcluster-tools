@@ -83,11 +83,11 @@ class Listings extends Component {
 
     // Give priority to exceptions to show without waiting for loop to happen
     if (message.exchange === queueEvents.taskException().exchange) {
-      notifications.notifyUser("Task exception");
+      notifications.notifyUser('Task exception');
     }
     
     if (message.exchange === queueEvents.taskFailed().exchange) {
-      notifications.notifyUser("Task failure");
+      notifications.notifyUser('Task failure');
     }
   }
 

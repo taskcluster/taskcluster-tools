@@ -139,6 +139,7 @@ export default class TerminalView extends Component {
 
   onMouseDown(e) {
     e.preventDefault();
+    
     if (e.button === 0) {
       this.dragging = true;
       this.startY = e.pageY;

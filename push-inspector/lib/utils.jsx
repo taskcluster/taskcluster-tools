@@ -46,7 +46,7 @@ export const webListener = {
       onMessageAction(message);
     });
 
-    listener.on('error', (err = new Error("Unknown error")) => {
+    listener.on('error', (err = new Error('Unknown error')) => {
       console.error('Error within the Listener: ', err);
       listener.close();
       onMessageAction(err);

@@ -5,10 +5,10 @@ import ConfirmAction from '../shared/confirmAction';
 
 class OneClickLoaner extends Component {
   constructor(props) {
-    super(props);  
+    super(props);
   }
 
-  render() {  
+  render() {
     const glyph = 'console';
     const label = 'One-Click Loaner';
     const successMsg = 'Your browser has been redirected to One-Click loaner';
@@ -16,9 +16,9 @@ class OneClickLoaner extends Component {
     const taskId = status.taskId;
     const action = () => loanerCreateTask(tasks, taskId, task, successMsg);
 
-    return (         
-  		<ConfirmAction label={label} glyph={glyph} action={action}>
-      	<div>
+    return (
+      <ConfirmAction label={label} glyph={glyph} action={action}>
+        <div>
           This will duplicate the task and create it under a different
           <code>taskId</code>.<br /><br />
           The new task will be altered as to:
@@ -31,11 +31,11 @@ class OneClickLoaner extends Component {
           </ul>
           Note: this may not work with all tasks.
         </div>
-    	</ConfirmAction>
+      </ConfirmAction>
     );
   }
 }
 
-const mapStateToProps = ({ status, task, tasks}) => ({ status, task, tasks });
+const mapStateToProps = ({ status, task, tasks }) => ({ status, task, tasks });
 
 export default connect(mapStateToProps, actions)(OneClickLoaner);
