@@ -14,6 +14,17 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Push Inspector",
+    link:           '/push-inspector/',
+    icon:           'cube',
+    display:        true,
+    description: [
+      "Inspect task groups, monitor progress, view dependencies, states and",
+      "inspect the individual tasks that makes up the task group using the",
+      "embedded task-inspector."
+    ].join('\n')
+  },
+  {
     title:          "Task-Graph Inspector",
     link:           '/task-graph-inspector/',
     icon:           'cubes',
