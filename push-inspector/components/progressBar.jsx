@@ -46,9 +46,9 @@ class ProgressBar extends Component {
   * Progress bar on click handler
   */
   progressBarClicked(event) {
-    const title = event.target.title.toLowerCase();
+    const title = event.target.innerText.toLowerCase();
     const status = ['failed', 'completed', 'running', 'pending', 'exception', 'unscheduled']
-      .find(status => title.includes(status));
+      .find(status => title.includes(status[0]));
     
     if (status) {
       this.props.setActiveTaskStatus(status);
@@ -126,23 +126,25 @@ class ProgressBar extends Component {
     };
 
     return (
-      <bs.ProgressBar className="progressBar" onClick={this.progressBarClicked}>
-        {groups.map((group, index) => {
-          const subtasks = this[group];
-          const className = group === 'running' ? `label-${group} active` : `label-${group}`;
-          const title = toTitle(group);
-          const label = subtasks.length ? `${title[0]}(${subtasks.length})` : '...';
+      <span onClick={this.progressBarClicked}>
+        <bs.ProgressBar className="progressBar">
+          {groups.map((group, index) => {
+            const subtasks = this[group];
+            const className = group === 'running' ? `label-${group} active` : `label-${group}`;
+            const title = toTitle(group);
+            const label = subtasks.length ? `${title[0]}(${subtasks.length})` : '...';
 
-          return (
-            <bs.ProgressBar
-              key={index}
-              title={title}
-              className={className}
-              now={getWeightedPercent(percents[index])}
-              label={label} />
-          );
-        })}
-      </bs.ProgressBar>
+            return (
+              <bs.ProgressBar
+                key={index}
+                title={title}
+                className={className}
+                now={getWeightedPercent(percents[index])}
+                label={label} />
+            );
+          })}
+        </bs.ProgressBar>
+      </span>
     );
   }
 
