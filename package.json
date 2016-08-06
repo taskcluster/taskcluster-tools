@@ -19,6 +19,7 @@
     "babelify": "6.0.2",
     "bluebird": "^3.4.0",
     "bootstrap": "^3.3.6",
+    "change-case": "^3.0.0",
     "classnames": "^2.2.3",
     "codemirror": "^5.11.0",
     "concat-stream": "1.4.6",
