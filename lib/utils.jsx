@@ -9,8 +9,7 @@ var taskcluster   = require('taskcluster-client');
 var debug         = require('debug')('lib:utils');
 var rison         = require('rison');
 var bs            = require('react-bootstrap');
-var changeCase    = require('change-case')
-var { signIn }    = require('./layout');
+var changeCase    = require('change-case');
 
 
 /**
@@ -144,7 +143,7 @@ var createTaskClusterMixin = (options) => {
       // Update clients with new credentials
       this._createClients(e.detail);
       
-      this.setState({createdTaskIdError: undefined});
+      this.setState({ createdTaskIdError: null });
       if (options.reloadOnLogin) {
         // Reload state now that we have new credentials
         this.reload();
@@ -297,12 +296,6 @@ var createTaskClusterMixin = (options) => {
         code = `HTTP ${err.statusCode}`;
       }
 
-      var action = changeCase.titleCase(err.body.requestInfo.method);
-      if (action === "Create Task" && window.location.pathname === "/task-inspector/") {
-        action = "One-Click Loaner";
-        var preAction = "press";
-      }
-
       // Find if user is logged out and error code is 403
       var loggedOut403 = !auth.hasCredentials() && err.statusCode === 403;
 
@@ -315,8 +308,7 @@ var createTaskClusterMixin = (options) => {
       return (
         loggedOut403 ? (
         <bs.Alert bsStyle="info"> 
-          <strong>{code}&nbsp;</strong>
-          <p>Please <a className="pointer" onClick={signIn}>sign in</a> and {preAction} <strong>{action}</strong> again</p>
+          <p>We need to authenticate you first. Please sign in and try again.</p>
         </bs.Alert>
         ) : ( 
         <bs.Alert bsStyle="danger">

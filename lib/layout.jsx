@@ -9,13 +9,6 @@ let format      = require('./format');
 // time before expiration at which we warn
 let EXPIRY_WARNING = 5 * 60 * 1000;
 
-/** Log-in open a authentication URL */
-function signIn() {
-  window.open(auth.buildLoginURL(), '_blank');
-}
-
-exports.signIn = signIn;
-
 /** Navigation bar for layout.jade */
 let Navigation = React.createClass({
   /** Get initial state */
@@ -27,6 +20,10 @@ let Navigation = React.createClass({
     };
   },
 
+  /** Log-in open a authentication URL */
+  signIn() {
+    window.open(auth.buildLoginURL(), '_blank');
+  },
 
   /** Log out (clear credentials) */
   signOut() {
@@ -187,7 +184,7 @@ let Navigation = React.createClass({
     // if there are no credentials at all, then there is no menu -- just a sign-in link
     if (!this.state.credentials) {
       return (
-        <bs.NavItem onSelect={signIn} ref="credentials">
+        <bs.NavItem onSelect={this.signIn} ref="credentials">
           <bs.Glyphicon glyph="log-in"/>&nbsp;Sign in
         </bs.NavItem>
       );
@@ -204,7 +201,7 @@ let Navigation = React.createClass({
           <format.Icon name="key"/>&nbsp;Manage Credentials
         </bs.MenuItem>
         <bs.MenuItem divider />
-        <bs.NavItem onSelect={signIn}>
+        <bs.NavItem onSelect={this.signIn}>
           <bs.Glyphicon glyph="log-in"/>&nbsp;
           Sign In
         </bs.NavItem>
@@ -225,13 +222,17 @@ let Navigation = React.createClass({
         <bs.Overlay
           show={true}
           rootClose={true}
-          onHide={ () => this.setState({credentialsMessage: undefined}) }
+          onHide={this.overlayHideHandler}
           placement="bottom"
-          target={ props => ReactDOM.findDOMNode(this.refs.credentials) }>
+          target={props => ReactDOM.findDOMNode(this.refs.credentials)}>
           {popover}
         </bs.Overlay>
       );
     }
+  },
+
+  overlayHideHandler() {
+    this.setState({ credentialsMessage: '' });
   },
 });
 
