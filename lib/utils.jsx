@@ -9,6 +9,7 @@ var taskcluster   = require('taskcluster-client');
 var debug         = require('debug')('lib:utils');
 var rison         = require('rison');
 var bs            = require('react-bootstrap');
+var changeCase    = require('change-case');
 
 
 /**
@@ -141,7 +142,8 @@ var createTaskClusterMixin = (options) => {
     handleCredentialsChanged(e) {
       // Update clients with new credentials
       this._createClients(e.detail);
-
+      
+      this.setState({ createdTaskIdError: null });
       if (options.reloadOnLogin) {
         // Reload state now that we have new credentials
         this.reload();
@@ -286,17 +288,29 @@ var createTaskClusterMixin = (options) => {
      */
     renderError(err) {
       // Find some sort of summary or error code
-      let code = err.code + ' Error!';
-      if (!err.code && err.statusCode) {
-        code = 'HTTP ' + err.statusCode;
+      let code = 'Unknown Error';
+
+      if (err.code) {
+        code = `${changeCase.titleCase(err.code.replace('Error', ''))} Error!`;
+      } else if (err.statusCode) {
+        code = `HTTP ${err.statusCode}`;
       }
-      code = code || 'Unknown Error';
+
+      // Find if user is logged out and error code is 403
+      var loggedOut403 = !auth.hasCredentials() && err.statusCode === 403;
 
       // Find some sort of message
-      let message = err.message || '```\n' + err.stack + '\n```';
+      const message = err.message ?
+        err.message.slice(0, err.message.search('----')) :
+        '```\n' + err.stack + '\n```';
+      const title = <bs.Button>Additional details...</bs.Button>;
 
-      let title = <bs.Button bsStyle="link">Additional details...</bs.Button>;
       return (
+        loggedOut403 ? (
+        <bs.Alert bsStyle="info"> 
+          <p>You are not authorized to perform the requested action. Please sign in and try again.</p>
+        </bs.Alert>
+        ) : ( 
         <bs.Alert bsStyle="danger">
           <strong>
             {code}&nbsp;
@@ -308,6 +322,7 @@ var createTaskClusterMixin = (options) => {
             </pre>
           </format.Collapse>
         </bs.Alert>
+        )
       );
     },
 
