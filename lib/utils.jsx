@@ -308,7 +308,7 @@ var createTaskClusterMixin = (options) => {
       return (
         loggedOut403 ? (
         <bs.Alert bsStyle="info"> 
-          <p>We need to authenticate you first. Please sign in and try again.</p>
+          <p>You are not authorized to perform the requested action. Please sign in and try again.</p>
         </bs.Alert>
         ) : ( 
         <bs.Alert bsStyle="danger">
