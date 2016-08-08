@@ -126,7 +126,7 @@ class ProgressBar extends Component {
     };
 
     return (
-      <span onClick={this.progressBarClicked}>
+      <div onClick={this.progressBarClicked}>
         <bs.ProgressBar className="progressBar">
           {groups.map((group, index) => {
             const subtasks = this[group];
@@ -144,7 +144,7 @@ class ProgressBar extends Component {
             );
           })}
         </bs.ProgressBar>
-      </span>
+      </div>
     );
   }
 
