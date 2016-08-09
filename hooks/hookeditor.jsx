@@ -185,6 +185,9 @@ var HookDisplay = React.createClass({
           onClick={this.props.startEditing}>
           <bs.Glyphicon glyph="pencil"/>&nbsp;Edit Hook
         </bs.Button>
+        <bs.Button bsStyle="success" onClick={this.props.triggerHook}>
+          <bs.Glyphicon glyph="repeat" /> Trigger Hook
+        </bs.Button>
       </bs.ButtonToolbar>
     </div>
   }
@@ -533,6 +536,7 @@ var HookEditView = React.createClass({
     currentHookGroupId: React.PropTypes.string,
     refreshHookList:    React.PropTypes.func.isRequired,
     selectHook:         React.PropTypes.func.isRequired,
+    triggerHook:        React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -602,12 +606,20 @@ var HookEditView = React.createClass({
         return <HookDisplay hook={this.state.hook}
                     currentHookId={this.props.currentHookId}
                     currentHookGroupId={this.props.currentHookGroupId}
-                    startEditing={this.startEditing} />
+                    startEditing={this.startEditing}
+                    triggerHook={this.triggerHook} />
     }
   },
 
   startEditing() {
     this.setState({editing: true});
+  },
+
+  triggerHook() {
+    // Payloads are ignored, so we send empty data over
+    this.hooks
+      .triggerHook(this.props.currentHookGroupId, this.props.currentHookId, {})
+      .catch((error) => this.setState({ error }));
   },
 
   createHook(hookGroupId, hookId, hook) {
@@ -633,7 +645,7 @@ var HookEditView = React.createClass({
         this.props.currentHookGroupId,
         this.props.currentHookId,
         hook
-      )
+      );
       this.setState({
         hook:    stripHookIds(hook),
         editing: false,
