@@ -157,7 +157,10 @@ class Listings extends Component {
     }
     
     this.setup();
-    this.constructLoopForMessages();
+    
+    if (this.props.tasksRetrievedFully && !this.loop) {
+      this.constructLoopForMessages();
+    }
   }
 
   render() {
