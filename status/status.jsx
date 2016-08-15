@@ -207,17 +207,30 @@ export let Service = React.createClass({
     link: React.PropTypes.string.isRequired,
     poll: React.PropTypes.func.isRequired
   },
-  getInitialState() {
-    // TODO: set up when component mounts?
-    let intervalId = setInterval(this.props.poll.bind(this, status => {
-      this.setState({status: status});
-    }), 5000);
 
+  componentWillMount() {
+    this.poll();
+  },
+
+  componentWillUnmount() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+  },
+
+  poll() {
+    this.props.poll(status => {
+      this.setState({status});
+      this.timer = setTimeout(this.poll, 5000);
+    });
+  },
+
+  getInitialState() {
     return {
       status: "loading",
-      intervalId: intervalId
     };
   },
+
   render: function() {
     return (
       <div className="form-horizontal service-status-container">
