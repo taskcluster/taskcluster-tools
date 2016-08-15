@@ -23,10 +23,16 @@ function makeRequest(options, allowHeaders = []) {
   });
 }
 
-function pollTaskclusterService(url, cb) {
-  $.getJSON(url)
-    .done(data => cb(data.alive))
-    .fail(err => cb(false));
+function pollTaskclusterService(key, cb) {
+  return $.getJSON(`http://api.uptimerobot.com/getMonitors?apiKey=${key}&format=json&noJsonCallback=1`)
+    .done(res => {
+      var monitor = res.monitors.monitor[0];
+      cb(monitor.status === "2");  // 2 is "up"
+    }).fail(err => {
+      console.log("Error fetching data from uptimerobot");
+      console.error(err);
+      cb(false);
+    });
 }
 
 function dummyPoll(cb) {
@@ -36,27 +42,45 @@ function dummyPoll(cb) {
 let taskclusterServices = [
   {
     name: "Queue",
-    poll: pollTaskclusterService.bind(null, "https://queue.taskcluster.net/v1/ping"),
+    poll: pollTaskclusterService.bind(null, "m776323830-a170e7abc854f94cc2f4c078"),
     link: "https://queue.taskcluster.net/v1/ping",
     description: "queue.taskcluster.net"
   },
   {
+    name: "Auth",
+    poll: pollTaskclusterService.bind(null, "m776208480-28abc3b309cb0e526a5ebce8"),
+    link: "https://auth.taskcluster.net/v1/ping",
+    description: "auth.taskcluster.net"
+  },
+  {
     name: "AWS Provisioner",
-    poll: pollTaskclusterService.bind(null, "https://aws-provisioner.taskcluster.net/v1/ping"),
-    link: "https://aws-provider.taskcluster.net/v1/ping",
+    poll: pollTaskclusterService.bind(null, "m776120201-37b5da206dfd8de4b00ae25b"),
+    link: "https://aws-provisioner.taskcluster.net/v1/ping",
     description: "aws-provisioner.taskcluster.net"
   },
   {
+    name: "Events",
+    poll: pollTaskclusterService.bind(null, "m776321033-e82bb32adfa08a0bba0002c6"),
+    link: "https://events.taskcluster.net/v1/ping",
+    description: "events.taskcluster.net"
+  },
+  {
     name: "Index",
-    poll: pollTaskclusterService.bind(null, "https://index.taskcluster.net/v1/ping"),
+    poll: pollTaskclusterService.bind(null, "m776362434-85a6996de0f9c73cf21bbf89"),
     link: "https://index.taskcluster.net/v1/ping",
     description: "index.taskcluster.net"
   },
   {
     name: "Scheduler",
-    poll: pollTaskclusterService.bind(null, "https://scheduler.taskcluster.net/v1/ping"),
+    poll: pollTaskclusterService.bind(null, "m776120202-44923d8660c2a1bd1a5de440"),
     link: "https://scheduler.taskcluster.net/v1/ping",
     description: "https://scheduler.taskcluster.net"
+  },
+  {
+    name: "Secrets",
+    poll: pollTaskclusterService.bind(null, "m777577313-6d58b81186c4064cf7a8d1e1"),
+    link: "https://secrets.taskcluster.net/v1/ping",
+    description: "https://secrets.taskcluster.net"
   }
 ];
 
