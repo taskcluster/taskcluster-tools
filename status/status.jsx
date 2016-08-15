@@ -204,7 +204,7 @@ export let ServiceGroup = React.createClass({
   },
   render() {
     return (
-      <div>
+      <bs.Col className="service-group" md={6} sm={12}>
         <h2 data-tip data-for={this.props.name}>{this.props.name}</h2>
         <bs.ButtonToolbar>
           {this.props.services.map(service => {
@@ -220,7 +220,7 @@ export let ServiceGroup = React.createClass({
         <ReactTooltip id={this.props.name} place="top" type="info" effect="float">
           <span>{this.props.description}</span>
         </ReactTooltip>
-      </div>
+      </bs.Col>
     );
   }
 });
@@ -243,11 +243,15 @@ export let TaskclusterStatus = React.createClass({
 export let TaskclusterDashboard  = React.createClass({
   render: function() {
     return (
-      <bs.Row>
-        <TaskclusterStatus/>
-        <ServiceGroup name="Taskcluster" services={taskclusterServices} description="Taskcluster services"/>
-        <ServiceGroup name="Services" services={otherServices} description="External services Taskcluster depends on"/>
-      </bs.Row>
+      <div>
+        <bs.Row>
+          <TaskclusterStatus/>
+        </bs.Row>
+        <bs.Row>
+          <ServiceGroup name="Taskcluster Services" services={taskclusterServices} description="Taskcluster services"/>
+          <ServiceGroup name="External Services" services={otherServices} description="External services Taskcluster depends on"/>
+        </bs.Row>
+      </div>
     );
   }
 });
