@@ -277,28 +277,10 @@ export let ServiceGroup = React.createClass({
   }
 });
 
-export let TaskclusterStatus = React.createClass({
-  render: function() {
-    return (
-      <bs.Col className="taskcluster-status" lg={12} md={12} sm={12} xs={12}>
-        <div className="center-block">
-          <h1>Taskcluster Status</h1>
-        </div>
-        <div className="circle center-block">
-          <StatusChecker status={"up"}/>
-        </div>
-      </bs.Col>
-    );
-  }
-});
-
 export let TaskclusterDashboard  = React.createClass({
   render: function() {
     return (
       <div>
-        <bs.Row>
-          <TaskclusterStatus/>
-        </bs.Row>
         <bs.Row>
           <ServiceGroup name="Taskcluster Services" services={taskclusterServices} description="Taskcluster services"/>
           <ServiceGroup name="External Services" services={otherServices} description="External services Taskcluster depends on"/>
