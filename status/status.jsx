@@ -5,6 +5,7 @@ const $ = require('jquery');
 const WWW_Authenticate = require('www-authenticate').parsers.WWW_Authenticate;
 const ReactTooltip = require("react-tooltip");
 const config = require("../build/status/config")
+const format = require('../lib/format');
 
 // Make a request to the cors proxy service
 function makeRequest(options, allowHeaders = []) {
@@ -27,11 +28,11 @@ function pollTaskclusterService(key, cb) {
   return $.getJSON(`http://api.uptimerobot.com/getMonitors?apiKey=${key}&format=json&noJsonCallback=1`)
     .done(res => {
       var monitor = res.monitors.monitor[0];
-      cb(monitor.status === "2");  // 2 is "up"
+      cb((monitor.status === "2") ? "up" : "down");  // 2 is "up"
     }).fail(err => {
       console.log("Error fetching data from uptimerobot");
       console.error(err);
-      cb(false);
+      cb("error");
     });
 }
 
@@ -97,15 +98,15 @@ let otherServices = [
 
         let items = data.getElementsByTagName('item');
         if (!items.length) {
-          cb(true);
+          cb("up");
           return;
         }
 
         let title = items[0].getElementsByTagName('title');
-        cb(title[0].innerHTML.startsWith('Service is operating normally'));
+        cb((title[0].innerHTML.startsWith('Service is operating normally'))? "up" : "down");
       } catch (err) {
         console.log(err.stack || err);
-        cb(false);
+        cb("down");
       }
     }
   },
@@ -129,7 +130,7 @@ let otherServices = [
         await Promise.resolve(req);
       } catch (err) {
         if (err.status != 401) {
-          cb(false);
+          cb("down");
           return;
         }
 
@@ -149,12 +150,12 @@ let otherServices = [
           }));
         } catch (err) {
           console.log(err.stack || err);
-          cb(false);
+          cb("err");
           return;
         }
       }
 
-      cb(true);
+      cb("up");
     }
   },
   {
@@ -165,23 +166,36 @@ let otherServices = [
       Promise.resolve(makeRequest({
         url: 'https://status.heroku.com/feed'
       }))
-      .then(data => cb(!data.length || data[0].title.startsWith('Resolved')))
+      .then(data => cb((!data.length || data[0].title.startsWith('Resolved')) ? "up" : "down"))
       .catch(err => {
         console.log(err || err.stack);
-        cb(false);
+        cb("err");
       });
     }
   }
 ];
 
+var STATUS_DISPLAY = {
+  'loading': {'icon': 'spinner', 'spin': true, 'color': 'gray'},
+  'up': {'icon': 'thumbs-up', 'color': 'green'},
+  'degraded': {'icon': 'exclamation', 'color': 'orange'},
+  'down': {'icon': 'thumbs-down', 'color': 'red'},
+  'err': {'icon': 'frown-o', 'color': 'red'},
+};
+
 export let StatusChecker = React.createClass({
   propTypes: {
-    up: React.PropTypes.bool.isRequired
+    status: React.PropTypes.string.isRequired
   },
   render: function() {
-    let image = this.props.up ? "green-check.png" : "red-check.png";
+    let {icon, spin, color} = STATUS_DISPLAY[this.props.status] || STATUS_DISPLAY['err'];
     return (
-      <img className="img-check img-fluid center-block" src={image}/>
+        <format.Icon
+          name={icon}
+          size="lg"
+          spin={spin}
+          className="pull-left"
+          style={{'color': color}} />
     );
   }
 });
@@ -194,12 +208,13 @@ export let Service = React.createClass({
     poll: React.PropTypes.func.isRequired
   },
   getInitialState() {
-    let intervalId = setInterval(this.props.poll.bind(this, serviceUp => {
-      this.setState({up: serviceUp});
+    // TODO: set up when component mounts?
+    let intervalId = setInterval(this.props.poll.bind(this, status => {
+      this.setState({status: status});
     }), 5000);
 
     return {
-      up: true,
+      status: "loading",
       intervalId: intervalId
     };
   },
@@ -208,7 +223,7 @@ export let Service = React.createClass({
       <div className="form-horizontal service-status-container">
         <a target="_blank" href={this.props.link}>
           <div data-tip data-for={this.props.name}>
-            <label className="service-status"><StatusChecker up={this.state.up}/></label>
+            <label className="service-status"><StatusChecker status={this.state.status}/></label>
             <label className="service-status">{this.props.name}</label>
           </div>
         </a>
@@ -257,7 +272,7 @@ export let TaskclusterStatus = React.createClass({
           <h1>Taskcluster Status</h1>
         </div>
         <div className="circle center-block">
-          <StatusChecker up={true}/>
+          <StatusChecker status={"up"}/>
         </div>
       </bs.Col>
     );
