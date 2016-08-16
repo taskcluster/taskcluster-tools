@@ -41,59 +41,46 @@ function dummyPoll(cb) {
   setTimeout(cb.bind(null, true), 0);
 }
 
-// these come from the uptimerobot administrative interface, and are intended
-// to be embedded in pages just like this.  Each key corresponds to a single
-// monitor.
-const UPTIMEROBOT_API_KEYS = {
-  queue: "m776323830-a170e7abc854f94cc2f4c078",
-  auth: "m776208480-28abc3b309cb0e526a5ebce8",
-  aws_provisioner: "m776120201-37b5da206dfd8de4b00ae25b",
-  events: "m776321033-e82bb32adfa08a0bba0002c6",
-  index: "m776362434-85a6996de0f9c73cf21bbf89",
-  scheduler: "m776120202-44923d8660c2a1bd1a5de440",
-  secrets: "m777577313-6d58b81186c4064cf7a8d1e1",
-};
-
 let taskclusterServices = [
   {
     name: "Queue",
-    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['queue']),
+    poll: pollTaskclusterService.bind(null, config.UPTIMEROBOT_API_KEY_QUEUE),
     link: "https://queue.taskcluster.net/v1/ping",
     description: "queue.taskcluster.net"
   },
   {
     name: "Auth",
-    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['auth']),
+    poll: pollTaskclusterService.bind(null, config.UPTIMEROBOT_API_KEY_AUTH),
     link: "https://auth.taskcluster.net/v1/ping",
     description: "auth.taskcluster.net"
   },
   {
     name: "AWS Provisioner",
-    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['aws_provisioner']),
+    poll: pollTaskclusterService.bind(null, config.UPTIMEROBOT_API_KEY_AWS_PROVISIONER),
     link: "https://aws-provisioner.taskcluster.net/v1/ping",
     description: "aws-provisioner.taskcluster.net"
   },
   {
     name: "Events",
-    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['events']),
+    poll: pollTaskclusterService.bind(null, config.UPTIMEROBOT_API_KEY_EVENTS),
     link: "https://events.taskcluster.net/v1/ping",
     description: "events.taskcluster.net"
   },
   {
     name: "Index",
-    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['index']),
+    poll: pollTaskclusterService.bind(null, config.UPTIMEROBOT_API_KEY_INDEX),
     link: "https://index.taskcluster.net/v1/ping",
     description: "index.taskcluster.net"
   },
   {
     name: "Scheduler",
-    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['scheduler']),
+    poll: pollTaskclusterService.bind(null, config.UPTIMEROBOT_API_KEY_SCHEDULER),
     link: "https://scheduler.taskcluster.net/v1/ping",
     description: "https://scheduler.taskcluster.net"
   },
   {
     name: "Secrets",
-    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['secrets']),
+    poll: pollTaskclusterService.bind(null, config.UPTIMEROBOT_API_KEY_SECRETS),
     link: "https://secrets.taskcluster.net/v1/ping",
     description: "https://secrets.taskcluster.net"
   }
