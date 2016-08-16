@@ -356,8 +356,6 @@ var TaskGraphInspector = React.createClass({
         <dd><code>{taskGraph.status.taskGraphId}</code></dd>
       </dl>
       {this.renderTaskTable()}
-      <hr/>
-      {this.renderTaskView()}
       </span>
     );
   },
@@ -390,6 +388,7 @@ var TaskGraphInspector = React.createClass({
       <table className="table table-condensed task-graph-inspector-tasks">
         <thead>
           <tr>
+            <th>&nbsp;</th>
             <th>TaskId</th>
             <th>Name</th>
             <th>State</th>
@@ -412,47 +411,20 @@ var TaskGraphInspector = React.createClass({
             if (task.taskId == this.state.taskId) {
               relation = '-';
             }
-            // var myStatus = this.state['task/' + task.taskId + '/status'];
-            var myStatus = {
-              "taskId": "-9J6gFkvSiGfzvvIdnjQLw",
-              "provisionerId": "aws-provisioner-v1",
-              "workerType": "opt-linux64",
-              "schedulerId": "task-graph-scheduler",
-              "taskGroupId": "RzZ5FBeISiCaLboJcS1SBg",
-              "deadline": "2016-03-04T01:59:27.255Z",
-              "expires": "3016-02-29T01:59:27.295Z",
-              "retriesLeft": 5,
-              "state": "completed",
-              "runs": [
-                {
-                  "runId": 0,
-                  "state": "completed",
-                  "reasonCreated": "scheduled",
-                  "scheduled": "2016-02-29T02:10:51.326Z",
-                  "workerGroup": "us-east-1d",
-                  "workerId": "i-f815cc7c",
-                  "takenUntil": "2016-02-29T02:31:09.204Z",
-                  "started": "2016-02-29T02:11:09.284Z",
-                  "reasonResolved": "completed",
-                  "resolved": "2016-02-29T02:11:51.828Z"
-                }
-              ]
-            };
-            // console.log('myStatus',myStatus);
             return (
               <tr key={task.taskId}
                   className={this.state.taskId == task.taskId ? 'info' : null}
                   onClick={this.handleSelectTask.bind(this, task.taskId)}>
-                <td><bs.Glyphicon glyph={this.state.taskId == task.taskId ? "minus-sign" : "plus-sign"} />&nbsp;<code>{task.taskId}</code></td>
+                <td><bs.Glyphicon glyph={this.state.taskId == task.taskId ? "minus-sign" : "plus-sign"} />&nbsp;</td>  
+                <td><code>{task.taskId}</code></td>
                 <td>
-                  <format.Markdown>
-                    {task.name}
-                  </format.Markdown>
                   {
                     this.state.taskId == task.taskId ?
-                      <TaskSummary status={myStatus} />
+                      this.renderTaskSummary()
                     :
-                      undefined
+                    <format.Markdown>
+                      {task.name}
+                    </format.Markdown>
                   } 
                 </td>
                 <td>
@@ -485,8 +457,8 @@ var TaskGraphInspector = React.createClass({
     );
   },
 
-  /** Render taskview for currently selected task */
-  renderTaskView: function() {
+  /** Render taskSummary for currently selected task */
+  renderTaskSummary: function() {
     // If nothing is selected don't try to load
     if (!this.state.taskId || this.state.taskId === '') {
       return undefined;
@@ -499,14 +471,9 @@ var TaskGraphInspector = React.createClass({
 
     // Find status structure from state
     var status = this.state['task/' + this.state.taskId + '/status'];
-    console.log('task/' + this.state.taskId + '/status','status-0');
-    console.log(status,'status-1');
 
     return (
-      <TaskView ref="taskView"
-          hashEntry={this.nextHashEntry()}
-          status={status}
-          queue={this.props.queue}/>
+      <TaskSummary status={status}/>
     );
   },
 
@@ -519,7 +486,11 @@ var TaskGraphInspector = React.createClass({
 
   /** Handle selection of a task */
   handleSelectTask: function(taskId) {
-    this.setState({taskId: taskId});
+    if (this.state.taskId === taskId) {
+      this.setState({taskId: null});
+    } else {
+      this.setState({taskId: taskId});
+    }
   },
 
   /** Handle form submission */
