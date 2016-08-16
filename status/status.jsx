@@ -27,12 +27,13 @@ function makeRequest(options, allowHeaders = []) {
 function pollTaskclusterService(key, cb) {
   return $.getJSON(`http://api.uptimerobot.com/getMonitors?apiKey=${key}&format=json&noJsonCallback=1`)
     .done(res => {
-      var monitor = res.monitors.monitor[0];
-      cb((monitor.status === "2") ? "up" : "down");  // 2 is "up"
+      const [ monitor ] = res.monitors.monitor;
+
+      cb(monitor.status === '2' ? 'up' : 'down');  // 2 is 'up'
     }).fail(err => {
-      console.log("Error fetching data from uptimerobot");
+      console.error("Error fetching data from uptimerobot");
       console.error(err);
-      cb("error");
+      cb('err');
     });
 }
 
@@ -40,46 +41,59 @@ function dummyPoll(cb) {
   setTimeout(cb.bind(null, true), 0);
 }
 
+// these come from the uptimerobot administrative interface, and are intended
+// to be embedded in pages just like this.  Each key corresponds to a single
+// monitor.
+const UPTIMEROBOT_API_KEYS = {
+  queue: "m776323830-a170e7abc854f94cc2f4c078",
+  auth: "m776208480-28abc3b309cb0e526a5ebce8",
+  aws_provisioner: "m776120201-37b5da206dfd8de4b00ae25b",
+  events: "m776321033-e82bb32adfa08a0bba0002c6",
+  index: "m776362434-85a6996de0f9c73cf21bbf89",
+  scheduler: "m776120202-44923d8660c2a1bd1a5de440",
+  secrets: "m777577313-6d58b81186c4064cf7a8d1e1",
+};
+
 let taskclusterServices = [
   {
     name: "Queue",
-    poll: pollTaskclusterService.bind(null, "m776323830-a170e7abc854f94cc2f4c078"),
+    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['queue']),
     link: "https://queue.taskcluster.net/v1/ping",
     description: "queue.taskcluster.net"
   },
   {
     name: "Auth",
-    poll: pollTaskclusterService.bind(null, "m776208480-28abc3b309cb0e526a5ebce8"),
+    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['auth']),
     link: "https://auth.taskcluster.net/v1/ping",
     description: "auth.taskcluster.net"
   },
   {
     name: "AWS Provisioner",
-    poll: pollTaskclusterService.bind(null, "m776120201-37b5da206dfd8de4b00ae25b"),
+    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['aws_provisioner']),
     link: "https://aws-provisioner.taskcluster.net/v1/ping",
     description: "aws-provisioner.taskcluster.net"
   },
   {
     name: "Events",
-    poll: pollTaskclusterService.bind(null, "m776321033-e82bb32adfa08a0bba0002c6"),
+    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['events']),
     link: "https://events.taskcluster.net/v1/ping",
     description: "events.taskcluster.net"
   },
   {
     name: "Index",
-    poll: pollTaskclusterService.bind(null, "m776362434-85a6996de0f9c73cf21bbf89"),
+    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['index']),
     link: "https://index.taskcluster.net/v1/ping",
     description: "index.taskcluster.net"
   },
   {
     name: "Scheduler",
-    poll: pollTaskclusterService.bind(null, "m776120202-44923d8660c2a1bd1a5de440"),
+    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['scheduler']),
     link: "https://scheduler.taskcluster.net/v1/ping",
     description: "https://scheduler.taskcluster.net"
   },
   {
     name: "Secrets",
-    poll: pollTaskclusterService.bind(null, "m777577313-6d58b81186c4064cf7a8d1e1"),
+    poll: pollTaskclusterService.bind(null, UPTIMEROBOT_API_KEYS['secrets']),
     link: "https://secrets.taskcluster.net/v1/ping",
     description: "https://secrets.taskcluster.net"
   }
@@ -98,15 +112,15 @@ let otherServices = [
 
         let items = data.getElementsByTagName('item');
         if (!items.length) {
-          cb("up");
+          cb('up');
           return;
         }
 
         let title = items[0].getElementsByTagName('title');
-        cb((title[0].innerHTML.startsWith('Service is operating normally'))? "up" : "down");
+        cb(title[0].innerHTML.startsWith('Service is operating normally') ? "up" : "down");
       } catch (err) {
         console.log(err.stack || err);
-        cb("down");
+        cb('down');
       }
     }
   },
@@ -130,7 +144,7 @@ let otherServices = [
         await Promise.resolve(req);
       } catch (err) {
         if (err.status != 401) {
-          cb("down");
+          cb('down');
           return;
         }
 
@@ -150,12 +164,12 @@ let otherServices = [
           }));
         } catch (err) {
           console.log(err.stack || err);
-          cb("err");
+          cb('err');
           return;
         }
       }
 
-      cb("up");
+      cb('up');
     }
   },
   {
@@ -169,18 +183,18 @@ let otherServices = [
       .then(data => cb((!data.length || data[0].title.startsWith('Resolved')) ? "up" : "down"))
       .catch(err => {
         console.log(err || err.stack);
-        cb("err");
+        cb('err');
       });
     }
   }
 ];
 
-var STATUS_DISPLAY = {
-  'loading': {'icon': 'spinner', 'spin': true, 'color': 'gray'},
-  'up': {'icon': 'thumbs-up', 'color': 'green'},
-  'degraded': {'icon': 'exclamation', 'color': 'orange'},
-  'down': {'icon': 'thumbs-down', 'color': 'red'},
-  'err': {'icon': 'frown-o', 'color': 'red'},
+const STATUS_DISPLAY = {
+  'loading': {icon: 'spinner', spin: true, color: 'gray'},
+  'up': {icon: 'thumbs-up', color: 'green'},
+  'degraded': {icon: 'exclamation', color: 'orange'},
+  'down': {icon: 'thumbs-down', color: 'red'},
+  'err': {icon: 'frown-o', color: 'red'},
 };
 
 export let StatusChecker = React.createClass({
@@ -188,14 +202,14 @@ export let StatusChecker = React.createClass({
     status: React.PropTypes.string.isRequired
   },
   render: function() {
-    let {icon, spin, color} = STATUS_DISPLAY[this.props.status] || STATUS_DISPLAY['err'];
+    let { icon, spin, color } = STATUS_DISPLAY[this.props.status] || STATUS_DISPLAY['err'];
     return (
         <format.Icon
           name={icon}
           size="lg"
           spin={spin}
           className="pull-left"
-          style={{'color': color}} />
+          style={{color}} />
     );
   }
 });
@@ -220,7 +234,7 @@ export let Service = React.createClass({
 
   poll() {
     this.props.poll(status => {
-      this.setState({status});
+      this.setState({ status });
       this.timer = setTimeout(this.poll, 5000);
     });
   },
@@ -236,7 +250,7 @@ export let Service = React.createClass({
       <div className="form-horizontal service-status-container">
         <a target="_blank" href={this.props.link}>
           <div data-tip data-for={this.props.name}>
-            <label className="service-status"><StatusChecker status={this.state.status}/></label>
+            <label className="service-status"><StatusChecker status={this.state.status} /></label>
             <label className="service-status">{this.props.name}</label>
           </div>
         </a>
