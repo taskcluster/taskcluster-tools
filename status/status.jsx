@@ -31,7 +31,7 @@ function pollTaskclusterService(key, cb) {
 
       cb(monitor.status === '2' ? 'up' : 'down');  // 2 is 'up'
     }).fail(err => {
-      console.error("Error fetching data from uptimerobot");
+      console.error('Error fetching data from uptimerobot');
       console.error(err);
       cb('err');
     });
@@ -104,7 +104,7 @@ let otherServices = [
         }
 
         let title = items[0].getElementsByTagName('title');
-        cb(title[0].innerHTML.startsWith('Service is operating normally') ? "up" : "down");
+        cb(title[0].innerHTML.startsWith('Service is operating normally') ? 'up' : 'down');
       } catch (err) {
         console.log(err.stack || err);
         cb('down');
@@ -167,7 +167,7 @@ let otherServices = [
       Promise.resolve(makeRequest({
         url: 'https://status.heroku.com/feed'
       }))
-      .then(data => cb((!data.length || data[0].title.startsWith('Resolved')) ? "up" : "down"))
+      .then(data => cb((!data.length || data[0].title.startsWith('Resolved')) ? 'up' : 'down'))
       .catch(err => {
         console.log(err || err.stack);
         cb('err');
@@ -177,11 +177,11 @@ let otherServices = [
 ];
 
 const STATUS_DISPLAY = {
-  'loading': {icon: 'spinner', spin: true, color: 'gray'},
-  'up': {icon: 'thumbs-up', color: 'green'},
-  'degraded': {icon: 'exclamation', color: 'orange'},
-  'down': {icon: 'thumbs-down', color: 'red'},
-  'err': {icon: 'frown-o', color: 'red'},
+  loading: { icon: 'spinner', spin: true, color: 'gray' },
+  up: { icon: 'thumbs-up', color: 'green' },
+  degraded: { icon: 'exclamation', color: 'orange' },
+  down: { icon: 'thumbs-down', color: 'red' },
+  err: { icon: 'frown-o', color: 'red' },
 };
 
 export let StatusChecker = React.createClass({
@@ -189,14 +189,14 @@ export let StatusChecker = React.createClass({
     status: React.PropTypes.string.isRequired
   },
   render: function() {
-    let { icon, spin, color } = STATUS_DISPLAY[this.props.status] || STATUS_DISPLAY['err'];
+    const { icon, spin, color } = STATUS_DISPLAY[this.props.status] || STATUS_DISPLAY['err'];
     return (
         <format.Icon
           name={icon}
           size="lg"
           spin={spin}
           className="pull-left"
-          style={{color}} />
+          style={{ color }} />
     );
   }
 });
@@ -228,7 +228,7 @@ export let Service = React.createClass({
 
   getInitialState() {
     return {
-      status: "loading",
+      status: 'loading',
     };
   },
 
@@ -283,8 +283,8 @@ export let TaskclusterDashboard  = React.createClass({
     return (
       <div>
         <bs.Row>
-          <ServiceGroup name="Taskcluster Services" services={taskclusterServices} description="Taskcluster services"/>
-          <ServiceGroup name="External Services" services={otherServices} description="External services Taskcluster depends on"/>
+          <ServiceGroup name="Taskcluster Services" services={taskclusterServices} description="Taskcluster services" />
+          <ServiceGroup name="External Services" services={otherServices} description="External services Taskcluster depends on" />
         </bs.Row>
       </div>
     );
