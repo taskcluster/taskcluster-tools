@@ -3,8 +3,7 @@ var bs              = require('react-bootstrap');
 var utils           = require('../lib/utils');
 var taskcluster     = require('taskcluster-client');
 var _               = require('lodash');
-var TaskView        = require('../lib/ui/taskview');
-var TaskSummary       = require('../lib/ui/tasksummary');
+var TaskSummary     = require('../lib/ui/tasksummary');
 var format          = require('../lib/format');
 var PreviousTasks   = require('../lib/ui/previoustasks');
 
@@ -15,42 +14,42 @@ var TaskGraphInspector = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue, Scheduler and associated events
       clients: {
-        scheduler:                taskcluster.Scheduler,
-        schedulerEvents:          taskcluster.SchedulerEvents,
-        queue:                    taskcluster.Queue,
-        queueEvents:              taskcluster.QueueEvents
+        scheduler: taskcluster.Scheduler,
+        schedulerEvents: taskcluster.SchedulerEvents,
+        queue: taskcluster.Queue,
+        queueEvents: taskcluster.QueueEvents
       },
       // Reload when state.taskGraphId changes, ignore credential changes
-      reloadOnKeys:               ['taskGraphId'],
-      reloadOnLogin:              false
+      reloadOnKeys: ['taskGraphId'],
+      reloadOnLogin: false
     }),
     // Called handler when state.taskGraphId and state.taskId changes
     utils.createWatchStateMixin({
       onKeys: {
-        updateTaskGraphIdInput:   ['taskGraphId'],
-        loadTaskStatus:           ['taskId']
+        updateTaskGraphIdInput: ['taskGraphId'],
+        loadTaskStatus: ['taskId']
       }
     }),
     // Listen for messages, reload bindings() when state.taskGraphId changes
     utils.createWebListenerMixin({
-      reloadOnKeys:               ['taskGraphId']
+      reloadOnKeys: ['taskGraphId']
     }),
     // Serialize state.taskGraphId to location.hash as string
     utils.createLocationHashMixin({
-      keys:                       ['taskGraphId', 'taskId'],
-      type:                       'string'
+      keys: ['taskGraphId', 'taskId'],
+      type: 'string'
     })
   ],
 
   /** Get initial state */
   getInitialState: function() {
     return {
-      taskGraphId:        '',
-      taskId:             null,
-      taskGraphLoaded:    true,
-      taskGraphError:     undefined,
-      taskGraph:          null,
-      taskGraphIdInput:   ''
+      taskGraphId: '',
+      taskId: null,
+      taskGraphLoaded: true,
+      taskGraphError: undefined,
+      taskGraph: null,
+      taskGraphIdInput: ''
       // Remark we'll cache task status structures under
       // 'task/<taskId>/status' as arrive from messages or when we load a
       // a task...
@@ -62,14 +61,14 @@ var TaskGraphInspector = React.createClass({
     // Skip loading empty-strings
     if (this.state.taskGraphId === '') {
       return {
-        taskGraph:      null
+        taskGraph: null
       };
     }
 
     // Construct promised state
     return {
       // Load task status and take the `status` key from the response
-      taskGraph:        this.scheduler.inspect(this.state.taskGraphId)
+      taskGraph: this.scheduler.inspect(this.state.taskGraphId)
     };
   },
 
@@ -183,7 +182,7 @@ var TaskGraphInspector = React.createClass({
 
     // Create updated state
     var state = {
-      taskGraph:      taskGraph
+      taskGraph: taskGraph
     };
 
     // Cache status structure, we don't have to reload it if we select the task
@@ -293,9 +292,9 @@ var TaskGraphInspector = React.createClass({
 
     // Mapping from state to labels
     var taskGraphStateLabel = {
-      running:          'label label-primary',
-      finished:         'label label-success',
-      blocked:          'label label-danger'
+      running: 'label label-primary',
+      finished: 'label label-success',
+      blocked: 'label label-danger'
     };
 
     // Shorten source if necessary
@@ -363,13 +362,13 @@ var TaskGraphInspector = React.createClass({
   /** Render table of tasks in a task-graph */
   renderTaskTable: function() {
     var taskStateLabel = {
-      unscheduled:      'label label-default',
-      scheduled:        'label label-info',
-      pending:          'label label-info',
-      running:          'label label-primary',
-      completed:        'label label-success',
-      failed:           'label label-danger',
-      exception:        'label label-warning'
+      unscheduled: 'label label-default',
+      scheduled: 'label label-info',
+      pending: 'label label-info',
+      running: 'label label-primary',
+      completed: 'label label-success',
+      failed: 'label label-danger',
+      exception: 'label label-warning'
     };
 
     var requiredTasks = [];
@@ -413,18 +412,14 @@ var TaskGraphInspector = React.createClass({
             }
             return (
               <tr key={task.taskId}
-                  className={this.state.taskId == task.taskId ? 'info' : null}
+                  className={this.state.taskId === task.taskId ? 'info' : null}
                   onClick={this.handleSelectTask.bind(this, task.taskId)}>
-                <td><bs.Glyphicon glyph={this.state.taskId == task.taskId ? "minus-sign" : "plus-sign"} />&nbsp;</td>  
+                <td><bs.Glyphicon glyph={this.state.taskId === task.taskId ? "minus-sign" : "plus-sign"} /></td>  
                 <td><code>{task.taskId}</code></td>
                 <td>
-                  {
-                    this.state.taskId == task.taskId ?
-                      this.renderTaskSummary()
-                    :
-                    <format.Markdown>
-                      {task.name}
-                    </format.Markdown>
+                  {this.state.taskId === task.taskId ?
+                    this.renderTaskSummary() :
+                    <format.Markdown>{task.name}</format.Markdown>
                   } 
                 </td>
                 <td>
@@ -472,25 +467,19 @@ var TaskGraphInspector = React.createClass({
     // Find status structure from state
     var status = this.state['task/' + this.state.taskId + '/status'];
 
-    return (
-      <TaskSummary status={status}/>
-    );
+    return <TaskSummary status={status} />;
   },
 
   /** Update TaskGraphIdInput to reflect input */
   handleTaskGraphIdInputChange: function() {
     this.setState({
-      taskGraphIdInput:   this.refs.taskGraphId.getInputDOMNode().value.trim()
+      taskGraphIdInput: this.refs.taskGraphId.getInputDOMNode().value.trim()
     });
   },
 
   /** Handle selection of a task */
   handleSelectTask: function(taskId) {
-    if (this.state.taskId === taskId) {
-      this.setState({taskId: null});
-    } else {
-      this.setState({taskId: taskId});
-    }
+    this.setState({ taskId: this.state.taskId === taskId ? null : taskId });
   },
 
   /** Handle form submission */

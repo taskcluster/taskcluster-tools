@@ -1,10 +1,10 @@
-let React             = require('react');
-let _                 = require('lodash');
-let bs                = require('react-bootstrap');
-let format            = require('../format');
-let path              = require('path');
-let taskcluster       = require('taskcluster-client');
-let utils             = require('../utils');
+const React             = require('react');
+const _                 = require('lodash');
+const bs                = require('react-bootstrap');
+const format            = require('../format');
+const path              = require('path');
+const taskcluster       = require('taskcluster-client');
+const utils             = require('../utils');
 
 /** Displays information about a task in a tab page */
 var TaskSummary = React.createClass({
@@ -13,11 +13,11 @@ var TaskSummary = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue:                taskcluster.Queue
+        queue:  taskcluster.Queue
       },
       // Reload when props.status.taskId changes, ignore credential changes
-      reloadOnProps:          ['status.taskId'],
-      reloadOnLogin:          false
+      reloadOnProps:  ['status.taskId'],
+      reloadOnLogin:  false
     })
   ],
 
@@ -30,9 +30,9 @@ var TaskSummary = React.createClass({
   getInitialState() {
     return {
       // task definition
-      taskLoaded:         false,
-      taskError:          undefined,
-      task:               undefined
+      taskLoaded:  false,
+      taskError:  null,
+      task:  undefined
     };
   },
 
@@ -45,23 +45,17 @@ var TaskSummary = React.createClass({
 
   render() {
     // Easy references to values
-    var status  = this.props.status;
-    var task    = this.state.task;
+    const { status } = this.props;
+    const { task } = this.state;
 
     var taskStateLabel = {
-      unscheduled:      'label label-default',
-      pending:          'label label-info',
-      running:          'label label-primary',
-      completed:        'label label-success',
-      failed:           'label label-danger',
-      exception:        'label label-warning'
+      unscheduled:  'label label-default',
+      pending:  'label label-info',
+      running:  'label label-primary',
+      completed:  'label label-success',
+      failed:  'label label-danger',
+      exception:  'label label-warning'
     };
-
-    var isResolved = [
-      'completed',
-      'failed',
-      'exception'
-    ].indexOf(status.state) !== -1;
 
     return this.renderWaitFor('task') || (
       <div>
@@ -86,18 +80,14 @@ var TaskSummary = React.createClass({
         </dd>
         <dt>Task Inspector</dt>
         <dd>
-          <a target="_blank" href={'../task-inspector/#' + status.taskId}>
-            {status.taskId}
-            &nbsp;
-            <i className="fa fa-external-link"></i>
+          <a target="_blank" href={`../task-inspector/#${status.taskId}`}>
+            {status.taskId} <i className="fa fa-external-link" />
           </a>
         </dd>
       </dl>
       </div>
     );
-  },
-
+  }
 });
 
-// Export TaskSummary
 module.exports = TaskSummary;
