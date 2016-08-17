@@ -13,26 +13,26 @@ var TaskSummary = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue:  taskcluster.Queue
+        queue: taskcluster.Queue
       },
       // Reload when props.status.taskId changes, ignore credential changes
-      reloadOnProps:  ['status.taskId'],
-      reloadOnLogin:  false
+      reloadOnProps: ['status.taskId'],
+      reloadOnLogin: false
     })
   ],
 
   // Validate properties
   propTypes: {
-    status:   React.PropTypes.object.isRequired
+    status: React.PropTypes.object.isRequired
   },
 
   /** Get initial state */
   getInitialState() {
     return {
       // task definition
-      taskLoaded:  false,
-      taskError:  null,
-      task:  undefined
+      taskLoaded: false,
+      taskError: null,
+      task: null
     };
   },
 
@@ -49,42 +49,42 @@ var TaskSummary = React.createClass({
     const { task } = this.state;
 
     var taskStateLabel = {
-      unscheduled:  'label label-default',
-      pending:  'label label-info',
-      running:  'label label-primary',
-      completed:  'label label-success',
-      failed:  'label label-danger',
-      exception:  'label label-warning'
+      unscheduled: 'label label-default',
+      pending: 'label label-info',
+      running: 'label label-primary',
+      completed: 'label label-success',
+      failed: 'label label-danger',
+      exception: 'label label-warning'
     };
 
     return this.renderWaitFor('task') || (
       <div>
-      <dl className="dl-horizontal">
-        <dt>Name</dt>
-        <dd>
-          <format.Markdown>
-            {task.metadata.name}
-          </format.Markdown>
-        </dd>
-        <dt>Description</dt>
-        <dd>
-          <format.Markdown>
-            {task.metadata.description}
-          </format.Markdown>
-        </dd>
-        <dt>State</dt>
-        <dd>
-          <span className={taskStateLabel[status.state]}>
-            {status.state}
-          </span>
-        </dd>
-        <dt>Task Inspector</dt>
-        <dd>
-          <a target="_blank" href={`../task-inspector/#${status.taskId}`}>
-            {status.taskId} <i className="fa fa-external-link" />
-          </a>
-        </dd>
-      </dl>
+        <dl className="dl-horizontal">
+          <dt>Name</dt>
+          <dd>
+            <format.Markdown>
+              {task.metadata.name}
+            </format.Markdown>
+          </dd>
+          <dt>Description</dt>
+          <dd>
+            <format.Markdown>
+              {task.metadata.description}
+            </format.Markdown>
+          </dd>
+          <dt>State</dt>
+          <dd>
+            <span className={taskStateLabel[status.state]}>
+              {status.state}
+            </span>
+          </dd>
+          <dt>Task Inspector</dt>
+          <dd>
+            <a target="_blank" href={`../task-inspector/#${status.taskId}`}>
+              {status.taskId} <i className="fa fa-external-link" />
+            </a>
+          </dd>
+        </dl>
       </div>
     );
   }

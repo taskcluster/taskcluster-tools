@@ -47,7 +47,7 @@ var TaskGraphInspector = React.createClass({
       taskGraphId: '',
       taskId: null,
       taskGraphLoaded: true,
-      taskGraphError: undefined,
+      taskGraphError: null,
       taskGraph: null,
       taskGraphIdInput: ''
       // Remark we'll cache task status structures under
@@ -414,7 +414,7 @@ var TaskGraphInspector = React.createClass({
               <tr key={task.taskId}
                   className={this.state.taskId === task.taskId ? 'info' : null}
                   onClick={this.handleSelectTask.bind(this, task.taskId)}>
-                <td><bs.Glyphicon glyph={this.state.taskId === task.taskId ? "minus-sign" : "plus-sign"} /></td>  
+                <td><bs.Glyphicon glyph={this.state.taskId === task.taskId ? 'chevron-down' : 'chevron-right'} /></td>  
                 <td><code>{task.taskId}</code></td>
                 <td>
                   {this.state.taskId === task.taskId ?
