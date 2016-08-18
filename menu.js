@@ -100,7 +100,7 @@ module.exports = [
   {
     title:          "Scope Inspector",
     link:           '/auth/scopes/',
-    icon:           'wifi',
+    icon:           'graduation-cap',
     display:        true,
     description: [
       "Explore scopes on `auth.taskcluster.net`. This tool allows you to",
