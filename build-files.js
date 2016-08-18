@@ -24,6 +24,11 @@ module.exports = [
   'auth/roles/app.less',
   'auth/roles/app.jsx',
 
+  // Scopes Manager
+  'auth/scopes/index.jade',
+  'auth/scopes/app.less',
+  'auth/scopes/app.jsx',
+
   // Login
   'login/index.jade',
   'login/app.jsx',
