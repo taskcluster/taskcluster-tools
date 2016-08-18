@@ -36,7 +36,7 @@ var ScopeInspector = React.createClass({
       selectedScope:    '',
       selectedEntity:   '',
       scopeSearchTerm:  '',
-      entitySearchMode: 'Exact',
+      entitySearchMode: 'Has Scope',
     };
   },
 
@@ -91,11 +91,11 @@ var ScopeInspector = React.createClass({
             _.startsWith(this.state.selectedEntity, 'role:') ? (
               <RoleEditor
                 currentRoleId={this.state.selectedEntity.slice('role:'.length)}
-                reloadRoleId={() => {}}/>
+                reloadRoleId={this.reload}/>
             ) : (
               <ClientEditor
                 currentClientId={this.state.selectedEntity.slice('client:'.length)}
-                reloadClientId={() => {}}/>
+                reloadClientId={this.reload}/>
             )
           }
         </bs.Col>
@@ -116,7 +116,7 @@ var ScopeInspector = React.createClass({
     if (mode === 'Exact') {
       match = scope => scope === this.state.selectedScope;
     }
-    if (mode === 'Owns Scope') {
+    if (mode === 'Has Scope') {
       match = scope => {
         if (scope === this.state.selectedScope) {
           return true;
@@ -127,7 +127,7 @@ var ScopeInspector = React.createClass({
         return false;
       };
     }
-    if (mode === 'Owns Sub-Scope') {
+    if (mode === 'Has Sub-Scope') {
       let pattern = this.state.selectedScope;
       if (!/\*$/.test(pattern)) {
         pattern += "*"; // Otherwise this test doesn't make any sense
@@ -166,15 +166,15 @@ var ScopeInspector = React.createClass({
                       style={mode === 'Exact' ? {} : {visibility: 'hidden'}}/>
                       &nbsp; Exact
                   </bs.MenuItem>
-                  <bs.MenuItem key="2" onClick={this.setEntitySearchMode.bind(this, 'Owns Scope')}>
+                  <bs.MenuItem key="2" onClick={this.setEntitySearchMode.bind(this, 'Has Scope')}>
                     <bs.Glyphicon glyph="ok"
-                      style={mode === 'Owns Scope' ? {} : {visibility: 'hidden'}}/>
-                      &nbsp; Owns Scope
+                      style={mode === 'Has Scope' ? {} : {visibility: 'hidden'}}/>
+                      &nbsp; Has Scope
                   </bs.MenuItem>
-                  <bs.MenuItem key="3"  onClick={this.setEntitySearchMode.bind(this, 'Owns Sub-Scope')}>
+                  <bs.MenuItem key="3"  onClick={this.setEntitySearchMode.bind(this, 'Has Sub-Scope')}>
                     <bs.Glyphicon glyph="ok"
-                      style={mode === 'Owns Sub-Scope' ? {} : {visibility: 'hidden'}}/>
-                      &nbsp; Owns Sub-Scope
+                      style={mode === 'Has Sub-Scope' ? {} : {visibility: 'hidden'}}/>
+                      &nbsp; Has Sub-Scope
                   </bs.MenuItem>
                 </bs.DropdownButton>
               </bs.InputGroup>
