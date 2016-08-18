@@ -6,17 +6,18 @@ var _                 = require('lodash');
 var format            = require('../lib/format');
 var WorkerTypeView    = require('./workertypeview');
 var WorkerTypeEditor  = require('./workertypeeditor');
+var reference = require('../ami-sets/temp-aws-prov-reference');
 
 var WorkerTypeRow = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
         queue:          taskcluster.Queue,
-        awsProvisioner: taskcluster.AwsProvisioner
+        awsProvisioner: taskcluster.createClient(reference)
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://aws-provisioner.taskcluster.net/v1'
+          baseUrl:      'http://localhost:5557/v1'
         }
       },
       reloadOnProps: [
@@ -199,11 +200,11 @@ var WorkerTypeTable = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: taskcluster.AwsProvisioner,
+        awsProvisioner: taskcluster.createClient(reference),
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://aws-provisioner.taskcluster.net/v1'
+          baseUrl:      'http://localhost:5557/v1'
         }
       },
       reloadOnProps: [

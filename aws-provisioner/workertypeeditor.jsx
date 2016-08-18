@@ -9,6 +9,9 @@ var ConfirmAction     = require('../lib/ui/confirmaction');
 require('codemirror/mode/javascript/javascript');
 require('../lib/codemirror/json-lint');
 
+// temporary until we have an updated taskcluster-client with the new methods in it
+var reference = require('../ami-sets/temp-aws-prov-reference');
+
 /** Encode/decode UserData property of object */
 var encodeUserData = (obj) => {
   if (obj && obj.UserData) {
@@ -25,11 +28,11 @@ var WorkerTypeEditor = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: taskcluster.AwsProvisioner,
+        awsProvisioner: taskcluster.createClient(reference),
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://aws-provisioner.taskcluster.net/v1'
+          baseUrl:      'http://localhost:5557/v1'
         }
       },
       reloadOnProps: ['definition', 'workerType']

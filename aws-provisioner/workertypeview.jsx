@@ -304,7 +304,7 @@ var WorkerTypeView = React.createClass({
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl:      'https://aws-provisioner.taskcluster.net/v1'
+          baseUrl:      'http://localhost:5557/v1'
         }
       },
       reloadOnProps: [
@@ -430,4 +430,3 @@ var WorkerTypeView = React.createClass({
 
 // Export WorkerTypeView
 module.exports = WorkerTypeView;
-
