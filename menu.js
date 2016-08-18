@@ -98,6 +98,17 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Scope Inspector",
+    link:           '/auth/scopes/',
+    icon:           'wifi',
+    display:        true,
+    description: [
+      "Explore scopes on `auth.taskcluster.net`. This tool allows you to",
+      "find roles and clients with a given scope. This is effectively reverse",
+      "client and role lookup."
+    ].join('\n')
+  },
+  {
     title:          "Pulse Inspector",
     link:           '/pulse-inspector/',
     icon:           'wifi',
