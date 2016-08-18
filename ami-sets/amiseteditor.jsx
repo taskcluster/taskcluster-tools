@@ -41,7 +41,7 @@ var AmiSetEditor = React.createClass({
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
+          baseUrl: 'http://localhost:5557/v1'
         }
       },
       reloadOnProps: ['currentAmiSet']
@@ -69,7 +69,8 @@ var AmiSetEditor = React.createClass({
       amis: initialAmiSet,
       editing: true,
       working: false,
-      error: null
+      error: null,
+      invalidAmis: []
     };
   },
 
@@ -79,6 +80,7 @@ var AmiSetEditor = React.createClass({
       return {
         amiSet: '',
         amis: initialAmiSet,
+        invalidAmis: [],
         editing: true,
         working: false,
         error: null
@@ -87,6 +89,7 @@ var AmiSetEditor = React.createClass({
       return {
         amiSet: this.props.currentAmiSet,
         amis: this.awsProvisioner.amiSet(this.props.currentAmiSet),
+        invalidAmis: this.awsProvisioner.validateAmiSet(this.props.currentAmiSet),
         editing: false,
         working: false,
         error: null
@@ -124,12 +127,40 @@ var AmiSetEditor = React.createClass({
                   </div>
                   ) : (
                   <span>
+                    {
+                      this.renderWaitFor('invalidAmis') || (
+                        this.state.invalidAmis.length ? (
+                          <bs.Alert bsStyle="danger">
+                            <strong>DO NOT use this AMI set</strong>
+                            <p>This AMI set contains the following invalid AMIs:</p>
+                            <ul>
+                            {
+                              this.state.invalidAmis.map(ami => {
+                                return (
+                                  <li key={ami.imageId}><strong>{ami.imageId}</strong> ({ami.region})</li>
+                                )
+                              })
+                            }
+                            </ul>
+                          </bs.Alert>
+                        ) : (
+                          <bs.Alert bsStyle="success">
+                            All AMIs from this set are still valid.
+                          </bs.Alert>
+                        )
+                      )
+                    }
                     <pre>{JSON.stringify(_.pick(this.state.amis, ['amis']), null, 2)}</pre>
                     <bs.ButtonToolbar>
                       <bs.Button
                         bsStyle="success"
                         onClick={this.startEditing}>
                         <bs.Glyphicon glyph="pencil"/> Edit AMI Set
+                      </bs.Button>
+                      <bs.Button
+                        bsStyle="info"
+                        onClick={this.validateAmiSet}>
+                        <bs.Glyphicon glyph="ok"/> Validate AMI Set
                       </bs.Button>
                     </bs.ButtonToolbar>
                   </span>
@@ -219,6 +250,13 @@ var AmiSetEditor = React.createClass({
 
   amiSetChange() {
     this.setState({ amiSet: this.refs.amiSet.getValue() });
+  },
+
+  async validateAmiSet() {
+    let invalidAmis = await this.awsProvisioner.validateAmiSet(this.props.currentAmiSet);
+    this.setState({
+      invalidAmis: invalidAmis
+    });
   },
 
   async saveAmiSet() {
