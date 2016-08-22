@@ -25,7 +25,7 @@ function makeRequest(options, allowHeaders = []) {
 }
 
 function pollTaskclusterService(key, cb) {
-  return $.getJSON(`http://api.uptimerobot.com/getMonitors?apiKey=${key}&format=json&noJsonCallback=1`)
+  return $.getJSON(`https://api.uptimerobot.com/getMonitors?apiKey=${key}&format=json&noJsonCallback=1`)
     .done(res => {
       const [ monitor ] = res.monitors.monitor;
 
