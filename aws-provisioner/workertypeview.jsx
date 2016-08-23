@@ -99,7 +99,8 @@ var WorkerTypeResources = React.createClass({
           {
             this.renderSpotRequestLink(
               instance.srId,
-              instance.region
+              instance.region,
+              true
             )
           }
         </td>
@@ -121,6 +122,7 @@ var WorkerTypeResources = React.createClass({
             this.renderSpotRequestLink(
               spotReq.id,
               spotReq.region,
+              spotReq.visibleToEC2Api
             )
           }
         </td>
@@ -157,14 +159,23 @@ var WorkerTypeResources = React.createClass({
     );
   },
 
-  renderSpotRequestLink(spotRequestId, region) {
+  renderSpotRequestLink(spotRequestId, region, visibleToEC2) {
     var link = 'https://console.aws.amazon.com/ec2/v2/home?region=' +
                 region + '#SpotInstances:spotInstanceRequestId=' +
                 spotRequestId + ';sort=requestId';
+    var apiString = '';
+    // API Visibility refers to the fact that the spot request has been made
+    // but due to eventual consistency is not yet showing up in the describe*
+    //
+    // NOTE: only doing comparison to false instead of !visibleToEC2 for
+    // deployment reasons since the API currently spits out 'undefined'
+    if (visibleToEC2 === false) {
+      apiString = ' (Internally tracked)'
+    }
     return (
       <a href={link}
          target='_blank'>
-        <code>{spotRequestId}</code>
+        <code>{spotRequestId}</code>{apiString}
         <i className='fa fa-external-link' style={{paddingLeft: 5}}></i>
       </a>
     );
