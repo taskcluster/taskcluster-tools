@@ -21,7 +21,7 @@ var WorkerTypeResources = React.createClass({
       <span>
         <h3>Running Instances</h3>
         We have a total running instance capacity of {this.runningCapacity()}.
-        These are instance that the provisioner counts as doing work.
+        These are instances that the provisioner counts as doing work.
         <bs.Table>
           <thead>
             <tr>
@@ -62,7 +62,7 @@ var WorkerTypeResources = React.createClass({
         </bs.Table>
         <h3>Spot Requests</h3>
         We have unfilled spot requests for a capacity of {this.spotReqCapacity()}.
-        Amazon is yet to decided on the bid, or they have not told us the
+        Amazon is yet to decide on the bid, or they have not told us the
         outcome yet.
         <bs.Table>
           <thead>
@@ -161,19 +161,19 @@ var WorkerTypeResources = React.createClass({
     var link = 'https://console.aws.amazon.com/ec2/v2/home?region=' +
                 region + '#SpotInstances:spotInstanceRequestId=' +
                 spotRequestId + ';sort=requestId';
-    var apiString = '';
     // API Visibility refers to the fact that the spot request has been made
-    // but due to eventual consistency is not yet showing up in the describe*
+    // but due to eventual consistency is not yet showing up in the 
+    // describe* EC2 API endpoints
     //
     // NOTE: only doing comparison to false instead of !visibleToEC2 for
-    // deployment reasons since the API currently spits out 'undefined'
-    if (visibleToEC2 === false) {
-      apiString = ' (Internally tracked)'
-    }
+    // deployment reasons since the API currently spits out 'undefined' for
+    // both internally tracked and api tracked requests
     return (
       <a href={link}
          target='_blank'>
-        <code>{spotRequestId}</code>{apiString}
+        <code>{spotRequestId}</code>{
+          visibleToEC2 === false ? ' (Internally tracked)' : ''
+        }
         <i className='fa fa-external-link' style={{paddingLeft: 5}}></i>
       </a>
     );
