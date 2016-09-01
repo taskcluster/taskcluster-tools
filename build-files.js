@@ -97,6 +97,11 @@ module.exports = [
   'secrets/app.jsx',
   'secrets/app.less',
 
+  // Cache Purge Inspector
+  'purge-caches/index.jade',
+  'purge-caches/app.jsx',
+  'purge-caches/app.less',
+
   // Interactive
   'interactive/index.jade',
   'interactive/app.jsx',

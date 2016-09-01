@@ -120,6 +120,15 @@ module.exports = [
     ].join('\n')
   },
   {
+    title:          "Cache Purge Inspector",
+    link:           '/purge-caches/',
+    icon:           'bolt',
+    display:        true,
+    description: [
+      "View currently active cache purges and schedule a new one if needed.",
+    ].join('\n')
+  },
+  {
     title:          "Index Browser",
     link:           '/index/',
     icon:           'sitemap',
