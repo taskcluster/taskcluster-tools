@@ -26,10 +26,11 @@ var decodeUserData = (obj) => {
 
 var initialAmiSet = {
   amis: [{
-    region: '...',
-    hvm: '...',
-    pv: '...'
-  }]
+    region: '',
+    hvm: '',
+    pv: ''
+  }],
+  invalidAmis: []
 };
 
 /** Create amiSet editor/viewer (same thing) */
@@ -129,15 +130,18 @@ var AmiSetEditor = React.createClass({
                   <span>
                     {
                       this.renderWaitFor('invalidAmis') || (
-                        this.state.invalidAmis.length ? (
+                        !this.state.invalidAmis.valid ? (
                           <bs.Alert bsStyle="danger">
                             <strong>DO NOT use this AMI set</strong>
                             <p>This AMI set contains the following invalid AMIs:</p>
                             <ul>
                             {
-                              this.state.invalidAmis.map(ami => {
+                              this.state.invalidAmis.invalidAmis.map(ami => {
                                 return (
-                                  <li key={ami.imageId}><strong>{ami.imageId}</strong> ({ami.region})</li>
+                                  <li key={ami.imageId}>
+                                    <strong>{ami.imageId}</strong> ({ami.region})
+                                    {ami.virtualizationType ? ' - wrong virtualization type: this AMI is ' + ami.virtualizationType : ''}
+                                  </li>
                                 )
                               })
                             }
@@ -156,11 +160,6 @@ var AmiSetEditor = React.createClass({
                         bsStyle="success"
                         onClick={this.startEditing}>
                         <bs.Glyphicon glyph="pencil"/> Edit AMI Set
-                      </bs.Button>
-                      <bs.Button
-                        bsStyle="info"
-                        onClick={this.validateAmiSet}>
-                        <bs.Glyphicon glyph="ok"/> Validate AMI Set
                       </bs.Button>
                     </bs.ButtonToolbar>
                   </span>
@@ -276,7 +275,11 @@ var AmiSetEditor = React.createClass({
       await this.awsProvisioner.createAmiSet(this.state.amiSet, this.state.amis);
       this.setState({
         editing: false,
-        error: null
+        error: null,
+        invalidAmis: {
+          valid: true,
+          invalidAmis: []
+        }
       });
       this.props.selectAmiSet(this.state.amiSet);
       this.props.refreshAmiSetsList();

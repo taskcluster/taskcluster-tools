@@ -36,9 +36,6 @@ var WorkerTypeList = React.createClass({
 
   getInitialState() {
     return {
-      // selected workerType identifier (string)
-      // or 'create:worker-type' to indicate creation of workerType
-      selected: '',
       selectedWorkerTypes: [],
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
@@ -167,48 +164,52 @@ var WorkerTypeList = React.createClass({
   },
 
   async applyAmiSet() {
-    // Validate amiSet again
     let invalidAmis = await this.awsProvisioner.validateAmiSet(this.props.currentAmiSet);
     this.state.errorWorkerTypes = [];
 
-    if (invalidAmis.length > 0){
+    if (!invalidAmis.valid) {
       this.setState({ error: 'This AMI set contains invalid AMIs.' });
     } else {
       var amiSet = await this.awsProvisioner.amiSet(this.props.currentAmiSet);
-      var regions = [];
 
-// instead you should search through the list of regions that already exist in the workerType
-// and set rgn.launchSpec.ImageId based on rgn.region and on the instanceType (to determine hvm or pv)
-// then if there *is* any data in the secrets or scopes or whatever, it won't be changed
-
-      amiSet.amis.map(ami =>{
-        regions.push({
-          region: ami.region,
-          secrets: {},
-          scopes: [],
-          userData: {},
-          launchSpec:
-          {
-            ImageId: ami.hvm
-          }
-        });
-      });
       this.state.selectedWorkerTypes.map(async(workerType) => {
         var wtype = await this.awsProvisioner.workerType(workerType.value);
 
-        // Delete Worker Type name and lastModified fields to make sure it passes
-        // the schema validation
-        delete wtype.workerType;
-        delete wtype.lastModified;
-        wtype.regions = regions;
-        try {
-          await this.awsProvisioner.updateWorkerType(workerType.value, wtype);
-          this.setState({
-            error: null
+        var matched_regions = false;
+        amiSet.amis.forEach(ami => {
+          wtype.regions.forEach(region => {
+            if (ami.region === region.region){
+              matched_regions = true;
+              region.launchSpec.ImageId = ami.hvm;
+            }
           });
-        } catch(err) {
-          this.state.errorWorkerTypes.push({workertype: workerType.value});
-          this.setState({ error: err});
+        });
+
+        if (matched_regions){
+          try {
+            let re = /Updated with AMI set*/;
+            var today = new Date().toJSON().slice(0,10);
+            let updatedDescription = "Updated with AMI set " + this.props.currentAmiSet + " on " + today;
+
+            if (wtype.description.search(re) !== -1) {
+              wtype.description = wtype.description.replace(re, updatedDescription);
+            } else {
+              wtype.description = wtype.description.concat(" - ", updatedDescription);
+            }
+
+            // Delete Worker Type name and lastModified fields to make sure it passes
+            // the schema validation
+            delete wtype.workerType;
+            delete wtype.lastModified;
+
+            await this.awsProvisioner.updateWorkerType(workerType.value, wtype);
+            this.setState({
+              error: null
+            });
+          } catch(err) {
+            this.state.errorWorkerTypes.push({ workertype: workerType.value });
+            this.setState({ error: err});
+          }
         }
       });
     };
