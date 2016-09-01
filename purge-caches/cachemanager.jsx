@@ -33,7 +33,7 @@ var CacheManager = React.createClass({
     return (
       <bs.Row>
         <bs.Col md={8}>
-          <p>All currently ative cache purges are displayed below. 24 hours after creation, requests expire and are no longer displayed here. The <strong>before</strong> column is the time at which any caches that match the previous three classifiers are considered invalid. Any caches created after that time are fine.</p>
+          <p>All currently active cache purges are displayed below. 24 hours after creation, requests expire and are no longer displayed here. The <strong>before</strong> column is the time at which any caches that match the previous three classifiers are considered invalid. Any caches created after that time are fine.</p>
         </bs.Col>
         <bs.Col md={4}>
           <bs.ButtonToolbar>
