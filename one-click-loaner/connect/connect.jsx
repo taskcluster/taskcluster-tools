@@ -92,6 +92,12 @@ let Connect = React.createClass({
     ];
   },
 
+  listening() {
+    this.queue.listLatestArtifacts(this.state.taskId).then(result => {
+      result.artifacts.forEach(a => this.processArtifact(a, false));
+    }).catch(err => console.log("Failed to list artifacts: ", err));
+  },
+
   handleMessage(message) {
     // Update status structure
     this.setState({
