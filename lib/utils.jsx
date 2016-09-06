@@ -142,7 +142,7 @@ var createTaskClusterMixin = (options) => {
     handleCredentialsChanged(e) {
       // Update clients with new credentials
       this._createClients(e.detail);
-      
+
       this.setState({ createdTaskIdError: null });
       if (options.reloadOnLogin) {
         // Reload state now that we have new credentials
@@ -307,10 +307,10 @@ var createTaskClusterMixin = (options) => {
 
       return (
         loggedOut403 ? (
-        <bs.Alert bsStyle="info"> 
+        <bs.Alert bsStyle="info">
           <p>You are not authorized to perform the requested action. Please sign in and try again.</p>
         </bs.Alert>
-        ) : ( 
+        ) : (
         <bs.Alert bsStyle="danger">
           <strong>
             {code}&nbsp;
@@ -373,6 +373,8 @@ exports.createTaskClusterMixin = createTaskClusterMixin;
  *    listening:    true || false || null // null when connecting
  * }
  * And calls `this.handleMessage(message)` when a message arrives.
+ * When listening is started `this.listening()` will be called if it is
+ * implemented.
  */
 var createWebListenerMixin = (options) => {
   // Set default options
@@ -491,6 +493,9 @@ var createWebListenerMixin = (options) => {
             listening:        true,
             listeningError:   undefined
           });
+          if (this.listening instanceof Function) {
+            this.listening();
+          }
         }, err => {
           debug("Error while listening: %s, %j", err, err);
           if (!err) {
@@ -514,6 +519,9 @@ var createWebListenerMixin = (options) => {
           listening:        true,
           listeningError:   undefined
         });
+        if (this.listening instanceof Function) {
+          this.listening();
+        }
       }, err => {
         debug("Error while listening: %s, %j", err, err);
         if (!err) {
