@@ -181,7 +181,7 @@ export default class TerminalView extends Component {
                 return <div key={start++} dangerouslySetInnerHTML={{ __html: new_line }}></div>;
               } else {
                 return <div key={start++}>{line}</div>;
-              };
+              }
             })
           }
         </div>
