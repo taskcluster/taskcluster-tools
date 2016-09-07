@@ -3,6 +3,7 @@ import * as bs from 'react-bootstrap';
 import work from 'webworkify';
 import ansiRegex from 'ansi-regex';
 import _ from 'lodash';
+import ansi_up from 'ansi_up';
 
 export default class TerminalView extends Component {
   constructor(props) {
