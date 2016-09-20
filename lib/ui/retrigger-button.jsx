@@ -65,7 +65,7 @@ let RetriggerButton = React.createClass({
     task.deadline = new Date(now + Date.parse(task.deadline) - created).toJSON();
     task.expires = new Date(now + Date.parse(task.expires) - created).toJSON();
     task.created = new Date(now).toJSON();
-    task.dependencies = task.dependencies.filter(requiredTask => requiredTask != taskId);
+    task.dependencies = task.dependencies.filter(requiredTask => requiredTask !== taskId);
 
     task.retries = 0;
 
