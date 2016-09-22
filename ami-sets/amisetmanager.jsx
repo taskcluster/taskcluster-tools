@@ -1,6 +1,7 @@
 var React = require('react');
 var bs = require('react-bootstrap');
 var AmiSetEditor = require('./amiseteditor');
+var WorkerTypeList = require('./workertypelist');
 var utils = require('../lib/utils');
 var taskcluster = require('taskcluster-client');
 
@@ -15,7 +16,7 @@ var AmiSetManager = React.createClass({
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
+          baseUrl: 'http://localhost:5557/v1'
         }
       },
     }),
@@ -45,14 +46,14 @@ var AmiSetManager = React.createClass({
   render() {
     return (
       <bs.Row>
-        <bs.Col md={5}>
+        <bs.Col md={4}>
           {this.renderAmiSetsTable()}
           <bs.ButtonToolbar>
             <bs.Button
               bsStyle="primary"
               onClick={this.selectAmiSet.bind(this, '')}
               disabled={this.state.selectedAmiSet === ''}>
-              <bs.Glyphicon glyph="plus"/> Add AMI Set
+              <bs.Glyphicon glyph="plus"/> Create new AMI Set
             </bs.Button>
             <bs.Button
               bsStyle="success"
@@ -62,7 +63,11 @@ var AmiSetManager = React.createClass({
             </bs.Button>
           </bs.ButtonToolbar>
         </bs.Col>
-        <bs.Col md={7}>
+        <bs.Col md={4}>
+          <WorkerTypeList
+            currentAmiSet={this.state.selectedAmiSet} />
+        </bs.Col>
+        <bs.Col md={4}>
           <AmiSetEditor
             currentAmiSet={this.state.selectedAmiSet}
             reloadAmiSet={this.reloadAmiSet}
