@@ -105,11 +105,17 @@ var SecretEditor = React.createClass({
                <div>
                  <input type="text" className="form-control" ref="name"
                         placeholder="garbage/<ircnick>/my-secret" />
-                 <p className="text-muted">Note that secrets starting with "garbage/" are visible to just about everybody.  Use them to experiment, but not for real secrets!</p>
+                 <br />
+                 <div className="alert alert-danger">Secrets starting with "garbage/" are visible to just about everybody.  Use them to experiment, but not for real secrets!</div>
                </div>
              ) : (
                 <div className="form-control-static">
                   {this.state.secretId}
+                  {
+                    this.state.secretId.startsWith('garbage/') ?
+                      <div className="alert alert-danger">This is a "garbage" secret and is visible to just about everybody. Do not put any real secrets here!</div> :
+                      null
+                  }
                 </div>
              )
            }
