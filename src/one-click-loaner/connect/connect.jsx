@@ -47,12 +47,12 @@ export default React.createClass({
     return {
       taskId: '',
       statusLoaded: true,
-      statusError: undefined,
+      statusError: null,
       status: null,
       shellUrl: null,
       displayUrl: null,
       taskLoaded: true,
-      taskError: undefined,
+      taskError: null,
       task: null
     };
   },
@@ -164,16 +164,17 @@ export default React.createClass({
 
   render() {
     if (this.state.taskId === '') {
-      return <b>No <code>taskId</code> is specified.</b>;
+      return <strong>No <code>taskId</code> is specified.</strong>;
     }
 
-    const includesState = _.includes(['completed', 'failed', 'exception'], this.state.status.state);
+    const includesState = this.state.status &&
+      _.includes(['completed', 'failed', 'exception'], this.state.status.state);
 
-    if (this.state.status && includesState) {
+    if (includesState) {
       return (
         <Alert bsStyle="warning">
-          <strong>Task Resolved!</strong>
-          You can not attach to an interactive task after it has stopped running.
+          <strong>Task Resolved!</strong> You can not attach to an interactive task after it has
+          stopped running.
         </Alert>
       );
     }
