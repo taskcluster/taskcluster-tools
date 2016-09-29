@@ -1,5 +1,4 @@
-TaskCluster Tools
-=================
+# TaskCluster Tools
 
 This repository contains a collection of useful tools for use with TaskCluster.
 Generally, we strive to not add UI to TaskCluster components, but instead offer
@@ -8,15 +7,13 @@ TaskCluster. See [TaskCluster documentation site](https://docs.taskcluster.net)
 for details.
 
 
-Developing TaskCluster Tools
-============================
+## Developing TaskCluster Tools
 
-Prerequisites for building TaskCluster Tools
---------------------------------------------
-  - Node version 4.x
+### Prerequisites for building TaskCluster Tools
 
-Building
---------
+- Node version v4+
+
+### Building
 
 ```
 git clone https://github.com/taskcluster/taskcluster-tools.git
@@ -24,69 +21,52 @@ cd taskcluster-tools
 npm install
 ```
 
-Code Organization
------------------
-  - lib/    (code intended for reuse)
-  - <app>/  (application specific-code, can be reused)
-  - `*.jsx` (file containing JSX)
-  - `*.js`  (file with pure Javascript, no JSX syntax or header)
+### Code Organization
 
-Grunt Tasks and Configuration
------------------------------
-Our grunt file offers compilation of:
+- `src/`    (Tools source code)
+- `src/<app>/`  (application specific-code, can be reused)
 
- - Javascript/JSX (react.js) files to browserified bundles
- - less files to CSS
- - jade files to HTML
+### Tasks and Configuration
 
-Testing changes
----------------
-Install the dependencies needed for grunt and start it up:
-* npm install
-* grunt develop or (./node_modules/.bin/grunt develop)
+Building this project uses [neutrino](https://github.com/mozilla-neutrino/neutrino),
+[neutrino-preset-react](https://github.com/mozilla-neutrino/neutrino-preset-react),
+and the `src/tools-preset` to:
 
-```
-Note: "grunt develop --force" allows grunt not to bail out when you save a syntax error or something similarly harmless.
-```
-Grunt allows you to test and see your changes.
-The grunt default task builds, watches sources and serves them from
-`http://localhost:9000`.
+- Compile ES2015+ syntax to ES5-compatible JS
+- Compile React JSX to de-sugared JS
+- Show ESLint errors during development, and both errors and warnings when building
+- Build application directories into page-specific bundles
+- LESS files to CSS
 
+### Testing changes
 
+Install npm dependencies and start it up:
+- npm install
+- npm start
 
-Available targets
------------------
+This will start a local development server on port 9000 (http://localhost:9000).
 
-  - `grunt`, the default target build, watches sources and serves the `build/`
-    folder on `http://localhost:9000/`.
-  - `grunt build`, builds sources into the `build/` folder.
-  - `grunt clean`, delete generated files (ie. deletes the `build/` folder).
-  - `grunt develop`, it serves on localhost and watches sources
+Any ESLint errors across the project will be displayed in the terminal during development.
+
+## Available targets
+
+- `npm start`: the default development build, watches `src/`, and serves on `http://localhost:9000/`
+- `npm run build`: builds `src/` into a `build/` directory
+
+## Testing
+
+Until someone comes up with something better, which probably involves Redux or similar,
+all testing is manual. Open the tools and check that they work. :)
 
 
-Configuration with Sublime 2
-----------------------------
-Install [sublime-react](https://github.com/reactjs/sublime-react), open one of
-`.jsx` files the do:
+## Ngrok Setup (optional)
 
-`View` > `Syntax` > `Open all with current extension as...` > `JavaScript (JSX)`
-
-
-Testing
--------
-Until someone comes up with something better, which probably involves redux or similar,
-all testing is manual. Open the tools and check that they work.
-
-
-Ngrok Setup (optional)
------------
 Ngrok allows you to expose a web server running on your local machine to the internet.
-Ngrok is used creating a https connection, so that you can login to the taskcluster-tools.
+Ngrok is used creating an https connection, so that you can login to the taskcluster-tools.
 For using ngrok:
-  - Create an account (free) on [ngrok](https://ngrok.com/).
-  - Install ngrok - npm install ngrok
-  - Run ngrok - ngrok http 9000
 
-```
-Note: You have to run ngrok in a separate terminal/console.
-```
+- Create an account (free) on [ngrok](https://ngrok.com/).
+- Install ngrok - npm install ngrok
+- Run ngrok - ngrok http 9000
+
+<sup>Note: You have to run ngrok in a separate terminal/console.</sup>
