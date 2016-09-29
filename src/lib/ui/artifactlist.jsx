@@ -140,18 +140,26 @@ export default React.createClass({
 
       if (/^public\//.test(artifact.name)) {
         if (this.props.runId != null) {
+          url = `https://queue.taskcluster.net/v1/task/${this.props.taskId}` +
+                `/runs/${this.props.runId}/artifacts/${artifact.name}`;
+          /*
           url = this.queue.buildUrl(
             this.queue.getArtifact,
             this.props.taskId,
             this.props.runId,
             artifact.name
           );
+          */
         } else {
+          url = `https://queue.taskcluster.net/v1/task/${this.props.taskId}` +
+                `/artifacts/${artifact.name}`;
+          /*
           url = this.queue.buildUrl(
             this.queue.getLatestArtifact,
             this.props.taskId,
             artifact.name
           );
+          */
         }
 
         icon = getIconFromMime(artifact.contentType);
