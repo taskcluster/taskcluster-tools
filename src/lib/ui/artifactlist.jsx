@@ -139,27 +139,20 @@ export default React.createClass({
       let icon;
 
       if (/^public\//.test(artifact.name)) {
+        url = 'https://queue.taskcluster.net/v1/task/';
         if (this.props.runId != null) {
-          url = `https://queue.taskcluster.net/v1/task/${this.props.taskId}` +
-                `/runs/${this.props.runId}/artifacts/${artifact.name}`;
-          /*
-          url = this.queue.buildUrl(
-            this.queue.getArtifact,
-            this.props.taskId,
-            this.props.runId,
-            artifact.name
-          );
-          */
+          url += `${this.props.taskId}/runs/${this.props.runId}/artifacts/${artifact.name}`;
+          // We could use queue.buildUrl as follows, but this creates URLs where artifact name
+          // has slashes encoded. For artifacts we specifically allow slashes in the name not
+          // to be encoded, as this make things like: $ wget <url> create files with nice names.
+          // url = this.queue.buildUrl(
+          //   this.queue.getArtifact,
+          //   this.props.taskId,
+          //   this.props.runId,
+          //   artifact.name
+          // );
         } else {
-          url = `https://queue.taskcluster.net/v1/task/${this.props.taskId}` +
-                `/artifacts/${artifact.name}`;
-          /*
-          url = this.queue.buildUrl(
-            this.queue.getLatestArtifact,
-            this.props.taskId,
-            artifact.name
-          );
-          */
+          url += `${this.props.taskId}/artifacts/${artifact.name}`;
         }
 
         icon = getIconFromMime(artifact.contentType);
