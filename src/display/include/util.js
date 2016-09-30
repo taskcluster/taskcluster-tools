@@ -12,6 +12,7 @@
 // Globals defined here
 var Util = {};
 
+window.Util = Util;
 
 /*
  * Make arrays quack
