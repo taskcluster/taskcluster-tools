@@ -31,7 +31,6 @@ preset.module.loaders.push(lessLoader);
 preset.module.loaders.push({ test: /JSONStream/, loader: 'shebang-loader' });
 // Don't parse the ws module as it seems to blow up Webpack
 preset.module.noParse = ['ws'];
-preset.externals.ws = true;
 // Override the ESLint config file with our own rules
 preset.eslint.configFile = path.join(__dirname, 'eslint.js');
 // Ignore lint problems in these files as they are external resources placed in-tree
