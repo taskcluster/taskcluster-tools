@@ -257,7 +257,8 @@ export const ServiceGroup = React.createClass({
   render() {
     return (
       <Col className="service-group" md={6} sm={12}>
-        <h2 data-tip data-for={this.props.name}>{this.props.name}</h2>
+        <h4 data-tip data-for={this.props.name}>{this.props.name}</h4>
+        <hr />
         <ButtonToolbar>
           {this.props.services.map(service => (
             <Service
@@ -283,7 +284,7 @@ export const TaskClusterDashboard = React.createClass({
       <div>
         <Row>
           <ServiceGroup
-            name="Taskcluster Services"
+            name="TaskCluster Services"
             services={taskclusterServices}
             description="Taskcluster services" />
           <ServiceGroup

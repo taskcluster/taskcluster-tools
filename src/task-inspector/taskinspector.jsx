@@ -2,7 +2,8 @@ import React from 'react';
 import { findDOMNode } from 'react-dom';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
-import { FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import { Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button }
+  from 'react-bootstrap';
 import _ from 'lodash';
 import TaskView from '../lib/ui/taskview';
 import PreviousTasks from '../lib/ui/previoustasks';
@@ -109,49 +110,54 @@ export default React.createClass({
     const invalidInput = !VALID_INPUT.test(this.state.taskIdInput);
 
     return (
-      <div>
-        <h1>Task Inspector</h1>
-        <p>This tool lets you inspect a task given the <code>taskId</code></p>
-        <form className="form-horizontal" onSubmit={this.handleSubmit}>
-          <div className="row">
-            <div className="col-sm-8">
+      <div style={{ marginBottom: 40 }}>
+        <h4>Task Inspector</h4>
+        <p>
+          Given a <code>taskId</code>, The task inspector lets you load, monitor, and inspect the
+          state, runs, artifacts, definition, and logs of a task as it is evaluated. You can also
+          use this tool to download private artifacts.
+        </p>
+        <hr />
+
+        <Row>
+          <Col sm={8}>
+            <Form onSubmit={this.handleSubmit}>
               <FormGroup validationState={invalidInput ? 'error' : null}>
-                <ControlLabel className="col-sm-2">
-                  <span>Enter <code>TaskId</code></span>
-                </ControlLabel>
-                <div className="col-sm-10">
+                <ControlLabel>Task ID</ControlLabel>
+                <InputGroup>
                   <FormControl
                     type="text"
                     ref="taskId"
-                    placeholder="taskId"
+                    placeholder="Enter taskId, e.g. 8U3xVyssSBuinaXwRgJ_qQ"
                     value={this.state.taskIdInput}
-                    onChange={this.handleTaskIdInputChange}/>
-                  <FormControl.Feedback />
-                </div>
+                    onChange={this.handleTaskIdInputChange} />
+                  <InputGroup.Button>
+                    <Button type="submit" disabled={!this.state.statusLoaded || invalidInput}>
+                      Inspect Task
+                    </Button>
+                  </InputGroup.Button>
+                </InputGroup>
               </FormGroup>
+            </Form>
+          </Col>
 
-              <div className="form-group">
-                <div className="col-sm-offset-2 col-sm-10">
-                  <input
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={!this.state.statusLoaded || invalidInput}
-                    value="Inspect task" />
-                </div>
-              </div>
-            </div>
+          <Col sm={4} style={{ marginTop: '25px' }}>
+            <PreviousTasks objectId={this.state.taskId} objectType="taskId" />
+          </Col>
+        </Row>
 
-            <div className="col-sm-4">
-              <PreviousTasks objectId={this.state.taskId} objectType="taskId" />
-            </div>
-          </div>
-        </form>
-        {
-          this.renderWaitFor('status') || (this.state.status ?
-            <TaskView ref="taskView" status={this.state.status} hashEntry={this.nextHashEntry()}/> :
-            null
-          )
-        }
+        <Row>
+          <Col xs={12}>
+            {this.renderWaitFor('status') || (this.state.status ? (
+                <TaskView
+                  ref="taskView"
+                  status={this.state.status}
+                  hashEntry={this.nextHashEntry()}/>
+              ) :
+              null
+            )}
+          </Col>
+        </Row>
       </div>
     );
   },

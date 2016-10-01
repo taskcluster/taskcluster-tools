@@ -88,11 +88,12 @@ export default React.createClass({
               </Button>
             </Col>
             <Col md={11}>
-              <div style={{ fontSize: '26px' }}>
+              <h4>
                 {selectedEntity.split(':')[0]}: <code>{selectedEntity.split(':')[1]}</code>
-              </div>
+              </h4>
             </Col>
           </Row>
+          <br /><br />
           {
             _.startsWith(this.state.selectedEntity, 'role:') ? (
               <RoleEditor
@@ -189,12 +190,14 @@ export default React.createClass({
                   <MenuItem key="3" onClick={this.setEntitySearchMode.bind(this, 'Has Sub-Scope')}>
                     <Glyphicon
                       glyph="ok"
-                      style={mode === 'Has Sub-Scope' ? {} : { visibility: 'hidden' }} /> Has Sub-Scope
+                      style={mode === 'Has Sub-Scope' ? {} : { visibility: 'hidden' }} />
+                    &nbsp;Has Sub-Scope
                   </MenuItem>
                 </DropdownButton>
               </InputGroup>
             </Col>
           </Row>
+          <br /><br />
           <Table condensed hover className="scopes-inspector-scopes-table">
             <thead>
               <tr>
@@ -259,7 +262,7 @@ export default React.createClass({
     return (
       <Row>
         <Col md={12}>
-          <InputGroup>
+          <InputGroup style={{ marginBottom: 20 }}>
             <InputGroup.Addon><Glyphicon glyph="search" /></InputGroup.Addon>
             <FormControl
               type="text"

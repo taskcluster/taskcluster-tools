@@ -1,7 +1,11 @@
 import React from 'react';
+import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
 import * as utils from '../../lib/utils';
+import './previoustasks.less';
 
-const PreviousTasks = React.createClass({
+export default React.createClass({
+  displayName: 'PreviousTasks',
+
   mixins: [
     // Calls load() initially and on reload()
     utils.createTaskClusterMixin({
@@ -66,7 +70,7 @@ const PreviousTasks = React.createClass({
     const rows = objectIds
       .map(objectId => {
         const link = `#${objectId}`;
-        return <li key={objectId}><a href={link}>{objectId}</a></li>;
+        return <ListGroupItem key={objectId} href={link}>{objectId}</ListGroupItem>;
       })
       // show most recent first
       .reverse();
@@ -75,32 +79,27 @@ const PreviousTasks = React.createClass({
       switch (this.state.objectType) {
         case 'taskGraphId':
           return (
-            <span>
-              <p>
-                Find tasks at <a href="/index">index</a>, then
-                click their TaskGroupId link to see task graphs
-              </p>
-            </span>
+            <ListGroupItem>
+              Find tasks at the <a href="/index">index</a>, then
+              click their TaskGroupId link to see task graphs.
+            </ListGroupItem>
           );
         case 'taskId':
         default:
           return (
-            <span>
-              <p>Find tasks at <a href="/index">index</a></p>
-            </span>
+            <ListGroupItem>
+              Find tasks at the <a href="/index">index</a>.
+            </ListGroupItem>
           );
       }
     }
 
     return (
-      <span>
-        <strong>Previously Viewed Tasks</strong>
-        <ul>
+      <Panel header="Previously Viewed Tasks" collapsible defaultExpanded={false}>
+        <ListGroup fill>
           {rows}
-        </ul>
-      </span>
+        </ListGroup>
+      </Panel>
     );
   }
 });
-
-export default PreviousTasks;

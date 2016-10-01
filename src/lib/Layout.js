@@ -137,7 +137,7 @@ const Navigation = React.createClass({
         <Navbar.Header>
           <Navbar.Brand>
             <a href="/">
-              <img src="/lib/assets/taskcluster-36.png" width="36" height="36" /> TaskCluster Tools
+              <img src="/lib/assets/taskcluster-36.png" width="26" height="26" /> TaskCluster Tools
             </a>
           </Navbar.Brand>
         </Navbar.Header>

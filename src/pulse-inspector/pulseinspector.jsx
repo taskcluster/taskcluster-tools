@@ -116,7 +116,7 @@ export default React.createClass({
     return (
       <Row>
         <Col md={12}>
-          <h1>Pulse Inspector</h1>
+          <h4>Pulse Inspector</h4>
           <p>
             This tool lets you listen to Pulse messages from any exchange and
             routing key. When messages are received you can inspect the
@@ -128,29 +128,35 @@ export default React.createClass({
             </a>. Notice that all exchanges from TaskCluster is formally
             documented on <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
           </p>
+          <hr/>
           {this.renderForm()}
           {this.state.listeningError ? this.renderListeningError() : null}
           <hr/>
           <ButtonToolbar className="pull-right">
-            <Button bsStyle="danger" onClick={this.clearBindings} disabled={!!this.state.bindings.length}>
-              <Glyphicon glyph="trash"/> Clear Bindings
+            <Button
+              bsSize="sm"
+              bsStyle="danger"
+              onClick={this.clearBindings}
+              disabled={!!this.state.bindings.length}>
+                <Glyphicon glyph="trash" /> Clear Bindings
             </Button>
           </ButtonToolbar>
-          <h2>Bindings</h2>
+          <h5>Bindings</h5>
           {this.renderBindings()}
           <hr/>
           <ButtonToolbar className="pull-right">
             <Button
+              bsSize="sm"
               bsStyle="success"
               onMouseDown={this.createDownload}
               href="data:application/json;base64,IkJyb3dzZXIgSXNzdWUi"
               ref="downloadLink"
               download="pulse-messages.json"
               disabled={!!this.state.messages.length}>
-                <Glyphicon glyph="download-alt"/> Download Messages
+                <Glyphicon glyph="download-alt" /> Download Messages
             </Button>
           </ButtonToolbar>
-          <h2>Messages</h2>
+          <h5>Messages</h5>
           {this.renderMessages()}
           <br />
           <br />
@@ -192,19 +198,19 @@ export default React.createClass({
 
   renderForm() {
     return (
-      <div className="form form-horizontal">
+      <div className="form">
         <FormGroup>
-          <ControlLabel className="col-xs-3">Pulse Exchange</ControlLabel>
-          <div className="col-xs-9">
+          <ControlLabel>Pulse Exchange</ControlLabel>
+          <div>
             <FormControl
               type="text"
               ref="exchange"
-              placeholder="exchange/<username>/some-exchange-name"/>
+              placeholder="exchange/<username>/some-exchange-name" />
           </div>
         </FormGroup>
         <FormGroup>
-          <ControlLabel className="col-xs-3">Routing Key Pattern</ControlLabel>
-          <div className="col-xs-9">
+          <ControlLabel>Routing Key Pattern</ControlLabel>
+          <div>
             <FormControl
               type="text"
               ref="routingKeyPattern"
@@ -213,7 +219,7 @@ export default React.createClass({
           </div>
         </FormGroup>
         <div className="form-group">
-          <div className="col-xs-offset-3 col-xs-9">
+          <div>
             <ButtonToolbar>
               <Button
                 bsStyle="primary"

@@ -131,7 +131,7 @@ const ClientEditor = React.createClass({
 
     return this.renderWaitFor('client') || (
       <div className="client-editor">
-        <h3>{title}</h3>
+        <h4 style={{ marginTop: 0 }}>{title}</h4>
         <hr style={{ marginBottom: 10 }}/>
         <div className="form-horizontal">
           {

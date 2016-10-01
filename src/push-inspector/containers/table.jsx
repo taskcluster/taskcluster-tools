@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { hashHistory } from 'react-router';
 import { connect } from 'react-redux';
+import { Label } from 'react-bootstrap';
 import * as actions from '../actions';
-import { beautified } from '../lib/utils';
 
 class Table extends Component {
   constructor(props) {
@@ -34,14 +34,14 @@ class Table extends Component {
 
     return (
       <tr>
-        <th className="table-column-baseline">
-          <span className="table-header">Name</span>
-        </th>
         <th>
           <span className="table-header">State</span>&nbsp;
-          <button className={activeTaskStatus ? '' : 'hideVisibility'} onClick={this.clearFilter.bind(this)}>
-            Clear Filter
-          </button>
+          <button
+            className={activeTaskStatus ? '' : 'hideVisibility'}
+            onClick={this.clearFilter.bind(this)}>Clear Filter</button>
+        </th>
+        <th className="table-column-baseline">
+          <span className="table-header">Name</span>
         </th>
       </tr>
     );
@@ -60,38 +60,25 @@ class Table extends Component {
     const status = this.props.activeTaskStatus;
     const list = !status ? data : data.filter(l => l.status.state === status);
 
-    return list.map((task, i) => {
-      const state = beautified.labelClassName(task.status.state);
-
-      return (
-        <tr className="listings-table-labels-row" onClick={() => this.taskClicked(task)} key={i}>
-          <td className="listings-table-labels-column">{task.task.metadata.name}</td>
-          <td><span className={state}>{task.status.state}</span></td>
-        </tr>
-      );
-    });
+    return list.map((task, i) => (
+      <tr className="listings-table-labels-row" onClick={() => this.taskClicked(task)} key={i}>
+        <td>
+          <Label bsSize="sm" className={`label-${task.status.state}`}>{task.status.state}</Label>
+        </td>
+        <td>{task.task.metadata.name}</td>
+      </tr>
+    ));
   }
 
-  /**
-  * Render list of tasks
-  */
-  renderList() {
+  render() {
     const headerComponents = this.generateHeaders();
     const rowComponents = this.generateRows();
 
     return (
-      <table id="tasks-list" className="table task-list-table">
+      <table className="table table-condensed">
         <thead>{headerComponents}</thead>
         <tbody className="tasks-list-body">{rowComponents}</tbody>
       </table>
-    );
-  }
-
-  render() {
-    return (
-      <div className="table-wrapper">
-        {this.renderList()}
-      </div>
     );
   }
 }

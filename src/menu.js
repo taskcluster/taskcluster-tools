@@ -7,8 +7,8 @@ module.exports = [
     link: '/task-inspector/',
     icon: 'cube',
     display: true,
-    description: `The task inspector lets you load, monitor and inspect the state, runs, artifacts,
-      definition and logs of a task in as it is evaluated. You can' also use this tool download
+    description: `The task inspector lets you load, monitor, and inspect the state, runs, artifacts,
+      definition, and logs of a task as it is evaluated. You can also use this tool to download
       private artifacts.`
   },
   {
@@ -16,24 +16,8 @@ module.exports = [
     link: '/push-inspector/',
     icon: 'cube',
     display: true,
-    description: `Inspect task groups, monitor progress, view dependencies, states and inspect the
-      individual tasks that makes up the task group using the embedded task-inspector.`
-  },
-  {
-    title: 'Task-Graph Inspector',
-    link: '/task-graph-inspector/',
-    icon: 'cubes',
-    display: true,
-    description: `Inspect task-graphs, monitor progress, view dependencies, states and inspect the
-     individual tasks that makes up the task-graph, using the embedded task-inspector.`
-  },
-  {
-    title: 'Task Group Inspector',
-    link: '/task-group-inspector/',
-    icon: 'cubes',
-    display: true,
-    description: `Inspect task groups, monitor progress, view dependencies, states and inspect the
-      individual tasks that makes up the task group using the embedded task-inspector.`
+    description: `Inspect task groups, monitor progress, view dependencies and states, and inspect
+      the individual tasks that make up the task group using the embedded task-inspector.`
   },
   {
     title: 'Task Creator',

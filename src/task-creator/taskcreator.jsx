@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ButtonToolbar, Glyphicon, Col } from 'react-bootstrap';
+import { Button, ButtonToolbar, Glyphicon, Row, Col } from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import CodeMirror from 'react-code-mirror';
@@ -104,21 +104,22 @@ export default React.createClass({
         window.location = link;
 
         return (
-          <Col md={10} mdOffset={1}>
-            <a href={link}>
-              See&nbsp;
-              <code>{this.state.createdTaskId}</code>
-              &nbsp;in task inspector.
-            </a>
-          </Col>
+          <Row style={{ marginBottom: 40 }}>
+            <Col sm={12}>
+              <a href={link}>
+                See&nbsp;
+                <code>{this.state.createdTaskId}</code>
+                &nbsp;in task inspector.
+              </a>
+            </Col>
+          </Row>
         );
       }
     }
 
     return (
-      <Col md={10} mdOffset={1}>
-        <h1>Task Creator</h1>
-        <hr/>
+      <Col sm={12}>
+        <h4>Task Creator</h4>
         <p>
           Write and submit a task to TaskCluster. For details on what you can
           write refer to the&nbsp;
@@ -127,6 +128,7 @@ export default React.createClass({
           task will be stored in <code>localStorage</code>, so you can always
           come back and easily try a new variation.
         </p>
+        <hr/>
         {this.state.createdTaskIdError ? this.renderError(this.state.createdTaskIdError) : null}
         {this.state.createdTaskIdLoaded === null ? this.renderSpinner() : this.renderEditor()}
       </Col>

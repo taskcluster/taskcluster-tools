@@ -1,278 +1,225 @@
 import React from 'react';
+import { Table, Label } from 'react-bootstrap';
 import ConfirmAction from './confirmaction';
 import LoanerButton from './loaner-button';
-import PurgeCacheButton from './purgecache-button';
-import RetriggerButton from './retrigger-button';
 import _ from 'lodash';
-import * as format from '../format';
+import { Markdown, DateView, Code } from '../format';
 import path from 'path';
-import taskcluster from 'taskcluster-client';
-import * as utils from '../utils';
+import './taskinfo.less';
 
 /** Displays information about a task in a tab page */
 const TaskInfo = React.createClass({
-  mixins: [
-    // Calls load() initially and on reload()
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue
-      clients: {
-        queue: taskcluster.Queue
-      },
-      // Reload when props.status.taskId changes, ignore credential changes
-      reloadOnProps: ['status.taskId'],
-      reloadOnLogin: false
-    })
-  ],
-
   // Validate properties
   propTypes: {
-    status: React.PropTypes.object.isRequired
-  },
-
-  /** Get initial state */
-  getInitialState() {
-    return {
-      // task definition
-      taskLoaded: false,
-      taskError: undefined,
-      task: undefined
-    };
-  },
-
-  /** Load task definition */
-  load() {
-    return {
-      task: this.queue.task(this.props.status.taskId)
-    };
+    status: React.PropTypes.object.isRequired,
+    task: React.PropTypes.object.isRequired
   },
 
   render() {
-    // Easy references to values
-    const status = this.props.status;
-    const task = this.state.task;
-
+    const { status, task } = this.props;
     const taskStateLabel = {
-      unscheduled: 'label label-default',
-      pending: 'label label-info',
-      running: 'label label-primary',
-      completed: 'label label-success',
-      failed: 'label label-danger',
-      exception: 'label label-warning'
+      unscheduled: 'default',
+      pending: 'info',
+      running: 'primary',
+      completed: 'success',
+      failed: 'danger',
+      exception: 'warning'
     };
 
-    const isResolved = [
-      'completed',
-      'failed',
-      'exception'
-    ].indexOf(status.state) !== -1;
-
-    return this.renderWaitFor('task') || (
+    return (
       <div>
-        <dl className="dl-horizontal">
-          <dt>Name</dt>
-          <dd>
-            <format.Markdown>
-              {task.metadata.name}
-            </format.Markdown>
-          </dd>
-          <dt>Description</dt>
-          <dd>
-            <format.Markdown>
-              {task.metadata.description}
-            </format.Markdown>
-          </dd>
-          <dt>Owner</dt>
-          <dd><code>{task.metadata.owner}</code></dd>
-          <dt>Source</dt>
-          <dd>
-            <a href={task.metadata.source}>
-              {
-                task.metadata.source.length > 90 ? (
-                  <span>...{task.metadata.source.substr(8 - 90)}</span>
-                ) : (
-                  <span>{task.metadata.source}</span>
-                )
-              }
-            </a>
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>State</dt>
-          <dd>
-            <span className={taskStateLabel[status.state]}>
-              {status.state}
-            </span>
-          </dd>
-          <dt>Retries Left</dt>
-          <dd>{status.retriesLeft} of {task.retries}</dd>
-          <dt>Actions</dt>
-          <dd>
-            <ConfirmAction buttonSize="xsmall"
-                           buttonStyle="primary"
-                           disabled={status.state !== 'unscheduled'}
-                           glyph="play"
-                           label="Schedule Task"
-                           action={this.scheduleTask}
-                           success="Successfully scheduled task!">
-              Are you sure you wish to schedule the task?
-              This will <b>overwrite any scheduling process</b> taking place,
-              if this task is part of a continuous integration process scheduling
-              this task may cause your code to land with broken tests.
-            </ConfirmAction>&nbsp;
-            <RetriggerButton task={this.state.task}
-                          taskId={status.taskId}
-                          buttonStyle="success"
-                          buttonSize="xsmall"/>&nbsp;
-            <ConfirmAction buttonSize="xsmall"
-                           buttonStyle="danger"
-                           disabled={isResolved}
-                           glyph="stop"
-                           label="Cancel Task"
-                           action={this.cancelTask}
-                           success="Successfully canceled task!">
-              Are you sure you wish to cancel this task?
-              Notice that another process or developer may still be able to
-              schedule a rerun. But all existing runs will be aborted and any
-              scheduling process will not be able to schedule the task.
-            </ConfirmAction>&nbsp;
-            <PurgeCacheButton caches={_.keys(((task || {}).payload || {}).cache || {})}
-                              provisionerId={task.provisionerId}
-                              workerType={task.workerType}/>&nbsp;
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Created</dt>
-          <dd>
-            <format.DateView date={task.created}/>
-          </dd>
-          <dt>Deadline</dt>
-          <dd>
-            <format.DateView date={task.deadline} since={task.created}/>
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>ProvisionerId</dt>
-          <dd><code>{task.provisionerId}</code></dd>
-          <dt>WorkerType</dt>
-          <dd><code>{task.workerType}</code></dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>SchedulerId</dt>
-          <dd><code>{task.schedulerId}</code></dd>
-          <dt>TaskGroupId</dt>
-          <dd>
-            <a href={`../task-group-inspector/#${task.taskGroupId}`}>
-              {task.taskGroupId}
-            </a>
-          </dd>
-          <dt>Dependencies</dt>
-          <dd>
-            {
-              task.dependencies.length ? (
-                  <ul>
-                    {task.dependencies.map((dep, index) => (
-                      <li key={index}>
-                        <a href={`../task-inspector/#${dep}`}>{dep}</a>
-                      </li>
-                    ))}
-                  </ul>
-                ) :
-                '-'
-            }
-          </dd>
-          <dt>Requires</dt>
-          <dd>
-            This task will be scheduled when <i>dependencies</i> are
-            {
-              task.requires === 'all-completed' ?
-                <span> <code>all-completed</code> successfully</span> :
-                <span> <code>all-resolved</code> with any resolution</span>
-            }
-            .
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Scopes</dt>
-          <dd>
-            {
-              task.scopes.length ? (
-                  <ul>
-                    {task.scopes.map((scope, index) => <li key={index}><code>{scope}</code></li>)}
-                  </ul>
-                ) :
-                '-'
-            }
-          </dd>
-          <dt>Routes</dt>
-          <dd>
-            {
-              task.routes.length ? (
-                  <ul>
-                    {task.routes.map((route, index) => <li key={index}><code>{route}</code></li>)}
-                  </ul>
-                ) :
-                '-'
-            }
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Task Definition</dt>
-          <dd>
-            <a href={`https://queue.taskcluster.net/v1/task/${status.taskId}`} target="_blank">
-              {status.taskId} <i className="fa fa-external-link" />
-            </a>
-          </dd>
-          <dt>Payload</dt>
-          <dd>
-            <format.Code language="json">
-              {JSON.stringify(task.payload, null, 2)}
-            </format.Code>
-          </dd>
-          <dt>Debug</dt>
-          <dd>
-            <ConfirmAction
-              buttonSize="small"
-              buttonStyle="default"
-              glyph="edit"
-              label="Edit and Re-create"
-              action={this.editTask}
-              success="Opening Task Creator">
-                Are you sure you wish to edit this task?<br/>
-                Note that the edited task will not be linked to other tasks or
-                have the same <code>task.routes</code> as other tasks,
-                so this is not a way to "fix" a failing task in a larger task graph.
-                Note that you may also not have the scopes required to create the
-                resulting task.
-            </ConfirmAction>&nbsp;
-            <LoanerButton
-              task={this.state.task}
-              taskId={status.taskId}
-              buttonStyle="default"
-              buttonSize="small" />&nbsp;
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Run Locally</dt>
-          <dd>
-            <format.Code language="bash">
-              {this.renderRunLocallyScript()}
-            </format.Code>
-          </dd>
-        </dl>
+        <Table>
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td><Markdown>{task.metadata.name}</Markdown></td>
+            </tr>
+
+            <tr>
+              <td>Description</td>
+              <td><Markdown>{task.metadata.description}</Markdown></td>
+            </tr>
+
+            <tr>
+              <td>Owner</td>
+              <td><code>{task.metadata.owner}</code></td>
+            </tr>
+
+            <tr>
+              <td>Source</td>
+              <td>
+                <a href={task.metadata.source}>
+                  {
+                    task.metadata.source.length > 90 ?
+                      <span>...{task.metadata.source.substr(8 - 90)}</span> :
+                      <span>{task.metadata.source}</span>
+                  }
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td>State</td>
+              <td>
+                <Label bsStyle={taskStateLabel[status.state]}>
+                  {status.state}
+                </Label>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Retries Left</td>
+              <td>{status.retriesLeft} of {task.retries}</td>
+            </tr>
+
+            <tr>
+              <td>Created</td>
+              <td><DateView date={task.created} /></td>
+            </tr>
+
+            <tr>
+              <td>Deadline</td>
+              <td><DateView date={task.deadline} since={task.created} /></td>
+            </tr>
+
+            <tr>
+              <td>Provisioner</td>
+              <td><code>{task.provisionerId}</code></td>
+            </tr>
+
+            <tr>
+              <td>WorkerType</td>
+              <td><code>{task.workerType}</code></td>
+            </tr>
+
+            <tr>
+              <td>SchedulerId</td>
+              <td><code>{task.schedulerId}</code></td>
+            </tr>
+
+            <tr>
+              <td>TaskGroupId</td>
+              <td>
+                <a href={`../push-inspector/#${task.taskGroupId}`}>{task.taskGroupId}</a>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Dependencies</td>
+              <td>
+                {
+                  task.dependencies.length ?
+                    task.dependencies.map((dependency, key) => (
+                      <div key={key}>
+                        <a href={`../task-inspector/#${dependency}`}>{dependency}</a>
+                      </div>
+                    )) :
+                    '-'
+                }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Requires</td>
+              <td>
+                This task will be scheduled when <em>dependencies</em> are
+                {
+                  task.requires === 'all-completed' ?
+                    <span> <code>all-completed</code> successfully.</span> :
+                    <span> <code>all-resolved</code> with any resolution.</span>
+                }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Scopes</td>
+              <td>
+                {
+                  task.scopes.length ?
+                    task.scopes.map((scope, key) => (
+                      <div key={key}>
+                        <code>{scope}</code>
+                      </div>
+                    )) :
+                    '-'
+                }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Routes</td>
+              <td>
+                {
+                  task.routes.length ?
+                    task.routes.map((route, key) => (
+                      <div key={key}>
+                        <code>{route}</code>
+                      </div>
+                    )) :
+                    '-'
+                }
+              </td>
+            </tr>
+
+            <tr>
+              <td>Task Definition</td>
+              <td>
+                <a href={`https://queue.taskcluster.net/v1/task/${status.taskId}`} target="_blank">
+                  {status.taskId} <i className="fa fa-external-link" />
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Payload</td>
+              <td>
+                <Code language="json">
+                  {JSON.stringify(task.payload, null, 2)}
+                </Code>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Debug</td>
+              <td>
+                <ConfirmAction
+                  buttonSize="small"
+                  buttonStyle="default"
+                  glyph="edit"
+                  label="Edit and Re-create"
+                  action={this.editTask}
+                  success="Opening Task Creator">
+                    Are you sure you wish to edit this task?<br />
+                    Note that the edited task will not be linked to other tasks or
+                    have the same <code>task.routes</code> as other tasks,
+                    so this is not a way to "fix" a failing task in a larger task graph.
+                    Note that you may also not have the scopes required to create the
+                    resulting task.
+                </ConfirmAction>&nbsp;
+                <LoanerButton
+                  task={this.props.task}
+                  taskId={status.taskId}
+                  buttonStyle="default"
+                  buttonSize="small" />
+              </td>
+            </tr>
+
+            <tr>
+              <td>Run Locally</td>
+              <td>
+                <Code language="bash">
+                  {this.renderRunLocallyScript()}
+                </Code>
+              </td>
+            </tr>
+          </tbody>
+        </Table>
       </div>
     );
   },
 
-  scheduleTask() {
-    return this.queue.scheduleTask(this.props.status.taskId);
-  },
-
   rerunTask() {
     return this.queue.rerunTask(this.props.status.taskId);
-  },
-
-  cancelTask() {
-    return this.queue.cancelTask(this.props.status.taskId);
   },
 
   editTask() {
@@ -294,9 +241,9 @@ const TaskInfo = React.createClass({
       'requires'
     ];
 
-    _.keys(this.state.task).forEach(key => {
+    _.keys(this.props.task).forEach(key => {
       if (!_.includes(exclude, key)) {
-        newTask[key] = this.state.task[key];
+        newTask[key] = this.props.task[key];
       }
     });
 
@@ -312,14 +259,14 @@ const TaskInfo = React.createClass({
     // Note:
     // We ignore cache folders, as they'll just be empty, which is fine.
     // TODO: Implement support for task.payload.features such as:
-    //        - taskclusterProxy
-    //        - testdroidProxy
-    //        - balrogVPNProxy
-    //       We can do this with --link and demonstrate how to inject
-    //       credentials using environment variables
-    //       (obviously we can provide the credentials)
+    //   - taskclusterProxy
+    //   - testdroidProxy
+    //   - balrogVPNProxy
+    //   We can do this with --link and demonstrate how to inject
+    //   credentials using environment variables
+    //   (obviously we can provide the credentials)
     const taskId = this.props.status.taskId;
-    const payload = this.state.task.payload;
+    const payload = this.props.task.payload;
     const cmds = [];
     const imagePullCmds = [];
     const deviceCmds = [];

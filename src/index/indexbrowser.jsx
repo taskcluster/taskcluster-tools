@@ -105,8 +105,7 @@ export default React.createClass({
         <Col md={6}>
           <this.props.entryView
             namespace={this.state.current}
-            hashEntry={this.props.hasHashEntry ? this.nextHashEntry() : null}
-          />
+            hashEntry={this.props.hasHashEntry ? this.nextHashEntry() : null} />
         </Col>
       </Row>
     );
