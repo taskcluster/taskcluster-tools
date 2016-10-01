@@ -17,10 +17,9 @@ export default React.createClass({
   render() {
     return (
       <Row>
-        <Col lg={6} lgOffset={3} md={8} mdOffset={2} sm={10} smOffset={1}>
-          <h2>TaskCluster Credentials</h2>
-          <hr/>
-          <CredentialView credentials={this.state.credentials}/>
+        <Col sm={12}>
+          <h4>TaskCluster Credentials</h4>
+          <hr />
           <ButtonToolbar>
             <Button bsStyle="primary" onClick={this.signIn}>
               <Glyphicon glyph="log-in"/> Sign In
@@ -29,6 +28,7 @@ export default React.createClass({
               <Glyphicon glyph="log-out"/> Sign Out
             </Button>
           </ButtonToolbar>
+          <CredentialView credentials={this.state.credentials} />
         </Col>
       </Row>
     );
@@ -87,44 +87,74 @@ const CredentialView = React.createClass({
     return this.renderWaitFor('info') || (() => {
       if (!info) {
         return (
-          <div>
+          <div style={{ marginTop: 20 }}>
             <p>No credentials loaded. Please sign in.</p>
           </div>
         );
       }
 
       return (
-        <div>
-          <dl className="dl-horizontal">
-            <dt>ClientId</dt>
-            <dd><code>{info.clientId}</code></dd>
+        <div style={{ marginTop: 20 }}>
+          <table className="table">
+            <tbody>
+              <tr>
+                <td>ClientId</td>
+                <td><code>{info.clientId}</code></td>
+              </tr>
 
-            <dt>AccessToken</dt>
-            {
-              showToken ?
-                <dd><code>{this.props.credentials.accessToken}</code></dd> :
-                <dd><a href="#" onClick={this.showToken}>show</a></dd>
-            }
+              <tr>
+                <td>AccessToken</td>
+                {
+                  showToken ?
+                    <td><code>{this.props.credentials.accessToken}</code></td> :
+                    <td><a href="#" onClick={this.showToken}>show</a></td>
+                }
+              </tr>
 
-            <dt>Type</dt>
-            <dd>{info.type}</dd>
+              <tr>
+                <td>Type</td>
+                <td>{info.type}</td>
+              </tr>
 
-            {info.start ? <dt>Valid From</dt> : null}
-            {info.start ? <dd><format.DateView date={info.start} /></dd> : null}
-            {info.expiry ? <dt>Expires</dt> : null}
-            {info.expiry ? <dd><format.DateView date={info.expiry} /></dd> : null}
+              {(() => {
+                if (info.start) {
+                  return (
+                    <tr>
+                      <td>Valid From</td>
+                      <td><format.DateView date={info.start} /></td>
+                    </tr>
+                  );
+                }
+              })()}
 
-            <dt>Scopes</dt>
-            <dd>
-              {
-                info.scopes.length ? (
-                  <ul>
-                    {info.scopes.map((scope, index) => <li key={index}><code>{scope}</code></li>)}
-                  </ul>
-                ) : 'none (or accessToken is invalid)'
-              }
-            </dd>
-          </dl>
+              {(() => {
+                if (info.expiry) {
+                  return (
+                    <tr>
+                      <td>Expires</td>
+                      <td><format.DateView date={info.expiry} /></td>
+                    </tr>
+                  );
+                }
+              })()}
+
+              <tr>
+                <td>Scopes</td>
+                <td>
+                  {
+                    info.scopes.length ? (
+                        <div style={{ lineHeight: 1.8 }}>
+                          {info.scopes.map((scope, key) => (
+                            <div key={key}><code>{scope}</code></div>
+                          ))}
+                        </div>
+                      ) :
+                      'none (or accessToken is invalid)'
+                  }
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       );
     })();
