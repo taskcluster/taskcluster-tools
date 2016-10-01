@@ -3,16 +3,15 @@ import { Button, Glyphicon, Modal, MenuItem } from 'react-bootstrap';
 import * as utils from '../utils';
 
 /** Button with an associated confirm dialog */
-const ConfirmAction = React.createClass({
+export default React.createClass({
+  displayName: 'ConfirmActionMenuItem',
+
   mixins: [
     // We use loadState to execute the action asynchronously
     utils.createTaskClusterMixin()
   ],
 
   propTypes: {
-    // Button size, style, glyph and disabled
-    buttonSize: React.PropTypes.string,
-    buttonStyle: React.PropTypes.string.isRequired,
     disabled: React.PropTypes.bool.isRequired,
     glyph: React.PropTypes.string.isRequired,
     label: React.PropTypes.string.isRequired,
@@ -41,14 +40,10 @@ const ConfirmAction = React.createClass({
 
   render() {
     return (
-      <Button
-        bsSize={this.props.buttonSize}
-        bsStyle={this.props.buttonStyle}
-        disabled={this.props.disabled}
-        onClick={this.openDialog}>
-          <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
-          {this.renderDialog()}
-      </Button>
+      <MenuItem disabled={this.props.disabled} onClick={this.openDialog}>
+        <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
+        {this.renderDialog()}
+      </MenuItem>
     );
   },
 
@@ -77,13 +72,13 @@ const ConfirmAction = React.createClass({
           {
             !(this.state.executing || this.state.result) ? (
               <Button
-                  onClick={this.executeAction}
-                  bsStyle={this.props.buttonStyle}
-                  hidden={this.state.result}>
-                <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
+                onClick={this.executeAction}
+                bsStyle={this.props.buttonStyle}
+                hidden={this.state.result}>
+                  <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
               </Button>
             ) :
-            null
+              null
           }
           <Button onClick={this.closeDialog} bsStyle="default">
             <Glyphicon glyph="remove" /> Close
@@ -113,5 +108,3 @@ const ConfirmAction = React.createClass({
     });
   }
 });
-
-export default ConfirmAction;

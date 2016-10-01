@@ -164,7 +164,13 @@ export default React.createClass({
 
   render() {
     if (this.state.taskId === '') {
-      return <strong>No <code>taskId</code> is specified.</strong>;
+      return (
+        <div>
+          <h4>Connect to Loaner</h4>
+          <hr />
+          <div className="alert alert-warning">No <code>taskId</code> was specified.</div>
+        </div>
+      );
     }
 
     const includesState = this.state.status &&

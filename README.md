@@ -53,6 +53,16 @@ Any ESLint errors across the project will be displayed in the terminal during de
 - `npm start`: the default development build, watches `src/`, and serves on `http://localhost:9000/`
 - `npm run build`: builds `src/` into a `build/` directory
 
+### Memory problems during development
+
+It's possible that when building a larger project like taskcluster-tools that Node.js will run out
+of memory for the amount of files being built during development. As a workaround, instead of
+running `npm start`, run the following to run the same command with more memory:
+
+```sh
+PORT=9000 node --max-old-space-size=4096 node_modules/.bin/neutrino start -p tools-preset
+```
+
 ## Testing
 
 Until someone comes up with something better, which probably involves Redux or similar,

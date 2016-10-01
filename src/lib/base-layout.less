@@ -2,17 +2,56 @@
 @import "~bootstrap/less/theme.less";
 @import "./custom-vars.less";
 @import "./assets/font-awesome/css/font-awesome.css";
+@import 'https://fonts.googleapis.com/css?family=Lato:400,700|Montserrat:400,700';
 
-#navbar nav.navbar-inverse .navbar-brand {
-  color:        #00d8ff;
-  padding-top:  0;
-  line-height:  50px;
+body {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
 }
 
-#navbar .navbar-brand > img {
-  display: inline;
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Montserrat', sans-serif;
 }
 
-#navbar nav.navbar-inverse .navbar-text {
-  color: #fff;
+pre {
+  font-size: 12px;
+}
+
+#navbar {
+  font-family: 'Montserrat', sans-serif;
+
+  nav.navbar-inverse {
+    background: #006071 none;
+    border-color: #55e5ff;
+
+    .navbar-brand {
+      color: #fff;
+      font-size: 24px;
+      text-transform: uppercase;
+      text-shadow: none;
+      font-weight: 700;
+    }
+
+    .navbar-text {
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .navbar-nav > li {
+      &:hover {
+        background-color: #01778c;
+      }
+
+      &> a {
+        color: #fff;
+        text-shadow: none;
+      }
+    }
+  }
+
+  .navbar-brand > img {
+    display: inline;
+    margin-top: -3px;
+  }
 }

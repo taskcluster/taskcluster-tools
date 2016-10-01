@@ -1,6 +1,6 @@
 import React from 'react';
 import { findDOMNode } from 'react-dom';
-import { FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import { FormGroup, FormControl, ControlLabel, InputGroup, Button } from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import LoanerButton from '../lib/ui/loaner-button';
@@ -67,22 +67,25 @@ export default React.createClass({
 
     return (
       <div>
-        <h1>Create Interactive Task from Task</h1>
+        <h4>One-Click Loaner</h4>
         <p>
-          This tool lets you create an interactive task given a <code>taskId</code>
+          This tool lets you create an interactive task given a <code>taskId</code>.
         </p>
-        <form className="form-horizontal" onSubmit={this.handleSubmit}>
+        <hr />
+        <form onSubmit={this.handleSubmit}>
           <FormGroup validationState={invalidInput ? 'error' : null}>
-            <ControlLabel className="col-sm-2"><span>Enter <code>TaskId</code></span></ControlLabel>
-            <div className="col-sm-10">
+            <ControlLabel>Task ID</ControlLabel>
+            <InputGroup>
               <FormControl
                 type="text"
                 ref="taskId"
-                placeholder="taskId"
+                placeholder="Enter a taskId"
                 value={this.state.taskIdInput}
                 onChange={this.handleTaskIdInputChange} />
-              <FormControl.Feedback />
-            </div>
+              <InputGroup.Button>
+                <Button type="submit">Submit</Button>
+              </InputGroup.Button>
+            </InputGroup>
           </FormGroup>
         </form>
         <br/><br/>

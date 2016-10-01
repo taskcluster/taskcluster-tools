@@ -56,7 +56,7 @@ export default React.createClass({
   /** Render user-interface */
   render() {
     return (
-      <Row>
+      <Row style={{ marginTop: 10 }}>
         <Col md={5}>
           {this.renderPrefixInput()}
           {this.renderClientsTable()}

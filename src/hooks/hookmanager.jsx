@@ -37,7 +37,8 @@ export default React.createClass({
     return (
       <Row>
         <Col md={4}>
-          <h3>Hooks</h3>
+          <h4>Hooks</h4>
+          <hr />
           <HookGroupBrowser
             ref="hookgroupbrowser"
             currentHookGroupId={this.state.currentHookGroupId}

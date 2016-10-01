@@ -1,10 +1,12 @@
 import React from 'react';
+import { Table, Label, Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import * as utils from '../utils';
 import * as format from '../format';
 import _ from 'lodash';
 import taskcluster from 'taskcluster-client';
 import LogView from './logview';
 import ArtifactList from './artifactlist';
+import './runinfo.less';
 
 /** Displays information about a run in a tab page */
 const RunInfo = React.createClass({
@@ -98,62 +100,101 @@ const RunInfo = React.createClass({
     };
 
     return (
-      <span>
-        <dl className="dl-horizontal">
-          <dt>State</dt>
-          <dd>
-            <span className={`label label-${stateLabelMap[run.state]}`}>{run.state}</span>
-          </dd>
-          <dt>Reason Created</dt>
-          <dd><code>{run.reasonCreated}</code></dd>
-          <dt>Reason Resolved</dt>
-          <dd>
-            {run.reasonResolved ? <code>{run.reasonResolved}</code> : '-'}
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Artifacts</dt>
-          <dd>{this.renderWaitFor('artifacts') || this.renderArtifacts()}</dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Scheduled</dt>
-          <dd>
-            <format.DateView date={run.scheduled}/>
-          </dd>
-          <dt>Started</dt>
-          <dd>
-            {
-              run.started ?
-                <format.DateView date={run.started} since={run.scheduled} /> :
-                '-'
-            }
-          </dd>
-          <dt>Resolved</dt>
-          <dd>
-            {
-              run.resolved ?
-                <format.DateView date={run.resolved} since={run.started} /> :
-                '-'
-            }
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>WorkerGroup</dt>
-          <dd>
-            {run.workerGroup ? <code>{run.workerGroup}</code> : '-'}
-          </dd>
-          <dt>WorkerId</dt>
-          <dd>
-            {run.workerId ? <code>{run.workerId}</code> : '-'}
-          </dd>
-          <dt>TakenUntil</dt>
-          <dd>
-            {run.takenUntil ? <format.DateView date={run.takenUntil}/> : '-'}
-          </dd>
-        </dl>
-        <hr/>
-        {this.renderWaitFor('artifacts') || this.renderLogView()}
-      </span>
+      <Tab.Container id="run-container" defaultActiveKey="details">
+        <Row>
+          <Col sm={12}>
+            <Nav bsStyle="pills">
+              <NavItem eventKey="details">Run {this.props.run.runId} Details</NavItem>
+              <NavItem eventKey="artifacts">Artifacts</NavItem>
+              <NavItem eventKey="logs">Logs</NavItem>
+            </Nav>
+          </Col>
+          <Col sm={12}>
+            <Tab.Content>
+              <Tab.Pane eventKey="details">
+                <Table>
+                  <tbody>
+                    <tr>
+                      <td>State</td>
+                      <td>
+                        <Label bsStyle={stateLabelMap[run.state]}>{run.state}</Label>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>Reason Created</td>
+                      <td><code>{run.reasonCreated}</code></td>
+                    </tr>
+
+                    <tr>
+                      <td>Reason Resolved</td>
+                      <td>
+                        {run.reasonResolved ? <code>{run.reasonResolved}</code> : '-'}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>Scheduled</td>
+                      <td>
+                        <format.DateView date={run.scheduled} />
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>Started</td>
+                      <td>
+                        {
+                          run.started ?
+                            <format.DateView date={run.started} since={run.scheduled} /> :
+                            '-'
+                        }
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>Resolved</td>
+                      <td>
+                        {
+                          run.resolved ?
+                            <format.DateView date={run.resolved} since={run.started} /> :
+                            '-'
+                        }
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>WorkerGroup</td>
+                      <td>
+                        {run.workerGroup ? <code>{run.workerGroup}</code> : '-'}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>WorkerId</td>
+                      <td>
+                        {run.workerId ? <code>{run.workerId}</code> : '-'}
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>TakenUntil</td>
+                      <td>
+                        {run.takenUntil ? <format.DateView date={run.takenUntil}/> : '-'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </Tab.Pane>
+              <Tab.Pane eventKey="artifacts">
+                {this.renderWaitFor('artifacts') || this.renderArtifacts()}
+              </Tab.Pane>
+              <Tab.Pane eventKey="logs">
+                {this.renderWaitFor('artifacts') || this.renderLogView()}
+              </Tab.Pane>
+            </Tab.Content>
+          </Col>
+        </Row>
+      </Tab.Container>
     );
   },
 

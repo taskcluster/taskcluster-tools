@@ -13,6 +13,7 @@ import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 import WorkerTypeView from './workertypeview';
 import WorkerTypeEditor from './workertypeeditor';
+import './aws-provisioner.less';
 
 const WorkerTypeRow = React.createClass({
   mixins: [
@@ -70,13 +71,13 @@ const WorkerTypeRow = React.createClass({
         onClick={this.props.onClick}
         className={this.props.selected ? 'active' : null}
         style={{ cursor: 'pointer' }}>
-        <td><code>{this.props.workerType.workerType}</code></td>
-        <td>
-          <OverlayTrigger placement="left" overlay={this.tooltip()}>
-            {this.renderCapacityBar()}
-          </OverlayTrigger>
-        </td>
-        <td>{this.state.pendingTasksLoaded ? this.state.pendingTasks.pendingTasks : '...'}</td>
+          <td><code>{this.props.workerType.workerType}</code></td>
+          <td>
+            <OverlayTrigger placement="left" overlay={this.tooltip()}>
+              {this.renderCapacityBar()}
+            </OverlayTrigger>
+          </td>
+          <td>{this.state.pendingTasksLoaded ? this.state.pendingTasks.pendingTasks : '...'}</td>
       </tr>
     );
   },
@@ -250,19 +251,20 @@ export default React.createClass({
   render() {
     return (
       <div>
-        <ButtonToolbar>
-          <Button
-            bsStyle="primary"
-            onClick={this.setSelected.bind(this, 'create:worker-type')}
-            style={{ marginBottom: 10 }}>
-            <Glyphicon glyph="plus" /> Create WorkerType
-          </Button>
-        </ButtonToolbar>
         {
           this.state.selected === 'create:worker-type' ?
             this.renderWorkerTypeCreator() :
             this.renderWorkerTypeView()
         }
+        <ButtonToolbar className="pull-right">
+          <Button
+            bsStyle="primary"
+            bsSize="sm"
+            onClick={this.setSelected.bind(this, 'create:worker-type')}
+            style={{ marginTop: -10, padding: '3px 12px' }}>
+            <Glyphicon glyph="plus" /> Create WorkerType
+          </Button>
+        </ButtonToolbar>
         <span>{this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()}</span>
       </div>
     );
@@ -271,13 +273,13 @@ export default React.createClass({
   renderWorkerTypeTable() {
     return (
       <div>
-        <h2>Worker Types</h2>
-        <Table>
+        <h4>Worker Types</h4>
+        <Table style={{ marginTop: 20 }}>
           <thead>
             <tr>
-              <th>WorkerType</th>
-              <th className="col-md-6">Capacity</th>
-              <th>Pending Tasks</th>
+              <th className="col-xs-2">WorkerType</th>
+              <th>Capacity</th>
+              <th className="col-xs-2">Pending Tasks</th>
             </tr>
           </thead>
           <tbody>
@@ -302,9 +304,9 @@ export default React.createClass({
     }
 
     return (
-      <div style={{ marginBottom: 50 }}>
+      <div style={{ marginBottom: 40 }}>
+        <h4>Worker Type: <code>{this.state.selected}</code></h4>
         <hr />
-        <h2>Worker Type: <code>{this.state.selected}</code></h2>
         <WorkerTypeView
           provisionerId={this.props.provisionerId}
           workerType={this.state.selected}

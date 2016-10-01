@@ -96,7 +96,7 @@ const RoleEditor = React.createClass({
     try {
       return this.renderWaitFor('role') || (
         <div className="role-editor">
-          <h3>{title}</h3>
+          <h4 style={{ marginTop: 0 }}>{title}</h4>
           <hr style={{ marginBottom: 10 }} />
           <div className="form-horizontal">
             {

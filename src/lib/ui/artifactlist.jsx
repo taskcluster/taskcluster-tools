@@ -1,4 +1,5 @@
 import React from 'react';
+import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
 import * as utils from '../utils';
 import taskcluster from 'taskcluster-client';
 import * as auth from '../auth';
@@ -192,15 +193,14 @@ export default React.createClass({
 
   render() {
     return (
-      <ul className="fa-ul">
-        {this.state.artifacts.map((artifact, index) => (
-          <li key={index}>
-            <i className={`fa-li fa fa-${artifact.icon}`} />
+      <div style={{ fontSize: 14 }}>
+        {this.state.artifacts.map((artifact, key) => (
+          <div key={key} style={{ marginBottom: 8 }}>
+            <i className={`fa fa-${artifact.icon}`} style={{ marginRight: 5 }} />
             <a href={artifact.url} target="_blank">{artifact.name}</a>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     );
   }
-
 });

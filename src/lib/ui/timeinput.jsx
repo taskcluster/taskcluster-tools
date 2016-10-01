@@ -22,9 +22,6 @@ export default React.createClass({
     const formatted = value.format(format);
     const inputClass = classNames('input-group', this.state.valid ? 'has-success' : 'has-error');
 
-    console.log('RENDERING COMPONENT');
-    // format value onchange className
-
     return (
       <div className={inputClass}>
        <input

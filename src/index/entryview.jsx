@@ -48,8 +48,8 @@ export default React.createClass({
   render() {
     return (
       <div>
-        <h2>Indexed Task</h2>
-        <hr/>
+        <h4>Indexed Task</h4>
+        <hr />
         {
           this.state.taskLoaded && this.state.taskError &&
           this.state.taskError.statusCode === 404 ? (

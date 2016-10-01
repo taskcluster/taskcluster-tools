@@ -49,7 +49,14 @@ class PushInspector extends Component {
 
     return (
       <div>
+        <h4>Push Inspector</h4>
+        <p>
+          Inspect task groups, monitor progress, view dependencies and states, and inspect
+          the individual tasks that make up the task group using the embedded task-inspector.
+        </p>
+        <hr />
         <Search taskGroupId={taskGroupId} />
+        <hr />
         <ProgressBar
           taskGroupId={taskGroupId}
           taskId={taskId}
@@ -58,6 +65,7 @@ class PushInspector extends Component {
           setActiveTaskStatus={setActiveTaskStatus}
           tasksRetrievedFully={tasksRetrievedFully} />
         {handleLoadingAndError}
+        <hr />
         <div className={!tasks.length ? 'hideDisplay' : ''}>
           {children}
         </div>

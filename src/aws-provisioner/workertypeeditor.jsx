@@ -8,7 +8,6 @@ import CodeMirror from 'react-code-mirror';
 import ConfirmAction from '../lib/ui/confirmaction';
 import 'codemirror/mode/javascript/javascript';
 import '../lib/codemirror/json-lint';
-import './workertypeeditor.less';
 
 /* eslint-disable no-param-reassign */
 /** Encode/decode UserData property of object */

@@ -36,7 +36,8 @@ export default React.createClass({
   render() {
     return (
       <Row>
-        <Col md={8}>
+        <Col md={12}>
+          <h4>Cache Purge Inspector</h4>
           <p>
             All currently active cache purges are displayed below.
             24 hours after creation, requests expire and are no longer displayed here.
@@ -44,15 +45,21 @@ export default React.createClass({
             previous three classifiers are considered invalid.
             Any caches created after that time are fine.
           </p>
+          <hr />
         </Col>
-        <Col md={4}>
-          <ButtonToolbar>
-            <Button bsStyle="success" onClick={this.reload} disabled={!this.state.cachesLoaded}>
-              <Glyphicon glyph="refresh"/> Refresh All
+        <Col md={12}>
+          <ButtonToolbar className="pull-right">
+            <Button
+              bsSize="sm"
+              bsStyle="success"
+              onClick={this.reload}
+              disabled={!this.state.cachesLoaded}>
+                <Glyphicon glyph="refresh" /> Refresh All
             </Button>
           </ButtonToolbar>
         </Col>
         <Col md={12}>
+          <br /><br />
           {this.renderCachesTable()}
         </Col>
       </Row>

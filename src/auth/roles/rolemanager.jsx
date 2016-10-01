@@ -48,29 +48,26 @@ const RoleManager = React.createClass({
   /** Render user-interface */
   render() {
     return (
-      <Row>
+      <Row style={{ marginTop: 10 }}>
         <Col md={5}>
           {this.renderRolesTable()}
           <ButtonToolbar>
-            <Button bsStyle="primary"
-                       onClick={this.selectRoleId.bind(this, '')}
-                       disabled={this.state.selectedRoleId === ''}>
-              <Glyphicon glyph="plus"/>
-              &nbsp;
-              Add Role
+            <Button
+              bsStyle="primary"
+              onClick={this.selectRoleId.bind(this, '')}
+              disabled={this.state.selectedRoleId === ''}>
+                <Glyphicon glyph="plus" /> Add Role
             </Button>
-            <Button bsStyle="success"
-                       onClick={this.reload}
-                       disabled={!this.state.rolesLoaded}>
-              <Glyphicon glyph="refresh"/>
-              &nbsp;
-              Refresh
+            <Button
+              bsStyle="success"
+              onClick={this.reload}
+              disabled={!this.state.rolesLoaded}>
+                <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar>
         </Col>
         <Col md={7}>
-          <RoleEditor currentRoleId={this.state.selectedRoleId}
-                      reloadRoleId={this.reloadRoleId}/>
+          <RoleEditor currentRoleId={this.state.selectedRoleId} reloadRoleId={this.reloadRoleId} />
         </Col>
       </Row>
     );

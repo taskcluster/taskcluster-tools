@@ -25,10 +25,8 @@ const initialTask = {
 
 ReactDOM.render((
   <Layout>
-    <Row style={{ marginBottom: 50 }}>
-      <TaskCreator
-        localStorageKey="task-creator/task"
-        initialTaskValue={JSON.stringify(initialTask, null, '\t')}/>
-    </Row>
+    <TaskCreator
+      localStorageKey="task-creator/task"
+      initialTaskValue={JSON.stringify(initialTask, null, '\t')}/>
   </Layout>
 ), document.getElementById('root'));

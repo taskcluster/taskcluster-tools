@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import { hashHistory } from 'react-router';
-import { FormGroup, FormControl } from 'react-bootstrap';
+import { FormGroup, FormControl, ControlLabel, InputGroup, Button } from 'react-bootstrap';
 
 const VALID_SLUG = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
 
@@ -62,21 +62,23 @@ class Search extends Component {
 
     return (
       <div>
-        <form onSubmit={this.onFormSubmit} className="input-group search-form">
-          <div className="searchLabel">Enter <code>taskGroupId</code></div>
+        <form onSubmit={this.onFormSubmit}>
           <FormGroup validationState={invalidInput ? 'error' : null}>
-            <FormControl
-              type="text"
-              placeholder="taskGroupId"
-              bsClass="form-control"
-              value={this.state.term}
-              onChange={this.onInputChange} />
+            <ControlLabel>Task Group ID</ControlLabel>
+            <InputGroup>
+              <FormControl
+                type="text"
+                placeholder="Enter a taskGroupId"
+                bsClass="form-control"
+                value={this.state.term}
+                onChange={this.onInputChange} />
+              <InputGroup.Button type="submit">
+                <Button>
+                  <i className="fa fa-search" /> Inspect
+                </Button>
+              </InputGroup.Button>
+            </InputGroup>
           </FormGroup>
-          <div className="input-group-btn inspect-btn">
-            <button type="submit" className="button btn btn-secondary">
-              <i className="fa fa-search" /> Inspect
-            </button>
-          </div>
         </form>
       </div>
     );
