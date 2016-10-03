@@ -53,7 +53,9 @@ export default class LogView extends Component {
 
     return (
       <div>
-        <div><label>Show Log</label></div>
+        <div>
+          <label>Show Log</label>
+        </div>
         <div className="select-wrapper">
           <Select
             value={this.state.name}
