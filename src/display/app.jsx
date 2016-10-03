@@ -89,7 +89,7 @@ const Display = React.createClass({
     }
 
     // Get port
-    let { port } = opts.port;
+    let { port } = opts;
 
     if (!port) {
       if (opts.protocol === 'wss:') {
