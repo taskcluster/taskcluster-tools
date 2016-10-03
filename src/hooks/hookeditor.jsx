@@ -309,7 +309,7 @@ const HookEditor = React.createClass({
             <label className="control-label col-md-2">Schedule</label>
             <div className="col-md-10">
                <p className="text-info">
-                 See <a href="https://www.npmjs.com/package/cron-parser">cron-parser</a> for format
+                 See <a target="_blank" href="https://www.npmjs.com/package/cron-parser">cron-parser</a> for format
                  information. Times are in UTC.
                </p>
                <ul style={{ paddingLeft: 20 }}>
