@@ -234,13 +234,16 @@ export default React.createClass({
       selected: '',
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
-      workerTypeSummariesError: null
+      workerTypeSummariesError: null,
+      workerTypeStartsWith: ""
     };
   },
 
   load() {
     return {
-      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries()
+      workerTypeSummaries: this.state.workerTypeStartsWith? 
+          this.awsProvisioner.listWorkerTypeSummaries().filter(summary => workerType.startsWith(this.state.clientPrefix)):
+          this.awsProvisioner.listWorkerTypeSummaries();
     };
   },
 
@@ -251,6 +254,7 @@ export default React.createClass({
   render() {
     return (
       <div>
+        {this.renderTypeInput()}
         {
           this.state.selected === 'create:worker-type' ?
             this.renderWorkerTypeCreator() :
@@ -269,6 +273,28 @@ export default React.createClass({
       </div>
     );
   },
+    
+  renderTypeInput() { 
+    let setType = (e) => {this.setState({workerTypeStartsWith: e.target.value});}
+    let enterType = (e) => {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        setType(e);
+      }
+    };
+    return <div className="form-group form-group-sm">
+       <div className="input-group">
+         <div className="input-group-addon text-sm"><em>WorkerTypes beginning with</em></div>
+         <input type="search" className="form-control"
+                defaultValue={this.state.workerTypeStartsWith}
+                onBlur={setType}
+                onKeyUp={enterType}/>
+         <div className="input-group-addon">
+           <bs.Glyphicon glyph="search"/>
+         </div>
+       </div>
+     </div>;
+  }, 
 
   renderWorkerTypeTable() {
     return (
