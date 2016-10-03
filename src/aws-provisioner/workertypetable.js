@@ -241,9 +241,7 @@ export default React.createClass({
 
   load() {
     return {
-      workerTypeSummaries: this.state.workerTypeStartsWith? 
-          this.awsProvisioner.listWorkerTypeSummaries().filter(summary => workerType.startsWith(this.state.clientPrefix)):
-          this.awsProvisioner.listWorkerTypeSummaries();
+      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries().filter(summary => summary.workerType.startsWith(this.state.workerTypeStartsWith))
     };
   },
 
