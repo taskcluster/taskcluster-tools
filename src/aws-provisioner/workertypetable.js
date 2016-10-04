@@ -316,14 +316,14 @@ export default React.createClass({
             .filter(workerType => (
                 workerType.workerType.startsWith(this.state.workerTypeStartsWith)))
             .map(workerType => (
- -              <WorkerTypeRow
- -                key={workerType.workerType}
- -                provisionerId={this.props.provisionerId}
- -                workerType={workerType}
- -                selected={this.state.selected === workerType.workerType}
- -                onClick={this.setSelected.bind(this, workerType.workerType)}
- -                summary={workerType} />
- -          ))}
+                <WorkerTypeRow
+                  key={workerType.workerType}
+                  provisionerId={this.props.provisionerId}
+                  workerType={workerType}
+                  selected={this.state.selected === workerType.workerType}
+                  onClick={this.setSelected.bind(this, workerType.workerType)}
+                  summary={workerType} />
+            ))}
           </tbody>
         </Table>
       </div>
