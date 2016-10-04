@@ -295,7 +295,7 @@ export default React.createClass({
                 <Glyphicon glyph="search" />
             </div>
         </div>
-      </div>;
+      </div>
     );
   },
 
