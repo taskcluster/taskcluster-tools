@@ -235,7 +235,7 @@ export default React.createClass({
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
       workerTypeSummariesError: null,
-      workerTypeStartsWith: ''
+      workerTypeContains: ''
     };
   },
 
@@ -273,7 +273,7 @@ export default React.createClass({
   },
 
   renderTypeInput() {
-    const setWorkerType = e => this.setState({ workerTypeStartsWith: e.target.value });
+    const setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
     const enterWorkerType = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
@@ -288,7 +288,7 @@ export default React.createClass({
           <input
             type="search"
             className="form-control"
-            defaultValue={this.state.workerTypeStartsWith}
+            defaultValue={this.state.workerTypeContains}
             onBlur={setWorkerType}
             onKeyUp={enterWorkerType}/>
           <div className="input-group-addon">
@@ -315,7 +315,7 @@ export default React.createClass({
           {
             this.state.workerTypeSummaries
               .filter(workerType => workerType.workerType
-                .includes(this.state.workerTypeStartsWith))
+                .includes(this.state.workerTypeContains))
               .map(workerType => (
                 <WorkerTypeRow
                   key={workerType.workerType}
