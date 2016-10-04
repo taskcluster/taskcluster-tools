@@ -286,13 +286,13 @@ export default React.createClass({
         <div className="input-group">
             <div className="input-group-addon text-sm"><em>WorkerTypes beginning with</em></div>
             <input
-                type="search"
-                className="form-control"
-                defaultValue={this.state.workerTypeStartsWith}
-                onBlur={setWorkerType}
-                onKeyUp={enterWorkerType}/>
+              type="search"
+              className="form-control"
+              defaultValue={this.state.workerTypeStartsWith}
+              onBlur={setWorkerType}
+              onKeyUp={enterWorkerType}/>
             <div className="input-group-addon">
-                <Glyphicon glyph="search" />
+              <Glyphicon glyph="search" />
             </div>
         </div>
       </div>
@@ -312,18 +312,20 @@ export default React.createClass({
             </tr>
           </thead>
           <tbody>
-          {this.state.workerTypeSummaries
-            .filter(workerType => (
-                workerType.workerType.startsWith(this.state.workerTypeStartsWith)))
-            .map(workerType => (
+          {
+            this.state.workerTypeSummaries
+              .filter(workerType => workerType.workerType
+                .startsWith(this.state.workerTypeStartsWith))
+              .map(workerType => (
                 <WorkerTypeRow
                   key={workerType.workerType}
                   provisionerId={this.props.provisionerId}
                   workerType={workerType}
                   selected={this.state.selected === workerType.workerType}
-                  onClick={this.setSelected.bind(this, workerType.workerType)}
+                  onClick={() => this.setSelected(this.workerType.workerType)}
                   summary={workerType} />
-            ))}
+              ))
+          }
           </tbody>
         </Table>
       </div>
