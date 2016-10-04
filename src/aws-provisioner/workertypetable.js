@@ -284,16 +284,16 @@ export default React.createClass({
     return (
       <div className="form-group form-group-sm">
         <div className="input-group">
-            <div className="input-group-addon text-sm"><em>WorkerTypes beginning with</em></div>
-            <input
-              type="search"
-              className="form-control"
-              defaultValue={this.state.workerTypeStartsWith}
-              onBlur={setWorkerType}
-              onKeyUp={enterWorkerType}/>
-            <div className="input-group-addon">
-              <Glyphicon glyph="search" />
-            </div>
+          <div className="input-group-addon text-sm"><em>WorkerTypes beginning with</em></div>
+          <input
+            type="search"
+            className="form-control"
+            defaultValue={this.state.workerTypeStartsWith}
+            onBlur={setWorkerType}
+            onKeyUp={enterWorkerType}/>
+          <div className="input-group-addon">
+            <Glyphicon glyph="search" />
+          </div>
         </div>
       </div>
     );
