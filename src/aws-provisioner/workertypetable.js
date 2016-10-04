@@ -241,7 +241,7 @@ export default React.createClass({
 
   load() {
     return {
-      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries().filter(summary => summary.workerType.startsWith(this.state.workerTypeStartsWith))
+      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries()
     };
   },
 
@@ -307,15 +307,17 @@ export default React.createClass({
             </tr>
           </thead>
           <tbody>
-          {this.state.workerTypeSummaries.map(workerType => (
-            <WorkerTypeRow
-              key={workerType.workerType}
-              provisionerId={this.props.provisionerId}
-              workerType={workerType}
-              selected={this.state.selected === workerType.workerType}
-              onClick={this.setSelected.bind(this, workerType.workerType)}
-              summary={workerType} />
-          ))}
+              {this.state.workerTypeSummaries
+                  .filter(summary => summary.workerType.startsWith(this.state.workerTypeStartsWith))
+                  .map(summary => {
+                      return <WorkerTypeRow
+                          key={summary.workerType}
+                          provisionerId={this.props.provisionerId}
+                          workerType={summary}
+                          selected={this.state.selected === summary.workerType}
+                          onClick={this.setSelected.bind(this, summary.workerType)}
+                          summary={summary}/>;
+              })}
           </tbody>
         </Table>
       </div>
