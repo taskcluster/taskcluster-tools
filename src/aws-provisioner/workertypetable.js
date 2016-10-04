@@ -235,7 +235,7 @@ export default React.createClass({
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
       workerTypeSummariesError: null,
-      workerTypeStartsWith: ""
+      workerTypeStartsWith: ''
     };
   },
 
@@ -271,28 +271,33 @@ export default React.createClass({
       </div>
     );
   },
-    
-  renderTypeInput() { 
-    let setType = (e) => {this.setState({workerTypeStartsWith: e.target.value});}
-    let enterType = (e) => {
+
+  renderTypeInput() {
+    let setWorkerType = e => this.setState({workerTypeStartsWith: e.target.value});
+    let enterWorkerType = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
-        setType(e);
+        setWorkerType(e);
       }
     };
-    return <div className="form-group form-group-sm">
-       <div className="input-group">
-         <div className="input-group-addon text-sm"><em>WorkerTypes beginning with</em></div>
-         <input type="search" className="form-control"
+
+    return (
+      <div className="form-group form-group-sm">
+        <div className="input-group">
+            <div className="input-group-addon text-sm"><em>WorkerTypes beginning with</em></div>
+            <input
+                type="search"
+                className="form-control"
                 defaultValue={this.state.workerTypeStartsWith}
-                onBlur={setType}
-                onKeyUp={enterType}/>
-         <div className="input-group-addon">
-           <bs.Glyphicon glyph="search"/>
-         </div>
-       </div>
-     </div>;
-  }, 
+                onBlur={setWorkerType}
+                onKeyUp={enterWorkerType}/>
+            <div className="input-group-addon">
+                <Glyphicon glyph="search" />
+            </div>
+        </div>
+      </div>;
+    );
+  },
 
   renderWorkerTypeTable() {
     return (
@@ -307,17 +312,18 @@ export default React.createClass({
             </tr>
           </thead>
           <tbody>
-              {this.state.workerTypeSummaries
-                  .filter(workerType => workerType.workerType.startsWith(this.state.workerTypeStartsWith))
-                  .map(workerType => {
-                      return <WorkerTypeRow
-                          key={workerType.workerType}
-                          provisionerId={this.props.provisionerId}
-                          workerType={workerType}
-                          selected={this.state.selected === workerType.workerType}
-                          onClick={this.setSelected.bind(this, workerType.workerType)}
-                          summary={workerType}/>;
-              })}
+          {this.state.workerTypeSummaries
+            .filter(workerType => (
+                workerType.workerType.startsWith(this.state.workerTypeStartsWith)))
+            .map(workerType => (
+ -              <WorkerTypeRow
+ -                key={workerType.workerType}
+ -                provisionerId={this.props.provisionerId}
+ -                workerType={workerType}
+ -                selected={this.state.selected === workerType.workerType}
+ -                onClick={this.setSelected.bind(this, workerType.workerType)}
+ -                summary={workerType} />
+ -          ))}
           </tbody>
         </Table>
       </div>
