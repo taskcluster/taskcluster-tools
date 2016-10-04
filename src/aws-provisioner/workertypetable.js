@@ -284,7 +284,7 @@ export default React.createClass({
     return (
       <div className="form-group form-group-sm">
         <div className="input-group">
-          <div className="input-group-addon text-sm"><em>WorkerTypes beginning with</em></div>
+          <div className="input-group-addon text-sm"><em>WorkerTypes containing</em></div>
           <input
             type="search"
             className="form-control"
@@ -315,7 +315,7 @@ export default React.createClass({
           {
             this.state.workerTypeSummaries
               .filter(workerType => workerType.workerType
-                .startsWith(this.state.workerTypeStartsWith))
+                .includes(this.state.workerTypeStartsWith))
               .map(workerType => (
                 <WorkerTypeRow
                   key={workerType.workerType}
