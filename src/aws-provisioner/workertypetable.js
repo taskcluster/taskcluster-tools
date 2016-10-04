@@ -273,8 +273,8 @@ export default React.createClass({
   },
 
   renderTypeInput() {
-    let setWorkerType = e => this.setState({workerTypeStartsWith: e.target.value});
-    let enterWorkerType = e => {
+    const setWorkerType = e => this.setState({ workerTypeStartsWith: e.target.value });
+    const enterWorkerType = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
         setWorkerType(e);
