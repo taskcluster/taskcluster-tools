@@ -8,11 +8,6 @@ console.log('credentials', credentials);
 
 // Update credentials if new ones were provided by querystring
 if (credentials.clientId && credentials.accessToken) {
-  // Parse certificate, if present
-  if (typeof credentials.certificate === 'string') {
-    credentials.certificate = JSON.parse(credentials.certificate);
-  }
-
   // Store credentials
   auth.saveCredentials(credentials);
 

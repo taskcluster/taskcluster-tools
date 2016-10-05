@@ -4,11 +4,17 @@ import url from 'url';
 const debug = createDebugger('tools:lib:credentials');
 
 /** Save credentials from localStorage (removed them if null is given) */
-export const saveCredentials = credentials => {
+export const saveCredentials = credentialsParam => {
+  const credentials = credentialsParam; // work around lint error
   if (!credentials) {
     // delete credentials
     delete localStorage.credentials;
   } else {
+    // Parse certificate, if present
+    if (typeof credentials.certificate === 'string') {
+      credentials.certificate = JSON.parse(credentials.certificate);
+    }
+
     // Store credentials as JSON
     localStorage.credentials = JSON.stringify(credentials);
   }
@@ -48,6 +54,7 @@ export const loadCredentials = () => {
     return creds;
   } catch (err) {
     debug('Failed to parse credentials, err: %s', err, err.stack);
+    return null;
   }
 };
 
