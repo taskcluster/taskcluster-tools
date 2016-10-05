@@ -252,7 +252,6 @@ export default React.createClass({
   render() {
     return (
       <div>
-        {this.renderTypeInput()}
         {
           this.state.selected === 'create:worker-type' ?
             this.renderWorkerTypeCreator() :
@@ -267,6 +266,7 @@ export default React.createClass({
             <Glyphicon glyph="plus" /> Create WorkerType
           </Button>
         </ButtonToolbar>
+        {this.renderTypeInput()}
         <span>{this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()}</span>
       </div>
     );
