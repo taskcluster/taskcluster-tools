@@ -11,17 +11,17 @@ var ConfirmAction = require('../lib/ui/confirmaction');
 var reference = require('./temp-aws-prov-reference');
 
 var WorkerTypeList = React.createClass({
-    mixins: [
-      utils.createTaskClusterMixin({
-        clients: {
-          awsProvisioner: taskcluster.createClient(reference)
-        },
-        clientOpts: {
-          awsProvisioner: {
-            baseUrl: 'http://localhost:5557/v1'
-          }
-        },
-      }),
+  mixins: [
+    utils.createTaskClusterMixin({
+      clients: {
+        awsProvisioner: taskcluster.createClient(reference)
+      },
+      clientOpts: {
+        awsProvisioner: {
+          baseUrl: 'http://localhost:5557/v1'
+        }
+      },
+    }),
     utils.createLocationHashMixin({
       keys: ['selected'],
       type: 'string'
@@ -39,94 +39,82 @@ var WorkerTypeList = React.createClass({
       selectedWorkerTypes: [],
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
-      workerTypeSummariesError: undefined,
+      workerTypeSummariesError: null,
       invalidAmis: [],
       errorWorkerTypes: [],
       error: null
     };
   },
 
-  handleSelectChange (value) {
+  handleSelectChange(value) {
 		// console.log('You\'ve selected:', value);
 		this.setState({ selectedWorkerTypes: value });
 	},
 
-  toggleDisabled (e) {
+  toggleDisabled(e) {
 		this.setState({ disabled: e.target.checked });
   },
 
   load() {
-    if (!this.props.currentAmiSet) {
-      return {
-        workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries(),
-        invalidAmis: [],
-        selectedWorkerTypes: [],
-        errorWorkerTypes: [],
-        error: null
-      };
-    } else {
-      return {
-        workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries(),
-        invalidAmis: this.awsProvisioner.validateAmiSet(this.props.currentAmiSet),
-        selectedWorkerTypes: [],
-        errorWorkerTypes: [],
-        error: null
-      };
-    }
+    return {
+      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries(),
+      invalidAmis: this.props.currentAmiSet ?
+        this.awsProvisioner.validateAmiSet(this.props.currentAmiSet) :
+        [],
+      selectedWorkerTypes: [],
+      errorWorkerTypes: [],
+      error: null
+    };
   },
 
   setSelected(workerType) {
-    this.setState({selected: workerType});
+    this.setState({ selected: workerType });
   },
 
   render() {
-    if (this.state.error) {
-      return (
-        <bs.Alert bsStyle="danger" onDismiss={this.dismissError}>
-          <strong>Error executing operation</strong>
-          <p>
-            {this.state.error.toString()}
-          </p>
-          {
-            this.state.errorWorkerTypes.length &&
-            (
-              <span>
-                <p>The AMI set was not applied to the following Worker Types:</p>
-                <ul>
-                {
-                  this.state.errorWorkerTypes.map(wtype => {
-                    return (
-                      <li key={wtype.workertype}><strong>{wtype.workertype}</strong></li>
-                    )
-                  })
-                }
-                </ul>
-              </span>
-            )
-          }
-        </bs.Alert>
-      )
+    if (!this.state.error) {
+      return this.props.currentAmiSet ?
+        this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable() :
+        (
+          <span>Please, first select an AmiSet.</span>
+        )
     }
 
     return (
-      this.props.currentAmiSet ? (
-        this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()
-      ) : (
-        <span>Please, first select an AmiSet.</span>
-      )
-    )
+      <bs.Alert bsStyle="danger" onDismiss={this.dismissError}>
+        <strong>Error executing operation</strong>
+        <p>
+          {this.state.error.toString()}
+        </p>
+        {
+          this.state.errorWorkerTypes.length &&
+          (
+            <span>
+              <p>The AMI set was not applied to the following Worker Types:</p>
+              <ul>
+              {
+                this.state.errorWorkerTypes.map(wtype => {
+                  return (
+                    <li key={wtype.workertype}><strong>{wtype.workertype}</strong></li>
+                  )
+                })
+              }
+              </ul>
+            </span>
+          )
+        }
+      </bs.Alert>
+    );
   },
 
   renderWorkerTypeTable() {
-    let workerTypes = [];
-    this.state.workerTypeSummaries.map(workerType => {
-      workerTypes.push({ value: workerType.workerType , label: workerType.workerType });
-    });
+    const workerTypes = this.state.workerTypeSummaries
+      .map(({ workerType }) => ({ value: workerType.workerType, label: workerType.workerType }));
 
     return (
       <span>
         <h4>
-          Select the worker types to apply <code>{ this.props.currentAmiSet }</code>
+          Select the worker types to apply <code>{this.props.currentAmiSet}</code>
         </h4>
         <div>
           <Select
@@ -136,8 +124,7 @@ var WorkerTypeList = React.createClass({
             multi={true}
             options={workerTypes}
             onChange={this.handleSelectChange}
-            placeholder="Select workerTypes"
-            />
+            placeholder="Select workerTypes"/>
             <br/>
             {this.renderApplyToolbar()}
         </div>
@@ -153,66 +140,63 @@ var WorkerTypeList = React.createClass({
           glyph="ok"
           label="Apply AMI Sets"
           action={this.applyAmiSet}
-          disabled={this.state.invalidAmis.length > 0 ||
-                    this.state.selectedWorkerTypes.length == 0}
+          disabled={this.state.invalidAmis.length || !this.state.selectedWorkerTypes.length}
           success="AMI Set applied">
-          Apply <code>{this.props.currentAmiSet}</code>
-          to selected Worker Types?
+          Apply <code>{this.props.currentAmiSet}</code> to selected Worker Types?
         </ConfirmAction>
       </bs.ButtonToolbar>
     );
   },
 
   async applyAmiSet() {
-    let invalidAmis = await this.awsProvisioner.validateAmiSet(this.props.currentAmiSet);
-    this.state.errorWorkerTypes = [];
+    const invalidAmis = await this.awsProvisioner.validateAmiSet(this.props.currentAmiSet);
+    this.setState({ errorWorkerTypes: []});
 
     if (!invalidAmis.valid) {
-      this.setState({ error: 'This AMI set contains invalid AMIs.' });
-    } else {
-      var amiSet = await this.awsProvisioner.amiSet(this.props.currentAmiSet);
+      return this.setState({ error: 'This AMI set contains invalid AMIs.' });
+    }
 
-      this.state.selectedWorkerTypes.map(async(workerType) => {
-        var wtype = await this.awsProvisioner.workerType(workerType.value);
+    const amiSet = await this.awsProvisioner.amiSet(this.props.currentAmiSet);
 
-        var matched_regions = false;
-        amiSet.amis.forEach(ami => {
-          wtype.regions.forEach(region => {
-            if (ami.region === region.region){
-              matched_regions = true;
-              region.launchSpec.ImageId = ami.hvm;
-            }
-          });
-        });
+    this.state.selectedWorkerTypes.map(async(workerType) => {
+      var wtype = await this.awsProvisioner.workerType(workerType.value);
+      var matchedRegions = false;
 
-        if (matched_regions){
-          try {
-            let re = /Updated with AMI set*/;
-            var today = new Date().toJSON().slice(0,10);
-            let updatedDescription = "Updated with AMI set " + this.props.currentAmiSet + " on " + today;
-
-            if (wtype.description.search(re) !== -1) {
-              wtype.description = wtype.description.replace(re, updatedDescription);
-            } else {
-              wtype.description = wtype.description.concat(" - ", updatedDescription);
-            }
-
-            // Delete Worker Type name and lastModified fields to make sure it passes
-            // the schema validation
-            delete wtype.workerType;
-            delete wtype.lastModified;
-
-            await this.awsProvisioner.updateWorkerType(workerType.value, wtype);
-            this.setState({
-              error: null
-            });
-          } catch(err) {
-            this.state.errorWorkerTypes.push({ workertype: workerType.value });
-            this.setState({ error: err});
+      amiSet.amis.forEach(ami => {
+        wtype.regions.forEach(region => {
+          if (ami.region === region.region){
+            matchedRegions = true;
+            region.launchSpec.ImageId = ami.hvm;
           }
-        }
+        });
       });
-    };
+
+      if (matchedRegions){
+        try {
+          var today = new Date().toJSON().slice(0,10);
+          const updatedDescription = `Updated with AMI set ${this.props.currentAmiSet} on ${today}`;
+
+          if (workerType.description.includes('Updated with AMI set')) {
+            workerType.description = updatedDescription;
+          } else {
+            workerType.description += ` - ${updatedDescription}`;
+          }
+
+          // Delete Worker Type name and lastModified fields to make sure it passes
+          // the schema validation
+          delete wtype.workerType;
+          delete wtype.lastModified;
+
+          await this.awsProvisioner.updateWorkerType(workerType.value, wtype);
+          this.setState({
+            error: null
+          });
+        } catch (err) {
+          this.state.errorWorkerTypes.push({ workertype: workerType.value });
+          this.setState({ error: err });
+        }
+      }
+    });
   },
 });
 
