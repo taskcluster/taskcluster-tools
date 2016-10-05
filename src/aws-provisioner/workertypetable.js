@@ -266,7 +266,6 @@ export default React.createClass({
             <Glyphicon glyph="plus" /> Create WorkerType
           </Button>
         </ButtonToolbar>
-        {this.renderTypeInput()}
         <span>{this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()}</span>
       </div>
     );
@@ -303,6 +302,7 @@ export default React.createClass({
     return (
       <div>
         <h4>Worker Types</h4>
+        {this.renderTypeInput()}
         <Table style={{ marginTop: 20 }}>
           <thead>
             <tr>
