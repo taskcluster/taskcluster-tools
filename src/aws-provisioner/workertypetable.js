@@ -322,7 +322,7 @@ export default React.createClass({
                   provisionerId={this.props.provisionerId}
                   workerType={workerType}
                   selected={this.state.selected === workerType.workerType}
-                  onClick={() => this.setSelected(this.workerType.workerType)}
+                  onClick={() => this.setSelected(workerType.workerType)}
                   summary={workerType} />
               ))
           }
