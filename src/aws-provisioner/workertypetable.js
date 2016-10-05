@@ -234,7 +234,8 @@ export default React.createClass({
       selected: '',
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
-      workerTypeSummariesError: null
+      workerTypeSummariesError: null,
+      workerTypeContains: ''
     };
   },
 
@@ -270,10 +271,38 @@ export default React.createClass({
     );
   },
 
+  renderTypeInput() {
+    const setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
+    const enterWorkerType = e => {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        setWorkerType(e);
+      }
+    };
+
+    return (
+      <div className="form-group form-group-sm">
+        <div className="input-group">
+          <div className="input-group-addon text-sm"><em>WorkerTypes containing</em></div>
+          <input
+            type="search"
+            className="form-control"
+            defaultValue={this.state.workerTypeContains}
+            onBlur={setWorkerType}
+            onKeyUp={enterWorkerType}/>
+          <div className="input-group-addon">
+            <Glyphicon glyph="search" />
+          </div>
+        </div>
+      </div>
+    );
+  },
+
   renderWorkerTypeTable() {
     return (
       <div>
         <h4>Worker Types</h4>
+        {this.renderTypeInput()}
         <Table style={{ marginTop: 20 }}>
           <thead>
             <tr>
@@ -283,15 +312,20 @@ export default React.createClass({
             </tr>
           </thead>
           <tbody>
-          {this.state.workerTypeSummaries.map(workerType => (
-            <WorkerTypeRow
-              key={workerType.workerType}
-              provisionerId={this.props.provisionerId}
-              workerType={workerType}
-              selected={this.state.selected === workerType.workerType}
-              onClick={this.setSelected.bind(this, workerType.workerType)}
-              summary={workerType} />
-          ))}
+          {
+            this.state.workerTypeSummaries
+              .filter(workerType => workerType.workerType
+                .includes(this.state.workerTypeContains))
+              .map(workerType => (
+                <WorkerTypeRow
+                  key={workerType.workerType}
+                  provisionerId={this.props.provisionerId}
+                  workerType={workerType}
+                  selected={this.state.selected === workerType.workerType}
+                  onClick={() => this.setSelected(this.workerType.workerType)}
+                  summary={workerType} />
+              ))
+          }
           </tbody>
         </Table>
       </div>
