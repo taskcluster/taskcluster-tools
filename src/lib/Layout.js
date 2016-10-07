@@ -323,14 +323,6 @@ const Navigation = React.createClass({
       disabledIfNotSignedIn = 'disabled';
     }
 
-    // TODO: get this from config
-    const signinMethods = [
-      'okta',
-      'persona',
-      'manual',
-      'devel'
-    ];
-
     const setCredentials = credentials => {
       this.setState({ signinMenuOpen: false });
       auth.saveCredentials(credentials);
@@ -349,7 +341,7 @@ const Navigation = React.createClass({
       });
     };
 
-    const signinItems = signinMethods.map(meth =>
+    const signinItems = process.env.SIGN_IN_METHODS.split(' ').map(meth =>
       SIGNIN_MENU_ITEMS[meth]({
         setCredentials,
         showMessage,

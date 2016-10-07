@@ -5,7 +5,7 @@
   "scripts": {
     "build": "neutrino build -p tools-preset",
     "deploy": "npm run build && s3-deploy './build/**' --cwd './build/' --region us-west-2 --bucket taskcluster-tools --gzip --cache 0",
-    "start": "PORT=9000 neutrino start -p tools-preset",
+    "start": "PORT=9000 SIGN_IN_METHODS=devel neutrino start -p tools-preset",
     "test": "npm run build"
   },
   "repository": "taskcluster/taskcluster-tools",

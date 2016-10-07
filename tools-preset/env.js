@@ -23,5 +23,8 @@ module.exports = {
     process.env.UPTIMEROBOT_API_KEY_SCHEDULER || 'm776120202-44923d8660c2a1bd1a5de440'),
 
   UPTIMEROBOT_API_KEY_SECRETS: JSON.stringify(
-    process.env.UPTIMEROBOT_API_KEY_SECRETS || 'm777577313-6d58b81186c4064cf7a8d1e1')
+    process.env.UPTIMEROBOT_API_KEY_SECRETS || 'm777577313-6d58b81186c4064cf7a8d1e1'),
+
+  SIGN_IN_METHODS: JSON.stringify(
+    process.env.SIGN_IN_METHODS || 'okta persona manual')
 };
