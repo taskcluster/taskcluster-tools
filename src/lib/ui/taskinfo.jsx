@@ -1,6 +1,7 @@
 import React from 'react';
-import { Table, Label } from 'react-bootstrap';
+import { Button, Table, Label } from 'react-bootstrap';
 import ConfirmAction from './confirmaction';
+import RunLocally from './runLocally';
 import LoanerButton from './loaner-button';
 import _ from 'lodash';
 import { Markdown, DateView, Code } from '../format';
@@ -200,16 +201,17 @@ const TaskInfo = React.createClass({
                   task={this.props.task}
                   taskId={status.taskId}
                   buttonStyle="default"
-                  buttonSize="small" />
-              </td>
-            </tr>
-
-            <tr>
-              <td>Run Locally</td>
-              <td>
-                <Code language="bash">
-                  {this.renderRunLocallyScript()}
-                </Code>
+                  buttonSize="small" />&nbsp;
+                  <RunLocally
+                  buttonSize="small"
+                  buttonStyle="default"
+                  label="To Run Locally"
+                  action={this.renderRunLocallyScript}
+                  success="to run locally">
+                  <Code language="bash">
+                    {this.renderRunLocallyScript()}
+                  </Code>
+                </RunLocally>&nbsp;
               </td>
             </tr>
           </tbody>
@@ -221,7 +223,6 @@ const TaskInfo = React.createClass({
   rerunTask() {
     return this.queue.rerunTask(this.props.status.taskId);
   },
-
   editTask() {
     const newTask = {
       // filled in by task creator on load
@@ -254,6 +255,15 @@ const TaskInfo = React.createClass({
     window.location.href = '../task-creator';
   },
 
+  printRun() {
+    return (
+      <div>
+        <Code language="bash">
+            {this.renderRunLocallyScript()}
+        </Code>
+    </div>
+    );
+  },
   /** Render script illustrating how to run locally */
   renderRunLocallyScript() {
     // Note:
