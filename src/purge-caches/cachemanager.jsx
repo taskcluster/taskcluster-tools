@@ -117,7 +117,7 @@ export default React.createClass({
     );
   },
 
-renderForm() {
+  renderForm() {
     return (
       <div className="form-horizontal">
         <h4 style={{ marginTop: 7 }}>Create Purge Cache Request</h4>
