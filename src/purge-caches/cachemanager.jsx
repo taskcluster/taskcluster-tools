@@ -13,10 +13,7 @@ import {
 import * as utils from '../lib/utils';
 import * as format from '../lib/format';
 import taskcluster from 'taskcluster-client';
-import TimeInput from '../lib/ui/timeinput';
-import moment from 'moment';
 import { findDOMNode } from 'react-dom';
-import _ from 'lodash';
 
 export default React.createClass({
   displayName: 'CacheManager',
@@ -34,8 +31,7 @@ export default React.createClass({
   getInitialState() {
     return {
       caches: null,
-      cachesLoaded: false,
-      before: new Date()
+      cachesLoaded: false
     };
   },
 
@@ -63,7 +59,7 @@ export default React.createClass({
           <hr />
         </Col>
         <Col md={7}>
-          <ButtonToolbar className="pull-right">
+          <ButtonToolbar>
             <Button
               bsSize="sm"
               bsStyle="success"
@@ -154,16 +150,7 @@ export default React.createClass({
           </div>
         </FormGroup>
 
-        <FormGroup>
-          <ControlLabel className="col-md-3">Before</ControlLabel>
-          <div className="col-md-9">
-            <TimeInput
-              format="YYYY-MM-DD HH:mm:ss ZZ"
-              value={moment(new Date(this.state.before))}
-              onChange={this.onBeforeChange}
-              className="form-control" />
-          </div>
-        </FormGroup>
+        <p>Please note: the `before` date and time will be set to current date and time.</p>
 
         <ButtonToolbar>
           <Button
@@ -178,15 +165,14 @@ export default React.createClass({
   },
 
   async sendRequest() {
-    this.purgeCaches.purgeCache(
-      findDOMNode(this.refs.provisionerId).value,
-      findDOMNode(this.refs.workerType).value,
-      { cacheName: findDOMNode(this.refs.cacheName).value }
-    );
-  },
-
-  onBeforeChange(date) {
-    this.setState({ before: date.toDate().toJSON() });
-    console.log(this.state.before);
+    try {
+      await this.purgeCaches.purgeCache(
+        findDOMNode(this.refs.provisionerId).value,
+        findDOMNode(this.refs.workerType).value,
+        { cacheName: findDOMNode(this.refs.cacheName).value }
+      );
+    } catch (e) {
+      console.log(e);
+    }
   }
 });
