@@ -1,8 +1,22 @@
 import React from 'react';
-import { Row, Col, ButtonToolbar, Glyphicon, Table, Button } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  ButtonToolbar,
+  Glyphicon,
+  Table,
+  Button,
+  FormGroup,
+  ControlLabel,
+  FormControl
+} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import * as format from '../lib/format';
 import taskcluster from 'taskcluster-client';
+import TimeInput from '../lib/ui/timeinput';
+import moment from 'moment';
+import { findDOMNode } from 'react-dom';
+import _ from 'lodash';
 
 export default React.createClass({
   displayName: 'CacheManager',
@@ -20,7 +34,8 @@ export default React.createClass({
   getInitialState() {
     return {
       caches: null,
-      cachesLoaded: false
+      cachesLoaded: false,
+      before: new Date()
     };
   },
 
@@ -47,7 +62,7 @@ export default React.createClass({
           </p>
           <hr />
         </Col>
-        <Col md={12}>
+        <Col md={7}>
           <ButtonToolbar className="pull-right">
             <Button
               bsSize="sm"
@@ -58,9 +73,13 @@ export default React.createClass({
             </Button>
           </ButtonToolbar>
         </Col>
-        <Col md={12}>
+        <Col md={7}>
           <br /><br />
           {this.renderCachesTable()}
+        </Col>
+        <Col md={5}>
+          <br />
+          {this.renderForm()}
         </Col>
       </Row>
     );
@@ -97,5 +116,77 @@ export default React.createClass({
         <td><format.DateView date={cache.before}/></td>
       </tr>
     );
+  },
+
+  renderForm() {
+    return (
+      <div className="form-horizontal">
+        <h4 style={{ marginTop: 7 }}>Create Purge Cache Request</h4>
+        <hr style={{ marginBottom: 20 }}/>
+
+        <FormGroup>
+          <ControlLabel className="col-md-3">Provisioner ID</ControlLabel>
+          <div className="col-md-9">
+            <FormControl
+              type="text"
+              ref="provisionerId"
+              placeholder="provisioner-id" />
+          </div>
+        </FormGroup>
+
+        <FormGroup>
+          <ControlLabel className="col-md-3">Worker Type</ControlLabel>
+          <div className="col-md-9">
+            <FormControl
+              type="text"
+              ref="workerType"
+              placeholder="worker-type" />
+          </div>
+        </FormGroup>
+
+        <FormGroup>
+          <ControlLabel className="col-md-3">Cache Name</ControlLabel>
+          <div className="col-md-9">
+            <FormControl
+              type="text"
+              ref="cacheName"
+              placeholder="cache-name" />
+          </div>
+        </FormGroup>
+
+        <FormGroup>
+          <ControlLabel className="col-md-3">Before</ControlLabel>
+          <div className="col-md-9">
+            <TimeInput
+              format="YYYY-MM-DD HH:mm:ss ZZ"
+              value={moment(new Date(this.state.before))}
+              onChange={this.onBeforeChange}
+              className="form-control" />
+          </div>
+        </FormGroup>
+
+        <ButtonToolbar>
+          <Button
+            bsStyle="primary"
+            onClick={this.sendRequest}>
+            <Glyphicon glyph="plus" /> Create request
+          </Button>
+        </ButtonToolbar>
+
+      </div>
+    );
+  },
+
+  async sendRequest() {
+    this.purgeCaches.purgeCache(
+      findDOMNode(this.refs.provisionerId).value,
+      findDOMNode(this.refs.workerType).value,
+      { cacheName: findDOMNode(this.refs.cacheName).value }
+    );
+  },
+
+  onBeforeChange(date) {
+    this.setState({ before: date.toDate().toJSON() });
+    console.log(this.state.before);
   }
 });
