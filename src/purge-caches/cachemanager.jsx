@@ -33,7 +33,8 @@ export default React.createClass({
     return {
       caches: null,
       cachesLoaded: false,
-      error: null
+      formError: null,
+      tableError: null
     };
   },
 
@@ -74,9 +75,9 @@ export default React.createClass({
         <Col md={7}>
           <br /><br />
           {
-            this.state.error ?
+            this.state.tableError ?
             <Alert bsStyle="danger" onDismiss={this.dismissError}>
-              <strong>Error executing operation</strong> {this.state.error.toString()}
+              <strong>Error executing operation</strong> {this.state.tableError.toString()}
             </Alert> :
             this.renderCachesTable()
           }
@@ -107,7 +108,7 @@ export default React.createClass({
         </Table>
       );
     } catch (e) {
-      this.setState({ error: e });
+      this.setState({ tableError: e });
     }
   },
 
@@ -123,10 +124,10 @@ export default React.createClass({
   },
 
   renderForm() {
-    if (this.state.error) {
+    if (this.state.formError) {
       return (
         <Alert bsStyle="danger" onDismiss={this.dismissError}>
-          <strong>Error executing operation</strong> {this.state.error.toString()}
+          <strong>Error executing operation</strong> {this.state.formError.toString()}
         </Alert>
       );
     }
@@ -187,11 +188,11 @@ export default React.createClass({
         { cacheName: findDOMNode(this.refs.cacheName).value }
       );
     } catch (e) {
-      this.setState({ error: e });
+      this.setState({ formError: e });
     }
   },
 
   dismissError() {
-    this.setState({ error: null });
+    this.setState({ formError: null, tableError: null });
   }
 });
