@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Table, Label } from 'react-bootstrap';
+import { Table, Label } from 'react-bootstrap';
 import ConfirmAction from './confirmaction';
 import RunLocally from './runLocally';
 import LoanerButton from './loaner-button';
