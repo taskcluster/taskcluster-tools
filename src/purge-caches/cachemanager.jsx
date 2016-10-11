@@ -8,7 +8,8 @@ import {
   Button,
   FormGroup,
   ControlLabel,
-  FormControl
+  FormControl,
+  Alert
 } from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import * as format from '../lib/format';
@@ -31,7 +32,8 @@ export default React.createClass({
   getInitialState() {
     return {
       caches: null,
-      cachesLoaded: false
+      cachesLoaded: false,
+      error: null
     };
   },
 
@@ -71,6 +73,11 @@ export default React.createClass({
         </Col>
         <Col md={7}>
           <br /><br />
+          if (this.state.error) {
+            <Alert bsStyle="danger" onDismiss={this.dismissError}>
+              <strong>Error executing operation</strong> {this.state.error.toString()}
+            </Alert>
+          }
           {this.renderCachesTable()}
         </Col>
         <Col md={5}>
@@ -99,7 +106,7 @@ export default React.createClass({
         </Table>
       );
     } catch (e) {
-      console.log(e);
+      this.setState({ error: e });
     }
   },
 
@@ -115,6 +122,13 @@ export default React.createClass({
   },
 
   renderForm() {
+    if (this.state.error) {
+      return (
+        <Alert bsStyle="danger" onDismiss={this.dismissError}>
+          <strong>Error executing operation</strong> {this.state.error.toString()}
+        </Alert>
+      );
+    }
     return (
       <div className="form-horizontal">
         <h4 style={{ marginTop: 7 }}>Create Purge Cache Request</h4>
@@ -150,7 +164,7 @@ export default React.createClass({
           </div>
         </FormGroup>
 
-        <p>Please note: the `before` date and time will be set to current date and time.</p>
+        <p>Please note: The <code>before</code> date/time will be set to current date/time.</p>
 
         <ButtonToolbar>
           <Button
@@ -172,7 +186,11 @@ export default React.createClass({
         { cacheName: findDOMNode(this.refs.cacheName).value }
       );
     } catch (e) {
-      console.log(e);
+      this.setState({ error: e });
     }
+  },
+
+  dismissError() {
+    this.setState({ error: null });
   }
 });
