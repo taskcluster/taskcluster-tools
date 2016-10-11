@@ -34,7 +34,10 @@ export default React.createClass({
       caches: null,
       cachesLoaded: false,
       formError: null,
-      tableError: null
+      tableError: null,
+      formProvisionerId: '',
+      formWorkerType: '',
+      formCacheName: ''
     };
   },
 
@@ -142,7 +145,9 @@ export default React.createClass({
             <FormControl
               type="text"
               ref="provisionerId"
-              placeholder="provisioner-id" />
+              placeholder="provisioner-id"
+              value={this.state.formProvisionerId}
+              onChange={this.provisionerIdChange} />
           </div>
         </FormGroup>
 
@@ -152,7 +157,9 @@ export default React.createClass({
             <FormControl
               type="text"
               ref="workerType"
-              placeholder="worker-type" />
+              placeholder="worker-type"
+              value={this.state.formProvisionerId}
+              onChange={this.workerTypeChange} />
           </div>
         </FormGroup>
 
@@ -162,7 +169,9 @@ export default React.createClass({
             <FormControl
               type="text"
               ref="cacheName"
-              placeholder="cache-name" />
+              placeholder="cache-name"
+              value={this.state.formProvisionerId}
+              onChange={this.cacheNameChange} />
           </div>
         </FormGroup>
 
@@ -180,6 +189,18 @@ export default React.createClass({
     );
   },
 
+  provisionerIdChange(element) {
+    this.setState({ formProvisionerId: element.value });
+  },
+
+  workerTypeChange(element) {
+    this.setState({ formWorkerType: element.value });
+  },
+
+  cacheNameChange(element) {
+    this.setState({ formCacheName: element.value });
+  },
+
   async sendRequest() {
     try {
       await this.purgeCaches.purgeCache(
@@ -187,6 +208,12 @@ export default React.createClass({
         findDOMNode(this.refs.workerType).value,
         { cacheName: findDOMNode(this.refs.cacheName).value }
       );
+      this.setState({
+        formProvisionerId: '',
+        formWorkerType: '',
+        formCacheName: ''
+      });
+      this.reload();
     } catch (e) {
       this.setState({ formError: e });
     }
