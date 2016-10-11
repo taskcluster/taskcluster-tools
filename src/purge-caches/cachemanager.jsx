@@ -73,12 +73,13 @@ export default React.createClass({
         </Col>
         <Col md={7}>
           <br /><br />
-          if (this.state.error) {
+          {
+            this.state.error ?
             <Alert bsStyle="danger" onDismiss={this.dismissError}>
               <strong>Error executing operation</strong> {this.state.error.toString()}
-            </Alert>
+            </Alert> :
+            this.renderCachesTable()
           }
-          {this.renderCachesTable()}
         </Col>
         <Col md={5}>
           <br />
