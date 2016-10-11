@@ -202,12 +202,10 @@ const TaskInfo = React.createClass({
                   taskId={status.taskId}
                   buttonStyle="default"
                   buttonSize="small" />&nbsp;
-                  <RunLocally
+                <RunLocally
                   buttonSize="small"
                   buttonStyle="default"
-                  label="To Run Locally"
-                  action={this.renderRunLocallyScript}
-                  success="to run locally">
+                  label="Run Locally">
                   <Code language="bash">
                     {this.renderRunLocallyScript()}
                   </Code>
@@ -255,15 +253,6 @@ const TaskInfo = React.createClass({
     window.location.href = '../task-creator';
   },
 
-  printRun() {
-    return (
-      <div>
-        <Code language="bash">
-            {this.renderRunLocallyScript()}
-        </Code>
-    </div>
-    );
-  },
   /** Render script illustrating how to run locally */
   renderRunLocallyScript() {
     // Note:
