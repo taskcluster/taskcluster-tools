@@ -6811,9 +6811,9 @@
       "resolved": "https://registry.npmjs.org/react/-/react-15.3.2.tgz"
     },
     "react-bootstrap": {
-      "version": "0.30.3",
-      "from": "react-bootstrap@>=0.30.3 <0.31.0",
-      "resolved": "https://registry.npmjs.org/react-bootstrap/-/react-bootstrap-0.30.3.tgz",
+      "version": "0.30.5",
+      "from": "react-bootstrap@latest",
+      "resolved": "https://registry.npmjs.org/react-bootstrap/-/react-bootstrap-0.30.5.tgz",
       "dependencies": {
         "babel-runtime": {
           "version": "6.11.6",
@@ -6875,9 +6875,9 @@
       "resolved": "https://registry.npmjs.org/react-onclickoutside/-/react-onclickoutside-4.9.0.tgz"
     },
     "react-overlays": {
-      "version": "0.6.6",
-      "from": "react-overlays@>=0.6.6 <0.7.0",
-      "resolved": "https://registry.npmjs.org/react-overlays/-/react-overlays-0.6.6.tgz"
+      "version": "0.6.10",
+      "from": "react-overlays@>=0.6.10 <0.7.0",
+      "resolved": "https://registry.npmjs.org/react-overlays/-/react-overlays-0.6.10.tgz"
     },
     "react-prop-types": {
       "version": "0.4.0",
