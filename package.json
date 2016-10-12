@@ -58,7 +58,7 @@
     "less": "^2.7.1",
     "lodash.clonedeep": "^4.5.0",
     "neutrino": "^2.1.0",
-    "neutrino-preset-react": "^1.1.0",
+    "neutrino-preset-react": "1.1.1",
     "s3-deploy": "^0.6.1",
     "shebang-loader": "^0.0.1",
     "webpack": "^1.13.2",
