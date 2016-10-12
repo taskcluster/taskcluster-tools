@@ -11,7 +11,7 @@ for details.
 
 ### Prerequisites for building TaskCluster Tools
 
-- Node version v4+
+- Node version v6+
 
 ### Building
 
