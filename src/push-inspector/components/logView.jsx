@@ -52,8 +52,10 @@ export default class LogView extends Component {
     const logs = this.props.logs.map(({ name }) => ({ value: name, label: name }));
 
     return (
-      <span>
-        <label>Show Log</label>
+      <div>
+        <div>
+          <label>Show Log</label>
+        </div>
         <div className="select-wrapper">
           <Select
             value={this.state.name}
@@ -69,7 +71,7 @@ export default class LogView extends Component {
           </Button>
         </div>
         <TerminalView ref="termView" url={logUrl} />
-      </span>
+      </div>
     );
   }
 }

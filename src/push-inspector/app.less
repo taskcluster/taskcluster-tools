@@ -8,12 +8,6 @@
   visibility: hidden;
 }
 
-.artifact-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 .custom-btn button {
   font-size: 12px;
 }
@@ -22,10 +16,14 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow-y: auto;
+  max-height: 80px;
+  margin: 10px 0;
+  width: 300px;
 }
 
 .select-wrapper {
-  width: 100%;
+  width: 75%;
   display: inline-flex;
   margin-bottom: 5px;
 }
@@ -68,8 +66,8 @@
 }
 
 .viewer {
-  width: 100%;
   margin-bottom: 20px;
+  width: 90%;
 }
 
 .viewer > div {
@@ -83,7 +81,7 @@
   width: calc(100% - 20px);
   overflow-x: auto;
   overflow-y: hidden;
-  height: 600px;
+  height: 450px;
   padding-left: 7px;
 }
 
@@ -104,6 +102,11 @@
 .right-panel {
   padding-top: 10px;
   height:70vh;
+  overflow-y: auto;
+}
+
+.left-panel {
+  max-height: 70vh;
   overflow-y: auto;
 }
 
