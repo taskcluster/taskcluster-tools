@@ -78,10 +78,11 @@ export default React.createClass({
         <Col md={7}>
           <br /><br />
           {
-            this.state.tableError ?
+            this.state.tableError ? (
             <Alert bsStyle="danger" onDismiss={this.dismissError}>
-              <strong>Error executing operation</strong> {this.state.tableError.toString()}
-            </Alert> :
+              <strong>Error executing operation: </strong> {`${this.state.tableError}`}
+            </Alert>
+            ) :
             this.renderCachesTable()
           }
         </Col>
@@ -110,8 +111,8 @@ export default React.createClass({
           </tbody>
         </Table>
       );
-    } catch (e) {
-      this.setState({ tableError: e });
+    } catch (err) {
+      this.setState({ tableError: err });
     }
   },
 
@@ -130,10 +131,11 @@ export default React.createClass({
     if (this.state.formError) {
       return (
         <Alert bsStyle="danger" onDismiss={this.dismissError}>
-          <strong>Error executing operation</strong> {this.state.formError.toString()}
+          <strong>Error executing operation: </strong> {`${this.state.formError}`}
         </Alert>
       );
     }
+
     return (
       <div className="form-horizontal">
         <h4 style={{ marginTop: 7 }}>Create Purge Cache Request</h4>
@@ -141,47 +143,47 @@ export default React.createClass({
 
         <FormGroup>
           <ControlLabel className="col-md-3">Provisioner ID</ControlLabel>
-          <div className="col-md-9">
+          <Col md={9}>
             <FormControl
               type="text"
               ref="provisionerId"
-              placeholder="provisioner-id"
+              placeholder="Provisioner ID"
               value={this.state.formProvisionerId}
               onChange={this.provisionerIdChange} />
-          </div>
+          </Col>
         </FormGroup>
 
         <FormGroup>
           <ControlLabel className="col-md-3">Worker Type</ControlLabel>
-          <div className="col-md-9">
+          <Col md={9}>
             <FormControl
               type="text"
               ref="workerType"
-              placeholder="worker-type"
+              placeholder="Worker type"
               value={this.state.formProvisionerId}
               onChange={this.workerTypeChange} />
-          </div>
+          </Col>
         </FormGroup>
 
         <FormGroup>
           <ControlLabel className="col-md-3">Cache Name</ControlLabel>
-          <div className="col-md-9">
+          <Col md={9}>
             <FormControl
               type="text"
               ref="cacheName"
-              placeholder="cache-name"
+              placeholder="Cache name"
               value={this.state.formProvisionerId}
               onChange={this.cacheNameChange} />
-          </div>
+          </Col>
         </FormGroup>
 
-        <p>Please note: The <code>before</code> date/time will be set to current date/time.</p>
+        <p>Please note: The <code>before</code> date-time will be set to current date-time.</p>
 
         <ButtonToolbar>
           <Button
             bsStyle="primary"
             onClick={this.sendRequest}>
-            <Glyphicon glyph="plus" /> Create request
+              <Glyphicon glyph="plus" /> Create request
           </Button>
         </ButtonToolbar>
 
@@ -208,14 +210,15 @@ export default React.createClass({
         findDOMNode(this.refs.workerType).value,
         { cacheName: findDOMNode(this.refs.cacheName).value }
       );
+
       this.setState({
         formProvisionerId: '',
         formWorkerType: '',
         formCacheName: ''
       });
       this.reload();
-    } catch (e) {
-      this.setState({ formError: e });
+    } catch (err) {
+      this.setState({ formError: err });
     }
   },
 
