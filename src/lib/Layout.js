@@ -1,139 +1,25 @@
 import React from 'react';
 import { findDOMNode } from 'react-dom';
 import {
-  Navbar, Nav, NavItem, NavDropdown, MenuItem,
-  Glyphicon, Popover, Overlay, OverlayTrigger,
-  Tooltip, Modal, Button, FormControl, FormGroup,
-  ControlLabel
+  Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon, Popover, Overlay, Modal, Button,
+  FormControl, FormGroup, ControlLabel
 } from 'react-bootstrap';
 import menu from '../menu';
 import * as auth from './auth';
 import { Icon } from './format';
+import OktaMenuItem from './ui/OktaMenuItem';
+import PersonaMenuItem from './ui/PersonaMenuItem';
+import DevelopmentMenuItem from './ui/DevelopmentMenuItem';
+import ManualMenuItem from './ui/ManualMenuItem';
 import './base-layout.less';
-import taskcluster from 'taskcluster-client';
 
 // time before expiration at which we warn
 const EXPIRY_WARNING = 5 * 60 * 1000;
-
-const OktaMenuItem = React.createClass({
-  // This authenticates to Okta by opening a new Window where Okta will do its thing,
-  // then closing that window once creds are acquired.
-  signIn() {
-    // Just loading this page is sufficient.  It eventually redirects back to
-    // https://tools.t.n/login, which updates LocalStorage.  Auth listens for
-    // such updates and loads the creds out of storage.
-    window.open('https://login.taskcluster.net/sso/login', '_blank');
-  },
-
-  render() {
-    return (
-      <OverlayTrigger placement="left" delay={600} overlay={
-        <Tooltip id="okta-signin">If you have a <b>Mozilla LDAP Account</b>, sign
-          in with Okta to maximize your permissions. You can use this option even
-          if you are not an employee! If you also have a Mozillians account, make
-          sure your LDAP email is included in your Mozillians
-          profile.</Tooltip>
-        }>
-        <NavItem onSelect={this.signIn}>
-          <Glyphicon glyph="log-in"/> Sign In with Okta
-        </NavItem>
-      </OverlayTrigger>
-    );
-  }
-});
-
-const PersonaMenuItem = React.createClass({
-  // This interfaces directly with Persona, then uses the Login service API to
-  // convert the resulting promise into TaskCluster credentials.  NOTE: when
-  // Persona is gone, also remove the include.js reference in template.ejs
-  propTypes: {
-    setCredentials: React.PropTypes.func.isRequired,
-    showMessage: React.PropTypes.func.isRequired
-  },
-
-  signIn() {
-    navigator.id.get(assertion => {
-      const port = location.port || location.protocol === 'https:' ? '443' : '80';
-      const audience = `${location.protocol}//${location.host}:${port}`;
-      if (assertion) {
-        const login = new taskcluster.Login();
-        login.credentialsFromPersonaAssertion({ assertion, audience })
-          .then(this.props.setCredentials)
-          .catch(err => {
-            this.propx.showMessage({
-              title: 'Sign-In Error',
-              body: err.details ? `${err.body.details.code}: ${err.body.details.message}` : err.code
-            });
-          });
-      } else {
-        this.propx.showMessage({
-          title: 'Sign-In Cancelled',
-          body: 'Sign-In was cancelled'
-        });
-      }
-    });
-  },
-
-  render() {
-    return (
-      <OverlayTrigger placement="left" delay={600} overlay={
-        <Tooltip id="persona-signin">If you are a Mozillian, but do not have an LDAP
-          account, sign in with Persona. If you do not have a Mozillians profile,
-          set one up now. Get vouched to gain access to additional
-          scopes.</Tooltip>
-        }>
-        <NavItem onSelect={this.signIn}>
-          <Glyphicon glyph="user"/> Sign In with Persona
-        </NavItem>
-      </OverlayTrigger>
-    );
-  }
-});
-
-const DevelMenuItem = React.createClass({
-  // this uses `auth.buildLoginURL()` to generate a URL to the production
-  // login service, so this development instance of tools acts as a third-
-  // party to the produciton instance
-  signIn() {
-    window.open(auth.buildLoginURL(), '_blank');
-  },
-
-  render() {
-    return (
-      <OverlayTrigger placement="left" delay={600} overlay={
-        <Tooltip id="devel-signin">When running tools on a devel server, use this
-          option to get credentials from the production tools</Tooltip>
-        }>
-        <NavItem onSelect={this.signIn}>
-          <Glyphicon glyph="console"/> Development Sign-In
-        </NavItem>
-      </OverlayTrigger>
-    );
-  }
-});
-
-const ManualMenuItem = React.createClass({
-  propTypes: {
-    showManualModal: React.PropTypes.func.isRequired
-  },
-
-  render() {
-    return <OverlayTrigger placement="left" delay={600} overlay={
-      <Tooltip id="manual-signin">Use this option to provide a clientId,
-        accessToken, and certificate manually.</Tooltip>
-      }>
-      <NavItem onSelect={this.props.showManualModal}>
-        <Glyphicon glyph="paste"/> Sign In Manually
-      </NavItem>
-    </OverlayTrigger>;
-  }
-});
-
 const SIGNIN_MENU_ITEMS = {
-  okta: React.createFactory(OktaMenuItem),
-  persona: React.createFactory(PersonaMenuItem),
-  devel: React.createFactory(DevelMenuItem),
-  manual: React.createFactory(ManualMenuItem)
+  okta: OktaMenuItem,
+  persona: PersonaMenuItem,
+  development: DevelopmentMenuItem,
+  manual: ManualMenuItem
 };
 
 /** Navigation bar for layout.jade */
@@ -303,69 +189,81 @@ const Navigation = React.createClass({
     );
   },
 
+  setCredentials(credentials) {
+    this.setState({ signinMenuOpen: false });
+    auth.saveCredentials(credentials);
+  },
+
+  showMessage({ title, body }) {
+    this.setState({
+      credentialsMessage: { title, body },
+      signinMenuOpen: false
+    });
+  },
+
+  showManualModal() {
+    this.setState({ showManualModal: true });
+  },
+
   renderCredentialsMenu() {
-    let menuHeading;
-    let disabledIfNotSignedIn;
     if (this.state.credentials) {
       const glyph = this.state.credentialsExpiringSoon ? 'exclamation-sign' : 'user';
       const className = this.state.credentialsExpiringSoon ? 'text-warning' : '';
-      menuHeading = (
+      const menuHeading = (
         <span>
-          <Glyphicon className={className} glyph={glyph}/> {this.state.credentials.clientId}
+          <Glyphicon className={className} glyph={glyph} /> {this.state.credentials.clientId}
         </span>
       );
-    } else {
-      menuHeading = (
-        <span>
-          <Glyphicon glyph="log-in"/> Sign In
-        </span>
-      );
-      disabledIfNotSignedIn = 'disabled';
-    }
 
-    const setCredentials = credentials => {
-      this.setState({ signinMenuOpen: false });
-      auth.saveCredentials(credentials);
-    };
-
-    const showMessage = ({ title, body }) => {
-      this.setState({
-        credentialsMessage: { title, body },
-        signinMenuOpen: false
-      });
-    };
-
-    const showManualModal = () => {
-      this.setState({
-        showManualModal: true
-      });
-    };
-
-    const signinItems = process.env.SIGN_IN_METHODS.split(' ').map(meth =>
-      SIGNIN_MENU_ITEMS[meth]({
-        setCredentials,
-        showMessage,
-        showManualModal,
-        key: `${meth}-menu-item`
-      })
-    );
-
-    return (
-      <NavDropdown key={2} title={menuHeading}
-          ref="credentials" id="credentials"
+      return (
+        <NavDropdown
+          title={menuHeading}
+          ref="credentials"
+          id="credentials"
           open={this.state.signinMenuOpen}
           // Due to https://github.com/react-bootstrap/react-bootstrap/issues/1301,
           // handle expanding and collapsing this manually
           onToggle={expanded => this.setState({ signinMenuOpen: expanded })}>
-        <MenuItem href="/credentials/">
-          <Icon name="key"/> Manage Credentials
-        </MenuItem>
-        <MenuItem divider />
-        { signinItems }
-        <MenuItem divider />
-        <NavItem className={disabledIfNotSignedIn} onSelect={this.signOut}>
-          <Glyphicon glyph="log-out"/> Sign Out
-        </NavItem>
+            <MenuItem href="/credentials/">
+              <Icon name="key" /> Manage Credentials
+            </MenuItem>
+            <NavItem onSelect={this.signOut}>
+              <Glyphicon glyph="log-out" /> Sign Out
+            </NavItem>
+        </NavDropdown>
+      );
+    }
+
+    const menuHeading = <span><Glyphicon glyph="log-in" /> Sign In</span>;
+
+    return (
+      <NavDropdown
+        title={menuHeading}
+        ref="credentials"
+        id="credentials"
+        open={this.state.signinMenuOpen}
+        // Due to https://github.com/react-bootstrap/react-bootstrap/issues/1301,
+        // handle expanding and collapsing this manually
+        onToggle={expanded => this.setState({ signinMenuOpen: expanded })}>
+          {
+            Object
+              .keys(SIGNIN_MENU_ITEMS)
+              .map(key => {
+                const MenuItem = SIGNIN_MENU_ITEMS[key];
+
+                if (!process.env.SIGN_IN_METHODS.includes(key)) {
+                  return null;
+                }
+
+                return (
+                  <MenuItem
+                    key={key}
+                    setCredentials={this.setCredentials}
+                    showMessage={this.showMessage}
+                    showManualModal={this.showManualModal} />
+                );
+              })
+          }
       </NavDropdown>
     );
   },
@@ -388,90 +286,108 @@ const Navigation = React.createClass({
         onHide={this.overlayHideHandler}
         placement="bottom"
         target={() => findDOMNode(this.refs.credentials)}>
-        {popover}
+          {popover}
       </Overlay>
     );
+  },
+
+  closeModal() {
+    this.setState({ showManualModal: false });
+  },
+
+  submitForm(e) {
+    e.preventDefault();
+
+    let certificate;
+
+    if (this.state.manualCertificate !== '') {
+      try {
+        certificate = JSON.parse(this.state.manualCertificate);
+      } catch (err) {
+        return;
+      }
+    }
+
+    auth.saveCredentials({
+      certificate,
+      clientId: this.state.manualClientId,
+      accessToken: this.state.manualAccessToken
+    });
+    this.setState({ signinMenuOpen: false, showManualModal: false });
+  },
+
+  certificateIsValid() {
+    const { manualCertificate } = this.state;
+
+    if (manualCertificate === '') {
+      return true;
+    }
+
+    try {
+      JSON.parse(manualCertificate);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  },
+
+  formIsValid() {
+    return this.state.manualClientId && this.state.manualAccessToken && this.certificateIsValid();
   },
 
   renderManualModal() {
     // This modal must be outside of the "Sign In Manually" menu option as that
     // menu option is removed from the DOM as soon as it loses focus.
-    const closeModal = () => {
-      this.setState({ showManualModal: false });
-    };
-
-    const submitForm = e => {
-      let certificate;
-
-      e.preventDefault();
-
-      if (this.state.manualCertificate !== '') {
-        try {
-          certificate = JSON.parse(this.state.manualCertificate);
-        } catch (err) {
-          return;
-        }
-      }
-      auth.saveCredentials({
-        clientId: this.state.manualClientId,
-        accessToken: this.state.manualAccessToken,
-        certificate
-      });
-      this.setState({
-        signinMenuOpen: false,
-        showManualModal: false
-      });
-    };
-
-    const certificateIsValid = () => {
-      const manualCertificate = this.state.manualCertificate;
-      if (manualCertificate !== '') {
-        try {
-          JSON.parse(manualCertificate);
-        } catch (err) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    const formIsValid = () =>
-      this.state.manualClientId && this.state.manualAccessToken && certificateIsValid();
-
     return this.state.showManualModal ? (
-      <Modal show={true}>
-        <form className="login-form" onSubmit={submitForm}>
-          <Modal.Header><h4>Manual Sign-In</h4></Modal.Header>
-          <Modal.Body>
-            <FormGroup controlId="clientId">
-              <ControlLabel>Client Id</ControlLabel>
-              <FormControl className="top-element" ref="clientId"
-                name="clientId" type="text" placeholder="clientId" required
-                onChange={e => this.setState({ manualClientId: e.target.value })} />
-            </FormGroup>
-            <FormGroup controlId="accessToken">
-              <ControlLabel>Access Token</ControlLabel>
-              <FormControl className="mid-element" ref="accessToken"
-                name="accessToken" type="password" placeholder="accessToken"
-                required onChange={e => this.setState({ manualAccessToken: e.target.value })} />
-            </FormGroup>
-            <FormGroup controlId="certificate">
-              <ControlLabel>Certificate</ControlLabel>
-              <FormControl componentClass="textarea" className="bottom-element" ref="certificate"
-                name="certificate" rows={8} placeholder="JSON certificate (if required)"
-                onChange={e => this.setState({ manualCertificate: e.target.value })}/>
-            </FormGroup>
-            <p className="text-muted">Note that the credentials are not checked for validity!</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button bsStyle="default" onClick={closeModal}>Cancel</Button>
-            <Button type="submit" bsStyle="primary" disabled={!formIsValid()}>
-              <Glyphicon glyph="paste"/> Sign In
-            </Button>
-          </Modal.Footer>
-        </form>
-      </Modal>
-    ) : null;
+        <Modal show={true}>
+          <form className="login-form" onSubmit={this.submitForm}>
+            <Modal.Header><h4>Manual Sign-In</h4></Modal.Header>
+            <Modal.Body>
+              <FormGroup controlId="clientId">
+                <ControlLabel>Client Id</ControlLabel>
+                <FormControl
+                  required
+                  className="top-element"
+                  ref="clientId"
+                  name="clientId"
+                  type="text"
+                  placeholder="clientId"
+                  onChange={e => this.setState({ manualClientId: e.target.value })} />
+              </FormGroup>
+              <FormGroup controlId="accessToken">
+                <ControlLabel>Access Token</ControlLabel>
+                <FormControl
+                  required
+                  className="mid-element"
+                  ref="accessToken"
+                  name="accessToken"
+                  type="password"
+                  placeholder="accessToken"
+                  onChange={e => this.setState({ manualAccessToken: e.target.value })} />
+              </FormGroup>
+              <FormGroup controlId="certificate">
+                <ControlLabel>Certificate</ControlLabel>
+                <FormControl
+                  componentClass="textarea"
+                  className="bottom-element"
+                  ref="certificate"
+                  name="certificate"
+                  rows={8}
+                  placeholder="JSON certificate (if required)"
+                  onChange={e => this.setState({ manualCertificate: e.target.value })} />
+              </FormGroup>
+              <p className="text-muted">Note that the credentials are not checked for validity.</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button bsStyle="default" onClick={this.closeModal}>Cancel</Button>
+              <Button type="submit" bsStyle="primary" disabled={!this.formIsValid()}>
+                <Glyphicon glyph="paste" /> Sign In
+              </Button>
+            </Modal.Footer>
+          </form>
+        </Modal>
+      ) :
+      null;
   },
 
   overlayHideHandler() {

@@ -4,12 +4,16 @@ import url from 'url';
 const debug = createDebugger('tools:lib:credentials');
 
 /** Save credentials from localStorage (removed them if null is given) */
-export const saveCredentials = credentialsParam => {
-  const credentials = credentialsParam; // work around lint error
-  if (!credentials) {
+export const saveCredentials = creds => {
+  if (!creds) {
     // delete credentials
     delete localStorage.credentials;
+
+    // Notify interested parties that credentials have changed
+    window.dispatchEvent(new window.CustomEvent('credentials-changed', { detail: null }));
   } else {
+    const credentials = { ...creds };
+
     // Parse certificate, if present
     if (typeof credentials.certificate === 'string') {
       credentials.certificate = JSON.parse(credentials.certificate);
@@ -17,12 +21,12 @@ export const saveCredentials = credentialsParam => {
 
     // Store credentials as JSON
     localStorage.credentials = JSON.stringify(credentials);
-  }
 
-  // Notify interested parties that credentials have changed
-  window.dispatchEvent(new window.CustomEvent('credentials-changed', {
-    detail: credentials
-  }));
+    // Notify interested parties that credentials have changed
+    window.dispatchEvent(new window.CustomEvent('credentials-changed', {
+      detail: credentials
+    }));
+  }
 };
 
 /** Load credentials from localStorage */
