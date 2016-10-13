@@ -37,14 +37,15 @@ const Display = React.createClass({
     // Call this.connect() when props.socketUrl changes
     utils.createWatchStateMixin({
       onProps: {
-        connect: ['socketUrl']
+        connect: ['socketUrl', 'shared']
       }
     })
   ],
 
   getDefaultProps() {
     return {
-      viewOnly: false
+      viewOnly: false,
+      shared: false
     };
   },
 
@@ -73,7 +74,7 @@ const Display = React.createClass({
         encrypt: opts.protocol === 'wss:',
         true_color: true,
         local_cursor: true,
-        shared: false,
+        shared: this.props.shared,
         view_only: this.props.viewOnly,
         onUpdateState: this.onUpdateState,
         onPasswordRequired: this.onPasswordRequired,
@@ -151,7 +152,7 @@ const DisplayList = React.createClass({
     // Calls load() initially and on reload()
     utils.createTaskClusterMixin({
       // Reload when props.status.taskId changes, ignore credential changes
-      reloadOnProps: ['displaysUrl', 'socketUrl'],
+      reloadOnProps: ['displaysUrl', 'socketUrl', 'shared'],
       reloadOnLogin: false
     })
   ],
@@ -181,7 +182,9 @@ const DisplayList = React.createClass({
       const display = encodeURIComponent(this.state.display);
 
       return this.renderWaitFor('RFB') || (
-        <Display RFB={this.state.RFB} socketUrl={`${this.props.socketUrl}?display=${display}`} />
+        <Display RFB={this.state.RFB}
+                 socketUrl={`${this.props.socketUrl}?display=${display}`}
+                 shared={this.props.shared === 'true'} />
       );
     }
     return this.renderWaitFor('displays') || (
@@ -233,6 +236,7 @@ const DisplayList = React.createClass({
 //  * displaysUrl   (url for listing displays)
 //  * taskId
 //  * runId
+//  * shared
 const args = qs.parse(URL.parse(window.location.href).query);
 
 ReactDOM.render((
