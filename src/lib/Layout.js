@@ -338,56 +338,59 @@ const Navigation = React.createClass({
   renderManualModal() {
     // This modal must be outside of the "Sign In Manually" menu option as that
     // menu option is removed from the DOM as soon as it loses focus.
-    return this.state.showManualModal ? (
-        <Modal show={true}>
-          <form className="login-form" onSubmit={this.submitForm}>
-            <Modal.Header><h4>Manual Sign-In</h4></Modal.Header>
-            <Modal.Body>
-              <FormGroup controlId="clientId">
-                <ControlLabel>Client Id</ControlLabel>
-                <FormControl
-                  required
-                  className="top-element"
-                  ref="clientId"
-                  name="clientId"
-                  type="text"
-                  placeholder="clientId"
-                  onChange={e => this.setState({ manualClientId: e.target.value })} />
-              </FormGroup>
-              <FormGroup controlId="accessToken">
-                <ControlLabel>Access Token</ControlLabel>
-                <FormControl
-                  required
-                  className="mid-element"
-                  ref="accessToken"
-                  name="accessToken"
-                  type="password"
-                  placeholder="accessToken"
-                  onChange={e => this.setState({ manualAccessToken: e.target.value })} />
-              </FormGroup>
-              <FormGroup controlId="certificate">
-                <ControlLabel>Certificate</ControlLabel>
-                <FormControl
-                  componentClass="textarea"
-                  className="bottom-element"
-                  ref="certificate"
-                  name="certificate"
-                  rows={8}
-                  placeholder="JSON certificate (if required)"
-                  onChange={e => this.setState({ manualCertificate: e.target.value })} />
-              </FormGroup>
-              <p className="text-muted">Note that the credentials are not checked for validity.</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button bsStyle="default" onClick={this.closeModal}>Cancel</Button>
-              <Button type="submit" bsStyle="primary" disabled={!this.formIsValid()}>
-                <Glyphicon glyph="paste" /> Sign In
-              </Button>
-            </Modal.Footer>
-          </form>
-        </Modal>
-      ) :
-      null;
+    if (!this.state.showManualModal) {
+      return;
+    }
+
+    return (
+      <Modal show={true}>
+        <form className="login-form" onSubmit={this.submitForm}>
+          <Modal.Header><h4>Manual Sign-In</h4></Modal.Header>
+          <Modal.Body>
+            <FormGroup controlId="clientId">
+              <ControlLabel>Client Id</ControlLabel>
+              <FormControl
+                required
+                className="top-element"
+                ref="clientId"
+                name="clientId"
+                type="text"
+                placeholder="clientId"
+                onChange={e => this.setState({ manualClientId: e.target.value })} />
+            </FormGroup>
+            <FormGroup controlId="accessToken">
+              <ControlLabel>Access Token</ControlLabel>
+              <FormControl
+                required
+                className="mid-element"
+                ref="accessToken"
+                name="accessToken"
+                type="password"
+                placeholder="accessToken"
+                onChange={e => this.setState({ manualAccessToken: e.target.value })} />
+            </FormGroup>
+            <FormGroup controlId="certificate">
+              <ControlLabel>Certificate</ControlLabel>
+              <FormControl
+                componentClass="textarea"
+                className="bottom-element"
+                ref="certificate"
+                name="certificate"
+                rows={8}
+                placeholder="JSON certificate (if required)"
+                onChange={e => this.setState({ manualCertificate: e.target.value })} />
+            </FormGroup>
+            <p className="text-muted">Note that the credentials are not checked for validity.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button bsStyle="default" onClick={this.closeModal}>Cancel</Button>
+            <Button type="submit" bsStyle="primary" disabled={!this.formIsValid()}>
+              <Glyphicon glyph="paste" /> Sign In
+            </Button>
+          </Modal.Footer>
+        </form>
+      </Modal>
+    );
   },
 
   overlayHideHandler() {
