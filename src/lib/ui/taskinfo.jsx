@@ -1,7 +1,6 @@
 import React from 'react';
-import { Table, Label } from 'react-bootstrap';
+import { Button, Table, Label } from 'react-bootstrap';
 import ConfirmAction from './confirmaction';
-import RunLocally from './runLocally';
 import LoanerButton from './loaner-button';
 import _ from 'lodash';
 import { Markdown, DateView, Code } from '../format';
@@ -14,6 +13,16 @@ const TaskInfo = React.createClass({
   propTypes: {
     status: React.PropTypes.object.isRequired,
     task: React.PropTypes.object.isRequired
+  },
+
+  getInitialState() {
+    return {
+      scriptLoaded: false
+    };
+  },
+
+  onClick() {
+    this.setState({ scriptLoaded: true });
   },
 
   render() {
@@ -202,16 +211,23 @@ const TaskInfo = React.createClass({
                   taskId={status.taskId}
                   buttonStyle="default"
                   buttonSize="small" />&nbsp;
-                <RunLocally
-                  buttonSize="small"
-                  buttonStyle="default"
-                  label="Run Locally">
-                  <Code language="bash">
-                    {this.renderRunLocallyScript()}
-                  </Code>
-                </RunLocally>&nbsp;
+                <Button type="submit" bsSize="small" bsStyle="default" onClick={this.onClick }>
+                  Run Locally
+                </Button>
               </td>
             </tr>
+              {(this.state.scriptLoaded ? (
+                <tr>
+                  <td>Run Locally</td>
+                    <td>
+                      <Code language="bash">
+                        {this.renderRunLocallyScript()}
+                      </Code>
+                    </td>
+                  </tr>
+                ) :
+                null
+              )}
           </tbody>
         </Table>
       </div>
@@ -221,6 +237,7 @@ const TaskInfo = React.createClass({
   rerunTask() {
     return this.queue.rerunTask(this.props.status.taskId);
   },
+
   editTask() {
     const newTask = {
       // filled in by task creator on load
