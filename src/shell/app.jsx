@@ -42,10 +42,12 @@ term.onTerminalReady = async () => {
       ].join('')
     ]
   };
+
   let client;
   if (args.v === '1') {
     client = new DockerExecClient(options);
     await client.execute();
+
     const resize = client.resize;
     client.resize = (c, r) => resize.call(client, r, c);
   } else if (args.v === '2') {
@@ -53,6 +55,7 @@ term.onTerminalReady = async () => {
   }
 
   const io = term.io.push();
+
   io.onVTKeystroke = io.sendString = d => {
     client.stdin.write(d);
   };
