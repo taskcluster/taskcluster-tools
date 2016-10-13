@@ -1,6 +1,5 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
-import { buildLoginURL } from '../auth';
 
 export default class extends React.Component {
   static displayName = 'ManualMenuItem';
