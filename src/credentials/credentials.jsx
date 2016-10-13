@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import * as auth from '../lib/auth';
 import * as utils from '../lib/utils';
@@ -19,27 +19,10 @@ export default React.createClass({
       <Row>
         <Col sm={12}>
           <h4>TaskCluster Credentials</h4>
-          <hr />
-          <ButtonToolbar>
-            <Button bsStyle="primary" onClick={this.signIn}>
-              <Glyphicon glyph="log-in"/> Sign In
-            </Button>
-            <Button bsStyle="danger" onClick={this.signOut}>
-              <Glyphicon glyph="log-out"/> Sign Out
-            </Button>
-          </ButtonToolbar>
           <CredentialView credentials={this.state.credentials} />
         </Col>
       </Row>
     );
-  },
-
-  signIn() {
-    window.open(auth.buildLoginURL(), '_blank');
-  },
-
-  signOut() {
-    auth.saveCredentials(undefined);
   },
 
   handleCredentialsChanged() {

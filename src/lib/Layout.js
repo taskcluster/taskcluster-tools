@@ -1,16 +1,26 @@
 import React from 'react';
 import { findDOMNode } from 'react-dom';
 import {
-  Navbar, Nav, NavItem, NavDropdown, MenuItem,
-  Glyphicon, Popover, Overlay
+  Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon, Popover, Overlay, Modal, Button,
+  FormControl, FormGroup, ControlLabel
 } from 'react-bootstrap';
 import menu from '../menu';
 import * as auth from './auth';
 import { Icon } from './format';
+import OktaMenuItem from './ui/OktaMenuItem';
+import PersonaMenuItem from './ui/PersonaMenuItem';
+import DevelopmentMenuItem from './ui/DevelopmentMenuItem';
+import ManualMenuItem from './ui/ManualMenuItem';
 import './base-layout.less';
 
 // time before expiration at which we warn
 const EXPIRY_WARNING = 5 * 60 * 1000;
+const SIGNIN_MENU_ITEMS = {
+  okta: OktaMenuItem,
+  persona: PersonaMenuItem,
+  development: DevelopmentMenuItem,
+  manual: ManualMenuItem
+};
 
 /** Navigation bar for layout.jade */
 const Navigation = React.createClass({
@@ -18,13 +28,13 @@ const Navigation = React.createClass({
     return {
       credentials: auth.loadCredentials(),
       credentialsExpiringSoon: false,
-      credentialsMessage: null
+      credentialsMessage: null,
+      signinMenuOpen: false,
+      showManualModal: false,
+      manualClientId: '',
+      manualAccessToken: '',
+      manualCertificate: ''
     };
-  },
-
-  // Log-in open an authentication URL
-  signIn() {
-    window.open(auth.buildLoginURL(), '_blank');
   },
 
   // Log out (clear credentials)
@@ -55,6 +65,8 @@ const Navigation = React.createClass({
     this.setState({
       credentials,
       credentialsExpiringSoon: false,
+      signinMenuOpen: false,
+      showManualModal: false,
       credentialsMessage: credentials ? {
         title: 'Signed In',
         body: `You are now signed in as ${credentials.clientId}.`
@@ -86,7 +98,7 @@ const Navigation = React.createClass({
       return;
     }
 
-    const timeout = expiry - Date.now() - EXPIRY_WARNING + 500;
+    const timeout = (expiry - Date.now()) - (EXPIRY_WARNING + 500);
 
     this.expirationTimer = setTimeout(() => this.showExpirationWarning(), timeout);
   },
@@ -172,41 +184,86 @@ const Navigation = React.createClass({
           {this.renderCredentialsMenu()}
         </Nav>
         {this.renderCredentialsPopover()}
+        {this.renderManualModal()}
       </Navbar>
     );
   },
 
+  setCredentials(credentials) {
+    this.setState({ signinMenuOpen: false });
+    auth.saveCredentials(credentials);
+  },
+
+  showMessage({ title, body }) {
+    this.setState({
+      credentialsMessage: { title, body },
+      signinMenuOpen: false
+    });
+  },
+
+  showManualModal() {
+    this.setState({ showManualModal: true });
+  },
+
   renderCredentialsMenu() {
-    // if there are no credentials at all, then there is no menu -- just a sign-in link
-    if (!this.state.credentials) {
+    if (this.state.credentials) {
+      const glyph = this.state.credentialsExpiringSoon ? 'exclamation-sign' : 'user';
+      const className = this.state.credentialsExpiringSoon ? 'text-warning' : '';
+      const menuHeading = (
+        <span>
+          <Glyphicon className={className} glyph={glyph} /> {this.state.credentials.clientId}
+        </span>
+      );
+
       return (
-        <NavItem onSelect={this.signIn} ref="credentials">
-          <Glyphicon glyph="log-in" /> Sign in
-        </NavItem>
+        <NavDropdown
+          title={menuHeading}
+          ref="credentials"
+          id="credentials"
+          open={this.state.signinMenuOpen}
+          // Due to https://github.com/react-bootstrap/react-bootstrap/issues/1301,
+          // handle expanding and collapsing this manually
+          onToggle={expanded => this.setState({ signinMenuOpen: expanded })}>
+            <MenuItem href="/credentials/">
+              <Icon name="key" /> Manage Credentials
+            </MenuItem>
+            <NavItem onSelect={this.signOut}>
+              <Glyphicon glyph="log-out" /> Sign Out
+            </NavItem>
+        </NavDropdown>
       );
     }
 
-    // TODO: color this according to time until expiry
-    const glyph = this.state.credentialsExpiringSoon ? 'exclamation-sign' : 'user';
-    const className = this.state.credentialsExpiringSoon ? 'text-warning' : '';
-    const menuHeading = (
-      <span>
-        <Glyphicon className={className} glyph={glyph}/> {this.state.credentials.clientId}
-      </span>
-    );
+    const menuHeading = <span><Glyphicon glyph="log-in" /> Sign In</span>;
 
     return (
-      <NavDropdown key={2} title={menuHeading} ref="credentials" id="credentials">
-        <MenuItem href="/credentials">
-          <Icon name="key"/> Manage Credentials
-        </MenuItem>
-        <MenuItem divider />
-        <NavItem onSelect={this.signIn}>
-          <Glyphicon glyph="log-in"/> Sign In
-        </NavItem>
-        <NavItem onSelect={this.signOut}>
-          <Glyphicon glyph="log-out"/> Sign Out
-        </NavItem>
+      <NavDropdown
+        title={menuHeading}
+        ref="credentials"
+        id="credentials"
+        open={this.state.signinMenuOpen}
+        // Due to https://github.com/react-bootstrap/react-bootstrap/issues/1301,
+        // handle expanding and collapsing this manually
+        onToggle={expanded => this.setState({ signinMenuOpen: expanded })}>
+          {
+            Object
+              .keys(SIGNIN_MENU_ITEMS)
+              .map(key => {
+                const MenuItem = SIGNIN_MENU_ITEMS[key];
+
+                if (!process.env.SIGN_IN_METHODS.includes(key)) {
+                  return null;
+                }
+
+                return (
+                  <MenuItem
+                    key={key}
+                    setCredentials={this.setCredentials}
+                    showMessage={this.showMessage}
+                    showManualModal={this.showManualModal} />
+                );
+              })
+          }
       </NavDropdown>
     );
   },
@@ -229,8 +286,110 @@ const Navigation = React.createClass({
         onHide={this.overlayHideHandler}
         placement="bottom"
         target={() => findDOMNode(this.refs.credentials)}>
-        {popover}
+          {popover}
       </Overlay>
+    );
+  },
+
+  closeModal() {
+    this.setState({ showManualModal: false });
+  },
+
+  submitForm(e) {
+    e.preventDefault();
+
+    let certificate;
+
+    if (this.state.manualCertificate !== '') {
+      try {
+        certificate = JSON.parse(this.state.manualCertificate);
+      } catch (err) {
+        return;
+      }
+    }
+
+    auth.saveCredentials({
+      certificate,
+      clientId: this.state.manualClientId,
+      accessToken: this.state.manualAccessToken
+    });
+    this.setState({ signinMenuOpen: false, showManualModal: false });
+  },
+
+  certificateIsValid() {
+    const { manualCertificate } = this.state;
+
+    if (manualCertificate === '') {
+      return true;
+    }
+
+    try {
+      JSON.parse(manualCertificate);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  },
+
+  formIsValid() {
+    return this.state.manualClientId && this.state.manualAccessToken && this.certificateIsValid();
+  },
+
+  renderManualModal() {
+    // This modal must be outside of the "Sign In Manually" menu option as that
+    // menu option is removed from the DOM as soon as it loses focus.
+    if (!this.state.showManualModal) {
+      return;
+    }
+
+    return (
+      <Modal show={true}>
+        <form className="login-form" onSubmit={this.submitForm}>
+          <Modal.Header><h4>Manual Sign-In</h4></Modal.Header>
+          <Modal.Body>
+            <FormGroup controlId="clientId">
+              <ControlLabel>Client Id</ControlLabel>
+              <FormControl
+                required
+                className="top-element"
+                ref="clientId"
+                name="clientId"
+                type="text"
+                placeholder="clientId"
+                onChange={e => this.setState({ manualClientId: e.target.value })} />
+            </FormGroup>
+            <FormGroup controlId="accessToken">
+              <ControlLabel>Access Token</ControlLabel>
+              <FormControl
+                required
+                className="mid-element"
+                ref="accessToken"
+                name="accessToken"
+                type="password"
+                placeholder="accessToken"
+                onChange={e => this.setState({ manualAccessToken: e.target.value })} />
+            </FormGroup>
+            <FormGroup controlId="certificate">
+              <ControlLabel>Certificate</ControlLabel>
+              <FormControl
+                componentClass="textarea"
+                className="bottom-element"
+                ref="certificate"
+                name="certificate"
+                rows={8}
+                placeholder="JSON certificate (if required)"
+                onChange={e => this.setState({ manualCertificate: e.target.value })} />
+            </FormGroup>
+            <p className="text-muted">Note that the credentials are not checked for validity.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button bsStyle="default" onClick={this.closeModal}>Cancel</Button>
+            <Button type="submit" bsStyle="primary" disabled={!this.formIsValid()}>
+              <Glyphicon glyph="paste" /> Sign In
+            </Button>
+          </Modal.Footer>
+        </form>
+      </Modal>
     );
   },
 
