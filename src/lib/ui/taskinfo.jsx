@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Label } from 'react-bootstrap';
+import { Button, Table, Label } from 'react-bootstrap';
 import ConfirmAction from './confirmaction';
 import LoanerButton from './loaner-button';
 import _ from 'lodash';
@@ -13,6 +13,16 @@ const TaskInfo = React.createClass({
   propTypes: {
     status: React.PropTypes.object.isRequired,
     task: React.PropTypes.object.isRequired
+  },
+
+  getInitialState() {
+    return {
+      showRunLocallyScript: false
+    };
+  },
+
+  handleRunLocally() {
+    this.setState({ showRunLocallyScript: !this.state.showRunLocallyScript });
   },
 
   render() {
@@ -200,18 +210,24 @@ const TaskInfo = React.createClass({
                   task={this.props.task}
                   taskId={status.taskId}
                   buttonStyle="default"
-                  buttonSize="small" />
+                  buttonSize="small" />&nbsp;
+                <Button type="submit" bsSize="small" bsStyle="default" onClick={this.handleRunLocally}>
+                  Run Locally
+                </Button>
               </td>
             </tr>
-
-            <tr>
-              <td>Run Locally</td>
-              <td>
-                <Code language="bash">
-                  {this.renderRunLocallyScript()}
-                </Code>
-              </td>
-            </tr>
+              {this.state.showRunLocallyScript ? (
+                <tr>
+                  <td>Run Locally</td>
+                    <td>
+                      <Code language="bash">
+                        {this.renderRunLocallyScript()}
+                      </Code>
+                    </td>
+                  </tr>
+                ) :
+                null
+              }
           </tbody>
         </Table>
       </div>
