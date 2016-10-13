@@ -22,7 +22,7 @@ const TaskInfo = React.createClass({
   },
 
   handleRunLocally() {
-    this.setState({ showRunLocallyScript: true });
+    this.setState({ showRunLocallyScript: !this.state.showRunLocallyScript });
   },
 
   render() {
