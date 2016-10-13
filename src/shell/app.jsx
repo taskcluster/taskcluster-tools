@@ -6,6 +6,7 @@ import url from 'url';
 import qs from 'querystring';
 import { DockerExecClient } from 'docker-exec-websocket-server';
 import './shell.less';
+import wsshell from 'ws-shell';
 
 const args = qs.parse(url.parse(window.location.href).query);
 
@@ -21,8 +22,7 @@ ReactDOM.render((
 const term = new hterm.Terminal('interactive');
 
 term.onTerminalReady = async () => {
-  const io = term.io.push();
-  const client = new DockerExecClient({
+  const options = {
     url: args.socketUrl,
     tty: true,
     command: [
@@ -41,7 +41,23 @@ term.onTerminalReady = async () => {
         'exec $SPAWN;'
       ].join('')
     ]
-  });
+  };
+
+  // Create a shell client, with interface similar to child_process
+  // With an additional method client.resize(cols, rows) for TTY sizing.
+  let client;
+  if (args.v === '1') {
+    client = new DockerExecClient(options);
+    await client.execute();
+
+    // Wrap client.resize to switch argument ordering
+    const resize = client.resize;
+    client.resize = (c, r) => resize.call(client, r, c);
+  } else if (args.v === '2') {
+    client = await wsshell.dial(options);
+  }
+
+  const io = term.io.push();
 
   io.onVTKeystroke = io.sendString = d => {
     client.stdin.write(d);
@@ -57,8 +73,6 @@ term.onTerminalReady = async () => {
   term.prefs_.set('use-default-window-copy', true);
   /* eslint-enable no-underscore-dangle */
 
-  await client.execute();
-
   term.installKeyboard();
   io.writeUTF8(`Connected to remote shell for taskId: ${args.taskId}\r\n`);
 
@@ -70,15 +84,15 @@ term.onTerminalReady = async () => {
 
   client.resize(term.screenSize.height, term.screenSize.width);
 
-  io.onTerminalResize = (c, r) => {
-    client.resize(r, c);
-  };
+  io.onTerminalResize = (c, r) => client.resize(c, r);
   client.stdout.on('data', data => {
     io.writeUTF8(data.toString('utf8'));
   });
   client.stderr.on('data', data => {
     io.writeUTF8(data.toString('utf8'));
   });
+  client.stdout.resume();
+  client.stderr.resume();
 };
 
 term.decorate(document.getElementById('terminal'));
