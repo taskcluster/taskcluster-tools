@@ -17,12 +17,12 @@ const TaskInfo = React.createClass({
 
   getInitialState() {
     return {
-      scriptLoaded: false
+      showRunLocallyScript: false
     };
   },
 
-  onClick() {
-    this.setState({ scriptLoaded: true });
+  handleRunLocally() {
+    this.setState({ showRunLocallyScript: true });
   },
 
   render() {
@@ -211,12 +211,12 @@ const TaskInfo = React.createClass({
                   taskId={status.taskId}
                   buttonStyle="default"
                   buttonSize="small" />&nbsp;
-                <Button type="submit" bsSize="small" bsStyle="default" onClick={this.onClick }>
+                <Button type="submit" bsSize="small" bsStyle="default" onClick={this.handleRunLocally}>
                   Run Locally
                 </Button>
               </td>
             </tr>
-              {(this.state.scriptLoaded ? (
+              {this.state.showRunLocallyScript ? (
                 <tr>
                   <td>Run Locally</td>
                     <td>
@@ -227,7 +227,7 @@ const TaskInfo = React.createClass({
                   </tr>
                 ) :
                 null
-              )}
+              }
           </tbody>
         </Table>
       </div>
