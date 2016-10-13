@@ -14,7 +14,6 @@ import {
 import * as utils from '../lib/utils';
 import * as format from '../lib/format';
 import taskcluster from 'taskcluster-client';
-import { findDOMNode } from 'react-dom';
 
 export default React.createClass({
   displayName: 'CacheManager',
@@ -79,9 +78,9 @@ export default React.createClass({
           <br /><br />
           {
             this.state.tableError ? (
-            <Alert bsStyle="danger" onDismiss={this.dismissError}>
-              <strong>Error executing operation: </strong> {`${this.state.tableError}`}
-            </Alert>
+              <Alert bsStyle="danger" onDismiss={this.dismissError}>
+                <strong>Error executing operation: </strong> {`${this.state.tableError}`}
+              </Alert>
             ) :
             this.renderCachesTable()
           }
@@ -160,7 +159,7 @@ export default React.createClass({
               type="text"
               ref="workerType"
               placeholder="Worker type"
-              value={this.state.formProvisionerId}
+              value={this.state.formWorkerType}
               onChange={this.workerTypeChange} />
           </Col>
         </FormGroup>
@@ -172,7 +171,7 @@ export default React.createClass({
               type="text"
               ref="cacheName"
               placeholder="Cache name"
-              value={this.state.formProvisionerId}
+              value={this.state.formCacheName}
               onChange={this.cacheNameChange} />
           </Col>
         </FormGroup>
@@ -192,23 +191,23 @@ export default React.createClass({
   },
 
   provisionerIdChange(element) {
-    this.setState({ formProvisionerId: element.value });
+    this.setState({ formProvisionerId: element.target.value });
   },
 
   workerTypeChange(element) {
-    this.setState({ formWorkerType: element.value });
+    this.setState({ formWorkerType: element.target.value });
   },
 
   cacheNameChange(element) {
-    this.setState({ formCacheName: element.value });
+    this.setState({ formCacheName: element.target.value });
   },
 
   async sendRequest() {
     try {
       await this.purgeCaches.purgeCache(
-        findDOMNode(this.refs.provisionerId).value,
-        findDOMNode(this.refs.workerType).value,
-        { cacheName: findDOMNode(this.refs.cacheName).value }
+        this.state.formProvisionerId,
+        this.state.formWorkerType,
+        { cacheName: this.state.formCacheName }
       );
 
       this.setState({
