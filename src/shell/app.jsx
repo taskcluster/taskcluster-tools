@@ -43,11 +43,14 @@ term.onTerminalReady = async () => {
     ]
   };
 
+  // Create a shell client, with interface similar to child_process
+  // With an additional method client.resize(cols, rows) for TTY sizing.
   let client;
   if (args.v === '1') {
     client = new DockerExecClient(options);
     await client.execute();
 
+    // Wrap client.resize to switch argument ordering
     const resize = client.resize;
     client.resize = (c, r) => resize.call(client, r, c);
   } else if (args.v === '2') {
