@@ -45,7 +45,7 @@ export default class extends React.Component {
 
     return (
       <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
-        <NavItem onSelect={this.signIn}>
+        <NavItem onSelect={() => this.signIn()}>
           <Glyphicon glyph="user"/> Sign In with Persona
         </NavItem>
       </OverlayTrigger>
