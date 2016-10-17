@@ -1,17 +1,14 @@
 import React from 'react';
-import _ from 'lodash';
+import { Row, Col, Form, FormGroup, FormControl, Glyphicon, Button } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
-import * as utils from '../utils';
-import Select from 'react-select';
-import TerminalView from './terminalview';
-import './logview.less';
+import { createTaskClusterMixin } from '../utils';
 
 /** Render a terminal and a dropdown menu to select logs from */
 export default React.createClass({
   displayName: 'LogView',
 
   mixins: [
-    utils.createTaskClusterMixin({
+    createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
         queue: taskcluster.Queue
@@ -21,12 +18,13 @@ export default React.createClass({
 
   // Get initial state
   getInitialState() {
-    const entry = _.find(this.props.logs, { name: 'public/logs/terminal.log' }) ||
-      _.find(this.props.logs, { name: 'public/logs/live.log' }) ||
-      this.props.logs[0];
+    const entry = this.props.logs.find(log =>
+      log.name === 'public/logs/terminal.log' ||
+      log.name === 'public/logs/live.log'
+    ) || this.props.logs[0];
 
     return {
-      name: entry ? entry.name : undefined // URL to show
+      name: entry ? entry.name : ''
     };
   },
 
@@ -40,55 +38,60 @@ export default React.createClass({
     ]).isRequired
   },
 
-  // Fresh the log at request of the user
   refreshLog() {
-    this.refs.termView.refresh();
+    this.refs.logFrame.src = this.refs.logFrame.src;
   },
 
   render() {
-    // Create URL for the artifact
-    let logUrl;
-
-    if (this.state.name) {
-      logUrl = this.queue.buildUrl(
-        this.queue.getArtifact,
-        this.props.taskId,
-        this.props.runId,
-        this.state.name
-      );
+    if (!this.state.name) {
+      return <div>No logs found for the selected run.</div>;
     }
 
-    const logs = this.props.logs.map(log => ({ value: log.name, label: log.name }));
+    const logUrl = this.queue.buildUrl(
+      this.queue.getArtifact,
+      this.props.taskId,
+      this.props.runId,
+      this.state.name
+    );
+    const src = `https://taskcluster.github.io/unified-logviewer/?url=${logUrl}`;
 
     return (
-      <div>
-        <dl className="dl-horizontal log-view">
-          <dt>Show Log</dt>
-          <dd>
-            <div className="log-view-log-chooser">
-              <div className="log-view-dropdown-wrapper">
-                <Select
-                  value={this.state.name}
-                  onChange={this.handleLogChanged}
-                  options={logs}
-                  clearable={false}/>
-              </div>
-              <button
-                type="button"
-                className="btn btn-sm btn-default log-view-btn-refresh"
-                onClick={this.refreshLog}>
-                  <i className="glyphicon glyphicon-refresh" />
-              </button>
-            </div>
-          </dd>
-        </dl>
-        <TerminalView url={logUrl} ref="termView" />
-      </div>
+      <Row>
+        <Col sm={12}>
+          <Form inline>
+            <FormGroup style={{ marginRight: 10 }}>
+              <FormControl
+                componentClass="select"
+                value={this.state.name}
+                onChange={this.handleLogChanged}>
+                  {this.props.logs.map((log, key) => (
+                    <option value={log.name} key={key}>{log.name}</option>
+                  ))}
+              </FormControl>
+            </FormGroup>
+
+            <Button bsSize="sm" onClick={this.refreshLog} style={{ marginRight: 10 }}>
+              <Glyphicon glyph="refresh" /> Refresh
+            </Button>
+            <a href={src} target="_blank" className="btn btn-default btn-sm">
+              <Glyphicon glyph="new-window" /> Open in new window
+            </a>
+          </Form>
+        </Col>
+
+        <Col sm={12} style={{ marginTop: 20 }}>
+          <iframe
+            ref="logFrame"
+            height="500"
+            width="100%"
+            frameBorder="0"
+            src={src} />
+        </Col>
+      </Row>
     );
   },
 
-  /** Handle select changes in drop down box */
-  handleLogChanged(logName) {
-    this.setState({ name: logName });
+  handleLogChanged(e) {
+    this.setState({ name: e.target.value });
   }
 });
