@@ -188,7 +188,7 @@ const RunInfo = React.createClass({
               <Tab.Pane eventKey="artifacts">
                 {this.renderWaitFor('artifacts') || this.renderArtifacts()}
               </Tab.Pane>
-              <Tab.Pane eventKey="logs">
+              <Tab.Pane eventKey="logs" unmountOnExit={true}>
                 {this.renderWaitFor('artifacts') || this.renderLogView()}
               </Tab.Pane>
             </Tab.Content>

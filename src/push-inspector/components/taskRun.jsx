@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import LogView from './logView';
+import LogView from '../../lib/ui/logview';
 import ArtifactList from './artifactList';
 
 export default class TaskRun extends Component {
@@ -57,7 +57,6 @@ export default class TaskRun extends Component {
 
     const rowComponents = this.generateRows();
     const runId = status.runs[runNumber].runId;
-    const logView = this.renderLogView(taskId, runId, artifacts);
 
     return (
       <div>
@@ -69,12 +68,16 @@ export default class TaskRun extends Component {
                 <strong>Artifacts</strong>
               </td>
               <td>
-                <ArtifactList ref="artifactList" artifacts={artifacts} taskId={taskId} runId={runId} />
+                <ArtifactList
+                  ref="artifactList"
+                  artifacts={artifacts}
+                  taskId={taskId}
+                  runId={runId} />
               </td>
             </tr>
             </tbody>
         </table>
-        {logView}
+        {this.renderLogView(taskId, runId, artifacts)}
       </div>
     );
   }
