@@ -53,7 +53,8 @@ export default React.createClass({
       this.props.runId,
       this.state.name
     );
-    const src = `https://taskcluster.github.io/unified-logviewer/?url=${logUrl}`;
+    const src =
+      `https://taskcluster.github.io/unified-logviewer/?url=${logUrl}&jumpToHighlight=true`;
 
     return (
       <Row>
