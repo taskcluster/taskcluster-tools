@@ -2,6 +2,7 @@
 
 const preset = require('neutrino-preset-react');
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const env = require('./env');
 const entryPoints = require('./entry-points');
@@ -41,5 +42,14 @@ preset.eslint.ignorePattern = [
   'src/lib/codemirror/**/*.js',
   'src/lib/persona.js'
 ];
+
+if (process.env.NODE_ENV === 'production') {
+  // Neutrino copies non-JS files, but we also need the JS files from src/display/include that are
+  // dynamically imported
+  preset.plugins.push(new CopyPlugin([{
+    context: path.resolve(__dirname, '../src'),
+    from: `display/include/**/*`,
+  }]));
+}
 
 module.exports = preset;
