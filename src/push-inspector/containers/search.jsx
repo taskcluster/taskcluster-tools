@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
-import { hashHistory } from 'react-router';
-import { FormGroup, FormControl, ControlLabel, InputGroup, Button } from 'react-bootstrap';
+import {hashHistory} from 'react-router';
+import {FormGroup, FormControl, ControlLabel, InputGroup, Button} from 'react-bootstrap';
 
 const VALID_SLUG = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
 
@@ -12,7 +12,7 @@ class Search extends Component {
 
     this.state = {
       term: '',
-      prevTerm: ''
+      prevTerm: '',
     };
 
     this.onFormSubmit = this.onFormSubmit.bind(this);
@@ -24,9 +24,9 @@ class Search extends Component {
    */
   onFormSubmit(event) {
     const {
-      setDashboardBanner, tasksHaveBeenRetrieved, removeTasks, fetchTasksInSteps
+      setDashboardBanner, tasksHaveBeenRetrieved, removeTasks, fetchTasksInSteps,
     } = this.props;
-    const { term, prevTerm } = this.state;
+    const {term, prevTerm} = this.state;
 
     event.preventDefault();
 
@@ -36,12 +36,12 @@ class Search extends Component {
       removeTasks();
       fetchTasksInSteps(term, true);
       hashHistory.push(term);
-      this.setState({ prevTerm: term });
+      this.setState({prevTerm: term});
     }
   }
 
   onInputChange(event) {
-    this.setState({ term: event.target.value });
+    this.setState({term: event.target.value});
   }
 
   /**

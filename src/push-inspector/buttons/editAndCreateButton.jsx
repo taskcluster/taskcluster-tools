@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
@@ -8,7 +8,7 @@ class EditAndCreateButton extends Component {
     const glyph = 'edit';
     const label = 'Edit and Create';
     const successMsg = 'Upon creation, you will need to refresh the page to see the new task.';
-    const { task, editAndCreateTask } = this.props;
+    const {task, editAndCreateTask} = this.props;
     const action = () => editAndCreateTask(task, successMsg);
 
     return (
@@ -28,6 +28,6 @@ class EditAndCreateButton extends Component {
   }
 }
 
-const mapStateToProps = ({ task }) => ({ task });
+const mapStateToProps = ({task}) => ({task});
 
 export default connect(mapStateToProps, actions)(EditAndCreateButton);

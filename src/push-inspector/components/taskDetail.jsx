@@ -1,19 +1,19 @@
-import React, { Component } from 'react';
-import { ButtonToolbar } from 'react-bootstrap';
+import React, {Component} from 'react';
+import {ButtonToolbar} from 'react-bootstrap';
 import PurgeCacheButton from '../buttons/purgeCacheButton';
 import RetriggerButton from '../buttons/retriggerButton';
 import ScheduleTaskButton from '../buttons/scheduleTaskButton';
 import CancelTaskButton from '../buttons/cancelTaskButton';
 import EditAndCreateButton from '../buttons/editAndCreateButton';
 import OneClickLoanerButton from '../buttons/oneClickLoanerButton';
-import { beautified } from '../lib/utils';
+import {beautified} from '../lib/utils';
 
 export default class TaskDetail extends Component {
   /**
   * Render dependencies list
   */
   getDependenciesList(task) {
-    const { dependencies } = task;
+    const {dependencies} = task;
 
     if (!dependencies.length) {
       return <span>-</span>;
@@ -25,7 +25,10 @@ export default class TaskDetail extends Component {
           {
             dependencies.map((dependency, index) => (
               <li key={index}>
-                <a href={`https://queue.taskcluster.net/v1/task/${dependency}`} target="_blank">
+                <a
+                  href={`https://queue.taskcluster.net/v1/task/${dependency}`}
+                  target="_blank"
+                  rel="noopener noreferrer">
                   {dependency} <i className="fa fa-external-link" />
                 </a>
               </li>
@@ -41,7 +44,7 @@ export default class TaskDetail extends Component {
       return <div>Loading...</div>;
     }
 
-    const { task, status } = this.props;
+    const {task, status} = this.props;
     const dependenciesList = this.getDependenciesList(task);
 
     return (
@@ -62,7 +65,10 @@ export default class TaskDetail extends Component {
           <tr>
             <td><strong>TaskId</strong></td>
             <td>
-              <a href={`https://queue.taskcluster.net/v1/task/${status.taskId}`} target="_blank">
+              <a
+                href={`https://queue.taskcluster.net/v1/task/${status.taskId}`}
+                target="_blank"
+                rel="noopener noreferrer">
                 {status.taskId} <i className="fa fa-external-link" />
               </a>
             </td>

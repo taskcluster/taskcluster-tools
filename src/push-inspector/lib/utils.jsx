@@ -1,5 +1,5 @@
 import * as format from '../../lib/format';
-import { Button, Alert } from 'react-bootstrap';
+import {Button, Alert} from 'react-bootstrap';
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 
@@ -7,7 +7,7 @@ import taskcluster from 'taskcluster-client';
 * Creation of queue. If credentials are available, we use them at the start of the application
 */
 export let queue = localStorage.credentials ?
-  new taskcluster.Queue({ credentials: JSON.parse(localStorage.credentials) }) :
+  new taskcluster.Queue({credentials: JSON.parse(localStorage.credentials)}) :
   new taskcluster.Queue();
 
 /**
@@ -20,8 +20,8 @@ export const queueEvents = new taskcluster.QueueEvents();
 */
 export const authentication = {
   login: credentials => {
-    queue = new taskcluster.Queue({ credentials });
-  }
+    queue = new taskcluster.Queue({credentials});
+  },
 };
 
 /**
@@ -32,7 +32,7 @@ let listener = new taskcluster.WebListener();
 
 export const webListener = {
   startListening: (taskGroupId, onMessageAction) => {
-    const qkey = { taskGroupId };
+    const qkey = {taskGroupId};
 
     listener.bind(queueEvents.taskDefined(qkey));
     listener.bind(queueEvents.taskPending(qkey));
@@ -47,7 +47,6 @@ export const webListener = {
     });
 
     listener.on('error', (err = new Error('Unknown error')) => {
-      console.error('Error within the Listener: ', err);
       listener.close();
       onMessageAction(err);
     });
@@ -59,7 +58,7 @@ export const webListener = {
   stopListening() {
     listener.close();
     listener = new taskcluster.WebListener();
-  }
+  },
 };
 
 /**
@@ -98,7 +97,7 @@ export const rendering = {
         {message}
       </Alert>
     );
-  }
+  },
 };
 /* eslint-enable react/display-name */
 
@@ -106,7 +105,7 @@ export const rendering = {
 * beautified functions
 */
 export const beautified = {
-  labelClassName: state => `status-label label-${state}`
+  labelClassName: state => `status-label label-${state}`,
 };
 
 /**
@@ -116,11 +115,11 @@ export const notifications = {
   notifyUser: message => {
     /* eslint-disable no-new */
     new Notification(message, {
-      icon: '/lib/assets/taskcluster-36.png'
+      icon: '/lib/assets/taskcluster-36.png',
     });
     /* eslint-enable no-new */
   },
   requestPermission: () => {
     Notification.requestPermission();
-  }
+  },
 };

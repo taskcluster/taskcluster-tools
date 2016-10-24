@@ -10,7 +10,7 @@ import {
   TASKS_RETRIEVED_FULLY,
   CLEAR_TASKS_ACTIONS_MESSAGE,
   ACTIVE_TASK_GROUP_ID,
-  LIST_TASKGROUP_IN_PROGRESS
+  LIST_TASKGROUP_IN_PROGRESS,
 } from './types';
 
 // Helper functions
@@ -18,19 +18,19 @@ import {
   taskActionsInProgress,
   renderActionSuccess,
   renderActionError,
-  createTask
+  createTask,
 } from './helper';
-import { queue } from '../lib/utils';
+import {queue} from '../lib/utils';
 
 // Modules
 import taskcluster from 'taskcluster-client';
 import slugid from 'slugid';
 import _ from 'lodash';
-import { hashHistory } from 'react-router';
+import {hashHistory} from 'react-router';
 
 export const setDashboardBanner = msg => ({
   type: SET_DASHBOARD_BANNER,
-  payload: msg
+  payload: msg,
 });
 
 /**
@@ -38,14 +38,14 @@ export const setDashboardBanner = msg => ({
  */
 export const tasksHaveBeenRetrieved = isRetrieved => ({
   type: TASKS_RETRIEVED_FULLY,
-  payload: isRetrieved
+  payload: isRetrieved,
 });
 
 /**
  * Clears the message of the action modal
  */
 export const clearTaskActionsMessage = () => ({
-  type: CLEAR_TASKS_ACTIONS_MESSAGE
+  type: CLEAR_TASKS_ACTIONS_MESSAGE,
 });
 
 /**
@@ -53,7 +53,7 @@ export const clearTaskActionsMessage = () => ({
  */
 export const listTaskGroup = isFetching => ({
   type: LIST_TASKGROUP_IN_PROGRESS,
-  payload: isFetching
+  payload: isFetching,
 });
 
 /**
@@ -94,7 +94,7 @@ export const fetchTasksInSteps = (taskGroupId, isLimited) => {
         // Dispatch tasks
         dispatch({
           type: isLimited ? FETCH_TASKS_IN_STEP : FETCH_TASKS_FULLY,
-          payload: tasks
+          payload: tasks,
         });
 
         // Flag to indicate whether list has been loaded
@@ -121,7 +121,7 @@ export const fetchTask = taskId => async dispatch => {
 
     dispatch({
       type: FETCH_TASK,
-      payload: task
+      payload: task,
     });
   } catch (err) {
     dispatch(setDashboardBanner(err));
@@ -133,12 +133,12 @@ export const fetchArtifacts = taskId => async dispatch => {
 
   dispatch({
     type: FETCH_ARTIFACTS,
-    payload: response.artifacts
+    payload: response.artifacts,
   });
 };
 
 export const removeTasks = () => ({
-  type: REMOVE_TASKS
+  type: REMOVE_TASKS,
 });
 
 export const fetchStatus = taskId => async dispatch => {
@@ -147,7 +147,7 @@ export const fetchStatus = taskId => async dispatch => {
 
     dispatch({
       type: FETCH_STATUS,
-      payload: response.status
+      payload: response.status,
     });
   } catch (err) {
     dispatch(setDashboardBanner(err));
@@ -161,12 +161,12 @@ export const fetchStatus = taskId => async dispatch => {
 */
 export const setActiveTaskStatus = status => ({
   type: ACTIVE_TASK_STATUS,
-  payload: status
+  payload: status,
 });
 
 export const activeTaskGroupId = taskGroupId => ({
   type: ACTIVE_TASK_GROUP_ID,
-  payload: taskGroupId
+  payload: taskGroupId,
 });
 
 /**
@@ -175,7 +175,7 @@ export const activeTaskGroupId = taskGroupId => ({
 export const purge = (provisionerId, workerType, selectedCaches, successMessage) => {
   // Setup purgeCache
   const purgeCache = localStorage.credentials ?
-    new taskcluster.PurgeCache({ credentials: JSON.parse(localStorage.credentials) }) :
+    new taskcluster.PurgeCache({credentials: JSON.parse(localStorage.credentials)}) :
     new taskcluster.PurgeCache();
 
   return async dispatch => {
@@ -183,7 +183,7 @@ export const purge = (provisionerId, workerType, selectedCaches, successMessage)
 
     try {
       const promises = selectedCaches
-        .map(cacheName => purgeCache.purgeCache(provisionerId, workerType, { cacheName }));
+        .map(cacheName => purgeCache.purgeCache(provisionerId, workerType, {cacheName}));
 
       await Promise.all(promises);
 
@@ -215,7 +215,7 @@ export const retriggerTask = (list, toClone, successMessage) => {
 
       hashHistory.push(`${task.taskGroupId}/${response.status.taskId}`);
       // Update current list of tasks
-      dispatch(createTask(list, { task, status: response.status }));
+      dispatch(createTask(list, {task, status: response.status}));
       // Update modal message
       dispatch(renderActionSuccess(successMessage));
     } catch (err) {
@@ -263,7 +263,7 @@ export const editAndCreateTask = (oldTask, successMessage) => {
     'created',
     'deadline',
     'dependencies',
-    'requires'
+    'requires',
   ];
   const newTask = _.omit(oldTask, exclude);
 
@@ -322,10 +322,10 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
       const response = await queue.createTask(taskId, task);
 
       hashHistory.push(`${task.taskGroupId}/${response.status.taskId}`);
-      window.open(`${window.location.protocol}//${window.location.host}/one-click-loaner/connect/#${response.status.taskId}`);
+      window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${response.status.taskId}`);
 
       // Update current list of tasks
-      dispatch(createTask(list, { task, status: response.status }));
+      dispatch(createTask(list, {task, status: response.status}));
       dispatch(renderActionSuccess(successMessage));
     } catch (err) {
       dispatch(renderActionError(err));

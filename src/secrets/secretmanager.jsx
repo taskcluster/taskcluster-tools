@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
+import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import SecretEditor from './secreteditor';
@@ -11,13 +11,13 @@ const SecretsManager = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        secrets: taskcluster.Secrets
-      }
+        secrets: taskcluster.Secrets,
+      },
     }),
     utils.createLocationHashMixin({
       keys: ['selectedSecretId'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   /** Create an initial state */
@@ -26,13 +26,13 @@ const SecretsManager = React.createClass({
       selectedSecretId: '',
       secrets: undefined,
       secretsLoaded: false,
-      secretsError: null
+      secretsError: null,
     };
   },
 
   load() {
     return {
-      secrets: this.secrets.list().then(resp => resp.secrets)
+      secrets: this.secrets.list().then(resp => resp.secrets),
     };
   },
 
@@ -44,67 +44,66 @@ const SecretsManager = React.createClass({
           <Col md={5}>
             {this.renderSecretsTable()}
             <ButtonToolbar>
-              <Button bsStyle="primary"
-                         onClick={this.selectSecretId.bind(this, '')}
-                         disabled={this.state.selectedSecretId === ''}>
-                <Glyphicon glyph="plus"/>
-                &nbsp;
-                Add Secret
+              <Button
+                bsStyle="primary"
+                onClick={() => this.selectSecretId('')}
+                disabled={this.state.selectedSecretId === ''}>
+                <Glyphicon glyph="plus" /> Add Secret
               </Button>
-              <Button bsStyle="success"
-                         onClick={this.reload}
-                         disabled={!this.state.secretsLoaded}>
-                <Glyphicon glyph="refresh"/>
-                &nbsp;
-                Refresh
+              <Button
+                bsStyle="success"
+                onClick={this.reload}
+                disabled={!this.state.secretsLoaded}>
+                <Glyphicon glyph="refresh" /> Refresh
               </Button>
             </ButtonToolbar>
           </Col>
           <Col md={7}>
-            <SecretEditor currentSecretId={this.state.selectedSecretId}
-                          reloadSecrets={this.reloadSecrets} />
+            <SecretEditor currentSecretId={this.state.selectedSecretId} reloadSecrets={this.reloadSecrets} />
           </Col>
         </Row>
       );
     } catch (e) {
-      console.log(e);
+      // TODO: Handle error
     }
   },
 
   renderSecretsTable() {
     return this.renderWaitFor('secrets') || (
-      <Table condensed hover>
+      <Table condensed={true} hover={true}>
         <thead>
           <tr>
             <th>SecretId</th>
           </tr>
         </thead>
         <tbody>
-             {this.state.secrets.map(this.renderSecretRow)}
+          {this.state.secrets.map(this.renderSecretRow)}
         </tbody>
       </Table>
     );
   },
 
   renderSecretRow(secretId, index) {
-    const isSelected = (this.state.selectedSecretId === secretId);
+    const isSelected = this.state.selectedSecretId === secretId;
+
     return (
-      <tr key={index}
-          className={isSelected ? 'info' : undefined}
-          onClick={this.selectSecretId.bind(this, secretId)}>
+      <tr
+        key={index}
+        className={isSelected ? 'info' : null}
+        onClick={() => this.selectSecretId(secretId)}>
         <td><code>{secretId}</code></td>
       </tr>
     );
   },
 
   selectSecretId(secretId) {
-    this.setState({ selectedSecretId: secretId });
+    this.setState({selectedSecretId: secretId});
   },
 
   reloadSecrets() {
-    this.setState({ selectedSecretId: '' });
+    this.setState({selectedSecretId: ''});
     this.reload();
-  }
+  },
 });
 
 export default SecretsManager;

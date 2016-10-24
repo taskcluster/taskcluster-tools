@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ButtonToolbar, Glyphicon, Row, Col } from 'react-bootstrap';
+import {Button, ButtonToolbar, Glyphicon, Row, Col} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import CodeMirror from 'react-code-mirror';
@@ -15,7 +15,7 @@ const debug = createDebugger('taskcreator');
 
 /** Parse json with jsonlint and accept corrections, and throw on error */
 const parseJSON = text => {
-  const { json, errors } = jsonlint(text);
+  const {json, errors} = jsonlint(text);
 
   if (errors.length > 0) {
     throw new Error(errors[0].description || errors[0].message);
@@ -31,15 +31,15 @@ export default React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        queue: taskcluster.Queue
-      }
-    })
+        queue: taskcluster.Queue,
+      },
+    }),
   ],
 
   getDefaultProps() {
     return {
       localStorageKey: undefined,
-      initialTaskValue: '{}'
+      initialTaskValue: '{}',
     };
   },
 
@@ -63,7 +63,7 @@ export default React.createClass({
     return _.defaults(this.parameterizeTask(task), {
       createdTaskIdLoaded: false,
       createdTaskIdError: undefined,
-      createdTaskId: null
+      createdTaskId: null,
     });
   },
 
@@ -90,7 +90,7 @@ export default React.createClass({
     // Set task, and serialize to string after parameterization
     return {
       task,
-      invalidTask
+      invalidTask,
     };
   },
 
@@ -104,7 +104,7 @@ export default React.createClass({
         window.location = link;
 
         return (
-          <Row style={{ marginBottom: 40 }}>
+          <Row style={{marginBottom: 40}}>
             <Col sm={12}>
               <a href={link}>
                 See&nbsp;
@@ -128,7 +128,7 @@ export default React.createClass({
           task will be stored in <code>localStorage</code>, so you can always
           come back and easily try a new variation.
         </p>
-        <hr/>
+        <hr />
         {this.state.createdTaskIdError ? this.renderError(this.state.createdTaskIdError) : null}
         {this.state.createdTaskIdLoaded === null ? this.renderSpinner() : this.renderEditor()}
       </Col>
@@ -144,7 +144,7 @@ export default React.createClass({
           lineNumbers={true}
           mode="application/json"
           textAreaClassName="form-control"
-          textAreaStyle={{ minHeight: '20em' }}
+          textAreaStyle={{minHeight: '20em'}}
           value={this.state.task}
           onChange={this.handleTaskChange}
           indentWithTabs={true}
@@ -152,7 +152,7 @@ export default React.createClass({
           lint={true}
           gutters={['CodeMirror-lint-markers']}
           theme="ambiance" />
-        <br/>
+        <br />
         <ButtonToolbar>
           <Button bsStyle="primary" onClick={this.handleCreateTask} disabled={this.state.invalidTask}>
             <Glyphicon glyph="ok" /> Create Task
@@ -181,7 +181,7 @@ export default React.createClass({
 
     this.setState({
       invalidTask,
-      task: e.target.value
+      task: e.target.value,
     });
   },
 
@@ -208,7 +208,7 @@ export default React.createClass({
 
     // Load state from promise (see TaskClusterMixin)
     this.loadState({
-      createdTaskId: taskCreated
+      createdTaskId: taskCreated,
     });
   },
 
@@ -226,5 +226,5 @@ export default React.createClass({
   /** Reset to initialTaskValue */
   handleReset() {
     this.setState(this.parameterizeTask(this.props.initialTaskValue));
-  }
+  },
 });

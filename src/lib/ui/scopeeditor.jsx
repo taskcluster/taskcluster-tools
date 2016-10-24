@@ -1,5 +1,5 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import _ from 'lodash';
 
 const ScopeEditor = React.createClass({
@@ -9,7 +9,7 @@ const ScopeEditor = React.createClass({
     editing: React.PropTypes.bool,
     scopes: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
     // called when scopes have changed
-    scopesUpdated: React.PropTypes.func
+    scopesUpdated: React.PropTypes.func,
   },
 
   render() {
@@ -69,11 +69,11 @@ const ScopeEditor = React.createClass({
     const scopes = _.clone(this.props.scopes || []).sort();
 
     return (
-      <ul className="form-control-static" style={{ paddingLeft: 20 }}>
+      <ul className="form-control-static" style={{paddingLeft: 20}}>
         {scopes.map((scope, index) => <li key={index}><code>{scope}</code></li>)}
       </ul>
     );
-  }
+  },
 });
 
 export default ScopeEditor;

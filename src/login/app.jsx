@@ -4,8 +4,6 @@ import * as auth from '../lib/auth';
 // Load credentials for querystring
 const credentials = querystring.parse(location.search.substr(1));
 
-console.log('credentials', credentials);
-
 // Update credentials if new ones were provided by querystring
 if (credentials.clientId && credentials.accessToken) {
   // Store credentials

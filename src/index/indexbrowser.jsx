@@ -1,15 +1,6 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
-import {
-  Col,
-  Button,
-  Row,
-  Table,
-  Glyphicon,
-  FormGroup,
-  InputGroup,
-  FormControl
-} from 'react-bootstrap';
+import {findDOMNode} from 'react-dom';
+import {Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import './indexbrowser.less';
@@ -22,29 +13,29 @@ export default React.createClass({
     // Calls load()
     utils.createTaskClusterMixin({
       clients: {
-        index: taskcluster.Index
+        index: taskcluster.Index,
       },
       // Reload when state.namespace changes, ignore credentials changes
       reloadOnKeys: ['namespace', 'namespaceToken', 'tasksToken'],
-      reloadOnLogin: false
+      reloadOnLogin: false,
     }),
     // Called handler when state.namespace changes
     utils.createWatchStateMixin({
       onKeys: {
         updateNamespaceInput: ['namespace', 'current'],
-        clearContinuationTokens: ['namespace']
-      }
+        clearContinuationTokens: ['namespace'],
+      },
     }),
     // Serialize state.taskId to location.hash as string
     utils.createLocationHashMixin({
       keys: ['namespace', 'current'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   propTypes: {
     entryView: React.PropTypes.func.isRequired,
-    hasHashEntry: React.PropTypes.bool.isRequired
+    hasHashEntry: React.PropTypes.bool.isRequired,
   },
 
   getInitialState() {
@@ -54,31 +45,27 @@ export default React.createClass({
       namespaceToken: null, // namespace continuationToken
       tasksToken: null, // tasks continuationToken
       current: '', // selected task
-      namespaces: { namespaces: [] },
+      namespaces: {namespaces: []},
       namespacesLoaded: true,
       namespacesError: null,
-      tasks: { tasks: [] },
+      tasks: {tasks: []},
       tasksLoaded: true,
-      tasksError: null
+      tasksError: null,
     };
   },
 
   load() {
     return {
       namespaces: this.index.listNamespaces(this.state.namespace, {
-        continuationToken: this.state.namespaceToken || undefined
+        continuationToken: this.state.namespaceToken || undefined,
       }),
       tasks: this.index.listTasks(this.state.namespace, {
-        continuationToken: this.state.tasksToken || undefined
-      })
+        continuationToken: this.state.tasksToken || undefined,
+      }),
     };
   },
 
   render() {
-    const taskInfo = this.state.namespace ?
-      (this.renderWaitFor('tasks') || this.renderTasks()) :
-      null;
-
     return (
       <Row>
         <Col md={6} className="index-browser">
@@ -94,12 +81,12 @@ export default React.createClass({
                     type="text"
                     ref="namespace"
                     value={this.state.namespaceInput}
-                    onChange={this.handleNamespaceInputChange}/>
+                    onChange={this.handleNamespaceInputChange} />
                 </InputGroup>
               </div>
             </FormGroup>
           </form>
-          {taskInfo}
+          {this.stats.namespace && (this.renderWaitFor('tasks') || this.renderTasks())}
           {this.renderWaitFor('namespaces') || this.renderNamespaces()}
         </Col>
         <Col md={6}>
@@ -145,7 +132,7 @@ export default React.createClass({
   renderNamespaces() {
     return (
       <div>
-        <Table condensed hover className="namespace-table">
+        <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
             {this.state.namespaces.namespaces.map((ns, index) => (
               <tr key={index}>
@@ -178,7 +165,7 @@ export default React.createClass({
   renderTasks() {
     return (
       <div>
-        <Table condensed hover className="namespace-table">
+        <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
             {this.state.tasks.tasks.map((task, index) => {
               const isCurrent = (this.state.current === task.namespace);
@@ -188,26 +175,23 @@ export default React.createClass({
                   <td
                     onClick={this.setCurrent.bind(this, task.namespace)}
                     className={isCurrent ? 'info' : null}>
-                      {task.namespace.split('.').pop()}
+                    {task.namespace.split('.').pop()}
                   </td>
                 </tr>
-              ); })}
+              );
+            })}
           </tbody>
         </Table>
-        {
-          this.state.tasksToken ? (
-            <Button bsStyle="primary" onClick={this.clearTasksToken} className="pull-left">
-              <Glyphicon glyph="arrow-left"/> Back to start
-            </Button>
-          ) : null
-        }
-        {
-          this.state.tasks.continuationToken ? (
-            <Button bsStyle="primary" onClick={this.nextTasks} className="pull-right">
-              More tasks <Glyphicon glyph="arrow-right"/>
-            </Button>
-          ) : null
-        }
+        {this.state.tasksToken && (
+          <Button bsStyle="primary" onClick={this.clearTasksToken} className="pull-left">
+            <Glyphicon glyph="arrow-left" /> Back to start
+          </Button>
+        )}
+        {this.state.tasks.continuationToken && (
+          <Button bsStyle="primary" onClick={this.nextTasks} className="pull-right">
+            More tasks <Glyphicon glyph="arrow-right" />
+          </Button>
+        )}
       </div>
     );
   },
@@ -215,26 +199,26 @@ export default React.createClass({
   /** Load next tasks */
   nextTasks() {
     this.setState({
-      tasksToken: this.state.tasks.continuationToken
+      tasksToken: this.state.tasks.continuationToken,
     });
   },
 
   /** Load next namespaces */
   nextNamespaces() {
     this.setState({
-      namespaceToken: this.state.namespaces.continuationToken
+      namespaceToken: this.state.namespaces.continuationToken,
     });
   },
 
   /** Update namespace input field */
   updateNamespaceInput() {
-    this.setState({ namespaceInput: this.state.namespace });
+    this.setState({namespaceInput: this.state.namespace});
   },
 
   /** Handle changes in namespace input field */
   handleNamespaceInputChange() {
     this.setState({
-      namespaceInput: findDOMNode(this.refs.namespace).value
+      namespaceInput: findDOMNode(this.refs.namespace).value,
     });
   },
 
@@ -244,14 +228,14 @@ export default React.createClass({
       namespace: ns,
       current: ns,
       tasksToken: null,
-      namespaceToken: null
+      namespaceToken: null,
     });
   },
 
   /** Set current tasks */
   setCurrent(ns) {
     this.setState({
-      current: ns
+      current: ns,
     });
   },
 
@@ -267,19 +251,19 @@ export default React.createClass({
   clearContinuationTokens() {
     this.setState({
       tasksToken: null,
-      namespaceToken: null
+      namespaceToken: null,
     });
   },
 
   clearNamespaceToken() {
     this.setState({
-      namespaceToken: null
+      namespaceToken: null,
     });
   },
 
   clearTasksToken() {
     this.setState({
-      tasksToken: null
+      tasksToken: null,
     });
-  }
+  },
 });

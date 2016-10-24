@@ -1,6 +1,6 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
-import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
+import {findDOMNode} from 'react-dom';
+import {Alert, Button, ButtonToolbar, Glyphicon} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import * as format from '../lib/format';
@@ -14,21 +14,21 @@ const SecretEditor = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        secrets: taskcluster.Secrets
+        secrets: taskcluster.Secrets,
       },
-      reloadOnProps: ['currentSecretId']
-    })
+      reloadOnProps: ['currentSecretId'],
+    }),
   ],
 
   propTypes: {
     // Method to reload a client in the parent
-    reloadSecrets: React.PropTypes.func.isRequired
+    reloadSecrets: React.PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
     return {
       // '' implies. "Create Secret"
-      currentSecretId: ''
+      currentSecretId: '',
     };
   },
 
@@ -43,7 +43,7 @@ const SecretEditor = React.createClass({
       // Operation details, if currently doing anything
       working: false,
       error: null,
-      showSecret: false
+      showSecret: false,
     };
   },
 
@@ -55,11 +55,11 @@ const SecretEditor = React.createClass({
         secretId: '',
         secret: {
           secret: {},
-          expires: taskcluster.fromNow('1 day')
+          expires: taskcluster.fromNow('1 day'),
         },
         editing: true,
         working: false,
-        error: null
+        error: null,
       };
     }
 
@@ -70,7 +70,7 @@ const SecretEditor = React.createClass({
       editing: false,
       working: false,
       error: null,
-      showSecret: false
+      showSecret: false,
     };
   },
 
@@ -121,12 +121,12 @@ const SecretEditor = React.createClass({
                       {this.state.secretId}
                       {
                         this.state.secretId.startsWith('garbage/') ? (
-                            <div className="alert alert-danger">
-                              This is a "garbage" secret and is visible to just about everybody. Do
-                              not put any real secrets here!
-                            </div>
-                          ) :
-                          null
+                          <div className="alert alert-danger">
+                            This is a "garbage" secret and is visible to just about everybody.
+                            Do not put any real secrets here!
+                          </div>
+                        ) :
+                        null
                       }
                     </div>
                   )
@@ -137,14 +137,15 @@ const SecretEditor = React.createClass({
               <label className="control-label col-md-2">Expires</label>
               <div className="col-md-10">
                 {
-                  isEditing ?
+                  isEditing ? (
                     <TimeInput
                       format="YYYY-MM-DD HH:mm:ss ZZ"
                       value={moment(new Date(this.state.secret.expires))}
                       onChange={this.onExpiresChange}
                       className="form-control" />
-                    :
+                  ) : (
                     <format.DateView date={this.state.secret.expires} />
+                  )
                 }
               </div>
             </div>
@@ -170,7 +171,7 @@ const SecretEditor = React.createClass({
 
                     return (
                       <Button onClick={this.openSecret} bsStyle="warning">
-                        <format.Icon name="user-secret" style={{ padding: '.15em' }}/> Show secret
+                        <format.Icon name="user-secret" style={{padding: '.15em'}} /> Show secret
                       </Button>
                     );
                   }
@@ -188,8 +189,7 @@ const SecretEditor = React.createClass({
                 </Button>
                 &nbsp;&nbsp;
                 {
-                  isCreating ?
-                    null : (
+                  !isCreating && (
                     <ConfirmAction
                       buttonStyle="danger"
                       glyph="trash"
@@ -197,7 +197,7 @@ const SecretEditor = React.createClass({
                       label="Delete Secret"
                       action={this.deleteSecret}
                       success="Secret deleted">
-                        Are you sure you want to delete secret <code>{this.state.secretId}</code>?
+                      Are you sure you want to delete secret <code>{this.state.secretId}</code>?
                     </ConfirmAction>
                   )
                 }
@@ -213,8 +213,7 @@ const SecretEditor = React.createClass({
         </div>
       );
     } catch (e) {
-      console.log(e);
-      return <span>error in render - see console</span>;
+      return <span>Error while rendering - see devtools for details</span>;
     }
   },
 
@@ -222,16 +221,15 @@ const SecretEditor = React.createClass({
     const state = _.cloneDeep(this.state);
 
     state.secret.expires = date.toDate().toJSON();
-    console.log(this.state.secret.expires);
     this.setState(state);
   },
 
   startEditing() {
-    this.setState({ editing: true });
+    this.setState({editing: true});
   },
 
   openSecret() {
-    this.setState({ showSecret: true });
+    this.setState({showSecret: true});
   },
 
   async saveSecret() {
@@ -259,7 +257,7 @@ const SecretEditor = React.createClass({
     const expires = this.state.secret.expires;
 
     this.secrets
-      .set(secretId, { secret, expires })
+      .set(secretId, {secret, expires})
       .then(() => {
         const newSecret = _.cloneDeep(this.state.secret);
 
@@ -269,7 +267,7 @@ const SecretEditor = React.createClass({
         this.setState({
           secretId,
           editing: false,
-          secret: newSecret
+          secret: newSecret,
         });
 
         if (shouldReload) {
@@ -287,21 +285,19 @@ const SecretEditor = React.createClass({
   },
 
   showError(err) {
-    console.log(err);
-
     this.setState({
       error: err,
       // clear the value, just to be safe
-      value: null
+      value: null,
     });
   },
 
   dismissError() {
     this.setState({
       secretError: null,
-      error: null
+      error: null,
     });
-  }
+  },
 });
 
 export default SecretEditor;

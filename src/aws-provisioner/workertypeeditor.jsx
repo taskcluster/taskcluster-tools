@@ -1,6 +1,6 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
-import { ButtonToolbar, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import {findDOMNode} from 'react-dom';
+import {ButtonToolbar, FormGroup, ControlLabel, FormControl} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
@@ -27,15 +27,15 @@ const WorkerTypeEditor = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: taskcluster.AwsProvisioner
+        awsProvisioner: taskcluster.AwsProvisioner,
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-        }
+          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
+        },
       },
-      reloadOnProps: ['definition', 'workerType']
-    })
+      reloadOnProps: ['definition', 'workerType'],
+    }),
   ],
 
   propTypes: {
@@ -43,7 +43,7 @@ const WorkerTypeEditor = React.createClass({
     updated: React.PropTypes.func.isRequired,
     // WorkerType to update, null of none
     workerType: React.PropTypes.string,
-    definition: React.PropTypes.object.isRequired
+    definition: React.PropTypes.object.isRequired,
   },
 
   getInitialState() {
@@ -55,7 +55,7 @@ const WorkerTypeEditor = React.createClass({
     return {
       workerType: this.props.workerType,
       definition: JSON.stringify(def, null, 2),
-      invalidDefinition: false
+      invalidDefinition: false,
     };
   },
 
@@ -63,36 +63,36 @@ const WorkerTypeEditor = React.createClass({
     return (
       <div>
         {
-          this.props.workerType ?
+          this.props.workerType ? (
             <h3>Update <code>{this.props.workerType}</code></h3>
-            : (
-              <FormGroup validationState={this.workerTypeValidationState()}>
-                <ControlLabel>WorkerType</ControlLabel>
-                <div>
-                  <FormControl
-                    type="text"
-                    ref="workerType"
-                    placeholder="workerType"
-                    value={this.state.workerType}
-                    onChange={this.workerTypeChange} />
-                </div>
-              </FormGroup>
-            )
+          ) : (
+            <FormGroup validationState={this.workerTypeValidationState()}>
+              <ControlLabel>WorkerType</ControlLabel>
+              <div>
+                <FormControl
+                  type="text"
+                  ref="workerType"
+                  placeholder="workerType"
+                  value={this.state.workerType}
+                  onChange={this.workerTypeChange} />
+              </div>
+            </FormGroup>
+          )
         }
         <CodeMirror
           ref="definition"
           lineNumbers={true}
           mode="application/json"
           textAreaClassName="form-control"
-          textAreaStyle={{ minHeight: '20em' }}
+          textAreaStyle={{minHeight: '20em'}}
           value={this.state.definition}
           onChange={this.handleChange}
           indentWithTabs={true}
           tabSize={2}
           lint={true}
           gutters={['CodeMirror-lint-markers']}
-          theme="ambiance"/>
-        <br/>
+          theme="ambiance" />
+        <br />
         <ButtonToolbar>
           <ConfirmAction
             buttonStyle="primary"
@@ -102,10 +102,10 @@ const WorkerTypeEditor = React.createClass({
               this.workerTypeValidationState() === 'error'}
             action={this.props.workerType ? this.save : this.create}
             success="Saved Worker Type">
-              Are you sure that you would like to {this.props.workerType ? 'update' : 'create'} the
-              <code>{this.state.workerType}</code> workerType?
-              <br/>
-              If there is a minimum number of instances, they will be provisioned.
+            Are you sure that you would like to {this.props.workerType ? 'update' : 'create'} the
+            <code>{this.state.workerType}</code> workerType?
+            <br />
+            If there is a minimum number of instances, they will be provisioned.
           </ConfirmAction>
           {
             this.props.workerType ? (
@@ -115,8 +115,7 @@ const WorkerTypeEditor = React.createClass({
                 label="Remove WorkerType"
                 action={this.remove}
                 success="Removed WorkerType">
-                  Are you sure you want to delete the <code>{this.props.workerType}</code>
-                  workerType?
+                Are you sure you want to delete the <code>{this.props.workerType}</code> workerType?
               </ConfirmAction>
             ) :
             null
@@ -137,13 +136,13 @@ const WorkerTypeEditor = React.createClass({
 
     this.setState({
       definition: e.target.value,
-      invalidDefinition: invalid
+      invalidDefinition: invalid,
     });
   },
 
   workerTypeChange() {
     this.setState({
-      workerType: findDOMNode(this.refs.workerType).value
+      workerType: findDOMNode(this.refs.workerType).value,
     });
   },
 
@@ -190,7 +189,7 @@ const WorkerTypeEditor = React.createClass({
   async remove() {
     await this.awsProvisioner.removeWorkerType(this.props.workerType);
     await this.props.updated(this.props.workerType);
-  }
+  },
 });
 
 export default WorkerTypeEditor;

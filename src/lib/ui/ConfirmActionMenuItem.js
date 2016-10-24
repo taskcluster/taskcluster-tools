@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Glyphicon, Modal, MenuItem } from 'react-bootstrap';
+import {Button, Glyphicon, Modal, MenuItem} from 'react-bootstrap';
 import * as utils from '../utils';
 
 /** Button with an associated confirm dialog */
@@ -8,7 +8,7 @@ export default React.createClass({
 
   mixins: [
     // We use loadState to execute the action asynchronously
-    utils.createTaskClusterMixin()
+    utils.createTaskClusterMixin(),
   ],
 
   propTypes: {
@@ -19,12 +19,12 @@ export default React.createClass({
     children: React.PropTypes.node.isRequired,
     success: React.PropTypes.string.isRequired,
     // Function executing action, returns promise
-    action: React.PropTypes.func.isRequired
+    action: React.PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
     return {
-      disabled: false
+      disabled: false,
     };
   },
 
@@ -34,7 +34,7 @@ export default React.createClass({
       executing: false,
       resultLoaded: false,
       resultError: null,
-      result: null
+      result: null,
     };
   },
 
@@ -50,7 +50,7 @@ export default React.createClass({
   renderDialog() {
     return (
       <Modal bsStyle="primary" show={this.state.showDialog} onHide={this.closeDialog}>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton={true}>
           {this.props.label}
         </Modal.Header>
         <Modal.Body>
@@ -75,7 +75,7 @@ export default React.createClass({
                 onClick={this.executeAction}
                 bsStyle={this.props.buttonStyle}
                 hidden={this.state.result}>
-                  <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
+                <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
               </Button>
             ) :
               null
@@ -89,7 +89,7 @@ export default React.createClass({
   },
 
   openDialog() {
-    this.setState({ showDialog: true });
+    this.setState({showDialog: true});
   },
 
   closeDialog() {
@@ -102,9 +102,9 @@ export default React.createClass({
       executing: true,
       result: (async () => {
         const result = await this.props.action();
-        this.setState({ executing: false });
+        this.setState({executing: false});
         return result;
-      })()
+      })(),
     });
-  }
+  },
 });

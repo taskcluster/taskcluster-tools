@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-import { Button, Glyphicon, Modal } from 'react-bootstrap';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {Button, Glyphicon, Modal} from 'react-bootstrap';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import Loading from './loading';
-import { rendering } from '../lib/utils';
+import {rendering} from '../lib/utils';
 
 class ConfirmAction extends Component {
   constructor(props) {
     super(props);
     this.state = {
       showDialog: false,
-      executing: false
+      executing: false,
     };
 
     this.open = this.open.bind(this);
@@ -24,7 +24,7 @@ class ConfirmAction extends Component {
   close() {
     this.setState({
       showDialog: false,
-      executing: false
+      executing: false,
     });
 
     // Clear message
@@ -35,19 +35,19 @@ class ConfirmAction extends Component {
   * Open dialog
   */
   open() {
-    this.setState({ showDialog: true });
+    this.setState({showDialog: true});
   }
 
   /**
   * Execute action and set executing to true
   */
   executeAction() {
-    this.setState({ executing: true });
+    this.setState({executing: true});
     this.props.action();
   }
 
   message() {
-    const { taskActionInProgress, taskActionMessage } = this.props;
+    const {taskActionInProgress, taskActionMessage} = this.props;
 
     if (taskActionInProgress) {
       return <Loading />;
@@ -59,11 +59,11 @@ class ConfirmAction extends Component {
   }
 
   render() {
-    const { label, glyph, action, children, disabled } = this.props;
+    const {label, glyph, children, disabled} = this.props;
     const message = this.message();
     const dialogContent = (
       <span>
-        <hr/>
+        <hr />
         <h4>Status</h4>
         <span>
           {message}
@@ -77,12 +77,11 @@ class ConfirmAction extends Component {
           bsSize="small"
           onClick={this.open}
           disabled={disabled}>
-          <Glyphicon glyph={glyph} />
-          &nbsp;{label}
+          <Glyphicon glyph={glyph} /> {label}
         </Button>
 
         <Modal show={this.state.showDialog} onHide={this.close}>
-          <Modal.Header closeButton>
+          <Modal.Header closeButton={true}>
             <Modal.Title>{label}</Modal.Title>
           </Modal.Header>
           <Modal.Body className="format-modal-text format-modal-body">
@@ -113,8 +112,8 @@ class ConfirmAction extends Component {
   }
 }
 
-const mapStateToProps = ({ taskActionMessage, taskActionInProgress }) => (
-  { taskActionMessage, taskActionInProgress }
+const mapStateToProps = ({taskActionMessage, taskActionInProgress}) => (
+  {taskActionMessage, taskActionInProgress}
 );
 
 export default connect(mapStateToProps, actions)(ConfirmAction);

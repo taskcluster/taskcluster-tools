@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ConfirmAction from '../shared/confirmAction';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 
 class PurgeCacheButton extends Component {
@@ -8,7 +8,7 @@ class PurgeCacheButton extends Component {
     super(props);
 
     this.state = {
-      selected: this.props.caches || []
+      selected: this.props.caches || [],
     };
 
     this.update = this.update.bind(this);
@@ -18,7 +18,7 @@ class PurgeCacheButton extends Component {
     this.setState({
       selected: e.target.checked ?
         [...this.state.selected, e.target.value] :
-        this.state.selected.filter(c => c !== e.target.value)
+        this.state.selected.filter(c => c !== e.target.value),
     });
   }
 
@@ -26,7 +26,7 @@ class PurgeCacheButton extends Component {
     const glyph = 'trash';
     const label = 'Purger Worker Cache';
     const successMsg = 'Cache successfully purged!';
-    const { caches = [], provisionerId, workerType, purge } = this.props;
+    const {caches = [], provisionerId, workerType, purge} = this.props;
     const selectedCaches = this.state.selected;
     const action = () => purge(provisionerId, workerType, selectedCaches, successMsg);
 
@@ -40,7 +40,7 @@ class PurgeCacheButton extends Component {
           <p>Select the caches to purge:</p>
           <ul>
             {caches.map(cache => (
-               <li className="checkbox" key={cache}>
+              <li className="checkbox" key={cache}>
                 <label>
                   <input
                     name="cache"

@@ -1,7 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
 import * as format from '../format';
-import path from 'path';
 import taskcluster from 'taskcluster-client';
 import * as utils from '../utils';
 
@@ -12,17 +10,17 @@ const TaskSummary = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue: taskcluster.Queue
+        queue: taskcluster.Queue,
       },
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps: ['status.taskId'],
-      reloadOnLogin: false
-    })
+      reloadOnLogin: false,
+    }),
   ],
 
   // Validate properties
   propTypes: {
-    status: React.PropTypes.object.isRequired
+    status: React.PropTypes.object.isRequired,
   },
 
   /** Get initial state */
@@ -31,21 +29,21 @@ const TaskSummary = React.createClass({
       // task definition
       taskLoaded: false,
       taskError: null,
-      task: null
+      task: null,
     };
   },
 
   /** Load task definition */
   load() {
     return {
-      task: this.queue.task(this.props.status.taskId)
+      task: this.queue.task(this.props.status.taskId),
     };
   },
 
   render() {
     // Easy references to values
-    const { status } = this.props;
-    const { task } = this.state;
+    const {status} = this.props;
+    const {task} = this.state;
 
     const taskStateLabel = {
       unscheduled: 'label label-default',
@@ -53,7 +51,7 @@ const TaskSummary = React.createClass({
       running: 'label label-primary',
       completed: 'label label-success',
       failed: 'label label-danger',
-      exception: 'label label-warning'
+      exception: 'label label-warning',
     };
 
     return this.renderWaitFor('task') || (
@@ -79,14 +77,14 @@ const TaskSummary = React.createClass({
           </dd>
           <dt>Task Inspector</dt>
           <dd>
-            <a target="_blank" href={`../task-inspector/#${status.taskId}`}>
+            <a href={`../task-inspector/#${status.taskId}`} target="_blank" rel="noopener noreferrer">
               {status.taskId} <i className="fa fa-external-link" />
             </a>
           </dd>
         </dl>
       </div>
     );
-  }
+  },
 });
 
 export default TaskSummary;

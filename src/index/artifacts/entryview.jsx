@@ -8,29 +8,29 @@ const ArtifactView = React.createClass({
     // Calls load()
     utils.createTaskClusterMixin({
       clients: {
-        queue: taskcluster.Queue
+        queue: taskcluster.Queue,
       },
       // Reload when props.taskId changes, ignore credentials changes
       reloadOnProps: ['taskId'],
-      reloadOnLogin: false
-    })
+      reloadOnLogin: false,
+    }),
   ],
 
   getInitialState() {
     return {
       artifacts: null,
       artifactsLoaded: false,
-      artifactsError: null
+      artifactsError: null,
     };
   },
 
   propTypes: {
-    taskId: React.PropTypes.string.isRequired
+    taskId: React.PropTypes.string.isRequired,
   },
 
   load() {
     return {
-      artifacts: this.queue.listLatestArtifacts(this.props.taskId)
+      artifacts: this.queue.listLatestArtifacts(this.props.taskId),
     };
   },
 
@@ -40,7 +40,7 @@ const ArtifactView = React.createClass({
         taskId={this.props.taskId}
         artifacts={this.state.artifacts.artifacts} />
     );
-  }
+  },
 });
 
 const EntryView = React.createClass({
@@ -48,30 +48,30 @@ const EntryView = React.createClass({
     // Calls load()
     utils.createTaskClusterMixin({
       clients: {
-        index: taskcluster.Index
+        index: taskcluster.Index,
       },
       // Reload when props.namespace changes, ignore credentials changes
       reloadOnProps: ['namespace'],
-      reloadOnLogin: false
-    })
+      reloadOnLogin: false,
+    }),
   ],
 
   propTypes: {
-    namespace: React.PropTypes.string.isRequired
+    namespace: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
     return {
       task: null,
       taskError: null,
-      taskLoaded: false
+      taskLoaded: false,
     };
   },
 
   load() {
     return this.props.namespace === '' ?
-      { task: null, taskError: null, taskLoaded: true } :
-      { task: this.index.findTask(this.props.namespace) };
+      {task: null, taskError: null, taskLoaded: true} :
+      {task: this.index.findTask(this.props.namespace)};
   },
 
   render() {
@@ -112,8 +112,8 @@ const EntryView = React.createClass({
         <dl className="dl-horizontal">
           <dt>Latest Artifacts</dt>
           <dd>
-            <ArtifactView taskId={this.state.task.taskId}/>
-            <br/>
+            <ArtifactView taskId={this.state.task.taskId} />
+            <br />
             <div className="alert alert-info" role="alert">
               <strong>Latest Artifacts</strong>&nbsp;
               is the artifacts from the last run of the task.
@@ -124,7 +124,7 @@ const EntryView = React.createClass({
         </dl>
       </div>
     );
-  }
+  },
 });
 
 export default EntryView;

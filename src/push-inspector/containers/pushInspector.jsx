@@ -1,18 +1,18 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import Search from './search';
 import ProgressBar from '../components/progressBar';
 import Loading from '../shared/loading';
 import DashboardBanner from '../shared/dashboardBanner';
-import { authentication, rendering } from '../lib/utils';
+import {authentication, rendering} from '../lib/utils';
 
 class PushInspector extends Component {
   /**
   * handleLoadingAndError handles error and show the loading icon
   */
   handleLoadingAndError() {
-    const { tasks, params } = this.props;
+    const {tasks, params} = this.props;
     const taskGroupId = params.taskGroupId;
 
     if (!tasks.length && taskGroupId) {
@@ -30,9 +30,9 @@ class PushInspector extends Component {
   render() {
     const {
       tasks, status, children, setActiveTaskStatus,
-      params, dashboardBanner, tasksRetrievedFully
+      params, dashboardBanner, tasksRetrievedFully,
     } = this.props;
-    const { taskGroupId, taskId } = params;
+    const {taskGroupId, taskId} = params;
     const handleLoadingAndError = this.handleLoadingAndError();
 
     if (dashboardBanner) {
@@ -74,8 +74,8 @@ class PushInspector extends Component {
   }
 }
 
-const mapStateToProps = ({ tasks, status, dashboardBanner, tasksRetrievedFully }) => (
-  { tasks, status, dashboardBanner, tasksRetrievedFully }
+const mapStateToProps = ({tasks, status, dashboardBanner, tasksRetrievedFully}) => (
+  {tasks, status, dashboardBanner, tasksRetrievedFully}
 );
 
 export default connect(mapStateToProps, actions)(PushInspector);

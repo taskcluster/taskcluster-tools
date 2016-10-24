@@ -9,7 +9,7 @@ module.exports = [
     display: true,
     description: `The task inspector lets you load, monitor, and inspect the state, runs, artifacts,
       definition, and logs of a task as it is evaluated. You can also use this tool to download
-      private artifacts.`
+      private artifacts.`,
   },
   {
     title: 'Push Inspector',
@@ -17,7 +17,7 @@ module.exports = [
     icon: 'cube',
     display: true,
     description: `Inspect task groups, monitor progress, view dependencies and states, and inspect
-      the individual tasks that make up the task group using the embedded task-inspector.`
+      the individual tasks that make up the task group using the embedded task-inspector.`,
   },
   {
     title: 'Task Creator',
@@ -25,7 +25,7 @@ module.exports = [
     icon: 'pencil-square-o',
     display: true,
     description: `Create and submit tasks from the task creator. Created tasks will be persistent
-      in \`localStorage\` so you can try again with new parameters`
+      in \`localStorage\` so you can try again with new parameters`,
   },
   {
     title: 'AWS Provisioner',
@@ -33,14 +33,14 @@ module.exports = [
     icon: 'server',
     display: true,
     description: `Manage workertypes known to the AWS Provisioner and check on the status of AWS
-      Nodes`
+      Nodes`,
   },
   {
     title: 'AMI sets',
     link: '/ami-sets/',
     icon: 'server',
     display: true,
-    description: 'Manage AMI sets known to the AWS Provisioner'
+    description: 'Manage AMI sets known to the AWS Provisioner',
   },
   {
     title: 'Client Manager',
@@ -48,7 +48,7 @@ module.exports = [
     icon: 'users',
     display: true,
     description: `Manage clients on \`auth.taskcluster.net\`. This tool allows you to create, modify
-      and delete clients. You can also reset \`accessToken\` and explore indirect scopes.`
+      and delete clients. You can also reset \`accessToken\` and explore indirect scopes.`,
   },
   {
     title: 'Role Manager',
@@ -56,7 +56,7 @@ module.exports = [
     icon: 'shield',
     display: true,
     description: `Manage roles on \`auth.taskcluster.net\`. This tool allows you to create, modify
-      and delete roles. You can also manage scopes and explore indirect scopes.`
+      and delete roles. You can also manage scopes and explore indirect scopes.`,
   },
   {
     title: 'Scope Inspector',
@@ -64,7 +64,7 @@ module.exports = [
     icon: 'graduation-cap',
     display: true,
     description: `Explore scopes on \`auth.taskcluster.net\`. This tool allows you to find roles and
-      clients with a given scope. This is effectively reverse client and role lookup.`
+      clients with a given scope. This is effectively reverse client and role lookup.`,
   },
   {
     title: 'Pulse Inspector',
@@ -72,14 +72,14 @@ module.exports = [
     icon: 'wifi',
     display: true,
     description: `Bind to Pulse exchanges in your browser, observe messages arriving and inspect
-      messages. Useful when debugging and working with undocumented Pulse exchanges.`
+      messages. Useful when debugging and working with undocumented Pulse exchanges.`,
   },
   {
     title: 'Cache Purge Inspector',
     link: '/purge-caches/',
     icon: 'bolt',
     display: true,
-    description: 'View currently active cache purges and schedule a new one if needed.'
+    description: 'View currently active cache purges and schedule a new one if needed.',
   },
   {
     title: 'Index Browser',
@@ -87,7 +87,7 @@ module.exports = [
     icon: 'sitemap',
     display: true,
     description: `The generic index browser lets you browse through the hierarchy of namespaces in
-      the index, and discover indexed tasks.`
+      the index, and discover indexed tasks.`,
   },
   {
     title: 'Indexed Artifact Browser',
@@ -95,64 +95,64 @@ module.exports = [
     icon: 'folder-open',
     display: true,
     description: `The indexed artifact browser lets you easily view the artifacts from the latest
-      run of an indexed task.`
+      run of an indexed task.`,
   },
   {
     title: 'Hooks Manager',
     link: '/hooks/',
     icon: 'repeat',
     display: true,
-    description: 'Manage hooks: tasks that are created in response to events within TaskCluster.'
+    description: 'Manage hooks: tasks that are created in response to events within TaskCluster.',
   },
   {
     title: 'Secrets Manager',
     link: '/secrets/',
     icon: 'user-secret',
     display: true,
-    description: 'Manage secrets: values that can only be retrieved with the appropriate scopes.'
+    description: 'Manage secrets: values that can only be retrieved with the appropriate scopes.',
   },
   {
     type: 'divider',
-    display: false
+    display: false,
   },
   {
     title: 'Interactive Shell',
     link: '/interactive/',
     icon: 'terminal',
     display: false,
-    description: 'Open interactive shell within tasks.'
+    description: 'Open interactive shell within tasks.',
   },
   {
     title: 'Interactive Shell',
     link: '/shell/',
     icon: 'terminal',
     display: false,
-    description: 'Open interactive shell within tasks.'
+    description: 'Open interactive shell within tasks.',
   },
   {
     title: 'Interactive Display',
     link: '/display/',
     icon: 'television',
     display: false,
-    description: 'Connect to an interactive display within tasks.'
+    description: 'Connect to an interactive display within tasks.',
   },
   {
     title: 'One-Click Loaner',
     link: '/one-click-loaner/',
     icon: 'terminal',
     display: false,
-    description: 'Create a loaner from an existing task.'
+    description: 'Create a loaner from an existing task.',
   },
   {
     title: 'Connect to Loaner',
     link: '/one-click-loaner/connect/',
     icon: 'terminal',
     display: false,
-    description: 'Connect to an interactive display within tasks.'
+    description: 'Connect to an interactive display within tasks.',
   },
   {
     type: 'divider',
-    display: true
+    display: true,
   },
   {
     title: 'Documentation',
@@ -160,7 +160,7 @@ module.exports = [
     icon: 'book',
     display: true,
     description: `Visit the documentation site with documentation for all TaskCluster APIs and Pulse
-      exchanges.`
+      exchanges.`,
   },
   {
     title: 'GitHub Repository',
@@ -168,7 +168,7 @@ module.exports = [
     icon: 'github',
     display: true,
     description: `Go to the source code repository for these tools. This site is completely static
-      and you can implement any changes and run it locally, or push it to any static site hosting.`
+      and you can implement any changes and run it locally, or push it to any static site hosting.`,
   },
   {
     title: 'Bugzilla Product',
@@ -176,14 +176,14 @@ module.exports = [
     icon: 'bug',
     display: true,
     description: `Visit the TaskCluster Bugzilla product to view open bugs, participate in
-      discussions or report new bugs in TaskCluster.`
+      discussions or report new bugs in TaskCluster.`,
   },
   {
     title: 'Credentials',
     link: '/credentials/',
     icon: 'key',
     display: false,
-    description: 'Manage credentials stored in the browser.'
+    description: 'Manage credentials stored in the browser.',
   },
   {
     title: 'Status',
@@ -191,13 +191,13 @@ module.exports = [
     icon: 'cogs',
     display: true,
     description: `Display the status of Taskcluster services and underlying services Taskcluster
-      depends on.`
+      depends on.`,
   },
   {
     title: 'Diagnostics',
     link: '/diagnostics/',
     icon: 'cogs',
     display: true,
-    description: 'Display results from diagnostics tests'
-  }
+    description: 'Display results from diagnostics tests',
+  },
 ];

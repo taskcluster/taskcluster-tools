@@ -4,7 +4,7 @@ import RoleManager from './rolemanager';
 import * as utils from '../../lib/utils';
 import Layout from '../../lib/Layout';
 
-const hashManager = utils.createHashManager({ separator: '/' });
+const hashManager = utils.createHashManager({separator: '/'});
 
 ReactDOM.render((
   <Layout>

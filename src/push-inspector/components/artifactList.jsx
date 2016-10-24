@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { queue } from '../lib/utils';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {queue} from '../lib/utils';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import * as auth from '../../lib/auth';
 
@@ -9,7 +9,7 @@ import * as auth from '../../lib/auth';
 const MIMETYPE_ICONS = [
   {
     icon: 'file-pdf-o',
-    matches: ['application/pdf', 'application/postscript']
+    matches: ['application/pdf', 'application/postscript'],
   }, {
     icon: 'file-archive-o',
     matches: [
@@ -26,17 +26,17 @@ const MIMETYPE_ICONS = [
       'application/x-apple-diskimage',
       'application/vnd.ms-cab-compressed',
       'application/vnd.android.package-archive',
-      'application/x-gtar'
-    ]
+      'application/x-gtar',
+    ],
   }, {
     icon: 'file-word-o',
-    matches: ['text/rtf', 'text/html']
+    matches: ['text/rtf', 'text/html'],
   }, {
     icon: 'file-excel-o',
-    matches: ['text/csv']
+    matches: ['text/csv'],
   }, {
     icon: 'file-powerpoint-o',
-    matches: []
+    matches: [],
   }, {
     icon: 'file-code-o',
     matches: [
@@ -46,33 +46,33 @@ const MIMETYPE_ICONS = [
       'text/css',
       'text/javascript',
       'text/xml',
-      'application/ecmascript'
-    ]
+      'application/ecmascript',
+    ],
   }, {
     icon: 'file-video-o',
-    matches: [/^video\//]
+    matches: [/^video\//],
   }, {
     icon: 'file-image-o',
-    matches: [/^image\//]
+    matches: [/^image\//],
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//]
+    matches: [/^text\//],
   }, {
     icon: 'file-audio-o',
-    matches: [/^audio\//]
+    matches: [/^audio\//],
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//]
+    matches: [/^text\//],
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//]
+    matches: [/^text\//],
   }, {
     icon: 'file-archive-o',
-    matches: [/compressed/, /tar/, /zip/]
+    matches: [/compressed/, /tar/, /zip/],
   }, {
     icon: 'file-o',
-    matches: [/.*/]
-  }
+    matches: [/.*/],
+  },
 ];
 
 /** Get icon from mimetype */
@@ -91,7 +91,7 @@ class ArtifactList extends Component {
     super(props);
 
     this.state = {
-      artifacts: this.props.artifacts || []
+      artifacts: this.props.artifacts || [],
     };
   }
 
@@ -105,14 +105,14 @@ class ArtifactList extends Component {
 
   /** Build the right url for artifacts */
   load() {
-    const artifacts = this.props.artifacts.map(({ name, contentType }) => {
+    const artifacts = this.props.artifacts.map(({name, contentType}) => {
       const isPublic = /^public\//.test(name);
       const hasCredentials = auth.hasCredentials();
 
       if (!isPublic && !hasCredentials) {
         return {
           name,
-          icon: 'lock'
+          icon: 'lock',
         };
       }
 
@@ -124,15 +124,15 @@ class ArtifactList extends Component {
       return {
         name,
         icon: getIconFromMime(contentType),
-        url: queue[method](...args)
+        url: queue[method](...args),
       };
     });
 
-    this.setState({ artifacts });
+    this.setState({artifacts});
   }
 
   render() {
-    const { artifacts } = this.state;
+    const {artifacts} = this.state;
 
     if (!artifacts.length) {
       return <div></div>;
@@ -143,7 +143,7 @@ class ArtifactList extends Component {
         {artifacts.map((artifact, index) => (
           <li key={index}>
             <i className={`fa fa-${artifact.icon}`} />
-            <a href={artifact.url} target="_blank"> {artifact.name}</a>
+            <a href={artifact.url} target="_blank" rel="noopener noreferrer"> {artifact.name}</a>
           </li>
         ))}
       </ul>

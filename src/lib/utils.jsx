@@ -96,7 +96,7 @@ export const createTaskClusterMixin = opts => {
     reloadOnProps: [], // List of properties to reload on
     reloadOnKeys: [], // List of state keys to reload on
     reloadOnLogin: false, // Reload when credentials are changed
-    ...opts
+    ...opts,
   };
 
   assert(Array.isArray(options.reloadOnProps), 'reloadOnProps must be an array');
@@ -134,7 +134,7 @@ export const createTaskClusterMixin = opts => {
     handleCredentialsChanged(e) {
       // Update clients with new credentials
       this._createClients(e.detail);
-      this.setState({ createdTaskIdError: null });
+      this.setState({createdTaskIdError: null});
 
       if (options.reloadOnLogin) {
         // Reload state now that we have new credentials
@@ -193,7 +193,7 @@ export const createTaskClusterMixin = opts => {
           this.setState({
             [`${key}Loaded`]: true,
             [`${key}Error`]: err,
-            [key]: result
+            [key]: result,
           });
         }
       };
@@ -215,7 +215,6 @@ export const createTaskClusterMixin = opts => {
         .all(promises)
         .then(() => {})
         .catch(err => {
-          console.log(err);
           throw err;
         });
     },
@@ -272,8 +271,8 @@ export const createTaskClusterMixin = opts => {
     /** Render a spinner */
     renderSpinner() {
       return (
-        <div style={{ textAlign: 'center', margin: 20 }}>
-          <format.Icon name="spinner" size="2x" spin />
+        <div style={{textAlign: 'center', margin: 20}}>
+          <format.Icon name="spinner" size="2x" spin={true} />
         </div>
       );
     },
@@ -315,9 +314,9 @@ export const createTaskClusterMixin = opts => {
             </strong>
             <format.Markdown>{message}</format.Markdown>
             <format.Collapse title={title}>
-            <pre>
-              {JSON.stringify(err.body, null, 2)}
-            </pre>
+              <pre>
+                {JSON.stringify(err.body, null, 2)}
+              </pre>
             </format.Collapse>
           </bs.Alert>
         )
@@ -327,9 +326,9 @@ export const createTaskClusterMixin = opts => {
     /** Initialize client objects requested in options */
     _createClients(credentials) {
       _.forIn(options.clients, (Client, key) => {
-        this[key] = new Client({ credentials, ...options.clientOpts[key] });
+        this[key] = new Client({credentials, ...options.clientOpts[key]});
       });
-    }
+    },
   };
 };
 
@@ -374,7 +373,7 @@ export const createWebListenerMixin = opts => {
   const options = {
     reloadOnProps: [], // List of properties to reload on
     reloadOnKeys: [], // List of state keys to reload on
-    ...opts
+    ...opts,
   };
 
   assert(options.reloadOnProps instanceof Array, 'reloadOnProps must be an array');
@@ -459,7 +458,7 @@ export const createWebListenerMixin = opts => {
         this.__listener.on('message', this.handleMessage);
         this.__listener.on('error', err => {
           debug('Error while listening: %s, %j', err, err);
-          this.setState({ listeningError: err || new Error('Unknown error') });
+          this.setState({listeningError: err || new Error('Unknown error')});
           this.stopListening();
         });
 
@@ -471,7 +470,7 @@ export const createWebListenerMixin = opts => {
 
         this.setState({
           listening: null,
-          listeningError: null
+          listeningError: null,
         });
 
         return Promise
@@ -481,7 +480,7 @@ export const createWebListenerMixin = opts => {
 
             this.setState({
               listening: true,
-              listeningError: null
+              listeningError: null,
             });
 
             if (this.listening instanceof Function) {
@@ -490,7 +489,7 @@ export const createWebListenerMixin = opts => {
           })
           .catch(err => {
             debug('Error while listening: %s, %j', err, err);
-            this.setState({ listeningError: err || new Error('Unknown error') });
+            this.setState({listeningError: err || new Error('Unknown error')});
             return this.stopListening();
           });
       }
@@ -498,7 +497,7 @@ export const createWebListenerMixin = opts => {
       // Bind to all new bindings
       this.setState({
         listening: null,
-        listeningError: null
+        listeningError: null,
       });
 
       return Promise
@@ -509,7 +508,7 @@ export const createWebListenerMixin = opts => {
         .then(() => {
           this.setState({
             listening: true,
-            listeningError: null
+            listeningError: null,
           });
 
           if (this.listening instanceof Function) {
@@ -518,14 +517,14 @@ export const createWebListenerMixin = opts => {
         })
         .catch(err => {
           debug('Error while listening: %s, %j', err, err);
-          this.setState({ listeningError: err || new Error('Unknown error') });
+          this.setState({listeningError: err || new Error('Unknown error')});
           return this.stopListening();
         });
     },
 
     /** Stop listening, if already listening */
     stopListening() {
-      this.setState({ listening: false });
+      this.setState({listening: false});
 
       if (this.__listener) {
         const closed = this.__listener.close();
@@ -537,7 +536,7 @@ export const createWebListenerMixin = opts => {
       }
 
       return Promise.resolve();
-    }
+    },
   };
 };
 
@@ -627,7 +626,7 @@ class HashEntry {
  */
 class HashManager {
   constructor(options) {
-    this._options = { separator: '/', ...options };
+    this._options = {separator: '/', ...options};
 
     assert(this._options.separator.length === 1, 'Separator must have length 1');
 
@@ -734,7 +733,7 @@ export const createHashManager = options => {
  * Note, only one subcomponent can persist it's state.
  */
 export const createLocationHashMixin = opts => {
-  const options = { type: 'string', ...opts };
+  const options = {type: 'string', ...opts};
 
   assert(Array.isArray(options.keys), 'keys must be given');
   assert(options.keys.length > 0, 'at least one key must be given');
@@ -855,7 +854,7 @@ export const createLocationHashMixin = opts => {
       }
 
       this.setState({
-        [options.keys[index]]: hashState
+        [options.keys[index]]: hashState,
       });
     },
 
@@ -871,7 +870,7 @@ export const createLocationHashMixin = opts => {
 
         return lastHashEntry.next();
       }
-    }
+    },
   };
 };
 
@@ -900,7 +899,7 @@ export const createWatchStateMixin = opts => {
     onProps: {},
     onKeys: {},
     triggerAfterMount: true,
-    ...opts
+    ...opts,
   };
 
   _.forIn(options.onProps, (paths, key) => {
@@ -976,6 +975,6 @@ export const createWatchStateMixin = opts => {
 
       // Call handlers that needs to be invoked
       _.uniq(handlers).forEach(handler => this[handler]());
-    }
+    },
   };
 };

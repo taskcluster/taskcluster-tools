@@ -1,6 +1,6 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
-import { FormGroup, FormControl, ControlLabel, InputGroup, Button } from 'react-bootstrap';
+import {findDOMNode} from 'react-dom';
+import {FormGroup, FormControl, ControlLabel, InputGroup, Button} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import LoanerButton from '../lib/ui/loaner-button';
@@ -14,23 +14,23 @@ export default React.createClass({
     // Calls load() initially and on reload()
     utils.createTaskClusterMixin({
       clients: {
-        queue: taskcluster.Queue
+        queue: taskcluster.Queue,
       },
       // Reload when state.taskId changes, ignore credential changes
       reloadOnKeys: ['taskId'],
-      reloadOnLogin: false
+      reloadOnLogin: false,
     }),
     // Called handler when state.taskId changes
     utils.createWatchStateMixin({
       onKeys: {
-        updateTaskIdInput: ['taskId']
-      }
+        updateTaskIdInput: ['taskId'],
+      },
     }),
     // Serialize state.taskId to location.hash as string
     utils.createLocationHashMixin({
       keys: ['taskId'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   getInitialState() {
@@ -39,7 +39,7 @@ export default React.createClass({
       taskLoaded: true,
       taskError: null,
       task: null,
-      taskIdInput: ''
+      taskIdInput: '',
     };
   },
 
@@ -47,18 +47,18 @@ export default React.createClass({
   load() {
     // Skip loading empty-strings
     if (this.state.taskId === '') {
-      return { task: null };
+      return {task: null};
     }
 
     // Reload task definition
     return {
-      task: this.queue.task(this.state.taskId)
+      task: this.queue.task(this.state.taskId),
     };
   },
 
   /** When taskId changed we should update the input */
   updateTaskIdInput() {
-    this.setState({ taskIdInput: this.state.taskId });
+    this.setState({taskIdInput: this.state.taskId});
   },
 
   // Render a task-inspector
@@ -88,24 +88,18 @@ export default React.createClass({
             </InputGroup>
           </FormGroup>
         </form>
-        <br/><br/>
-        {
-          !invalidInput ? (
-            <div className="text-center">
-              {
-                this.renderWaitFor('task') || (this.state.task ? (
-                  <LoanerButton
-                    buttonStyle="primary"
-                    buttonSize="large"
-                    taskId={this.state.taskId}
-                    task={this.state.task} />
-                ) :
-                null)
-              }
-            </div>
-          ) :
-          null
-        }
+        <br /><br />
+        {!invalidInput && (
+          <div className="text-center">
+            {this.renderWaitFor('task') || (this.state.task && (
+              <LoanerButton
+                buttonStyle="primary"
+                buttonSize="large"
+                taskId={this.state.taskId}
+                task={this.state.task} />
+            ))}
+          </div>
+        )}
       </div>
     );
   },
@@ -118,16 +112,16 @@ export default React.createClass({
     if (!invalidInput) {
       this.setState({
         taskIdInput,
-        taskId: taskIdInput
+        taskId: taskIdInput,
       });
     } else {
-      this.setState({ taskIdInput });
+      this.setState({taskIdInput});
     }
   },
 
   /** Handle form submission */
   handleSubmit(e) {
     e.preventDefault();
-    this.setState({ taskId: this.state.taskIdInput });
-  }
+    this.setState({taskId: this.state.taskIdInput});
+  },
 });

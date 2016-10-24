@@ -4,17 +4,16 @@ import ConfirmAction from './confirmaction';
 import * as utils from '../utils';
 import slugid from 'slugid';
 import _ from 'lodash';
-import shellescape from 'shell-escape';
-import { Button } from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 
 const LoanerButton = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue: taskcluster.Queue
-      }
-    })
+        queue: taskcluster.Queue,
+      },
+    }),
   ],
 
   propTypes: {
@@ -22,12 +21,12 @@ const LoanerButton = React.createClass({
     task: React.PropTypes.object.isRequired,
     buttonSize: React.PropTypes.string.isRequired,
     buttonStyle: React.PropTypes.string.isRequired,
-    disabled: React.PropTypes.bool
+    disabled: React.PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
-      disabled: false
+      disabled: false,
     };
   },
 
@@ -47,23 +46,24 @@ const LoanerButton = React.createClass({
 
   render() {
     return (
-      <span>
-        <ConfirmAction glyph="console"
-                       label="One-Click Loaner"
-                       buttonSize={this.props.buttonSize}
-                       buttonStyle={this.props.buttonStyle}
-                       disabled={this.props.disabled || !this.valid()}
-                       action={this.createTask}
-                       success="Task created">
-          This will duplicate the task and create it under a different
-          <code>taskId</code>.<br/><br/>
+      <div>
+        <ConfirmAction
+          glyph="console"
+          label="One-Click Loaner"
+          buttonSize={this.props.buttonSize}
+          buttonStyle={this.props.buttonStyle}
+          disabled={this.props.disabled || !this.valid()}
+          action={this.createTask}
+          success="Task created">
+          This will duplicate the task and create it under a different <code>taskId</code>.
+          <br /><br />
           The new task will be altered as to:
           <ul>
-            <li>Set <code>task.payload.features.interactive = true</code>,</li>
-            <li>Strip <code>task.payload.caches</code> to avoid poisoning,</li>
-            <li>Ensures <code>task.payload.maxRunTime</code> is minimum 60 minutes,</li>
-            <li>Strip <code>task.routes</code> to avoid side-effects, and</li>
-            <li>Set the environment variable<code>TASKCLUSTER_INTERACTIVE=true</code>.</li>
+            <li>Set <code>task.payload.features.interactive = true</code></li>
+            <li>Strip <code>task.payload.caches</code> to avoid poisoning</li>
+            <li>Ensures <code>task.payload.maxRunTime</code> is minimum 60 minutes</li>
+            <li>Strip <code>task.routes</code> to avoid side-effects</li>
+            <li>Set the environment variable<code>TASKCLUSTER_INTERACTIVE=true</code></li>
           </ul>
           Note: this may not work with all tasks.
         </ConfirmAction>&nbsp;
@@ -74,7 +74,7 @@ const LoanerButton = React.createClass({
           onClick={this.editTask}>
           Edit and Create Loaner Task
         </Button>
-      </span>
+      </div>
     );
   },
 
@@ -141,7 +141,7 @@ const LoanerButton = React.createClass({
 
     // ..and go there
     window.location.href = '/task-creator/';
-  }
+  },
 });
 
 export default LoanerButton;

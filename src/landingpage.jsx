@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Col, Row } from 'react-bootstrap';
-import { chunk } from 'lodash';
+import {Col, Row} from 'react-bootstrap';
+import {chunk} from 'lodash';
 import menu from './menu';
-import { Markdown, Icon } from './lib/format';
+import {Markdown, Icon} from './lib/format';
 import Layout from './lib/Layout';
 import './landingpage.less';
 

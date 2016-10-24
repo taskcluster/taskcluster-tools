@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import {Alert} from 'react-bootstrap';
 import * as utils from '../../lib/utils';
 import * as format from '../../lib/format';
 import taskcluster from 'taskcluster-client';
@@ -14,7 +14,7 @@ const taskStateLabel = {
   running: 'label label-primary',
   completed: 'label label-success',
   failed: 'label label-danger',
-  exception: 'label label-warning'
+  exception: 'label label-warning',
 };
 
 export default React.createClass({
@@ -26,21 +26,21 @@ export default React.createClass({
       // Need updated clients for Queue and QueueEvents
       clients: {
         queue: taskcluster.Queue,
-        queueEvents: taskcluster.QueueEvents
+        queueEvents: taskcluster.QueueEvents,
       },
       // Reload when state.taskId changes, ignore credential changes
       reloadOnKeys: ['taskId'],
-      reloadOnLogin: false
+      reloadOnLogin: false,
     }),
     // Listen for messages, reload bindings() when state.taskId changes
     utils.createWebListenerMixin({
-      reloadOnKeys: ['taskId']
+      reloadOnKeys: ['taskId'],
     }),
     // Serialize state.taskId to location.hash as string
     utils.createLocationHashMixin({
       keys: ['taskId'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   getInitialState() {
@@ -53,7 +53,7 @@ export default React.createClass({
       displayUrl: null,
       taskLoaded: true,
       taskError: null,
-      task: null
+      task: null,
     };
   },
 
@@ -61,7 +61,7 @@ export default React.createClass({
     // Skip loading empty-strings
     if (this.state.taskId === '') {
       return {
-        status: null
+        status: null,
       };
     }
 
@@ -69,8 +69,7 @@ export default React.createClass({
       .listLatestArtifacts(this.state.taskId)
       .then(result => {
         result.artifacts.forEach(a => this.processArtifact(a, false));
-      })
-      .catch(err => console.log('Failed to list artifacts: ', err));
+      });
 
     // Reload status structure
     return {
@@ -78,7 +77,7 @@ export default React.createClass({
       status: this.queue
         .status(this.state.taskId)
         .then(_.property('status')),
-      task: this.queue.task(this.state.taskId)
+      task: this.queue.task(this.state.taskId),
     };
   },
 
@@ -90,7 +89,7 @@ export default React.createClass({
 
     // Construct the routing key pattern
     const routingKey = {
-      taskId: this.state.taskId
+      taskId: this.state.taskId,
     };
 
     // Return all interesting bindings
@@ -101,7 +100,7 @@ export default React.createClass({
       this.queueEvents.artifactCreated(routingKey),
       this.queueEvents.taskCompleted(routingKey),
       this.queueEvents.taskFailed(routingKey),
-      this.queueEvents.taskException(routingKey)
+      this.queueEvents.taskException(routingKey),
     ];
   },
 
@@ -110,14 +109,13 @@ export default React.createClass({
       .listLatestArtifacts(this.state.taskId)
       .then(result => {
         result.artifacts.forEach(a => this.processArtifact(a, false));
-      })
-      .catch(err => console.log('Failed to list artifacts: ', err));
+      });
   },
 
   handleMessage(message) {
     // Update status structure
     this.setState({
-      status: message.payload.status
+      status: message.payload.status,
     });
 
     // If the message origins from the artifact create exchange,
@@ -138,8 +136,8 @@ export default React.createClass({
         shellUrl: [
           this.queue.getLatestArtifact,
           this.state.taskId,
-          name
-        ]
+          name,
+        ],
       });
 
       if (notify) {
@@ -152,8 +150,8 @@ export default React.createClass({
         displayUrl: [
           this.queue.getLatestArtifact,
           this.state.taskId,
-          name
-        ]
+          name,
+        ],
       });
 
       if (notify) {
@@ -193,10 +191,10 @@ export default React.createClass({
             You have approximately 5 minutes to connect, after that the loaner
             will shutdown when all connections are closed.
           </em>
-          <br/><br/>
+          <br /><br />
           <div className="text-center">
             <strong>Click to open a session, in a new tab</strong>
-            <br/>
+            <br />
 
             <div onClick={this.openShell} className="connect-link-button">
               <span className="fa-stack">
@@ -214,7 +212,7 @@ export default React.createClass({
               <span className="connect-link-text">Display</span>
             </div>
           </div>
-          <br/><br/>
+          <br /><br />
 
           <Alert bsStyle="info">
             <strong>This is not a development environment!</strong> Interactive tasks are a great
@@ -235,7 +233,7 @@ export default React.createClass({
       <div>
         <h1>Waiting for Loaner...</h1>
         <em>Waiting for interactive session to be ready.</em>
-        <br/><br/>
+        <br /><br />
         {this.renderStatus()}
       </div>
     );
@@ -313,7 +311,7 @@ export default React.createClass({
       const notification = new window.Notification('TaskCluster - Loaner Ready!', {
         icon: '/one-click-loaner/connect/terminal.png',
         body: `The one-click-loaner task: ${this.state.taskId} that you have been waiting for is
-          now ready. Connect now, if don't connect quickly the task will terminate.`
+          now ready. Connect now, if don't connect quickly the task will terminate.`,
       });
 
       // Close notification after 30s (browser may close it sooner)
@@ -323,5 +321,5 @@ export default React.createClass({
         window.focus();
       });
     }
-  }
+  },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
+import {ListGroup, ListGroupItem, Panel} from 'react-bootstrap';
 import * as utils from '../../lib/utils';
 import './previoustasks.less';
 
@@ -11,8 +11,8 @@ export default React.createClass({
     utils.createTaskClusterMixin({
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps: ['objectId', 'objectType'],
-      reloadOnLogin: false
-    })
+      reloadOnLogin: false,
+    }),
   ],
 
   getPreviousObjectIds(type, newId) {
@@ -26,7 +26,6 @@ export default React.createClass({
         ids = itemValue;
       }
     } catch (e) {
-      console.error(e);
       localStorage.setItem(itemKey, JSON.stringify(ids));
     }
     if (newId) {
@@ -53,7 +52,7 @@ export default React.createClass({
     return {
       previousObjectIds: this.getPreviousObjectIds(this.props.objectType, this.props.objectId),
       objectId: this.props.objectId,
-      objectType: this.props.objectType
+      objectType: this.props.objectType,
     };
   },
 
@@ -61,7 +60,7 @@ export default React.createClass({
     return {
       previousObjectIds: [],
       objectId: '',
-      objectType: ''
+      objectType: '',
     };
   },
 
@@ -95,11 +94,11 @@ export default React.createClass({
     }
 
     return (
-      <Panel header="Previously Viewed Tasks" collapsible defaultExpanded={false}>
-        <ListGroup fill>
+      <Panel header="Previously Viewed Tasks" collapsible={true} defaultExpanded={false}>
+        <ListGroup fill={true}>
           {rows}
         </ListGroup>
       </Panel>
     );
-  }
+  },
 });

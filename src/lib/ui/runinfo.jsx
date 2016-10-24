@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Label, Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
+import {Table, Label, Tab, Nav, NavItem, Row, Col} from 'react-bootstrap';
 import * as utils from '../utils';
 import * as format from '../format';
 import _ from 'lodash';
@@ -14,18 +14,18 @@ const RunInfo = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue: taskcluster.Queue
+        queue: taskcluster.Queue,
       },
       // Reload when status.taskId changes or run.runId
       reloadOnProps: ['status.taskId', 'run.runId'],
-      reloadOnLogin: true
-    })
+      reloadOnLogin: true,
+    }),
   ],
 
   // Validate properties
   propTypes: {
     status: React.PropTypes.object.isRequired,
-    run: React.PropTypes.object.isRequired
+    run: React.PropTypes.object.isRequired,
   },
 
   // Get initial state
@@ -33,7 +33,7 @@ const RunInfo = React.createClass({
     return {
       artifactsLoaded: true,
       artifactsError: null,
-      artifacts: []
+      artifacts: [],
     };
   },
 
@@ -46,7 +46,7 @@ const RunInfo = React.createClass({
       // Get list of artifacts, and take the `artifacts` property from the response
       artifacts: this.queue
         .listArtifacts(taskId, runId)
-        .then(_.property('artifacts'))
+        .then(_.property('artifacts')),
     };
   },
 
@@ -69,7 +69,7 @@ const RunInfo = React.createClass({
     // This in case we overwrite an artifact, only possible for reference
     // artifacts, but a use-case...
     let index = _.findIndex(this.state.artifacts, {
-      name: message.payload.artifact.name
+      name: message.payload.artifact.name,
     });
 
     // If not present in the list, we index to length, as this equals appending
@@ -84,7 +84,7 @@ const RunInfo = React.createClass({
     artifacts[index] = message.payload.artifact;
 
     // Update state
-    this.setState({ artifacts });
+    this.setState({artifacts});
   },
 
   // Render run
@@ -96,7 +96,7 @@ const RunInfo = React.createClass({
       running: 'primary',
       completed: 'success',
       failed: 'danger',
-      exception: 'warning'
+      exception: 'warning',
     };
 
     return (
@@ -179,7 +179,7 @@ const RunInfo = React.createClass({
                     <tr>
                       <td>TakenUntil</td>
                       <td>
-                        {run.takenUntil ? <format.DateView date={run.takenUntil}/> : '-'}
+                        {run.takenUntil ? <format.DateView date={run.takenUntil} /> : '-'}
                       </td>
                     </tr>
                   </tbody>
@@ -227,7 +227,7 @@ const RunInfo = React.createClass({
         taskId={this.props.status.taskId}
         runId={this.props.run.runId} />
     );
-  }
+  },
 });
 
 export default RunInfo;

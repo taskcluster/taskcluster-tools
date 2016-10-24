@@ -1,5 +1,5 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import taskcluster from 'taskcluster-client';
 import moment from 'moment';
 import * as utils from '../../lib/utils';
@@ -10,16 +10,7 @@ import ScopeEditor from '../../lib/ui/scopeeditor';
 import TimeInput from '../../lib/ui/timeinput';
 import * as auth from '../../lib/auth';
 import {
-  Alert,
-  OverlayTrigger,
-  Tooltip,
-  Modal,
-  FormGroup,
-  ControlLabel,
-  FormControl,
-  Button,
-  Glyphicon,
-  ButtonToolbar
+  Alert, OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar,
 } from 'react-bootstrap';
 import './clienteditor.less';
 
@@ -29,21 +20,21 @@ const ClientEditor = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth: taskcluster.Auth
+        auth: taskcluster.Auth,
       },
-      reloadOnProps: ['currentClientId']
-    })
+      reloadOnProps: ['currentClientId'],
+    }),
   ],
 
   propTypes: {
     // Method to reload a client in the parent
-    reloadClientId: React.PropTypes.func.isRequired
+    reloadClientId: React.PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
     return {
       // '' implies. "Create Client"
-      currentClientId: ''
+      currentClientId: '',
     };
   },
 
@@ -58,7 +49,7 @@ const ClientEditor = React.createClass({
       // Operation details, if currently doing anything
       working: false,
       error: null,
-      showModal: true
+      showModal: true,
     };
   },
 
@@ -75,12 +66,12 @@ const ClientEditor = React.createClass({
           expires: new Date(3017, 1, 1),
           description: '',
           scopes: [],
-          expandedScopes: []
+          expandedScopes: [],
         },
         accessToken: null,
         editing: true,
         working: false,
-        error: null
+        error: null,
       };
     }
 
@@ -89,7 +80,7 @@ const ClientEditor = React.createClass({
       this.setState({
         editing: false,
         working: false,
-        error: null
+        error: null,
       });
 
       return {};
@@ -100,7 +91,7 @@ const ClientEditor = React.createClass({
       accessToken: null,
       editing: false,
       working: false,
-      error: null
+      error: null,
     };
   },
 
@@ -131,8 +122,8 @@ const ClientEditor = React.createClass({
 
     return this.renderWaitFor('client') || (
       <div className="client-editor">
-        <h4 style={{ marginTop: 0 }}>{title}</h4>
-        <hr style={{ marginBottom: 10 }}/>
+        <h4 style={{marginTop: 0}}>{title}</h4>
+        <hr style={{marginBottom: 10}} />
         <div className="form-horizontal">
           {
             isCreating ? (
@@ -141,19 +132,19 @@ const ClientEditor = React.createClass({
                 trigger="focus"
                 defaultOverlayShown={clientId !== ''}
                 overlay={tooltip}>
-                  <FormGroup validationState={this.validClientId() ? 'success' : 'error'}>
-                    <ControlLabel className="col-md-3">ClientId</ControlLabel>
-                    <div className="col-md-9">
-                      <FormControl
-                        type="text"
-                        ref="clientId"
-                        placeholder="ClientId"
-                        value={this.state.client.clientId}
-                        onChange={this.onChange} />
-                      <FormControl.Feedback />
-                    </div>
-                  </FormGroup>
-                </OverlayTrigger>
+                <FormGroup validationState={this.validClientId() ? 'success' : 'error'}>
+                  <ControlLabel className="col-md-3">ClientId</ControlLabel>
+                  <div className="col-md-9">
+                    <FormControl
+                      type="text"
+                      ref="clientId"
+                      placeholder="ClientId"
+                      value={this.state.client.clientId}
+                      onChange={this.onChange} />
+                    <FormControl.Feedback />
+                  </div>
+                </FormGroup>
+              </OverlayTrigger>
             ) : (
               <div className="form-group">
                 <label className="control-label col-md-3">ClientId</label>
@@ -166,15 +157,15 @@ const ClientEditor = React.createClass({
             )
           }
           {
-             this.state.client.disabled ? (
-                <div className="form-group">
-                  <label className="control-label col-md-3">Disabled</label>
-                  <div className="col-md-9">
-                    This client is disabled
-                  </div>
+            this.state.client.disabled ? (
+              <div className="form-group">
+                <label className="control-label col-md-3">Disabled</label>
+                <div className="col-md-9">
+                  This client is disabled
                 </div>
-              ) :
-              null
+              </div>
+            ) :
+            null
           }
           {
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
@@ -199,7 +190,7 @@ const ClientEditor = React.createClass({
                   if (this.state.accessToken != null) {
                     return (
                       <Modal show={this.state.showModal} onHide={this.closeDialog}>
-                        <Modal.Header closeButton>Access Token</Modal.Header>
+                        <Modal.Header closeButton={true}>Access Token</Modal.Header>
                         <Modal.Body>
                           <p>The access token for this clientId is:</p>
                           <code>{this.state.accessToken}</code>
@@ -221,19 +212,19 @@ const ClientEditor = React.createClass({
           <div className="form-group">
             <label className="control-label col-md-3">Expires</label>
             <div className="col-md-9">
-                {
-                  isEditing ? (
-                      <TimeInput
-                        format="YYYY-MM-DD HH:mm:ss ZZ"
-                        value={moment(new Date(this.state.client.expires))}
-                        onChange={this.onExpiresChange}
-                        className="form-control" />
-                    ) : (
-                      <div className="form-control-static">
-                        <format.DateView date={this.state.client.expires} />
-                      </div>
-                    )
-                }
+              {
+                isEditing ? (
+                  <TimeInput
+                    format="YYYY-MM-DD HH:mm:ss ZZ"
+                    value={moment(new Date(this.state.client.expires))}
+                    onChange={this.onExpiresChange}
+                    className="form-control" />
+                ) : (
+                  <div className="form-control-static">
+                    <format.DateView date={this.state.client.expires} />
+                  </div>
+                )
+              }
             </div>
           </div>
           {
@@ -241,7 +232,7 @@ const ClientEditor = React.createClass({
               created: 'Created',
               lastModified: 'Last Modified',
               lastDateUsed: 'Last Date Used',
-              lastRotated: 'Last Rotated'
+              lastRotated: 'Last Rotated',
             }, (label, prop) => {
               if (!this.state.client[prop]) {
                 return;
@@ -275,9 +266,8 @@ const ClientEditor = React.createClass({
                 <div className="col-md-9">
                   <span className="text-muted">Expanded scopes are determined from the client
                     scopes, expanding roles for scopes beginning with <code>assume:</code>.
-                    </span>
-                  <ScopeEditor
-                    scopes={this.state.client.expandedScopes}/>
+                  </span>
+                  <ScopeEditor scopes={this.state.client.expandedScopes} />
                 </div>
               </div>
             ) :
@@ -332,8 +322,7 @@ const ClientEditor = React.createClass({
           label="Delete Client"
           action={this.deleteClient}
           success="Client deleted">
-            Are you sure you want to delete credentials with clientId&nbsp;
-            <code>{this.state.client.clientId}</code>?
+          Are you sure you want to delete credentials with client ID <code>{this.state.client.clientId}</code>?
         </ConfirmAction>
         {
           this.state.client.disabled ? (
@@ -344,7 +333,7 @@ const ClientEditor = React.createClass({
               label="Enable Client"
               action={this.enableClient}
               success="Client enabled">
-                Are you sure you want to enable clientId <code>{this.state.client.clientId}</code>?
+              Are you sure you want to enable client ID <code>{this.state.client.clientId}</code>?
             </ConfirmAction>
           ) : (
             <ConfirmAction
@@ -354,7 +343,7 @@ const ClientEditor = React.createClass({
               label="Disable Client"
               action={this.disableClient}
               success="Client disabled">
-                Are you sure you want to disable clientId <code>{this.state.client.clientId}</code>?
+              Are you sure you want to disable client ID <code>{this.state.client.clientId}</code>?
             </ConfirmAction>
           )
         }
@@ -370,7 +359,7 @@ const ClientEditor = React.createClass({
           bsStyle="primary"
           onClick={this.createClient}
           disabled={this.state.working || !this.validClientId()}>
-            <Glyphicon glyph="plus" /> Create Client
+          <Glyphicon glyph="plus" /> Create Client
         </Button>
       </ButtonToolbar>
     );
@@ -415,7 +404,7 @@ const ClientEditor = React.createClass({
     const client = _.cloneDeep(this.state.client);
 
     client.scopes = scopes;
-    this.setState({ client });
+    this.setState({client});
   },
 
   /** When expires exchanges in the editor */
@@ -435,36 +424,36 @@ const ClientEditor = React.createClass({
         client,
         accessToken: client.accessToken,
         editing: false,
-        working: false
+        working: false,
       });
     } catch (err) {
       this.setState({
         working: false,
-        error: err
+        error: err,
       });
     }
   },
 
   /** Close modal */
   closeDialog() {
-    this.setState({ accessToken: null });
+    this.setState({accessToken: null});
   },
 
   /** Start editing */
   startEditing() {
-    this.setState({ editing: true });
+    this.setState({editing: true});
   },
 
   /** Create new client */
   async createClient() {
-    this.setState({ working: true });
+    this.setState({working: true});
 
     try {
       const clientId = this.state.client.clientId;
       const client = await this.auth.createClient(clientId, {
         description: this.state.client.description,
         expires: this.state.client.expires,
-        scopes: this.state.client.scopes
+        scopes: this.state.client.scopes,
       });
 
       this.setState({
@@ -472,14 +461,14 @@ const ClientEditor = React.createClass({
         accessToken: client.accessToken,
         editing: false,
         working: false,
-        error: null
+        error: null,
       });
 
       this.props.reloadClientId(clientId);
     } catch (err) {
       this.setState({
         working: false,
-        error: err
+        error: err,
       });
     }
   },
@@ -494,12 +483,12 @@ const ClientEditor = React.createClass({
         .updateClient(clientId, {
           description: this.state.client.description,
           expires: this.state.client.expires,
-          scopes: this.state.client.scopes
+          scopes: this.state.client.scopes,
         })
         .then(client => {
           this.props.reloadClientId(clientId);
           return client;
-        })
+        }),
     });
   },
 
@@ -529,9 +518,9 @@ const ClientEditor = React.createClass({
   dismissError() {
     this.setState({
       working: false,
-      error: null
+      error: null,
     });
-  }
+  },
 });
 
 export default ClientEditor;

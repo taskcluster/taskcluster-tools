@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import Table from './table';
-import { queueEvents, webListener, notifications } from '../lib/utils';
+import {queueEvents, webListener, notifications} from '../lib/utils';
 import _ from 'lodash';
 
 class Listings extends Component {
@@ -20,7 +20,7 @@ class Listings extends Component {
   * Handle message from listener
   */
   handleMessage(message) {
-    const { taskId } = this.props.params;
+    const {taskId} = this.props.params;
 
     // Handle Error
     if (message instanceof Error) {
@@ -37,7 +37,7 @@ class Listings extends Component {
       queueEvents.artifactCreated().exchange,
       queueEvents.taskCompleted().exchange,
       queueEvents.taskFailed().exchange,
-      queueEvents.taskException().exchange
+      queueEvents.taskException().exchange,
     ];
 
     if (_.includes(queueExchanges, message.exchange)) {
@@ -63,9 +63,6 @@ class Listings extends Component {
   * Handle special cases
   */
   handleEdgeCases(message) {
-    const { fetchTask, fetchStatus, params } = this.props;
-    const { taskId } = params;
-
     // Give priority to exceptions to show without waiting for loop to happen
     if (message.exchange === queueEvents.taskException().exchange) {
       notifications.notifyUser('Task exception');
@@ -80,8 +77,8 @@ class Listings extends Component {
   * Construct loop that will update the tasks when messages arrive from the web listener
   */
   constructLoopForMessages() {
-    const { fetchTask, fetchStatus, params, fetchTasksInSteps } = this.props;
-    const { taskId, taskGroupId } = params;
+    const {params, fetchTasksInSteps} = this.props;
+    const {taskGroupId} = params;
 
     this.loop = setInterval(() => {
       if (this.bQueue.length) {
@@ -135,7 +132,7 @@ class Listings extends Component {
   * Fetch list of tasks and start the web listener
   */
   componentWillMount() {
-    const { taskGroupId } = this.props.params;
+    const {taskGroupId} = this.props.params;
 
     if (!this.props.listTaskGroupInProgress) {
       this.props.fetchTasksInSteps(taskGroupId, true);
@@ -162,8 +159,8 @@ class Listings extends Component {
   }
 }
 
-const mapStateToProps = ({ tasks, tasksRetrievedFully, listTaskGroupInProgress }) => (
-  { tasks, tasksRetrievedFully, listTaskGroupInProgress }
+const mapStateToProps = ({tasks, tasksRetrievedFully, listTaskGroupInProgress}) => (
+  {tasks, tasksRetrievedFully, listTaskGroupInProgress}
 );
 
 export default connect(mapStateToProps, actions)(Listings);

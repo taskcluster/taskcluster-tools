@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  OverlayTrigger,
-  ProgressBar,
-  Tooltip,
-  ButtonToolbar,
-  Button,
-  Glyphicon,
-  Table
-} from 'react-bootstrap';
+import {OverlayTrigger, ProgressBar, Tooltip, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
@@ -20,18 +12,18 @@ const WorkerTypeRow = React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         queue: taskcluster.Queue,
-        awsProvisioner: taskcluster.AwsProvisioner
+        awsProvisioner: taskcluster.AwsProvisioner,
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-        }
+          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
+        },
       },
       reloadOnProps: [
         'provisionerId',
-        'workerType'
-      ]
-    })
+        'workerType',
+      ],
+    }),
   ],
 
   propTypes: {
@@ -42,17 +34,17 @@ const WorkerTypeRow = React.createClass({
       maxCapacity: React.PropTypes.number.isRequired,
       requestedCapacity: React.PropTypes.number.isRequired,
       pendingCapacity: React.PropTypes.number.isRequired,
-      runningCapacity: React.PropTypes.number.isRequired
+      runningCapacity: React.PropTypes.number.isRequired,
     }).isRequired,
     selected: React.PropTypes.bool.isRequired,
-    onClick: React.PropTypes.func.isRequired
+    onClick: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
     return {
-      pendingTasks: { pendingTasks: 0 },
+      pendingTasks: {pendingTasks: 0},
       pendingTasksLoaded: false,
-      pendingTasksError: null
+      pendingTasksError: null,
     };
   },
 
@@ -61,7 +53,7 @@ const WorkerTypeRow = React.createClass({
       pendingTasks: this.queue.pendingTasks(
         this.props.provisionerId,
         this.props.workerType.workerType
-      )
+      ),
     };
   },
 
@@ -70,14 +62,14 @@ const WorkerTypeRow = React.createClass({
       <tr
         onClick={this.props.onClick}
         className={this.props.selected ? 'active' : null}
-        style={{ cursor: 'pointer' }}>
-          <td><code>{this.props.workerType.workerType}</code></td>
-          <td>
-            <OverlayTrigger placement="left" overlay={this.tooltip()}>
-              {this.renderCapacityBar()}
-            </OverlayTrigger>
-          </td>
-          <td>{this.state.pendingTasksLoaded ? this.state.pendingTasks.pendingTasks : '...'}</td>
+        style={{cursor: 'pointer'}}>
+        <td><code>{this.props.workerType.workerType}</code></td>
+        <td>
+          <OverlayTrigger placement="left" overlay={this.tooltip()}>
+            {this.renderCapacityBar()}
+          </OverlayTrigger>
+        </td>
+        <td>{this.state.pendingTasksLoaded ? this.state.pendingTasks.pendingTasks : '...'}</td>
       </tr>
     );
   },
@@ -146,7 +138,7 @@ const WorkerTypeRow = React.createClass({
       s: spotPer * 100,
       rc: runningCap,
       pc: pendingCap,
-      sc: spotReqCap
+      sc: spotReqCap,
     };
   },
 
@@ -160,7 +152,7 @@ const WorkerTypeRow = React.createClass({
         handle {this.props.workerType.requestedCapacity || '0'} tasks in parallel.
       </Tooltip>
     );
-  }
+  },
 });
 
 const defaultWorkerType = {
@@ -179,8 +171,8 @@ const defaultWorkerType = {
       secrets: {},
       scopes: [],
       userData: {},
-      launchSpec: {}
-    }
+      launchSpec: {},
+    },
   ],
   regions: [
     {
@@ -189,14 +181,14 @@ const defaultWorkerType = {
       scopes: [],
       userData: {},
       launchSpec: {
-        ImageId: 'ami-xx'
-      }
-    }
+        ImageId: 'ami-xx',
+      },
+    },
   ],
   userData: {},
   launchSpec: {},
   secrets: {},
-  scopes: []
+  scopes: [],
 };
 
 /** Table of workerTypes */
@@ -206,25 +198,25 @@ export default React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: taskcluster.AwsProvisioner
+        awsProvisioner: taskcluster.AwsProvisioner,
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-        }
+          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
+        },
       },
       reloadOnProps: [
-        'provisionerId'
-      ]
+        'provisionerId',
+      ],
     }),
     utils.createLocationHashMixin({
       keys: ['selected'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   propTypes: {
-    provisionerId: React.PropTypes.string.isRequired
+    provisionerId: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -235,18 +227,18 @@ export default React.createClass({
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
       workerTypeSummariesError: null,
-      workerTypeContains: ''
+      workerTypeContains: '',
     };
   },
 
   load() {
     return {
-      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries()
+      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries(),
     };
   },
 
   setSelected(workerType) {
-    this.setState({ selected: workerType });
+    this.setState({selected: workerType});
   },
 
   render() {
@@ -262,7 +254,7 @@ export default React.createClass({
             bsStyle="primary"
             bsSize="sm"
             onClick={this.setSelected.bind(this, 'create:worker-type')}
-            style={{ marginTop: -10, padding: '3px 12px' }}>
+            style={{marginTop: -10, padding: '3px 12px'}}>
             <Glyphicon glyph="plus" /> Create WorkerType
           </Button>
         </ButtonToolbar>
@@ -272,7 +264,7 @@ export default React.createClass({
   },
 
   renderTypeInput() {
-    const setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
+    const setWorkerType = e => this.setState({workerTypeContains: e.target.value});
     const enterWorkerType = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
@@ -289,7 +281,7 @@ export default React.createClass({
             className="form-control"
             defaultValue={this.state.workerTypeContains}
             onBlur={setWorkerType}
-            onKeyUp={enterWorkerType}/>
+            onKeyUp={enterWorkerType} />
           <div className="input-group-addon">
             <Glyphicon glyph="search" />
           </div>
@@ -303,7 +295,7 @@ export default React.createClass({
       <div>
         <h4>Worker Types</h4>
         {this.renderTypeInput()}
-        <Table style={{ marginTop: 20 }}>
+        <Table style={{marginTop: 20}}>
           <thead>
             <tr>
               <th className="col-xs-2">WorkerType</th>
@@ -312,20 +304,19 @@ export default React.createClass({
             </tr>
           </thead>
           <tbody>
-          {
-            this.state.workerTypeSummaries
-              .filter(workerType => workerType.workerType
-                .includes(this.state.workerTypeContains))
-              .map(workerType => (
-                <WorkerTypeRow
-                  key={workerType.workerType}
-                  provisionerId={this.props.provisionerId}
-                  workerType={workerType}
-                  selected={this.state.selected === workerType.workerType}
-                  onClick={() => this.setSelected(workerType.workerType)}
-                  summary={workerType} />
-              ))
-          }
+            {
+              this.state.workerTypeSummaries
+                .filter(workerType => workerType.workerType.includes(this.state.workerTypeContains))
+                .map(workerType => (
+                  <WorkerTypeRow
+                    key={workerType.workerType}
+                    provisionerId={this.props.provisionerId}
+                    workerType={workerType}
+                    selected={this.state.selected === workerType.workerType}
+                    onClick={() => this.setSelected(workerType.workerType)}
+                    summary={workerType} />
+                ))
+            }
           </tbody>
         </Table>
       </div>
@@ -333,12 +324,12 @@ export default React.createClass({
   },
 
   renderWorkerTypeView() {
-    if (!_.find(this.state.workerTypeSummaries, { workerType: this.state.selected })) {
+    if (!_.find(this.state.workerTypeSummaries, {workerType: this.state.selected})) {
       return;
     }
 
     return (
-      <div style={{ marginBottom: 40 }}>
+      <div style={{marginBottom: 40}}>
         <h4>Worker Type: <code>{this.state.selected}</code></h4>
         <hr />
         <WorkerTypeView
@@ -346,32 +337,30 @@ export default React.createClass({
           workerType={this.state.selected}
           hashEntry={this.nextHashEntry()}
           reload={this.reload}
-          updateSummary={this.updateSummary}/>
+          updateSummary={this.updateSummary} />
       </div>
     );
   },
 
   updateSummary(workerType, summary) {
-    console.log('updateSummary', workerType, summary);
-
     // work around https://github.com/taskcluster/aws-provisioner/pull/70
     const workerTypeSummaries = this.state.workerTypeSummaries
       .map(wt => wt.workerType === workerType ?
-        _.assign({ workerType }, summary) :
+        _.assign({workerType}, summary) :
         wt
       );
 
-    this.setState({ workerTypeSummaries });
+    this.setState({workerTypeSummaries});
   },
 
   renderWorkerTypeCreator() {
     return (
-      <div style={{ marginBottom: 50 }}>
-        <hr/>
+      <div style={{marginBottom: 50}}>
+        <hr />
         <h2>Create New WorkerType</h2>
         <WorkerTypeEditor
           definition={defaultWorkerType}
-          updated={this.workerTypeCreated}/>
+          updated={this.workerTypeCreated} />
       </div>
     );
   },
@@ -379,5 +368,5 @@ export default React.createClass({
   async workerTypeCreated(workerType) {
     await this.reload();
     this.setSelected(workerType);
-  }
+  },
 });

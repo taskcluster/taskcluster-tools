@@ -1,7 +1,7 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import _ from 'lodash';
-import { Button, Glyphicon, ButtonToolbar, Alert } from 'react-bootstrap';
+import {Button, Glyphicon, ButtonToolbar, Alert} from 'react-bootstrap';
 import ConfirmAction from '../lib/ui/confirmaction';
 import CodeMirror from 'react-code-mirror';
 import * as format from '../lib/format';
@@ -17,7 +17,7 @@ const initialHook = {
     name: '',
     description: '',
     owner: '',
-    emailOnError: true
+    emailOnError: true,
   },
   schedule: [],
   expires: '3 months',
@@ -28,22 +28,22 @@ const initialHook = {
     payload: {
       image: 'ubuntu:14.04',
       command: ['/bin/bash', '-c', 'echo "hello World"'],
-      maxRunTime: 60 * 10
+      maxRunTime: 60 * 10,
     },
     metadata: {
       name: 'Hook Task',
       description: 'Task Description',
       owner: 'name@example.com',
-      source: 'https://tools.taskcluster.net/hooks/'
-    }
-  }
+      source: 'https://tools.taskcluster.net/hooks/',
+    },
+  },
 };
 
 // some of the API functions return hook descriptions containing hookId
 // and hookGroupId, but the create and update methods do not take these
 // properties.  This function strips the properties on input.
 const stripHookIds = hook => {
-  const strippedHook = { ...hook };
+  const strippedHook = {...hook};
 
   delete strippedHook.hookId;
   delete strippedHook.hookGroupId;
@@ -55,20 +55,20 @@ const HookStatusDisplay = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        hooks: taskcluster.Hooks
+        hooks: taskcluster.Hooks,
       },
-      reloadOnProps: ['currentHookId', 'currentHookGroupId']
-    })
+      reloadOnProps: ['currentHookId', 'currentHookGroupId'],
+    }),
   ],
 
   propTypes: {
     currentHookId: React.PropTypes.string.isRequired,
-    currentHookGroupId: React.PropTypes.string.isRequired
+    currentHookGroupId: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
     return {
-      hookStatus: null
+      hookStatus: null,
     };
   },
 
@@ -76,7 +76,7 @@ const HookStatusDisplay = React.createClass({
   load() {
     return {
       hookStatus: this.hooks
-        .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId)
+        .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId),
     };
   },
 
@@ -95,7 +95,7 @@ const HookStatusDisplay = React.createClass({
       lastTime = <span className="text-muted">Never Fired</span>;
       lastResult = <span className="text-muted">None</span>;
     } else {
-      lastTime = <format.DateView date={stat.lastFire.time}/>;
+      lastTime = <format.DateView date={stat.lastFire.time} />;
 
       if (stat.lastFire.result === 'error') {
         lastResult = <pre>{JSON.stringify(stat.lastFire.error, null, 2)}</pre>;
@@ -107,9 +107,11 @@ const HookStatusDisplay = React.createClass({
       }
     }
 
-    const when = stat.nextScheduledDate ?
-      <format.DateView date={stat.nextScheduledDate} /> :
-      <span className="text-muted">Not Scheduled</span>;
+    const when = stat.nextScheduledDate ? (
+      <format.DateView date={stat.nextScheduledDate} />
+    ) : (
+      <span className="text-muted">Not Scheduled</span>
+    );
 
     return (
       <dl className="dl-horizontal">
@@ -126,7 +128,7 @@ const HookStatusDisplay = React.createClass({
         <dd>{when}</dd>
       </dl>
     );
-  }
+  },
 });
 
 const HookDisplay = React.createClass({
@@ -134,7 +136,7 @@ const HookDisplay = React.createClass({
     currentHookId: React.PropTypes.string.isRequired,
     currentHookGroupId: React.PropTypes.string.isRequired,
     hook: React.PropTypes.object.isRequired,
-    startEditing: React.PropTypes.func.isRequired
+    startEditing: React.PropTypes.func.isRequired,
   },
 
   render() {
@@ -162,12 +164,13 @@ const HookDisplay = React.createClass({
           <dt>Schedule</dt>
           <dd>
             {
-              hook.schedule.length ? (
+              !hook.schedule.length ? (
+                <span>(no schedule)</span>
+              ) : (
                 <ul className="hookSchedule">
                   {hook.schedule.map((schedule, key) => <li key={key}>{schedule}</li>)}
                 </ul>
-              ) :
-              <span>(no schedule)</span>
+              )
             }
           </dd>
         </dl>
@@ -197,7 +200,7 @@ const HookDisplay = React.createClass({
         </ButtonToolbar>
       </div>
     );
-  }
+  },
 });
 
 const HookEditor = React.createClass({
@@ -208,7 +211,7 @@ const HookEditor = React.createClass({
     isCreating: React.PropTypes.bool,
     createHook: React.PropTypes.func.isRequired,
     updateHook: React.PropTypes.func.isRequired,
-    deleteHook: React.PropTypes.func.isRequired
+    deleteHook: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -226,7 +229,7 @@ const HookEditor = React.createClass({
       schedule: _.cloneDeep(hook.schedule),
       expires: hook.expires,
       deadline: hook.deadline,
-      task: JSON.stringify(hook.task, null, 2)
+      task: JSON.stringify(hook.task, null, 2),
     };
   },
 
@@ -241,12 +244,16 @@ const HookEditor = React.createClass({
             <div className="col-md-10">
               {
                 isCreating ? (
-                  <input type="text"
+                  <input
+                    type="text"
                     className="form-control"
                     onChange={this.onHookGroupIdChange}
                     placeholder="hookGroupId" />
-                  ) :
-                  <div className="form-control-static">{this.props.currentHookGroupId}</div>
+                ) : (
+                  <div className="form-control-static">
+                    {this.props.currentHookGroupId}
+                  </div>
+                )
               }
             </div>
           </div>
@@ -255,51 +262,59 @@ const HookEditor = React.createClass({
             <div className="col-md-10">
               {
                 isCreating ? (
-                  <input type="text"
+                  <input
+                    type="text"
                     className="form-control"
                     onChange={this.onHookIdChange}
                     placeholder="hookId" />
-                  ) :
-                  <div className="form-control-static">{this.props.currentHookId}</div>
+                ) : (
+                  <div className="form-control-static">
+                    {this.props.currentHookId}
+                  </div>
+                )
               }
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">Name</label>
             <div className="col-md-10">
-               <input type="text"
-                 className="form-control"
-                 defaultValue={this.state.name}
-                 onChange={this.onNameChange}
-                 placeholder="Hook Name" />
+              <input
+                type="text"
+                className="form-control"
+                defaultValue={this.state.name}
+                onChange={this.onNameChange}
+                placeholder="Hook Name" />
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">Description</label>
             <div className="col-md-10">
-               <textarea className="form-control"
-                 defaultValue={this.state.description}
-                 onChange={this.onDescriptionChange}
-                 rows={8}
-                 placeholder="Hook Description (markdown)" />
+              <textarea
+                className="form-control"
+                defaultValue={this.state.description}
+                onChange={this.onDescriptionChange}
+                rows={8}
+                placeholder="Hook Description (markdown)" />
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">Owner</label>
             <div className="col-md-10">
-               <input type="text"
-                 className="form-control"
-                 defaultValue={this.state.owner}
-                 onChange={this.onOwnerChange}
-                 placeholder="Owner email" />
+              <input
+                type="text"
+                className="form-control"
+                defaultValue={this.state.owner}
+                onChange={this.onOwnerChange}
+                placeholder="Owner email" />
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">EmailOnError</label>
             <div className="col-md-10">
-              <input type="checkbox"
-                 checked={this.state.emailOnError}
-                 onChange={this.onEmailOnErrorChange} />
+              <input
+                type="checkbox"
+                checked={this.state.emailOnError}
+                onChange={this.onEmailOnErrorChange} />
               <span className="text-info">
                 Email the owner when an error occurs while creating a task.
               </span>
@@ -308,60 +323,63 @@ const HookEditor = React.createClass({
           <div className="form-group">
             <label className="control-label col-md-2">Schedule</label>
             <div className="col-md-10">
-               <p className="text-info">
-                 See <a target="_blank" href="https://www.npmjs.com/package/cron-parser">cron-parser</a> for format
-                 information. Times are in UTC.
-               </p>
-               <ul style={{ paddingLeft: 20 }}>
-                 {
-                   this.state.schedule.map((sched, index) => (
-                     <li key={index}>
-                       <code>{sched}</code>
-                       &nbsp;
-                       <Button
-                         bsStyle="danger"
-                         bsSize="xsmall"
-                         onClick={this.removeScheduleItem.bind(this, index)}>
-                          <Glyphicon glyph="trash"/>
-                       </Button>
-                     </li>
-                   ))
-                 }
-               </ul>
-               <div className="input-group">
-                 <input
-                   type="text"
-                   className="form-control"
-                   placeholder="* * * * * *"
-                   ref="newSch" />
-                 <span className="input-group-btn">
-                   <button
-                     className="btn btn-success"
-                     type="button" onClick={this.onNewScheduleItem}>
-                      <Glyphicon glyph="plus" /> Add
-                   </button>
-                 </span>
-               </div>
+              <p className="text-info">
+                See <a href="https://www.npmjs.com/package/cron-parser" target="_blank" rel="noopener noreferrer">
+                cron-parser</a> for format information. Times are in UTC.
+              </p>
+              <ul style={{paddingLeft: 20}}>
+                {
+                  this.state.schedule.map((sched, index) => (
+                    <li key={index}>
+                      <code>{sched}</code>
+                      &nbsp;
+                      <Button
+                        bsStyle="danger"
+                        bsSize="xsmall"
+                        onClick={this.removeScheduleItem.bind(this, index)}>
+                        <Glyphicon glyph="trash" />
+                      </Button>
+                    </li>
+                  ))
+                }
+              </ul>
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="* * * * * *"
+                  ref="newSch" />
+                <span className="input-group-btn">
+                  <button
+                    className="btn btn-success"
+                    type="button"
+                    onClick={this.onNewScheduleItem}>
+                    <Glyphicon glyph="plus" /> Add
+                  </button>
+                </span>
+              </div>
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">Expires</label>
             <div className="col-md-10">
-               <input type="text"
-                 className="form-control"
-                 defaultValue={this.state.expires}
-                 onChange={this.onExpiresChange}
-                 placeholder="Task expiration (relative)" />
+              <input
+                type="text"
+                className="form-control"
+                defaultValue={this.state.expires}
+                onChange={this.onExpiresChange}
+                placeholder="Task expiration (relative)" />
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">Deadline</label>
             <div className="col-md-10">
-               <input type="text"
-                 className="form-control"
-                 defaultValue={this.state.deadline}
-                 onChange={this.onDeadlineChange}
-                 placeholder="Task deadline (relative)" />
+              <input
+                type="text"
+                className="form-control"
+                defaultValue={this.state.deadline}
+                onChange={this.onDeadlineChange}
+                placeholder="Task deadline (relative)" />
             </div>
           </div>
           <div className="form-group">
@@ -385,7 +403,7 @@ const HookEditor = React.createClass({
         </div>
       );
     } catch (e) {
-      console.log(e);
+      // TODO: Handle error
     }
   },
 
@@ -394,7 +412,7 @@ const HookEditor = React.createClass({
       return (
         <ButtonToolbar>
           <Button bsStyle="primary" onClick={this.createHook} disabled={!this.validHook()}>
-            <Glyphicon glyph="plus"/> Create Hook
+            <Glyphicon glyph="plus" /> Create Hook
           </Button>
         </ButtonToolbar>
       );
@@ -411,8 +429,8 @@ const HookEditor = React.createClass({
           label="Delete Hook"
           action={this.props.deleteHook}
           success="Hook deleted">
-            Are you sure you want to delete hook
-            &nbsp;<code>{`${this.props.currentHookGroupId}/${this.props.currentHookId}`}</code>?
+          Are you sure you want to delete hook
+          &nbsp;<code>{`${this.props.currentHookGroupId}/${this.props.currentHookId}`}</code>?
         </ConfirmAction>
       </ButtonToolbar>
     );
@@ -436,27 +454,27 @@ const HookEditor = React.createClass({
   },
 
   onHookGroupIdChange(e) {
-    this.setState({ hookGroupId: e.target.value });
+    this.setState({hookGroupId: e.target.value});
   },
 
   onHookIdChange(e) {
-    this.setState({ hookId: e.target.value });
+    this.setState({hookId: e.target.value});
   },
 
   onNameChange(e) {
-    this.setState({ name: e.target.value });
+    this.setState({name: e.target.value});
   },
 
   onDescriptionChange(e) {
-    this.setState({ description: e.target.value });
+    this.setState({description: e.target.value});
   },
 
   onOwnerChange(e) {
-    this.setState({ owner: e.target.value });
+    this.setState({owner: e.target.value});
   },
 
   onEmailOnErrorChange() {
-    this.setState({ emailOnError: !this.state.emailOnError });
+    this.setState({emailOnError: !this.state.emailOnError});
   },
 
   removeScheduleItem(index) {
@@ -464,7 +482,7 @@ const HookEditor = React.createClass({
       .cloneDeep(this.state.schedule)
       .splice(index, 1);
 
-    this.setState({ schedule });
+    this.setState({schedule});
   },
 
   onNewScheduleItem() {
@@ -474,26 +492,26 @@ const HookEditor = React.createClass({
       const schedule = _.cloneDeep(this.state.schedule);
 
       schedule.push(sch);
-      this.setState({ schedule });
+      this.setState({schedule});
     }
 
     findDOMNode(this.refs.newSch).value = '';
   },
 
   onScheduleTextChange(e) {
-    this.setState({ scheduleText: e.target.value });
+    this.setState({scheduleText: e.target.value});
   },
 
   onExpiresChange(e) {
-    this.setState({ expires: e.target.value });
+    this.setState({expires: e.target.value});
   },
 
   onDeadlineChange(e) {
-    this.setState({ deadline: e.target.value });
+    this.setState({deadline: e.target.value});
   },
 
   onTaskChange(e) {
-    this.setState({ task: e.target.value });
+    this.setState({task: e.target.value});
   },
 
   getHookDefinition() {
@@ -502,12 +520,12 @@ const HookEditor = React.createClass({
         name: this.state.name,
         description: this.state.description,
         owner: this.state.owner,
-        emailOnError: this.state.emailOnError
+        emailOnError: this.state.emailOnError,
       },
       schedule: this.state.schedule,
       expires: this.state.expires,
       deadline: this.state.deadline,
-      task: JSON.parse(this.state.task)
+      task: JSON.parse(this.state.task),
     };
   },
 
@@ -518,7 +536,7 @@ const HookEditor = React.createClass({
 
   updateHook() {
     this.props.updateHook(this.getHookDefinition());
-  }
+  },
 });
 
 /** Create hook editor/viewer (same thing) */
@@ -527,10 +545,10 @@ const HookEditView = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        hooks: taskcluster.Hooks
+        hooks: taskcluster.Hooks,
       },
-      reloadOnProps: ['currentHookId', 'currentHookGroupId']
-    })
+      reloadOnProps: ['currentHookId', 'currentHookGroupId'],
+    }),
   ],
 
   propTypes: {
@@ -538,7 +556,7 @@ const HookEditView = React.createClass({
     currentHookGroupId: React.PropTypes.string,
     refreshHookList: React.PropTypes.func.isRequired,
     selectHook: React.PropTypes.func.isRequired,
-    triggerHook: React.PropTypes.func
+    triggerHook: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -548,7 +566,7 @@ const HookEditView = React.createClass({
       hookError: null,
       hook: null,
       editing: true,
-      error: null
+      error: null,
     };
   },
 
@@ -559,7 +577,7 @@ const HookEditView = React.createClass({
       return {
         hook: null,
         editing: true,
-        error: null
+        error: null,
       };
     }
 
@@ -570,7 +588,7 @@ const HookEditView = React.createClass({
     return {
       hook,
       editing: false,
-      error: null
+      error: null,
     };
   },
 
@@ -624,14 +642,14 @@ const HookEditView = React.createClass({
   },
 
   startEditing() {
-    this.setState({ editing: true });
+    this.setState({editing: true});
   },
 
   triggerHook() {
     // Payloads are ignored, so we send empty data over
     this.hooks
       .triggerHook(this.props.currentHookGroupId, this.props.currentHookId, {})
-      .catch(error => this.setState({ error }));
+      .catch(error => this.setState({error}));
   },
 
   createHook(hookGroupId, hookId, hook) {
@@ -644,7 +662,7 @@ const HookEditView = React.createClass({
         this.props.refreshHookList();
       })
       .catch(err => {
-        this.setState({ error: err });
+        this.setState({error: err});
       });
   },
 
@@ -655,10 +673,10 @@ const HookEditView = React.createClass({
       this.setState({
         hook: stripHookIds(hook),
         editing: false,
-        error: null
+        error: null,
       });
     } catch (err) {
-      this.setState({ error: err });
+      this.setState({error: err});
     }
   },
 
@@ -671,9 +689,9 @@ const HookEditView = React.createClass({
   /** Reset error state from operation*/
   dismissError() {
     this.setState({
-      error: null
+      error: null,
     });
-  }
+  },
 });
 
 export default HookEditView;

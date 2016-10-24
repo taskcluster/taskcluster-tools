@@ -1,7 +1,7 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import {
-  Alert, ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl
+  Alert, ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl,
 } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import * as utils from '../../lib/utils';
@@ -17,21 +17,21 @@ const RoleEditor = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth: taskcluster.Auth
+        auth: taskcluster.Auth,
       },
-      reloadOnProps: ['currentRoleId']
-    })
+      reloadOnProps: ['currentRoleId'],
+    }),
   ],
 
   propTypes: {
     // Method to reload a role in the parent
-    reloadRoleId: React.PropTypes.func.isRequired
+    reloadRoleId: React.PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
     return {
       // '' implies. "Create Role"
-      currentRoleId: ''
+      currentRoleId: '',
     };
   },
 
@@ -45,7 +45,7 @@ const RoleEditor = React.createClass({
       editing: true,
       // Operation details, if currently doing anything
       working: false,
-      error: null
+      error: null,
     };
   },
 
@@ -57,11 +57,11 @@ const RoleEditor = React.createClass({
         role: {
           roleId: '',
           scopes: [],
-          description: ''
+          description: '',
         },
         editing: true,
         working: false,
-        error: null
+        error: null,
       };
     }
 
@@ -70,7 +70,7 @@ const RoleEditor = React.createClass({
       role: this.auth.role(this.props.currentRoleId),
       editing: false,
       working: false,
-      error: null
+      error: null,
     };
   },
 
@@ -96,8 +96,8 @@ const RoleEditor = React.createClass({
     try {
       return this.renderWaitFor('role') || (
         <div className="role-editor">
-          <h4 style={{ marginTop: 0 }}>{title}</h4>
-          <hr style={{ marginBottom: 10 }} />
+          <h4 style={{marginTop: 0}}>{title}</h4>
+          <hr style={{marginBottom: 10}} />
           <div className="form-horizontal">
             {
               isCreating ? (
@@ -131,7 +131,7 @@ const RoleEditor = React.createClass({
               </div>
             </div>
             {
-              _.map({ created: 'Created', lastModified: 'Last Modified' }, (label, prop) => {
+              _.map({created: 'Created', lastModified: 'Last Modified'}, (label, prop) => {
                 if (!this.state.role[prop]) {
                   return;
                 }
@@ -164,13 +164,13 @@ const RoleEditor = React.createClass({
                     Expanded Scopes
                   </label>
                   <div className="col-md-9">
-                    <ScopeEditor scopes={this.state.role.expandedScopes}/>
+                    <ScopeEditor scopes={this.state.role.expandedScopes} />
                   </div>
                 </div>
               ) :
               null
             }
-            <hr/>
+            <hr />
             <div className="form-group">
               <div className="col-md-9 col-md-offset-3">
                 <div className="form-control-static">
@@ -183,10 +183,11 @@ const RoleEditor = React.createClass({
 
                     return (
                       <ButtonToolbar>
-                        <Button bsStyle="success"
+                        <Button
+                          bsStyle="success"
                           onClick={this.startEditing}
                           disabled={this.state.working}>
-                          <Glyphicon glyph="pencil"/> Edit Role
+                          <Glyphicon glyph="pencil" /> Edit Role
                         </Button>
                       </ButtonToolbar>
                     );
@@ -198,7 +199,7 @@ const RoleEditor = React.createClass({
         </div>
       );
     } catch (e) {
-      console.log(e);
+      // TODO: Handle error
     }
   },
 
@@ -221,7 +222,7 @@ const RoleEditor = React.createClass({
           label="Delete Role"
           action={this.deleteRole}
           success="Role deleted">
-            Are you sure you want to delete role with roleId <code>{this.state.role.roleId}</code>?
+          Are you sure you want to delete role with role ID <code>{this.state.role.roleId}</code>?
         </ConfirmAction>
       </ButtonToolbar>
     );
@@ -235,7 +236,7 @@ const RoleEditor = React.createClass({
           bsStyle="primary"
           onClick={this.createRole}
           disabled={this.state.working || !this.validRoleId()}>
-            <Glyphicon glyph="plus" /> Create Role
+          <Glyphicon glyph="plus" /> Create Role
         </Button>
       </ButtonToolbar>
     );
@@ -282,37 +283,37 @@ const RoleEditor = React.createClass({
 
     role.scopes = scopes;
 
-    this.setState({ role });
+    this.setState({role});
   },
 
   /** Start editing */
   startEditing() {
-    this.setState({ editing: true });
+    this.setState({editing: true});
   },
 
   /** Create new role */
   async createRole() {
-    this.setState({ working: true });
+    this.setState({working: true});
 
     try {
       const roleId = this.state.role.roleId;
       const role = await this.auth.createRole(roleId, {
         description: this.state.role.description,
-        scopes: this.state.role.scopes
+        scopes: this.state.role.scopes,
       });
 
       this.setState({
         role,
         editing: false,
         working: false,
-        error: null
+        error: null,
       });
 
       this.props.reloadRoleId(roleId);
     } catch (err) {
       this.setState({
         working: false,
-        error: err
+        error: err,
       });
     }
   },
@@ -326,12 +327,12 @@ const RoleEditor = React.createClass({
       role: this.auth
         .updateRole(roleId, {
           description: this.state.role.description,
-          scopes: this.state.role.scopes
+          scopes: this.state.role.scopes,
         })
         .then(role => {
           this.props.reloadRoleId(roleId);
           return role;
-        })
+        }),
     });
   },
 
@@ -347,9 +348,9 @@ const RoleEditor = React.createClass({
   dismissError() {
     this.setState({
       working: false,
-      error: null
+      error: null,
     });
-  }
+  },
 });
 
 export default RoleEditor;

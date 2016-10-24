@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import _ from 'lodash';
 import LogView from '../../lib/ui/logview';
 import ArtifactList from './artifactList';
@@ -11,7 +11,7 @@ export default class TaskRun extends Component {
   }
 
   generateRows() {
-    const { status } = this.props;
+    const {status} = this.props;
     const runNumber = status.runs.length - 1;
     const run = status.runs[runNumber];
 
@@ -29,7 +29,7 @@ export default class TaskRun extends Component {
   }
 
   renderLogView(taskId, runId, artifacts) {
-    const logs = artifacts.filter(({ name }) => /^public\/logs\//.test(name));
+    const logs = artifacts.filter(({name}) => /^public\/logs\//.test(name));
 
     if (!logs.length) {
       return;
@@ -41,7 +41,7 @@ export default class TaskRun extends Component {
   }
 
   render() {
-    const { status, artifacts } = this.props;
+    const {status, artifacts} = this.props;
     const taskId = status.taskId;
     const runNumber = status.runs.length - 1;
 
@@ -75,7 +75,7 @@ export default class TaskRun extends Component {
                   runId={runId} />
               </td>
             </tr>
-            </tbody>
+          </tbody>
         </table>
         {this.renderLogView(taskId, runId, artifacts)}
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, ButtonToolbar, Button, Glyphicon, Row, Table } from 'react-bootstrap';
+import {Col, ButtonToolbar, Button, Glyphicon, Row, Table} from 'react-bootstrap';
 import _ from 'lodash';
 import AmiSetEditor from './amiseteditor';
 import * as utils from '../lib/utils';
@@ -11,19 +11,19 @@ const AmiSetManager = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        awsProvisioner: taskcluster.createClient(reference)
+        awsProvisioner: taskcluster.createClient(reference),
       },
       clientOpts: {
         awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-        }
-      }
+          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
+        },
+      },
     }),
     // Serialize state.selectedAmiSet to location.hash as string
     utils.createLocationHashMixin({
       keys: ['selectedAmiSet'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   getInitialState() {
@@ -31,14 +31,14 @@ const AmiSetManager = React.createClass({
       amiSetsLoaded: false,
       amiSetsError: null,
       amiSets: null,
-      selectedAmiSet: '' // '' means "add new ami-set"
+      selectedAmiSet: '', // '' means "add new ami-set"
     };
   },
 
   /** Load state from amiSet (using TaskClusterMixin) */
   load() {
     return {
-      amiSets: this.awsProvisioner.listAmiSets()
+      amiSets: this.awsProvisioner.listAmiSets(),
     };
   },
 
@@ -52,13 +52,13 @@ const AmiSetManager = React.createClass({
               bsStyle="primary"
               onClick={this.selectAmiSet.bind(this, '')}
               disabled={this.state.selectedAmiSet === ''}>
-              <Glyphicon glyph="plus"/> Add AMI Set
+              <Glyphicon glyph="plus" /> Add AMI Set
             </Button>
             <Button
               bsStyle="success"
               onClick={this.reload}
               disabled={!this.state.amiSetsLoaded}>
-              <Glyphicon glyph="refresh"/> Refresh
+              <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar>
         </Col>
@@ -75,7 +75,7 @@ const AmiSetManager = React.createClass({
 
   renderAmiSetsTable() {
     return this.renderWaitFor('amiSets') || (
-      <Table ref="amisetstable" condensed hover className="ami-set-manager-table">
+      <Table ref="amisetstable" condensed={true} hover={true} className="ami-set-manager-table">
         <thead>
           <tr>
             <th>AmiSet</th>
@@ -92,9 +92,10 @@ const AmiSetManager = React.createClass({
     const isSelected = this.state.selectedAmiSet === amiSet;
 
     return (
-      <tr key={index}
+      <tr
+        key={index}
         className={isSelected ? 'info' : ''}
-        onClick={this.selectAmiSet.bind(this, amiSet)}>
+        onClick={() => this.selectAmiSet(amiSet)}>
         <td><code>{amiSet}</code></td>
       </tr>
     );
@@ -102,7 +103,7 @@ const AmiSetManager = React.createClass({
 
   async reloadAmiSet(amiSetId) {
     // Load amiSet ignore errors (assume amiSet doesn't exist)
-    const amiSet = await this.awsProvisioner.amiSet(amiSetId).catch(() => null);
+    const amiSet = await this.awsProvisioner.amiSet(amiSetId);
     let selectedAmiSet = amiSetId;
     let amiSets = _.cloneDeep(this.state.amiSets);
     const index = _.findIndex(amiSets, a => a.amiSet === amiSetId);
@@ -120,7 +121,7 @@ const AmiSetManager = React.createClass({
     }
 
     amiSets.sort((a, b) => a.amiSet > b.amiSet);
-    this.setState({ amiSets, selectedAmiSet });
+    this.setState({amiSets, selectedAmiSet});
   },
 
   refreshAmiSetsList() {
@@ -128,8 +129,8 @@ const AmiSetManager = React.createClass({
   },
 
   selectAmiSet(amiSet) {
-    this.setState({ selectedAmiSet: amiSet });
-  }
+    this.setState({selectedAmiSet: amiSet});
+  },
 });
 
 export default AmiSetManager;

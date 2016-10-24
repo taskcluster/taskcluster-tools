@@ -1,7 +1,7 @@
-import { TASK_ACTIONS_IN_PROGRESS,
+import {TASK_ACTIONS_IN_PROGRESS,
   TASK_ACTIONS_ERROR,
   TASK_ACTIONS_SUCCESS,
-  CREATE_TASK
+  CREATE_TASK,
 } from './types';
 
 /**
@@ -11,7 +11,7 @@ import { TASK_ACTIONS_IN_PROGRESS,
 */
 export const taskActionsInProgress = isExecuting => ({
   type: TASK_ACTIONS_IN_PROGRESS,
-  payload: isExecuting
+  payload: isExecuting,
 });
 
 /**
@@ -19,7 +19,7 @@ export const taskActionsInProgress = isExecuting => ({
 */
 export const renderActionError = err => ({
   type: TASK_ACTIONS_ERROR,
-  payload: err
+  payload: err,
 });
 
 /**
@@ -27,7 +27,7 @@ export const renderActionError = err => ({
 */
 export const renderActionSuccess = successMessage => ({
   type: TASK_ACTIONS_SUCCESS,
-  payload: successMessage
+  payload: successMessage,
 });
 
 /**
@@ -35,5 +35,5 @@ export const renderActionSuccess = successMessage => ({
 */
 export const createTask = (list, task) => ({
   type: CREATE_TASK,
-  payload: task
+  payload: task,
 });

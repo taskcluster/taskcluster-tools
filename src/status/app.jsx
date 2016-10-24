@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { TaskClusterDashboard } from './status';
+import {TaskClusterDashboard} from './status';
 import Layout from '../lib/Layout';
 
 ReactDOM.render((
