@@ -67,6 +67,13 @@ module.exports = [
       clients with a given scope. This is effectively reverse client and role lookup.`
   },
   {
+    title: 'Github Dashboard',
+    link: '/github/',
+    icon: 'code-fork',
+    display: true,
+    description: `Interact with builds from various Github repositories that have been submitted to Taskcluster.`
+  },
+  {
     title: 'Pulse Inspector',
     link: '/pulse-inspector/',
     icon: 'wifi',

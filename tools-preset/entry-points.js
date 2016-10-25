@@ -27,6 +27,7 @@ const entryPoints = [
   'hooks',
   'secrets',
   'purge-caches',
+  'github',
   'interactive',
   'shell',
   'display',
