@@ -22,6 +22,29 @@ ReactDOM.render((
 const term = new hterm.Terminal('interactive');
 
 term.onTerminalReady = async () => {
+  let client;
+
+  // Setup terminal
+  // We do this before we connect, so that the terminal window size is known
+  // when we send the window size.
+  const io = term.io.push();
+
+  io.onVTKeystroke = io.sendString = d => {
+    if (client) {
+      client.stdin.write(d);
+    }
+  };
+  io.onTerminalResize = () => null;
+
+  term.setCursorPosition(0, 0);
+  term.setCursorVisible(true);
+  term.setScrollbarVisible(false);
+  /* eslint-disable no-underscore-dangle */
+  term.prefs_.set('ctrl-c-copy', true);
+  term.prefs_.set('ctrl-v-paste', true);
+  term.prefs_.set('use-default-window-copy', true);
+  /* eslint-enable no-underscore-dangle */
+
   const options = {
     url: args.socketUrl,
     tty: true,
@@ -45,10 +68,10 @@ term.onTerminalReady = async () => {
 
   // Create a shell client, with interface similar to child_process
   // With an additional method client.resize(cols, rows) for TTY sizing.
-  let client;
   if (args.v === '1') {
-    client = new DockerExecClient(options);
-    await client.execute();
+    const dockerClient = new DockerExecClient(options);
+    await dockerClient.execute();
+    client = dockerClient;
 
     // Wrap client.resize to switch argument ordering
     const resize = client.resize;
@@ -56,22 +79,6 @@ term.onTerminalReady = async () => {
   } else if (args.v === '2') {
     client = await wsshell.dial(options);
   }
-
-  const io = term.io.push();
-
-  io.onVTKeystroke = io.sendString = d => {
-    client.stdin.write(d);
-  };
-  io.onTerminalResize = () => null;
-
-  term.setCursorPosition(0, 0);
-  term.setCursorVisible(true);
-  term.setScrollbarVisible(false);
-  /* eslint-disable no-underscore-dangle */
-  term.prefs_.set('ctrl-c-copy', true);
-  term.prefs_.set('ctrl-v-paste', true);
-  term.prefs_.set('use-default-window-copy', true);
-  /* eslint-enable no-underscore-dangle */
 
   term.installKeyboard();
   io.writeUTF8(`Connected to remote shell for taskId: ${args.taskId}\r\n`);
