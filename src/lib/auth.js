@@ -45,13 +45,14 @@ export const loadCredentials = () => {
 
     if (creds.certificate && creds.certificate.expiry < Date.now()) {
       saveCredentials(null); // clear credentials
-    } else if (creds.certificate) {
-      clearTimeout(credentialsExpiredTimeout);
+      return null;
+    }
 
+    clearTimeout(credentialsExpiredTimeout);
+    if (creds.certificate) {
       credentialsExpiredTimeout = setTimeout(() => saveCredentials(null),
         creds.certificate.expiry - Date.now());
     } else {
-      clearTimeout(credentialsExpiredTimeout);
       credentialsExpiredTimeout = null;
     }
 
