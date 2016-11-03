@@ -1,6 +1,8 @@
 module.exports = {
   NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
 
+  BASE_DOMAIN: JSON.stringify(process.env.BASE_DOMAIN || 'taskcluster.net'),
+
   CORS_PROXY: JSON.stringify(
     process.env.CORS_PROXY || 'https://cors-proxy.taskcluster.net/request'),
 

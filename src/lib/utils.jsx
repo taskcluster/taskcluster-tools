@@ -327,7 +327,11 @@ export const createTaskClusterMixin = opts => {
     /** Initialize client objects requested in options */
     _createClients(credentials) {
       _.forIn(options.clients, (Client, key) => {
-        this[key] = new Client({ credentials, ...options.clientOpts[key] });
+        this[key] = new Client({
+          credentials,
+          baseDomain: process.env.BASE_DOMAIN,
+          ...options.clientOpts[key]
+        });
       });
     }
   };
