@@ -123,11 +123,12 @@ const Navigation = React.createClass({
   // Render navigation bar
   render() {
     // Find active menu entry
-    let activeEntry = menu.find(entry => entry.link === location.pathname) ||
+    const pathname = location.pathname.replace(/\/index.html$/, '/');
+    let activeEntry = menu.find(entry => entry.link === pathname) ||
       { title: 'Unknown Page' };
 
     // Remove title on landing page
-    if (window.location.pathname === '/') {
+    if (pathname === '/') {
       activeEntry = null;
     } else {
       const link = document.createElement('link');
