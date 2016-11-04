@@ -51,6 +51,13 @@ const Navigation = React.createClass({
     this.startExpirationTimer();
   },
 
+  // Redirect to path without a trailing `/index.html`.
+  componentWillMount() {
+    if (location.pathname.endsWith('/index.html')) {
+      location.pathname = location.pathname.replace(/\/index.html$/, '/');
+    }
+  },
+
   // Stop listening for credentials-changed events
   componentWillUnmount() {
     window.removeEventListener('credentials-changed', this.handleCredentialsChanged, false);
