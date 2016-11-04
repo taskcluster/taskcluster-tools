@@ -9,31 +9,31 @@ const polyfill = require.resolve('babel-polyfill');
 const template = path.join(SRC, 'template.ejs');
 
 const entryPoints = [
+  'ami-sets',
   'auth/clients',
   'auth/roles',
   'auth/scopes',
-  'login',
-  'credentials',
-  'pulse-inspector',
-  'push-inspector',
-  'task-inspector',
-  'task-graph-inspector',
-  'task-group-inspector',
-  'task-creator',
   'aws-provisioner',
-  'ami-sets',
+  'credentials',
+  'diagnostics',
+  'display',
+  'hooks',
   'index',
   'index/artifacts',
-  'hooks',
-  'secrets',
-  'purge-caches',
   'interactive',
-  'shell',
-  'display',
+  'login',
   'one-click-loaner',
   'one-click-loaner/connect',
+  'pulse-inspector',
+  'purge-caches',
+  'push-inspector', // this page redirects to task-group-inspector
+  'secrets',
+  'shell',
   'status',
-  'diagnostics'
+  'task-creator',
+  'task-graph-inspector', // this page redirects to task-group-inspector
+  'task-group-inspector',
+  'task-inspector'
 ];
 
 /**

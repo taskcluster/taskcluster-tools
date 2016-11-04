@@ -112,7 +112,7 @@ const TaskInfo = React.createClass({
             <tr>
               <td>TaskGroupId</td>
               <td>
-                <a href={`../push-inspector/#${task.taskGroupId}`}>{task.taskGroupId}</a>
+                <a href={`../task-group-inspector/#/${task.taskGroupId}`}>{task.taskGroupId}</a>
               </td>
             </tr>
 

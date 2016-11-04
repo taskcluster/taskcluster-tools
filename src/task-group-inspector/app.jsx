@@ -1,18 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Row, Col} from 'react-bootstrap';
-import TaskGroupInspector from './taskgroupinspector';
-import * as utils from '../lib/utils';
+import {Provider} from 'react-redux';
+import {Router, hashHistory} from 'react-router';
+import {createStore, applyMiddleware} from 'redux';
+import reducers from './reducers';
+import thunk from 'redux-thunk';
+import routes from './routes';
 import Layout from '../lib/Layout';
+import './app.less';
 
-const hashManager = utils.createHashManager({separator: '/'});
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 
 ReactDOM.render((
   <Layout>
-    <Row style={{marginBottom: 50}}>
-      <Col md={10} mdOffset={1}>
-        <TaskGroupInspector hashEntry={hashManager.root()} />
-      </Col>
-    </Row>
+    <Provider store={createStoreWithMiddleware(reducers)}>
+      <Router history={hashHistory} routes={routes} />
+    </Provider>
   </Layout>
 ), document.getElementById('root'));

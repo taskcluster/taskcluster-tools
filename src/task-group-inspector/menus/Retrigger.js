@@ -1,19 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
-import ConfirmAction from '../shared/confirmAction';
+import ConfirmAction from './ConfirmAction';
 
-class OneClickLoaner extends Component {
+class Retrigger extends Component {
   render() {
-    const glyph = 'console';
-    const label = 'One-Click Loaner';
-    const successMsg = 'Your browser has been redirected to One-Click loaner';
-    const {status, task, tasks, loanerCreateTask} = this.props;
-    const taskId = status.taskId;
-    const action = () => loanerCreateTask(tasks, taskId, task, successMsg);
+    const {tasks, task, retriggerTask} = this.props;
 
     return (
-      <ConfirmAction label={label} glyph={glyph} action={action}>
+      <ConfirmAction label="Retrigger" glyph="repeat" action={() => retriggerTask(tasks, task, 'Retrigger success')}>
         <div>
           This will duplicate the task and create it under a different <code>taskId</code>.
           <br /><br />
@@ -32,6 +27,6 @@ class OneClickLoaner extends Component {
   }
 }
 
-const mapStateToProps = ({status, task, tasks}) => ({status, task, tasks});
+const mapStateToProps = ({task, tasks}) => ({task, tasks});
 
-export default connect(mapStateToProps, actions)(OneClickLoaner);
+export default connect(mapStateToProps, actions)(Retrigger);

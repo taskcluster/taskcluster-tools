@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
-import ConfirmAction from '../shared/confirmAction';
+import ConfirmAction from './ConfirmAction';
 
-class CancelTaskButton extends Component {
+class CancelTask extends Component {
   render() {
     const glyph = 'stop';
     const label = 'Cancel Task';
-    const successMsg = 'Successfully canceled task!';
+    const successMsg = 'Successfully cancelled task!';
     const {status, cancelTask} = this.props;
     const taskId = status.taskId;
     const action = () => cancelTask(taskId, successMsg);
@@ -35,4 +35,4 @@ class CancelTaskButton extends Component {
 
 const mapStateToProps = ({status}) => ({status});
 
-export default connect(mapStateToProps, actions)(CancelTaskButton);
+export default connect(mapStateToProps, actions)(CancelTask);

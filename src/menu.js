@@ -12,8 +12,8 @@ module.exports = [
       private artifacts.`,
   },
   {
-    title: 'Push Inspector',
-    link: '/push-inspector/',
+    title: 'Task Group Inspector',
+    link: '/task-group-inspector/',
     icon: 'cube',
     display: true,
     description: `Inspect task groups, monitor progress, view dependencies and states, and inspect
