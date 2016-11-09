@@ -14,7 +14,7 @@ module.exports = [
   {
     title: 'Task Group Inspector',
     link: '/task-group-inspector/',
-    icon: 'cube',
+    icon: 'cubes',
     display: true,
     description: `Inspect task groups, monitor progress, view dependencies and states, and inspect
       the individual tasks that make up the task group using the embedded task-inspector.`,
