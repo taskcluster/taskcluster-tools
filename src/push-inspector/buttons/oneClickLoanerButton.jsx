@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
@@ -8,7 +8,7 @@ class OneClickLoaner extends Component {
     const glyph = 'console';
     const label = 'One-Click Loaner';
     const successMsg = 'Your browser has been redirected to One-Click loaner';
-    const { status, task, tasks, loanerCreateTask } = this.props;
+    const {status, task, tasks, loanerCreateTask} = this.props;
     const taskId = status.taskId;
     const action = () => loanerCreateTask(tasks, taskId, task, successMsg);
 
@@ -32,6 +32,6 @@ class OneClickLoaner extends Component {
   }
 }
 
-const mapStateToProps = ({ status, task, tasks }) => ({ status, task, tasks });
+const mapStateToProps = ({status, task, tasks}) => ({status, task, tasks});
 
 export default connect(mapStateToProps, actions)(OneClickLoaner);

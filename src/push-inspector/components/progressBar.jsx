@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
-import { ProgressBar } from 'react-bootstrap';
-import { notifications } from '../lib/utils';
+import {ProgressBar} from 'react-bootstrap';
+import {notifications} from '../lib/utils';
 
 class PushProgressBar extends Component {
   constructor(props) {
@@ -92,7 +92,7 @@ class PushProgressBar extends Component {
   * Render progress bar
   */
   makeProgressBar() {
-    const { tasks, tasksRetrievedFully } = this.props;
+    const {tasks, tasksRetrievedFully} = this.props;
     const total = tasks.length;
     const threshold = 5;
 
@@ -109,7 +109,7 @@ class PushProgressBar extends Component {
       'exception',
       'unscheduled',
       'running',
-      'pending'
+      'pending',
     ];
 
     const percents = groups.map(group => {

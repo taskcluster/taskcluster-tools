@@ -1,8 +1,8 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import {
   Row, Col, ButtonToolbar, Button, Glyphicon, Table, Alert,
-  FormGroup, FormControl, ControlLabel
+  FormGroup, FormControl, ControlLabel,
 } from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import _ from 'lodash';
@@ -65,7 +65,7 @@ const MessageRow = React.createClass({
               </dd>
             ) : null}
           </dl>
-          <JSONInspector data={message.payload}/>
+          <JSONInspector data={message.payload} />
           <br />
         </td>
       </tr>
@@ -76,7 +76,7 @@ const MessageRow = React.createClass({
   handleClick() {
     // Do this indirectly so we don't have to render if the event handler changes
     this.props.onClick();
-  }
+  },
 });
 
 export default React.createClass({
@@ -85,17 +85,17 @@ export default React.createClass({
   /** Initialize mixins */
   mixins: [
     utils.createWebListenerMixin({
-      reloadOnKeys: ['bindings', 'doListen']
+      reloadOnKeys: ['bindings', 'doListen'],
     }),
     utils.createLocationHashMixin({
       keys: ['bindings'],
-      type: 'json'
-    })
+      type: 'json',
+    }),
   ],
 
   getDefaultProps() {
     return {
-      hashIndex: 0
+      hashIndex: 0,
     };
   },
 
@@ -107,7 +107,7 @@ export default React.createClass({
       messages: [], // List of messages received
       expandedMessage: null, // _idForInspector of current message
       listening: false, // State of listening, set by WebListenerMixin
-      listeningError: null // Listening error set by WebListenerMixin
+      listeningError: null, // Listening error set by WebListenerMixin
     };
   },
 
@@ -128,22 +128,22 @@ export default React.createClass({
             </a>. Notice that all exchanges from TaskCluster is formally
             documented on <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
           </p>
-          <hr/>
+          <hr />
           {this.renderForm()}
           {this.state.listeningError ? this.renderListeningError() : null}
-          <hr/>
+          <hr />
           <ButtonToolbar className="pull-right">
             <Button
               bsSize="sm"
               bsStyle="danger"
               onClick={this.clearBindings}
               disabled={!!this.state.bindings.length}>
-                <Glyphicon glyph="trash" /> Clear Bindings
+              <Glyphicon glyph="trash" /> Clear Bindings
             </Button>
           </ButtonToolbar>
           <h5>Bindings</h5>
           {this.renderBindings()}
-          <hr/>
+          <hr />
           <ButtonToolbar className="pull-right">
             <Button
               bsSize="sm"
@@ -153,7 +153,7 @@ export default React.createClass({
               ref="downloadLink"
               download="pulse-messages.json"
               disabled={!!this.state.messages.length}>
-                <Glyphicon glyph="download-alt" /> Download Messages
+              <Glyphicon glyph="download-alt" /> Download Messages
             </Button>
           </ButtonToolbar>
           <h5>Messages</h5>
@@ -175,7 +175,7 @@ export default React.createClass({
 
   /** Clear all bindings */
   clearBindings() {
-    this.setState({ bindings: [], doListen: false });
+    this.setState({bindings: [], doListen: false});
   },
 
   /** Render list of bindings */
@@ -215,7 +215,7 @@ export default React.createClass({
               type="text"
               ref="routingKeyPattern"
               placeholder="#.some-interesting-key.#"
-              defaultValue="#"/>
+              defaultValue="#" />
           </div>
         </FormGroup>
         <div className="form-group">
@@ -225,7 +225,7 @@ export default React.createClass({
                 bsStyle="primary"
                 onClick={this.addBinding}
                 disabled={this.state.listening === null}>
-                  <Glyphicon glyph="plus" /> Add binding
+                <Glyphicon glyph="plus" /> Add binding
               </Button>
               {this.state.listening ? (
                 <Button bsStyle="danger" onClick={this.dontListen}>
@@ -236,7 +236,7 @@ export default React.createClass({
                   bsStyle="success"
                   onClick={this.doListen}
                   disabled={this.state.listening === null}>
-                    <Glyphicon glyph="play" /> Start Listening
+                  <Glyphicon glyph="play" /> Start Listening
                 </Button>
               )}
             </ButtonToolbar>
@@ -250,18 +250,18 @@ export default React.createClass({
   addBinding() {
     const binding = {
       exchange: findDOMNode(this.refs.exchange).value,
-      routingKeyPattern: findDOMNode(this.refs.routingKeyPattern).value
+      routingKeyPattern: findDOMNode(this.refs.routingKeyPattern).value,
     };
 
-    this.setState({ bindings: this.state.bindings.concat([binding]) });
+    this.setState({bindings: this.state.bindings.concat([binding])});
   },
 
   dontListen() {
-    this.setState({ doListen: false });
+    this.setState({doListen: false});
   },
 
   doListen() {
-    this.setState({ doListen: true });
+    this.setState({doListen: true});
   },
 
   /** return bindings for WebListenerMixin */
@@ -271,10 +271,10 @@ export default React.createClass({
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
   handleMessage(message) {
-    this.setState({ messages: [{
+    this.setState({messages: [{
       ...message,
-      _idForInspector: slugid.nice()
-    }].concat(this.state.messages) });
+      _idForInspector: slugid.nice(),
+    }].concat(this.state.messages)});
   },
 
   /** Render table of messages */
@@ -282,26 +282,26 @@ export default React.createClass({
     const expandedMsgId = this.state.expandedMessage;
 
     return (
-      <Table condensed hover>
+      <Table condensed={true} hover={true}>
         <thead>
-        <tr>
-          <th>Exchange</th>
-          <th>Routing Key</th>
-        </tr>
+          <tr>
+            <th>Exchange</th>
+            <th>Routing Key</th>
+          </tr>
         </thead>
         <tbody>
-        {this.state.messages.map(message => {
-          const msgId = message._idForInspector;
-          const expanded = msgId === expandedMsgId;
+          {this.state.messages.map(message => {
+            const msgId = message._idForInspector;
+            const expanded = msgId === expandedMsgId;
 
-          return (
-            <MessageRow
-              key={msgId}
-              expanded={expanded}
-              message={message}
-              onClick={this.expandMessage.bind(this, msgId)}/>
-          );
-        })}
+            return (
+              <MessageRow
+                key={msgId}
+                expanded={expanded}
+                message={message}
+                onClick={this.expandMessage.bind(this, msgId)} />
+            );
+          })}
         </tbody>
       </Table>
     );
@@ -309,7 +309,7 @@ export default React.createClass({
 
   /** Set expended message, note we rely on object reference comparison here */
   expandMessage(idForInspector) {
-    this.setState({ expandedMessage: idForInspector });
+    this.setState({expandedMessage: idForInspector});
   },
 
   /** Render a listening error */
@@ -323,10 +323,10 @@ export default React.createClass({
 
   /** Dismiss a listening error, basically reset error state */
   dismissListeningError() {
-    this.setState({ listeningError: null });
+    this.setState({listeningError: null});
 
     if (!this.state.listening) {
-      this.setState({ doListen: false });
+      this.setState({doListen: false});
     }
-  }
+  },
 });

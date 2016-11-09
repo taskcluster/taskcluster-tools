@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button, Table, Label } from 'react-bootstrap';
+import {Button, Table, Label} from 'react-bootstrap';
 import ConfirmAction from './confirmaction';
 import LoanerButton from './loaner-button';
 import _ from 'lodash';
-import { Markdown, DateView, Code } from '../format';
+import {Markdown, DateView, Code} from '../format';
 import path from 'path';
 import './taskinfo.less';
 
@@ -12,28 +12,28 @@ const TaskInfo = React.createClass({
   // Validate properties
   propTypes: {
     status: React.PropTypes.object.isRequired,
-    task: React.PropTypes.object.isRequired
+    task: React.PropTypes.object.isRequired,
   },
 
   getInitialState() {
     return {
-      showRunLocallyScript: false
+      showRunLocallyScript: false,
     };
   },
 
   handleRunLocally() {
-    this.setState({ showRunLocallyScript: !this.state.showRunLocallyScript });
+    this.setState({showRunLocallyScript: !this.state.showRunLocallyScript});
   },
 
   render() {
-    const { status, task } = this.props;
+    const {status, task} = this.props;
     const taskStateLabel = {
       unscheduled: 'default',
       pending: 'info',
       running: 'primary',
       completed: 'success',
       failed: 'danger',
-      exception: 'warning'
+      exception: 'warning',
     };
 
     return (
@@ -60,9 +60,11 @@ const TaskInfo = React.createClass({
               <td>
                 <a href={task.metadata.source}>
                   {
-                    task.metadata.source.length > 90 ?
-                      <span>...{task.metadata.source.substr(8 - 90)}</span> :
+                    task.metadata.source.length > 90 ? (
+                      <span>...{task.metadata.source.substr(8 - 90)}</span>
+                    ) : (
                       <span>{task.metadata.source}</span>
+                    )
                   }
                 </a>
               </td>
@@ -134,9 +136,11 @@ const TaskInfo = React.createClass({
               <td>
                 This task will be scheduled when <em>dependencies</em> are
                 {
-                  task.requires === 'all-completed' ?
-                    <span> <code>all-completed</code> successfully.</span> :
+                  task.requires === 'all-completed' ? (
+                    <span> <code>all-completed</code> successfully.</span>
+                  ) : (
                     <span> <code>all-resolved</code> with any resolution.</span>
+                  )
                 }
               </td>
             </tr>
@@ -174,7 +178,10 @@ const TaskInfo = React.createClass({
             <tr>
               <td>Task Definition</td>
               <td>
-                <a href={`https://queue.taskcluster.net/v1/task/${status.taskId}`} target="_blank">
+                <a
+                  href={`https://queue.taskcluster.net/v1/task/${status.taskId}`}
+                  target="_blank"
+                  rel="noopener noreferrer">
                   {status.taskId} <i className="fa fa-external-link" />
                 </a>
               </td>
@@ -199,12 +206,12 @@ const TaskInfo = React.createClass({
                   label="Edit and Re-create"
                   action={this.editTask}
                   success="Opening Task Creator">
-                    Are you sure you wish to edit this task?<br />
-                    Note that the edited task will not be linked to other tasks or
-                    have the same <code>task.routes</code> as other tasks,
-                    so this is not a way to "fix" a failing task in a larger task graph.
-                    Note that you may also not have the scopes required to create the
-                    resulting task.
+                  Are you sure you wish to edit this task?<br />
+                  Note that the edited task will not be linked to other tasks or
+                  have the same <code>task.routes</code> as other tasks,
+                  so this is not a way to "fix" a failing task in a larger task graph.
+                  Note that you may also not have the scopes required to create the
+                  resulting task.
                 </ConfirmAction>&nbsp;
                 <LoanerButton
                   task={this.props.task}
@@ -216,18 +223,18 @@ const TaskInfo = React.createClass({
                 </Button>
               </td>
             </tr>
-              {this.state.showRunLocallyScript ? (
+            {
+              this.state.showRunLocallyScript && (
                 <tr>
                   <td>Run Locally</td>
-                    <td>
-                      <Code language="bash">
-                        {this.renderRunLocallyScript()}
-                      </Code>
-                    </td>
-                  </tr>
-                ) :
-                null
-              }
+                  <td>
+                    <Code language="bash">
+                      {this.renderRunLocallyScript()}
+                    </Code>
+                  </td>
+                </tr>
+              )
+            }
           </tbody>
         </Table>
       </div>
@@ -242,7 +249,7 @@ const TaskInfo = React.createClass({
     const newTask = {
       // filled in by task creator on load
       created: null,
-      deadline: null
+      deadline: null,
     };
     // copy fields from the parent task, intentionally excluding some
     // fields which might cause confusion if left unchanged
@@ -254,7 +261,7 @@ const TaskInfo = React.createClass({
       'created',
       'deadline',
       'dependencies',
-      'requires'
+      'requires',
     ];
 
     _.keys(this.props.task).forEach(key => {
@@ -412,7 +419,7 @@ const TaskInfo = React.createClass({
             '\r': '\\r',
             '\t': '\\t',
             '\v': '\\v',
-            '\b': '\\b'
+            '\b': '\\b',
           })[c]);
 
           return `'${replaced}'`;
@@ -449,7 +456,7 @@ const TaskInfo = React.createClass({
     cmds.push('docker rm -v "${container_name}"');
 
     return cmds.join('\n');
-  }
+  },
 });
 
 export default TaskInfo;

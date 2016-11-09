@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import {combineReducers} from 'redux';
 import tasksReducer from './tasks';
 import taskReducer from './task';
 import statusReducer from './status';
@@ -43,7 +43,7 @@ const rootReducer = combineReducers({
   taskGroup: taskGroupReducer,
 
   // Boolean set to true if application is currently fetch the list task group
-  listTaskGroupInProgress: listTaskGroupInProgressReducer
+  listTaskGroupInProgress: listTaskGroupInProgressReducer,
 });
 
 export default rootReducer;

@@ -2,7 +2,7 @@ import {
   FETCH_TASKS_IN_STEP,
   FETCH_TASKS_FULLY,
   CREATE_TASK,
-  REMOVE_TASKS
+  REMOVE_TASKS,
 } from '../actions/types';
 
 export default (state = [], action) => {

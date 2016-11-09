@@ -1,5 +1,4 @@
 import React from 'react';
-import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
 import * as utils from '../utils';
 import taskcluster from 'taskcluster-client';
 import * as auth from '../auth';
@@ -9,7 +8,7 @@ import * as auth from '../auth';
 const MIMETYPE_ICONS = [
   {
     icon: 'file-pdf-o',
-    matches: ['application/pdf', 'application/postscript']
+    matches: ['application/pdf', 'application/postscript'],
   }, {
     icon: 'file-archive-o',
     matches: [
@@ -26,18 +25,18 @@ const MIMETYPE_ICONS = [
       'application/x-apple-diskimage',
       'application/vnd.ms-cab-compressed',
       'application/vnd.android.package-archive',
-      'application/x-gtar'
+      'application/x-gtar',
 
-    ]
+    ],
   }, {
     icon: 'file-word-o',
-    matches: ['text/rtf', 'text/html']
+    matches: ['text/rtf', 'text/html'],
   }, {
     icon: 'file-excel-o',
-    matches: ['text/csv']
+    matches: ['text/csv'],
   }, {
     icon: 'file-powerpoint-o',
-    matches: []
+    matches: [],
   }, {
     icon: 'file-code-o',
     matches: [
@@ -47,33 +46,33 @@ const MIMETYPE_ICONS = [
       'text/css',
       'text/javascript',
       'text/xml',
-      'application/ecmascript'
-    ]
+      'application/ecmascript',
+    ],
   }, {
     icon: 'file-video-o',
-    matches: [/^video\//]
+    matches: [/^video\//],
   }, {
     icon: 'file-image-o',
-    matches: [/^image\//]
+    matches: [/^image\//],
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//]
+    matches: [/^text\//],
   }, {
     icon: 'file-audio-o',
-    matches: [/^audio\//]
+    matches: [/^audio\//],
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//]
+    matches: [/^text\//],
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//]
+    matches: [/^text\//],
   }, {
     icon: 'file-archive-o',
-    matches: [/compressed/, /tar/, /zip/]
+    matches: [/compressed/, /tar/, /zip/],
   }, {
     icon: 'file-o',
-    matches: [/.*/]
-  }
+    matches: [/.*/],
+  },
 ];
 
 /** Get icon from mimetype */
@@ -104,12 +103,12 @@ export default React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue: taskcluster.Queue
+        queue: taskcluster.Queue,
       },
       // Reload when taskId changes or runId
       reloadOnProps: ['taskId', 'runId', 'artifacts'],
-      reloadOnLogin: true
-    })
+      reloadOnLogin: true,
+    }),
   ],
 
   // Validate properties
@@ -119,15 +118,15 @@ export default React.createClass({
     // If not provided, latestArtifact is used
     runId: React.PropTypes.oneOfType([
       React.PropTypes.string,
-      React.PropTypes.number
-    ])
+      React.PropTypes.number,
+    ]),
   },
 
   /** Get initial state */
   getInitialState() {
     return {
       // list of artifacts with url built
-      artifacts: []
+      artifacts: [],
     };
   },
 
@@ -185,23 +184,23 @@ export default React.createClass({
       return {
         url,
         icon,
-        name: artifact.name
+        name: artifact.name,
       };
     });
 
-    this.setState({ artifacts });
+    this.setState({artifacts});
   },
 
   render() {
     return (
-      <div style={{ fontSize: 14 }}>
+      <div style={{fontSize: 14}}>
         {this.state.artifacts.map((artifact, key) => (
-          <div key={key} style={{ marginBottom: 8 }}>
-            <i className={`fa fa-${artifact.icon}`} style={{ marginRight: 5 }} />
-            <a href={artifact.url} target="_blank">{artifact.name}</a>
+          <div key={key} style={{marginBottom: 8}}>
+            <i className={`fa fa-${artifact.icon}`} style={{marginRight: 5}} />
+            <a href={artifact.url} target="_blank" rel="noopener noreferrer">{artifact.name}</a>
           </div>
         ))}
       </div>
     );
-  }
+  },
 });

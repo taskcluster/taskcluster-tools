@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
+import {Row, Col, ButtonToolbar, Button, Glyphicon} from 'react-bootstrap';
 import HookGroupBrowser from './hookgroupbrowser';
 import HookEditView from './hookeditor';
 import * as utils from '../lib/utils';
@@ -13,20 +13,20 @@ export default React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        hooks: taskcluster.Hooks
-      }
+        hooks: taskcluster.Hooks,
+      },
     }),
     utils.createLocationHashMixin({
       keys: ['currentHookGroupId', 'currentHookId'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   /** Create an initial state */
   getInitialState() {
     return {
       currentHookGroupId: null,
-      currentHookId: null
+      currentHookId: null,
     };
   },
 
@@ -49,11 +49,11 @@ export default React.createClass({
             <Button
               bsStyle="primary"
               disabled={creating}
-              onClick={this.selectHook.bind(this, null, null)}>
-                <Glyphicon glyph="plus" /> New Hook
+              onClick={() => this.selectHook(null, null)}>
+              <Glyphicon glyph="plus" /> New Hook
             </Button>
             <Button bsStyle="success" onClick={this.refreshHookList}>
-              <Glyphicon glyph="refresh"/> Refresh
+              <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar>
         </Col>
@@ -75,7 +75,7 @@ export default React.createClass({
   selectHook(hookGroupId, hookId) {
     this.setState({
       currentHookGroupId: hookGroupId,
-      currentHookId: hookId
+      currentHookId: hookId,
     });
-  }
+  },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Col, ButtonToolbar, Row } from 'react-bootstrap';
+import {Col, ButtonToolbar, Row} from 'react-bootstrap';
 import $ from 'jquery';
-import { parsers } from 'www-authenticate';
+import {parsers} from 'www-authenticate';
 import ReactTooltip from 'react-tooltip';
 import * as format from '../lib/format';
 import './status.less';
@@ -21,7 +21,7 @@ function makeRequest(options, allowHeaders = []) {
     url: process.env.CORS_PROXY,
     method: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(options)
+    data: JSON.stringify(options),
   });
 }
 
@@ -34,9 +34,7 @@ function pollTaskclusterService(key, cb) {
       // 2 is 'up'
       cb(monitor.status === '2' ? 'up' : 'down');
     })
-    .fail(err => {
-      console.error('Error fetching data from uptimerobot');
-      console.error(err);
+    .fail(() => {
       cb('err');
     });
 }
@@ -46,44 +44,44 @@ const taskclusterServices = [
     name: 'Queue',
     poll: pollTaskclusterService.bind(null, process.env.UPTIMEROBOT_API_KEY_QUEUE),
     link: 'https://queue.taskcluster.net/v1/ping',
-    description: 'queue.taskcluster.net'
+    description: 'queue.taskcluster.net',
   },
   {
     name: 'Auth',
     poll: pollTaskclusterService.bind(null, process.env.UPTIMEROBOT_API_KEY_AUTH),
     link: 'https://auth.taskcluster.net/v1/ping',
-    description: 'auth.taskcluster.net'
+    description: 'auth.taskcluster.net',
   },
   {
     name: 'AWS Provisioner',
     poll: pollTaskclusterService.bind(null, process.env.UPTIMEROBOT_API_KEY_AWS_PROVISIONER),
     link: 'https://aws-provisioner.taskcluster.net/v1/ping',
-    description: 'aws-provisioner.taskcluster.net'
+    description: 'aws-provisioner.taskcluster.net',
   },
   {
     name: 'Events',
     poll: pollTaskclusterService.bind(null, process.env.UPTIMEROBOT_API_KEY_EVENTS),
     link: 'https://events.taskcluster.net/v1/ping',
-    description: 'events.taskcluster.net'
+    description: 'events.taskcluster.net',
   },
   {
     name: 'Index',
     poll: pollTaskclusterService.bind(null, process.env.UPTIMEROBOT_API_KEY_INDEX),
     link: 'https://index.taskcluster.net/v1/ping',
-    description: 'index.taskcluster.net'
+    description: 'index.taskcluster.net',
   },
   {
     name: 'Scheduler',
     poll: pollTaskclusterService.bind(null, process.env.UPTIMEROBOT_API_KEY_SCHEDULER),
     link: 'https://scheduler.taskcluster.net/v1/ping',
-    description: 'https://scheduler.taskcluster.net'
+    description: 'https://scheduler.taskcluster.net',
   },
   {
     name: 'Secrets',
     poll: pollTaskclusterService.bind(null, process.env.UPTIMEROBOT_API_KEY_SECRETS),
     link: 'https://secrets.taskcluster.net/v1/ping',
-    description: 'https://secrets.taskcluster.net'
-  }
+    description: 'https://secrets.taskcluster.net',
+  },
 ];
 
 const otherServices = [
@@ -94,7 +92,7 @@ const otherServices = [
     poll: async cb => {
       try {
         const data = await Promise.resolve(makeRequest({
-          url: 'http://status.aws.amazon.com/rss/ec2-us-west-2.rss'
+          url: 'http://status.aws.amazon.com/rss/ec2-us-west-2.rss',
         }));
 
         const items = data.getElementsByTagName('item');
@@ -108,10 +106,9 @@ const otherServices = [
 
         cb(title[0].innerHTML.startsWith('Service is operating normally') ? 'up' : 'down');
       } catch (err) {
-        console.log(err.stack || err);
         cb('down');
       }
-    }
+    },
   },
   {
     name: 'Docker Registry',
@@ -124,7 +121,7 @@ const otherServices = [
       let req;
 
       try {
-        req = makeRequest({ url: 'https://index.docker.io/v2/' }, ['www-authenticate']);
+        req = makeRequest({url: 'https://index.docker.io/v2/'}, ['www-authenticate']);
 
         await Promise.resolve(req);
       } catch (err) {
@@ -136,25 +133,24 @@ const otherServices = [
         try {
           const auth = new WebAuthentication(req.getResponseHeader('www-authenticate'));
           const data = await Promise.resolve(makeRequest({
-            url: `${auth.parms.realm}?service=${auth.parms.service}`
+            url: `${auth.parms.realm}?service=${auth.parms.service}`,
           }));
 
           await Promise.resolve(makeRequest({
             url: 'https://index.docker.io/v2/',
             method: 'GET',
             headers: {
-              Authorization: `${auth.scheme} ${data.token}`
-            }
+              Authorization: `${auth.scheme} ${data.token}`,
+            },
           }));
         } catch (err) {
-          console.log(err.stack || err);
           cb('err');
           return;
         }
       }
 
       cb('up');
-    }
+    },
   },
   {
     name: 'Heroku',
@@ -162,31 +158,30 @@ const otherServices = [
     link: 'https://status.heroku.com/',
     poll: cb => {
       Promise.resolve(makeRequest({
-        url: 'https://status.heroku.com/feed'
+        url: 'https://status.heroku.com/feed',
       }))
       .then(data => cb((!data.length || data[0].title.startsWith('Resolved')) ? 'up' : 'down'))
-      .catch(err => {
-        console.log(err || err.stack);
+      .catch(() => {
         cb('err');
       });
-    }
-  }
+    },
+  },
 ];
 
 const STATUS_DISPLAY = {
-  loading: { icon: 'spinner', spin: true, color: 'gray' },
-  up: { icon: 'thumbs-up', color: 'green' },
-  degraded: { icon: 'exclamation', color: 'orange' },
-  down: { icon: 'thumbs-down', color: 'red' },
-  err: { icon: 'frown-o', color: 'red' }
+  loading: {icon: 'spinner', spin: true, color: 'gray'},
+  up: {icon: 'thumbs-up', color: 'green'},
+  degraded: {icon: 'exclamation', color: 'orange'},
+  down: {icon: 'thumbs-down', color: 'red'},
+  err: {icon: 'frown-o', color: 'red'},
 };
 
 export const StatusChecker = React.createClass({
   propTypes: {
-    status: React.PropTypes.string.isRequired
+    status: React.PropTypes.string.isRequired,
   },
   render() {
-    const { icon, spin, color } = STATUS_DISPLAY[this.props.status] || STATUS_DISPLAY.err;
+    const {icon, spin, color} = STATUS_DISPLAY[this.props.status] || STATUS_DISPLAY.err;
 
     return (
       <format.Icon
@@ -194,9 +189,9 @@ export const StatusChecker = React.createClass({
         size="lg"
         spin={spin}
         className="pull-left"
-        style={{ color }} />
+        style={{color}} />
     );
-  }
+  },
 });
 
 export const Service = React.createClass({
@@ -204,7 +199,7 @@ export const Service = React.createClass({
     name: React.PropTypes.string.isRequired,
     description: React.PropTypes.string.isRequired,
     link: React.PropTypes.string.isRequired,
-    poll: React.PropTypes.func.isRequired
+    poll: React.PropTypes.func.isRequired,
   },
 
   componentWillMount() {
@@ -219,22 +214,22 @@ export const Service = React.createClass({
 
   poll() {
     this.props.poll(status => {
-      this.setState({ status });
+      this.setState({status});
       this.timer = setTimeout(this.poll, 5000);
     });
   },
 
   getInitialState() {
     return {
-      status: 'loading'
+      status: 'loading',
     };
   },
 
   render() {
     return (
       <div className="form-horizontal service-status-container">
-        <a target="_blank" href={this.props.link}>
-          <div data-tip data-for={this.props.name}>
+        <a href={this.props.link} target="_blank" rel="noopener noreferrer">
+          <div data-tip={true} data-for={this.props.name}>
             <label className="service-status"><StatusChecker status={this.state.status} /></label>
             <label className="service-status">{this.props.name}</label>
           </div>
@@ -244,20 +239,20 @@ export const Service = React.createClass({
         </ReactTooltip>
       </div>
     );
-  }
+  },
 });
 
 export const ServiceGroup = React.createClass({
   PropTypes: {
     name: React.PropTypes.string.isRequired,
     services: React.PropTypes.array.isRequired,
-    description: React.PropTypes.string.isRequired
+    description: React.PropTypes.string.isRequired,
   },
 
   render() {
     return (
       <Col className="service-group" md={6} sm={12}>
-        <h4 data-tip data-for={this.props.name}>{this.props.name}</h4>
+        <h4 data-tip={true} data-for={this.props.name}>{this.props.name}</h4>
         <hr />
         <ButtonToolbar>
           {this.props.services.map(service => (
@@ -266,8 +261,7 @@ export const ServiceGroup = React.createClass({
               key={service.name}
               poll={service.poll}
               description={service.description}
-              link={service.link}
-            />
+              link={service.link} />
           ))}
         </ButtonToolbar>
         <ReactTooltip id={this.props.name} place="top" type="info" effect="float">
@@ -275,7 +269,7 @@ export const ServiceGroup = React.createClass({
         </ReactTooltip>
       </Col>
     );
-  }
+  },
 });
 
 export const TaskClusterDashboard = React.createClass({
@@ -294,5 +288,5 @@ export const TaskClusterDashboard = React.createClass({
         </Row>
       </div>
     );
-  }
+  },
 });

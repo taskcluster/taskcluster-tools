@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import { hashHistory } from 'react-router';
-import { connect } from 'react-redux';
-import { Label } from 'react-bootstrap';
+import React, {Component} from 'react';
+import {hashHistory} from 'react-router';
+import {connect} from 'react-redux';
+import {Label} from 'react-bootstrap';
 import * as actions from '../actions';
 
 class Table extends Component {
@@ -30,7 +30,7 @@ class Table extends Component {
   * Generate table columns
   */
   generateHeaders() {
-    const { activeTaskStatus } = this.props;
+    const {activeTaskStatus} = this.props;
 
     return (
       <tr>
@@ -83,6 +83,6 @@ class Table extends Component {
   }
 }
 
-const mapStateToProps = ({ tasks, activeTaskStatus }) => ({ tasks, activeTaskStatus });
+const mapStateToProps = ({tasks, activeTaskStatus}) => ({tasks, activeTaskStatus});
 
 export default connect(mapStateToProps, actions)(Table);

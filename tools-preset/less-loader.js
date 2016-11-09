@@ -1,6 +1,6 @@
 'use strict';
 
-const preset = require('neutrino-preset-react');
+const preset = require('neutrino-preset-taskcluster-web');
 const clone = require('lodash.clonedeep');
 
 // Create a loader for LESS files which just extends the CSS loader with using the less-loader

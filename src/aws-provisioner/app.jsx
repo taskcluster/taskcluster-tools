@@ -5,7 +5,7 @@ import WorkerTypeTable from './workertypetable';
 import Layout from '../lib/Layout';
 
 const PROVISIONER_ID = 'aws-provisioner-v1';
-const hashManager = utils.createHashManager({ separator: '/' });
+const hashManager = utils.createHashManager({separator: '/'});
 
 ReactDOM.render((
   <Layout>

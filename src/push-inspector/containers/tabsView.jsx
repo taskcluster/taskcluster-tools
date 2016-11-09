@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import TaskDetail from '../components/taskDetail';
 import TaskRun from '../components/taskRun';
 
@@ -10,7 +10,7 @@ class TabsView extends Component {
     super(props);
 
     this.state = {
-      tabIndex: 0
+      tabIndex: 0,
     };
 
     this.handleSelect = this.handleSelect.bind(this);
@@ -20,14 +20,14 @@ class TabsView extends Component {
   * Handle active tab on selection
   */
   handleSelect(index) {
-    this.setState({ tabIndex: index });
+    this.setState({tabIndex: index});
   }
 
   /**
   * Fetch task data
   */
   fetchTaskData() {
-    const { params, fetchArtifacts, fetchTask, fetchStatus } = this.props;
+    const {params, fetchArtifacts, fetchTask, fetchStatus} = this.props;
 
     fetchArtifacts(params.taskId);
     fetchTask(params.taskId);
@@ -45,13 +45,13 @@ class TabsView extends Component {
     //  This can happen when retriggering a task or clicking on a task
     if (prevProps.params.taskId !== this.props.params.taskId) {
       this.fetchTaskData();
-      this.setState({ tabIndex: 0 });
+      this.setState({tabIndex: 0});
     }
   }
 
   render() {
-    const { task, status, artifacts } = this.props;
-    const { tabIndex } = this.state;
+    const {task, status, artifacts} = this.props;
+    const {tabIndex} = this.state;
 
     return (
       <Tabs onSelect={this.handleSelect} selectedIndex={tabIndex}>
@@ -72,6 +72,6 @@ class TabsView extends Component {
   }
 }
 
-const mapStateToProps = ({ task, status, artifacts }) => ({ task, status, artifacts });
+const mapStateToProps = ({task, status, artifacts}) => ({task, status, artifacts});
 
 export default connect(mapStateToProps, actions)(TabsView);

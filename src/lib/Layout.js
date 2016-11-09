@@ -1,12 +1,12 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import {
-  Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon, Popover, Overlay, Modal, Button,
-  FormControl, FormGroup, ControlLabel
+  Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon, Popover, Overlay, Modal, Button, FormControl, FormGroup,
+  ControlLabel,
 } from 'react-bootstrap';
 import menu from '../menu';
 import * as auth from './auth';
-import { Icon } from './format';
+import {Icon} from './format';
 import OktaMenuItem from './ui/OktaMenuItem';
 import PersonaMenuItem from './ui/PersonaMenuItem';
 import DevelopmentMenuItem from './ui/DevelopmentMenuItem';
@@ -19,7 +19,7 @@ const SIGNIN_MENU_ITEMS = {
   okta: OktaMenuItem,
   persona: PersonaMenuItem,
   development: DevelopmentMenuItem,
-  manual: ManualMenuItem
+  manual: ManualMenuItem,
 };
 
 /** Navigation bar for layout.jade */
@@ -33,7 +33,7 @@ const Navigation = React.createClass({
       showManualModal: false,
       manualClientId: '',
       manualAccessToken: '',
-      manualCertificate: ''
+      manualCertificate: '',
     };
   },
 
@@ -42,7 +42,7 @@ const Navigation = React.createClass({
     // Clear credentials
     auth.saveCredentials(null);
     // Update state
-    this.setState({ credentials: null });
+    this.setState({credentials: null});
   },
 
   // Listen for credentials-changed events
@@ -69,11 +69,11 @@ const Navigation = React.createClass({
       showManualModal: false,
       credentialsMessage: credentials ? {
         title: 'Signed In',
-        body: `You are now signed in as ${credentials.clientId}.`
+        body: `You are now signed in as ${credentials.clientId}.`,
       } : {
         title: 'Signed Out',
-        body: 'You are now signed out.'
-      }
+        body: 'You are now signed out.',
+      },
     });
 
     this.startExpirationTimer();
@@ -115,8 +115,8 @@ const Navigation = React.createClass({
       credentialsExpiringSoon: true,
       credentialsMessage: {
         title: 'Expiring Soon',
-        body: 'Your temporary credentials will expire soon.  Sign in again to refresh them.'
-      }
+        body: 'Your temporary credentials will expire soon.  Sign in again to refresh them.',
+      },
     });
   },
 
@@ -124,7 +124,7 @@ const Navigation = React.createClass({
   render() {
     // Find active menu entry
     let activeEntry = menu.find(entry => entry.link === location.pathname) ||
-      { title: 'Unknown Page' };
+      {title: 'Unknown Page'};
 
     // Remove title on landing page
     if (window.location.pathname === '/') {
@@ -157,7 +157,7 @@ const Navigation = React.createClass({
           {
             activeEntry ? (
               <span>
-                <Icon name={activeEntry.icon || 'wrench'} fixedWidth />
+                <Icon name={activeEntry.icon || 'wrench'} fixedWidth={true} />
                 &nbsp;&nbsp;
                 {activeEntry.title}
               </span>
@@ -170,12 +170,12 @@ const Navigation = React.createClass({
               .filter(entry => entry.display)
               .map((entry, index) => {
                 if (entry.type === 'divider') {
-                  return <MenuItem key={index} divider />;
+                  return <MenuItem key={index} divider={true} />;
                 }
 
                 return (
                   <MenuItem key={index} href={entry.link}>
-                    <Icon name={entry.icon || 'wrench'} fixedWidth />&nbsp;&nbsp;{entry.title}
+                    <Icon name={entry.icon || 'wrench'} fixedWidth={true} />&nbsp;&nbsp;{entry.title}
                   </MenuItem>
                 );
               })
@@ -190,19 +190,19 @@ const Navigation = React.createClass({
   },
 
   setCredentials(credentials) {
-    this.setState({ signinMenuOpen: false });
+    this.setState({signinMenuOpen: false});
     auth.saveCredentials(credentials);
   },
 
-  showMessage({ title, body }) {
+  showMessage({title, body}) {
     this.setState({
-      credentialsMessage: { title, body },
-      signinMenuOpen: false
+      credentialsMessage: {title, body},
+      signinMenuOpen: false,
     });
   },
 
   showManualModal() {
-    this.setState({ showManualModal: true });
+    this.setState({showManualModal: true});
   },
 
   renderCredentialsMenu() {
@@ -223,13 +223,13 @@ const Navigation = React.createClass({
           open={this.state.signinMenuOpen}
           // Due to https://github.com/react-bootstrap/react-bootstrap/issues/1301,
           // handle expanding and collapsing this manually
-          onToggle={expanded => this.setState({ signinMenuOpen: expanded })}>
-            <MenuItem href="/credentials/">
-              <Icon name="key" /> Manage Credentials
-            </MenuItem>
-            <NavItem onSelect={this.signOut}>
-              <Glyphicon glyph="log-out" /> Sign Out
-            </NavItem>
+          onToggle={expanded => this.setState({signinMenuOpen: expanded})}>
+          <MenuItem href="/credentials/">
+            <Icon name="key" /> Manage Credentials
+          </MenuItem>
+          <NavItem onSelect={this.signOut}>
+            <Glyphicon glyph="log-out" /> Sign Out
+          </NavItem>
         </NavDropdown>
       );
     }
@@ -244,26 +244,26 @@ const Navigation = React.createClass({
         open={this.state.signinMenuOpen}
         // Due to https://github.com/react-bootstrap/react-bootstrap/issues/1301,
         // handle expanding and collapsing this manually
-        onToggle={expanded => this.setState({ signinMenuOpen: expanded })}>
-          {
-            Object
-              .keys(SIGNIN_MENU_ITEMS)
-              .map(key => {
-                const MenuItem = SIGNIN_MENU_ITEMS[key];
+        onToggle={expanded => this.setState({signinMenuOpen: expanded})}>
+        {
+          Object
+            .keys(SIGNIN_MENU_ITEMS)
+            .map(key => {
+              const MenuItem = SIGNIN_MENU_ITEMS[key];
 
-                if (!process.env.SIGN_IN_METHODS.includes(key)) {
-                  return null;
-                }
+              if (!process.env.SIGN_IN_METHODS.includes(key)) {
+                return null;
+              }
 
-                return (
-                  <MenuItem
-                    key={key}
-                    setCredentials={this.setCredentials}
-                    showMessage={this.showMessage}
-                    showManualModal={this.showManualModal} />
-                );
-              })
-          }
+              return (
+                <MenuItem
+                  key={key}
+                  setCredentials={this.setCredentials}
+                  showMessage={this.showMessage}
+                  showManualModal={this.showManualModal} />
+              );
+            })
+        }
       </NavDropdown>
     );
   },
@@ -286,13 +286,13 @@ const Navigation = React.createClass({
         onHide={this.overlayHideHandler}
         placement="bottom"
         target={() => findDOMNode(this.refs.credentials)}>
-          {popover}
+        {popover}
       </Overlay>
     );
   },
 
   closeModal() {
-    this.setState({ showManualModal: false });
+    this.setState({showManualModal: false});
   },
 
   submitForm(e) {
@@ -311,13 +311,13 @@ const Navigation = React.createClass({
     auth.saveCredentials({
       certificate,
       clientId: this.state.manualClientId,
-      accessToken: this.state.manualAccessToken
+      accessToken: this.state.manualAccessToken,
     });
-    this.setState({ signinMenuOpen: false, showManualModal: false });
+    this.setState({signinMenuOpen: false, showManualModal: false});
   },
 
   certificateIsValid() {
-    const { manualCertificate } = this.state;
+    const {manualCertificate} = this.state;
 
     if (manualCertificate === '') {
       return true;
@@ -350,24 +350,24 @@ const Navigation = React.createClass({
             <FormGroup controlId="clientId">
               <ControlLabel>Client Id</ControlLabel>
               <FormControl
-                required
+                required={true}
                 className="top-element"
                 ref="clientId"
                 name="clientId"
                 type="text"
                 placeholder="clientId"
-                onChange={e => this.setState({ manualClientId: e.target.value })} />
+                onChange={e => this.setState({manualClientId: e.target.value})} />
             </FormGroup>
             <FormGroup controlId="accessToken">
               <ControlLabel>Access Token</ControlLabel>
               <FormControl
-                required
+                required={true}
                 className="mid-element"
                 ref="accessToken"
                 name="accessToken"
                 type="password"
                 placeholder="accessToken"
-                onChange={e => this.setState({ manualAccessToken: e.target.value })} />
+                onChange={e => this.setState({manualAccessToken: e.target.value})} />
             </FormGroup>
             <FormGroup controlId="certificate">
               <ControlLabel>Certificate</ControlLabel>
@@ -378,7 +378,7 @@ const Navigation = React.createClass({
                 name="certificate"
                 rows={8}
                 placeholder="JSON certificate (if required)"
-                onChange={e => this.setState({ manualCertificate: e.target.value })} />
+                onChange={e => this.setState({manualCertificate: e.target.value})} />
             </FormGroup>
             <p className="text-muted">Note that the credentials are not checked for validity.</p>
           </Modal.Body>
@@ -394,8 +394,8 @@ const Navigation = React.createClass({
   },
 
   overlayHideHandler() {
-    this.setState({ credentialsMessage: '' });
-  }
+    this.setState({credentialsMessage: ''});
+  },
 });
 
 const Layout = props => (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import {Row, Col} from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import * as auth from '../lib/auth';
 import * as utils from '../lib/utils';
@@ -10,7 +10,7 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      credentials: auth.loadCredentials()
+      credentials: auth.loadCredentials(),
     };
   },
 
@@ -27,7 +27,7 @@ export default React.createClass({
 
   handleCredentialsChanged() {
     this.setState({
-      credentials: auth.loadCredentials()
+      credentials: auth.loadCredentials(),
     });
   },
 
@@ -39,28 +39,28 @@ export default React.createClass({
   /** Stop listening for credentials-changed events */
   componentWillUnmount() {
     window.removeEventListener('credentials-changed', this.handleCredentialsChanged, false);
-  }
+  },
 
 });
 
 const CredentialView = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
-      reloadOnProps: ['credentials']
-    })
+      reloadOnProps: ['credentials'],
+    }),
   ],
 
   getInitialState() {
     return {
       info: null,
-      showToken: false
+      showToken: false,
     };
   },
 
   load() {
     return this.props.credentials ?
-      { info: taskcluster.credentialInformation(this.props.credentials) } :
-      { info: null, infoLoaded: true };
+      {info: taskcluster.credentialInformation(this.props.credentials)} :
+      {info: null, infoLoaded: true};
   },
 
   render() {
@@ -70,14 +70,14 @@ const CredentialView = React.createClass({
     return this.renderWaitFor('info') || (() => {
       if (!info) {
         return (
-          <div style={{ marginTop: 20 }}>
+          <div style={{marginTop: 20}}>
             <p>No credentials loaded. Please sign in.</p>
           </div>
         );
       }
 
       return (
-        <div style={{ marginTop: 20 }}>
+        <div style={{marginTop: 20}}>
           <table className="table">
             <tbody>
               <tr>
@@ -88,9 +88,15 @@ const CredentialView = React.createClass({
               <tr>
                 <td>AccessToken</td>
                 {
-                  showToken ?
-                    <td><code>{this.props.credentials.accessToken}</code></td> :
-                    <td><a href="#" onClick={this.showToken}>show</a></td>
+                  showToken ? (
+                    <td>
+                      <code>{this.props.credentials.accessToken}</code>
+                    </td>
+                  ) : (
+                    <td>
+                      <a href="#" onClick={this.showToken}>show</a>
+                    </td>
+                  )
                 }
               </tr>
 
@@ -126,13 +132,11 @@ const CredentialView = React.createClass({
                 <td>
                   {
                     info.scopes.length ? (
-                        <div style={{ lineHeight: 1.8 }}>
-                          {info.scopes.map((scope, key) => (
-                            <div key={key}><code>{scope}</code></div>
-                          ))}
-                        </div>
-                      ) :
-                      'none (or accessToken is invalid)'
+                      <div style={{lineHeight: 1.8}}>
+                        {info.scopes.map((scope, key) => <div key={key}><code>{scope}</code></div>)}
+                      </div>
+                    ) :
+                    'none (or accessToken is invalid)'
                   }
                 </td>
               </tr>
@@ -144,6 +148,6 @@ const CredentialView = React.createClass({
   },
 
   showToken() {
-    this.setState({ showToken: true });
-  }
+    this.setState({showToken: true});
+  },
 });

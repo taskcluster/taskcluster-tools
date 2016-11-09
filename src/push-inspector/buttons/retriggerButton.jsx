@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import ConfirmAction from '../shared/confirmAction';
 
@@ -8,7 +8,7 @@ class RetriggerButton extends Component {
     const glyph = 'repeat';
     const label = 'Retrigger';
     const successMsg = 'Retrigger success';
-    const { tasks, task, retriggerTask } = this.props;
+    const {tasks, task, retriggerTask} = this.props;
     const action = () => retriggerTask(tasks, task, successMsg);
 
     return (
@@ -33,6 +33,6 @@ class RetriggerButton extends Component {
   }
 }
 
-const mapStateToProps = ({ task, tasks }) => ({ task, tasks });
+const mapStateToProps = ({task, tasks}) => ({task, tasks});
 
 export default connect(mapStateToProps, actions)(RetriggerButton);

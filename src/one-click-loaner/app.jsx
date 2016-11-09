@@ -4,7 +4,7 @@ import OneClickLoaner from './one-click-loaner';
 import * as utils from '../lib/utils';
 import Layout from '../lib/Layout';
 
-const hashManager = utils.createHashManager({ separator: '/' });
+const hashManager = utils.createHashManager({separator: '/'});
 
 ReactDOM.render((
   <Layout>

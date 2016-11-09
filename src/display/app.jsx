@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import URL from 'url';
 import qs from 'querystring';
-import { Grid, Row, Col, ListGroup, ListGroupItem, Button, Glyphicon } from 'react-bootstrap';
+import {Grid, Row, Col, ListGroup, ListGroupItem, Button, Glyphicon} from 'react-bootstrap';
 import * as format from '../lib/format';
 import * as utils from '../lib/utils';
 import Layout from '../lib/Layout';
@@ -18,42 +18,42 @@ const RFBLoaded = new Promise(accept => {
   Util.load_scripts([
     'webutil.js', 'base64.js', 'websock.js', 'des.js',
     'keysymdef.js', 'keyboard.js', 'input.js', 'display.js',
-    'inflator.js', 'rfb.js', 'keysym.js'
+    'inflator.js', 'rfb.js', 'keysym.js',
   ]);
   // Once loaded return RFB from window object
   window.onscriptsload = () => accept(window.RFB);
 });
 
-const RFB_STATE_LABELS = {
-  failed: 'danger',
-  fatal: 'danger',
-  normal: 'danger',
-  disconnected: 'danger',
-  loaded: 'danger'
-};
+// const RFB_STATE_LABELS = {
+//   failed: 'danger',
+//   fatal: 'danger',
+//   normal: 'danger',
+//   disconnected: 'danger',
+//   loaded: 'danger'
+// };
 
 const Display = React.createClass({
   mixins: [
     // Call this.connect() when props.socketUrl changes
     utils.createWatchStateMixin({
       onProps: {
-        connect: ['socketUrl', 'shared']
-      }
-    })
+        connect: ['socketUrl', 'shared'],
+      },
+    }),
   ],
 
   getDefaultProps() {
     return {
       viewOnly: false,
-      shared: false
+      shared: false,
     };
   },
 
   render() {
     return (
-      <center>
-          <canvas ref="display">Canvas not supported!</canvas>;
-      </center>
+      <div style={{textAlign: 'center'}}>
+        <canvas ref="display">Canvas not supported!</canvas>
+      </div>
     );
   },
 
@@ -82,7 +82,7 @@ const Display = React.createClass({
         onBell: this.onBell,
         onDesktopName: this.onDesktopName,
         connectTimeout: 5,
-        disconnectTimeout: 5
+        disconnectTimeout: 5,
       });
     } catch (err) {
       this.onUpdateState(null, 'fatal', null, `Unable to create RFB client, error: ${err}`);
@@ -90,7 +90,7 @@ const Display = React.createClass({
     }
 
     // Get port
-    let { port } = opts;
+    let {port} = opts;
 
     if (!port) {
       if (opts.protocol === 'wss:') {
@@ -118,33 +118,33 @@ const Display = React.createClass({
     }
   },
 
-  onDesktopName(rfb, name) {
-    console.log('Desktop name:', name);
+  onDesktopName(/* rfb, name */) {
     // TODO: Display desktop name
   },
 
-  onUpdateState(rfb, state, oldstate, msg) {
-    const level = RFB_STATE_LABELS[state] || 'danger';
-    const message = msg || `Transitioned from state: ${state} to ${state}`;
-
-    console.log(`${state} -> ${state}: ${message}`);
+  onUpdateState(/* rfb, state, oldstate, msg */) {
     // TODO: Display label and message
+    // const level = RFB_STATE_LABELS[state] || 'danger';
+    // const message = msg || `Transitioned from state: ${state} to ${state}`;
+
+    // console.log(`${state} -> ${state}: ${message}`);
   },
 
   onPasswordRequired(rfb) {
     // This shouldn't be necessary, so we just have this sketchy implementation
-    rfb.sendPassword(prompt('VNC server wants a password:'));
+    rfb.sendPassword(prompt('VNC server wants a password:')); // eslint-disable-line no-alert
   },
 
-  onClipboard(rfb, text) {
-    console.log(`Clipboard received: "${text}"`);
+  onClipboard(/* rfb, text */) {
     // TODO: Figure out how to sync clipboard, it might not be possible
     // maybe we can offer a button to copy out the clipboard...
+    // console.log(`Clipboard received: "${text}"`);
   },
 
   onBell() {
-    console.log('Bell!');
-  }
+    // TODO: Handle bell
+    // console.log('Bell!');
+  },
 });
 
 const DisplayList = React.createClass({
@@ -153,15 +153,15 @@ const DisplayList = React.createClass({
     utils.createTaskClusterMixin({
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps: ['displaysUrl', 'socketUrl', 'shared'],
-      reloadOnLogin: false
-    })
+      reloadOnLogin: false,
+    }),
   ],
 
   load() {
     return {
       displays: $.getJSON(this.props.displaysUrl),
       display: null,
-      RFB: RFBLoaded
+      RFB: RFBLoaded,
     };
   },
 
@@ -173,7 +173,7 @@ const DisplayList = React.createClass({
       RFB: null,
       RFBLoaded: true,
       RFBError: null,
-      display: null
+      display: null,
     };
   },
 
@@ -182,9 +182,10 @@ const DisplayList = React.createClass({
       const display = encodeURIComponent(this.state.display);
 
       return this.renderWaitFor('RFB') || (
-        <Display RFB={this.state.RFB}
-                 socketUrl={`${this.props.socketUrl}?display=${display}`}
-                 shared={this.props.shared === 'true'} />
+        <Display
+          RFB={this.state.RFB}
+          socketUrl={`${this.props.socketUrl}?display=${display}`}
+          shared={this.props.shared === 'true'} />
       );
     }
     return this.renderWaitFor('displays') || (
@@ -195,23 +196,23 @@ const DisplayList = React.createClass({
             <i>
               Pick a display to initiate a VNC session with a display server from the container.
             </i>
-            <br/><br/>
+            <br /><br />
             <ListGroup>
               {
                 this.state.displays.map((d, index) => (
                   <ListGroupItem
-                    style={{ cursor: 'pointer' }}
+                    style={{cursor: 'pointer'}}
                     key={index}
-                    onClick={this.setDisplay.bind(this, d.display)}>
-                      <Row>
-                        <Col md={2}>
-                          <format.Icon name="television" size="4x" />
-                        </Col>
-                        <Col md={10}>
-                          <h4>Display <code>{d.display}</code></h4>
-                          Resolution {d.width} &times; {d.height}
-                        </Col>
-                      </Row>
+                    onClick={() => this.setDisplay(d.display)}>
+                    <Row>
+                      <Col md={2}>
+                        <format.Icon name="television" size="4x" />
+                      </Col>
+                      <Col md={10}>
+                        <h4>Display <code>{d.display}</code></h4>
+                        Resolution {d.width} &times; {d.height}
+                      </Col>
+                    </Row>
                   </ListGroupItem>
                 ))
               }
@@ -226,8 +227,8 @@ const DisplayList = React.createClass({
   },
 
   setDisplay(display) {
-    this.setState({ display });
-  }
+    this.setState({display});
+  },
 });
 
 // Get arguments:

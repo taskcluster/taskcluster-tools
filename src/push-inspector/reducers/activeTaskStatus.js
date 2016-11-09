@@ -1,4 +1,4 @@
-import { ACTIVE_TASK_STATUS } from '../actions/types';
+import {ACTIVE_TASK_STATUS} from '../actions/types';
 
 const INITIAL_STATE = null;
 

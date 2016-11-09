@@ -1,6 +1,6 @@
 import React from 'react';
-import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
-import { Login } from 'taskcluster-client';
+import {OverlayTrigger, Tooltip, NavItem, Glyphicon} from 'react-bootstrap';
+import {Login} from 'taskcluster-client';
 import '../persona';
 
 // This interfaces directly with Persona, then uses the Login service API to convert the resulting
@@ -18,18 +18,18 @@ export default class extends React.Component {
         const login = new Login();
 
         login
-          .credentialsFromPersonaAssertion({ assertion, audience })
+          .credentialsFromPersonaAssertion({assertion, audience})
           .then(this.props.setCredentials)
           .catch(err => {
             this.props.showMessage({
               title: 'Sign-In Error',
-              body: err.details ? `${err.body.details.code}: ${err.body.details.message}` : err.code
+              body: err.details ? `${err.body.details.code}: ${err.body.details.message}` : err.code,
             });
           });
       } else {
         this.props.showMessage({
           title: 'Sign-In Cancelled',
-          body: 'Sign-In was cancelled'
+          body: 'Sign-In was cancelled',
         });
       }
     });
@@ -46,7 +46,7 @@ export default class extends React.Component {
     return (
       <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
         <NavItem onSelect={() => this.signIn()}>
-          <Glyphicon glyph="user"/> Sign In with Persona
+          <Glyphicon glyph="user" /> Sign In with Persona
         </NavItem>
       </OverlayTrigger>
     );

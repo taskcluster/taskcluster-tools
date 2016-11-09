@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Layout from '../lib/Layout';
-import { hterm, lib } from 'hterm-umd';
+import {hterm, lib} from 'hterm-umd';
 import url from 'url';
 import qs from 'querystring';
-import { DockerExecClient } from 'docker-exec-websocket-server';
+import {DockerExecClient} from 'docker-exec-websocket-server';
 import './shell.less';
 import wsshell from 'ws-shell';
 
@@ -61,9 +61,9 @@ term.onTerminalReady = async () => {
         'SPAWN="$SHELL";',
         'if [ "$SHELL" = "bash" ]; then SPAWN="bash -li"; fi;',
         'if [ -f "/bin/taskcluster-interactive-shell" ]; then SPAWN="/bin/taskcluster-interactive-shell"; fi;',
-        'exec $SPAWN;'
-      ].join('')
-    ]
+        'exec $SPAWN;',
+      ].join(''),
+    ],
   };
 
   // Create a shell client, with interface similar to child_process

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import {Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
 import _ from 'lodash';
 import taskcluster from 'taskcluster-client';
 import * as utils from '../utils';
@@ -17,17 +17,17 @@ const TaskView = React.createClass({
     utils.createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue: taskcluster.Queue
+        queue: taskcluster.Queue,
       },
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps: ['status.taskId'],
-      reloadOnLogin: false
+      reloadOnLogin: false,
     }),
     // Serialize state.currentTab to location.hash as string
     utils.createLocationHashMixin({
       keys: ['currentTab'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   // Get initial state
@@ -37,7 +37,7 @@ const TaskView = React.createClass({
       currentTab: this.props.initialTab,
       task: null,
       taskLoaded: false,
-      taskError: null
+      taskError: null,
     };
   },
 
@@ -45,13 +45,13 @@ const TaskView = React.createClass({
   getDefaultProps() {
     return {
       // Initial tab to show (empty string is task view)
-      initialTab: ''
+      initialTab: '',
     };
   },
 
   // Validate properties
   propTypes: {
-    status: React.PropTypes.object.isRequired
+    status: React.PropTypes.object.isRequired,
   },
 
   scheduleTask() {
@@ -64,7 +64,7 @@ const TaskView = React.createClass({
 
   load() {
     return {
-      task: this.queue.task(this.props.status.taskId)
+      task: this.queue.task(this.props.status.taskId),
     };
   },
 
@@ -77,7 +77,7 @@ const TaskView = React.createClass({
     const isResolved = [
       'completed',
       'failed',
-      'exception'
+      'exception',
     ].indexOf(this.props.status.state) !== -1;
 
     return (
@@ -91,10 +91,10 @@ const TaskView = React.createClass({
               label="Schedule Task"
               action={this.scheduleTask}
               success="Successfully scheduled task!">
-                Are you sure you wish to schedule the task? This will <strong>overwrite any
-                scheduling process</strong> taking place. If this task is part of a continuous
-                integration process scheduling this task may cause your code to land with broken
-                tests.
+              Are you sure you wish to schedule the task? This will <strong>overwrite any
+              scheduling process</strong> taking place. If this task is part of a continuous
+              integration process scheduling this task may cause your code to land with broken
+              tests.
             </ConfirmActionMenuItem>
             <RetriggerMenuItem task={this.state.task} taskId={this.props.status.taskId} />
             <ConfirmActionMenuItem
@@ -113,7 +113,7 @@ const TaskView = React.createClass({
               workerType={this.state.task.workerType} />
           </NavDropdown>
           <NavDropdown eventKey="runs" title="Runs" key="runs" id="task-view-runs">
-            {this.props.status.runs.map(({ runId }) => (
+            {this.props.status.runs.map(({runId}) => (
               <MenuItem eventKey={`${runId}`} key={`${runId}`}>
                 Run {runId}
               </MenuItem>
@@ -155,7 +155,7 @@ const TaskView = React.createClass({
   setCurrentTab(tab) {
     // Update state
     this.setState({
-      currentTab: tab
+      currentTab: tab,
     });
   },
 
@@ -164,7 +164,7 @@ const TaskView = React.createClass({
     if (this.refs.runInfo) {
       this.refs.runInfo.handleArtifactCreatedMessage(message);
     }
-  }
+  },
 });
 
 export default TaskView;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import $ from 'jquery';
 import TaskView from '../lib/ui/taskview';
 
@@ -12,7 +12,7 @@ export default React.createClass({
   componentDidMount() {
     $(findDOMNode(this.refs.affix))
       .affix({
-        offset: { top: 320 }
+        offset: {top: 320},
       });
   },
   render() {
@@ -25,5 +25,5 @@ export default React.createClass({
           queue={this.props.queue} />
       </div>
     );
-  }
+  },
 });

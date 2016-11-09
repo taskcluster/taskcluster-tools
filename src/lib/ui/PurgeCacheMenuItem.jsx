@@ -10,21 +10,21 @@ export default React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        purgeCache: taskcluster.PurgeCache
-      }
-    })
+        purgeCache: taskcluster.PurgeCache,
+      },
+    }),
   ],
 
   propTypes: {
     provisionerId: React.PropTypes.string.isRequired,
     workerType: React.PropTypes.string.isRequired,
-    caches: React.PropTypes.array
+    caches: React.PropTypes.array,
   },
 
   getInitialState() {
     return {
       purged: null,
-      selected: this.props.caches || []
+      selected: this.props.caches || [],
     };
   },
 
@@ -36,30 +36,28 @@ export default React.createClass({
         label="Purge worker cache"
         action={this.purge}
         success="Cache successfully purged!">
-          <div>
-            <p>
-              Are you sure you wish to purge caches used in this task across all workers of this
-              workerType?
-            </p>
-            <p>Select the caches to purge:</p>
-            <ul>
-              {(this.props.caches || []).map(cache => (
-                 <li className="checkbox" key={cache}>
-                   <label>
-                     <input
-                       name="cache"
-                       type="checkbox"
-                       onChange={this.update}
-                       checked={this.state.selected === null ?
-                         false :
-                         this.state.selected.includes(cache)}
-                       value={cache} />
-                     {cache}
-                   </label>
-                 </li>
-              ))}
-            </ul>
-          </div>
+        <div>
+          <p>
+            Are you sure you wish to purge caches used in this task across all workers of this
+            workerType?
+          </p>
+          <p>Select the caches to purge:</p>
+          <ul>
+            {(this.props.caches || []).map(cache => (
+              <li className="checkbox" key={cache}>
+                <label>
+                  <input
+                    name="cache"
+                    type="checkbox"
+                    onChange={this.update}
+                    checked={this.state.selected === null ? false : this.state.selected.includes(cache)}
+                    value={cache} />
+                  {cache}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
       </ConfirmActionMenuItem>
     );
   },
@@ -73,12 +71,12 @@ export default React.createClass({
       caches = caches.filter(i => i !== e.target.value);
     }
 
-    this.setState({ selected: caches });
+    this.setState({selected: caches});
   },
   purge() {
     const promises = this.state.selected.map(cacheName => this.purgeCache
-      .purgeCache(this.props.provisionerId, this.props.workerType, { cacheName }));
+      .purgeCache(this.props.provisionerId, this.props.workerType, {cacheName}));
 
     return Promise.all(promises);
-  }
+  },
 });

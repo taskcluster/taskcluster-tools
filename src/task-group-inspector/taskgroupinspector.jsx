@@ -1,12 +1,12 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import _ from 'lodash';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import TaskView from './taskview';
 import * as format from '../lib/format';
 import PreviousTasks from '../lib/ui/previoustasks';
-import { FormControl, FormGroup, ControlLabel } from 'react-bootstrap';
+import {FormControl, FormGroup, ControlLabel} from 'react-bootstrap';
 import './taskgroupinspector.less';
 
 const VALID_SLUG = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
@@ -20,26 +20,26 @@ export default React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         queue: taskcluster.Queue,
-        queueEvents: taskcluster.QueueEvents
+        queueEvents: taskcluster.QueueEvents,
       },
       // Reload when state.taskGroupId changes, ignore credential changes
       reloadOnKeys: ['taskGroupId'],
-      reloadOnLogin: false
+      reloadOnLogin: false,
     }),
     // Called handler when state.taskGroupId changes
     utils.createWatchStateMixin({
       onKeys: {
         updateTaskGroupIdInput: ['taskGroupId'],
-        loadTaskStatus: ['taskId']
-      }
+        loadTaskStatus: ['taskId'],
+      },
     }),
     // Listen for messages, reload bindings() when state.taskGroupId changes
-    utils.createWebListenerMixin({ reloadOnKeys: ['taskGroupId'] }),
+    utils.createWebListenerMixin({reloadOnKeys: ['taskGroupId']}),
     // Serialize state.taskGroupId to location.hash as string
     utils.createLocationHashMixin({
       keys: ['taskGroupId', 'taskId'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   /** Get initial state */
@@ -50,7 +50,7 @@ export default React.createClass({
       taskGroupLoaded: true,
       taskGroupError: null,
       taskGroup: null,
-      taskGroupIdInput: ''
+      taskGroupIdInput: '',
     };
   },
 
@@ -78,7 +78,7 @@ export default React.createClass({
       tasks.push(...result.tasks);
 
       this.setState({
-        taskGroup: { taskGroupId, tasks }
+        taskGroup: {taskGroupId, tasks},
       });
 
       continuationToken = result.continuationToken;
@@ -90,7 +90,7 @@ export default React.createClass({
   load() {
     // Skip loading empty-strings
     if (!this.state.taskGroupId) {
-      return { taskGroup: null };
+      return {taskGroup: null};
     }
 
     this.listTaskGroup(this.state.taskGroupId);
@@ -117,7 +117,7 @@ export default React.createClass({
   /** Update taskGroupId input field when taskGroupId changes */
   updateTaskGroupIdInput() {
     // This handle changes that occurs due to modifications of location.hash
-    this.setState({ taskGroupIdInput: this.state.taskGroupId });
+    this.setState({taskGroupIdInput: this.state.taskGroupId});
   },
 
   /** Return bindings for WebListenerMixin */
@@ -128,7 +128,7 @@ export default React.createClass({
     }
 
     // Create common routing key for queue events and task group events
-    const qkey = { taskGroupId: this.state.taskGroupId };
+    const qkey = {taskGroupId: this.state.taskGroupId};
 
     // Return all interesting bindings
     return [
@@ -138,7 +138,7 @@ export default React.createClass({
       this.queueEvents.artifactCreated(qkey),
       this.queueEvents.taskCompleted(qkey),
       this.queueEvents.taskFailed(qkey),
-      this.queueEvents.taskException(qkey)
+      this.queueEvents.taskException(qkey),
     ];
   },
 
@@ -152,7 +152,7 @@ export default React.createClass({
       this.queueEvents.artifactCreated().exchange,
       this.queueEvents.taskCompleted().exchange,
       this.queueEvents.taskFailed().exchange,
-      this.queueEvents.taskException().exchange
+      this.queueEvents.taskException().exchange,
     ];
 
     // Dispatch to handleQueueMessage or handleSchedulerMessage
@@ -182,8 +182,8 @@ export default React.createClass({
     taskGroup.tasks = taskGroup.tasks.slice();
 
     // Find index of task entry
-    const { taskId } = message.payload.status;
-    const index = _.findIndex(taskGroup.tasks, { taskId });
+    const {taskId} = message.payload.status;
+    const index = _.findIndex(taskGroup.tasks, {taskId});
 
     if (index === -1) {
       return; // if not present, we can't update it
@@ -201,7 +201,7 @@ export default React.createClass({
     taskGroup.tasks[index] = task;
 
     // Create updated state
-    const state = { taskGroup };
+    const state = {taskGroup};
 
     // Cache status structure, we don't have to reload it if we select the task
     // and if it is already selected it'll be immediately updated
@@ -209,7 +209,7 @@ export default React.createClass({
 
     // Update state, use loadState to ensure that <key>Error and <key>Loaded
     // are set correctly
-    this.loadState({ taskGroup });
+    this.loadState({taskGroup});
   },
 
   /** Handle message from the scheduler */
@@ -224,7 +224,7 @@ export default React.createClass({
 
     // Update task group status and update state
     taskGroup.status = message.payload.status;
-    this.setState({ taskGroup });
+    this.setState({taskGroup});
   },
 
   // Get taskId of selected task
@@ -276,7 +276,8 @@ export default React.createClass({
               </FormGroup>
 
               <div className="col-sm-offset-3 col-sm-9">
-                <input type="submit"
+                <input
+                  type="submit"
                   className="btn btn-primary"
                   disabled={!this.state.taskGroupLoaded || invalidInput}
                   value="Inspect task group" />
@@ -308,7 +309,7 @@ export default React.createClass({
 
     return (
       <div>
-        <hr/>
+        <hr />
         <dl className="dl-horizontal">
           <dt>taskGroupId</dt>
           <dd><code>{taskGroup.taskGroupId}</code></dd>
@@ -332,7 +333,7 @@ export default React.createClass({
       running: 'label label-primary',
       completed: 'label label-success',
       failed: 'label label-danger',
-      exception: 'label label-warning'
+      exception: 'label label-warning',
     };
 
     this.state.taskGroup.tasks.forEach(item => {
@@ -363,48 +364,45 @@ export default React.createClass({
             </tr>
           </thead>
           <tbody>
-          {
-            this.state.taskGroup.tasks.map(item => {
-              const task = item.task;
-              const status = item.status;
-              const stateLabel = taskStateLabel[status.state];
-              let relation = null;
+            {
+              this.state.taskGroup.tasks.map(item => {
+                const task = item.task;
+                const status = item.status;
+                const stateLabel = taskStateLabel[status.state];
+                let relation = null;
 
-              if (requiredTasks.indexOf(status.taskId) !== -1) {
-                relation = <span className={stateLabel}>required</span>;
-              }
+                if (requiredTasks.indexOf(status.taskId) !== -1) {
+                  relation = <span className={stateLabel}>required</span>;
+                }
 
-              if (dependentTasks.indexOf(status.taskId) !== -1) {
-                relation = <span className="label label-info">dependent</span>;
-              }
+                if (dependentTasks.indexOf(status.taskId) !== -1) {
+                  relation = <span className="label label-info">dependent</span>;
+                }
 
-              if (status.taskId === this.state.taskId) {
-                relation = '-';
-              }
+                if (status.taskId === this.state.taskId) {
+                  relation = '-';
+                }
 
-              return (
-                <tr key={status.taskId}
+                return (
+                  <tr
+                    key={status.taskId}
                     className={this.state.taskId === status.taskId ? 'info' : null}
                     onClick={this.handleSelectTask.bind(this, status.taskId)}>
-                  <td><code>{status.taskId}</code></td>
-                  <td>
-                    <format.Markdown>
-                      {task.metadata.name}
-                    </format.Markdown>
-                  </td>
-                  <td>
-                    <span className={stateLabel}>
-                      {status.state}
-                    </span>
-                  </td>
-                  <td>
-                    {status.runs.length}
-                  </td>
-                  <td>{relation}</td>
-                </tr>
-              );
-            })
-          }
+                    <td><code>{status.taskId}</code></td>
+                    <td>
+                      <format.Markdown>
+                        {task.metadata.name}
+                      </format.Markdown>
+                    </td>
+                    <td>
+                      <span className={stateLabel}>{status.state}</span>
+                    </td>
+                    <td>{status.runs.length}</td>
+                    <td>{relation}</td>
+                  </tr>
+                );
+              })
+            }
           </tbody>
         </table>
       </div>
@@ -444,18 +442,18 @@ export default React.createClass({
   /** Update TaskGroupIdInput to reflect input */
   handleTaskGroupIdInputChange() {
     this.setState({
-      taskGroupIdInput: findDOMNode(this.refs.taskGroupId).value.trim()
+      taskGroupIdInput: findDOMNode(this.refs.taskGroupId).value.trim(),
     });
   },
 
   /** Handle selection of a task */
   handleSelectTask(taskId) {
-    this.setState({ taskId });
+    this.setState({taskId});
   },
 
   /** Handle form submission */
   handleSubmit(e) {
     e.preventDefault();
-    this.setState({ taskGroupId: this.state.taskGroupIdInput });
-  }
+    this.setState({taskGroupId: this.state.taskGroupIdInput});
+  },
 });

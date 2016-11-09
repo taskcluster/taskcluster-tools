@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Layout from '../lib/Layout';
-import { hterm, lib } from 'hterm-umd';
+import {hterm, lib} from 'hterm-umd';
 import url from 'url';
 import qs from 'querystring';
-import { DockerExecClient } from 'docker-exec-websocket-server';
+import {DockerExecClient} from 'docker-exec-websocket-server';
 import './interactive.less';
 
 const args = qs.parse(url.parse(window.location.href).query);
@@ -36,9 +36,9 @@ term.onTerminalReady = async () => {
         'if [ -z `which "$SHELL"` ]; then export SHELL="/.taskclusterutils/busybox sh"; fi;',
         'SPAWN="$SHELL";',
         'if [ "$SHELL" = "bash" ]; then SPAWN="bash -li"; fi;',
-        'exec $SPAWN;'
-      ].join('')
-    ]
+        'exec $SPAWN;',
+      ].join(''),
+    ],
   });
 
   io.onVTKeystroke = io.sendString = d => {

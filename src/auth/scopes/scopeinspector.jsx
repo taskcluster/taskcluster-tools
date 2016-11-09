@@ -1,9 +1,6 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
-import {
-  Row, Col, Button, Glyphicon, InputGroup, FormControl,
-  DropdownButton, MenuItem, Table
-} from 'react-bootstrap';
+import {findDOMNode} from 'react-dom';
+import {Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table} from 'react-bootstrap';
 import * as utils from '../../lib/utils';
 import taskcluster from 'taskcluster-client';
 import * as format from '../../lib/format';
@@ -19,14 +16,14 @@ export default React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        auth: taskcluster.Auth
-      }
+        auth: taskcluster.Auth,
+      },
     }),
     // Serialize selectedScope and selectedEntity to location.hash as string
     utils.createLocationHashMixin({
       keys: ['selectedScope', 'selectedEntity'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   /** Create an initial state */
@@ -41,7 +38,7 @@ export default React.createClass({
       selectedScope: '',
       selectedEntity: '',
       scopeSearchTerm: '',
-      entitySearchMode: 'Has Scope'
+      entitySearchMode: 'Has Scope',
     };
   },
 
@@ -56,7 +53,7 @@ export default React.createClass({
     // - clients
     return {
       roles: this.auth.listRoles(),
-      clients: this.auth.listClients()
+      clients: this.auth.listClients(),
     };
   },
 
@@ -72,7 +69,7 @@ export default React.createClass({
   },
 
   renderSelectedEntity() {
-    const { selectedEntity } = this.state;
+    const {selectedEntity} = this.state;
 
     if (selectedEntity === '') {
       return;
@@ -84,7 +81,7 @@ export default React.createClass({
           <Row>
             <Col md={1}>
               <Button onClick={this.clearSelectedEntity}>
-                <Glyphicon glyph="chevron-left"/> Back
+                <Glyphicon glyph="chevron-left" /> Back
               </Button>
             </Col>
             <Col md={11}>
@@ -111,7 +108,7 @@ export default React.createClass({
   },
 
   clearSelectedEntity() {
-    this.setState({ selectedEntity: '' });
+    this.setState({selectedEntity: ''});
   },
 
   renderSelectedScope() {
@@ -161,7 +158,7 @@ export default React.createClass({
           <Row>
             <Col md={1}>
               <Button onClick={this.clearSelectedScope}>
-                <Glyphicon glyph="chevron-left"/> Back
+                <Glyphicon glyph="chevron-left" /> Back
               </Button>
             </Col>
             <Col md={11}>
@@ -169,59 +166,54 @@ export default React.createClass({
                 <InputGroup.Addon>Scope</InputGroup.Addon>
                 <FormControl
                   type="text"
-                 value={this.state.selectedScope}
-                 onChange={this.selectedScopeChanged}
-                 ref="selectedScope" />
-                  <DropdownButton
-                    componentClass={InputGroup.Button}
-                    title={`Match: ${mode}`}
-                    pullRight
-                    id="match">
-                  <MenuItem key="1" onClick={this.setEntitySearchMode.bind(this, 'Exact')}>
-                    <Glyphicon
-                      glyph="ok"
-                      style={mode === 'Exact' ? {} : { visibility: 'hidden' }} /> Exact
+                  value={this.state.selectedScope}
+                  onChange={this.selectedScopeChanged}
+                  ref="selectedScope" />
+                <DropdownButton
+                  componentClass={InputGroup.Button}
+                  title={`Match: ${mode}`}
+                  pullRight={true}
+                  id="match">
+                  <MenuItem key="1" onClick={() => this.setEntitySearchMode('Exact')}>
+                    <Glyphicon glyph="ok" style={mode === 'Exact' ? {} : {visibility: 'hidden'}} /> Exact
                   </MenuItem>
-                  <MenuItem key="2" onClick={this.setEntitySearchMode.bind(this, 'Has Scope')}>
-                    <Glyphicon
-                      glyph="ok"
-                     style={mode === 'Has Scope' ? {} : { visibility: 'hidden' }} /> Has Scope
+                  <MenuItem key="2" onClick={() => this.setEntitySearchMode('Has Scope')}>
+                    <Glyphicon glyph="ok" style={mode === 'Has Scope' ? {} : {visibility: 'hidden'}} /> Has Scope
                   </MenuItem>
-                  <MenuItem key="3" onClick={this.setEntitySearchMode.bind(this, 'Has Sub-Scope')}>
+                  <MenuItem key="3" onClick={() => this.setEntitySearchMode('Has Sub-Scope')}>
                     <Glyphicon
                       glyph="ok"
-                      style={mode === 'Has Sub-Scope' ? {} : { visibility: 'hidden' }} />
-                    &nbsp;Has Sub-Scope
+                      style={mode === 'Has Sub-Scope' ? {} : {visibility: 'hidden'}} /> Has Sub-Scope
                   </MenuItem>
                 </DropdownButton>
               </InputGroup>
             </Col>
           </Row>
           <br /><br />
-          <Table condensed hover className="scopes-inspector-scopes-table">
+          <Table condensed={true} hover={true} className="scopes-inspector-scopes-table">
             <thead>
               <tr>
                 <th>
-                  <format.Icon name="users" fixedWidth={true}/> Roles /
-                  <format.Icon name="user"/> Clients
+                  <format.Icon name="users" fixedWidth={true} /> Roles /
+                  <format.Icon name="user" /> Clients
                 </th>
               </tr>
             </thead>
             <tbody>
               {roles.map((role, index) => (
-                <tr key={index} onClick={this.selectEntity.bind(this, `role:${role.roleId}`)}>
+                <tr key={index} onClick={() => this.selectEntity(`role:${role.roleId}`)}>
                   <td>
-                    <format.Icon name="users" fixedWidth={true}/> <code>{role.roleId}</code>
+                    <format.Icon name="users" fixedWidth={true} /> <code>{role.roleId}</code>
                   </td>
                 </tr>
               ))}
               {clients.map((client, index) => (
                 <tr
                   key={index + roles.length}
-                  onClick={this.selectEntity.bind(this, `client:${client.clientId}`)}>
-                    <td>
-                      <format.Icon name="user" fixedWidth={true}/> <code>{client.clientId}</code>
-                    </td>
+                  onClick={() => this.selectEntity(`client:${client.clientId}`)}>
+                  <td>
+                    <format.Icon name="user" fixedWidth={true} /> <code>{client.clientId}</code>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -233,36 +225,36 @@ export default React.createClass({
 
   selectEntity(value) {
     this.setState({
-      selectedEntity: value
+      selectedEntity: value,
     });
   },
 
   selectedScopeChanged() {
     this.setState({
-      selectedScope: findDOMNode(this.refs.selectedScope).value
+      selectedScope: findDOMNode(this.refs.selectedScope).value,
     });
   },
 
   setEntitySearchMode(mode) {
-    this.setState({ entitySearchMode: mode });
+    this.setState({entitySearchMode: mode});
   },
 
   clearSelectedScope() {
-    this.setState({ selectedScope: '' });
+    this.setState({selectedScope: ''});
   },
 
   renderScopes() {
-    let scopes = _.uniq(_.flatten(
+    const scopes = _.uniq(_.flatten(
       this.state.roles.map(role => role.expandedScopes),
       this.state.clients.map(client => client.expandedScopes)
-    ));
+    ))
+    .sort()
+    .filter(scope => _.includes(scope, this.state.scopeSearchTerm));
 
-    scopes.sort();
-    scopes = scopes.filter(scope => _.includes(scope, this.state.scopeSearchTerm));
     return (
       <Row>
         <Col md={12}>
-          <InputGroup style={{ marginBottom: 20 }}>
+          <InputGroup style={{marginBottom: 20}}>
             <InputGroup.Addon><Glyphicon glyph="search" /></InputGroup.Addon>
             <FormControl
               type="text"
@@ -271,11 +263,11 @@ export default React.createClass({
               onChange={this.scopeSearchTermChanged} />
             <InputGroup.Button>
               <Button onClick={this.clearScopeSearchTerm}>
-                <Glyphicon glyph="remove"/> Clear
+                <Glyphicon glyph="remove" /> Clear
               </Button>
             </InputGroup.Button>
           </InputGroup>
-          <Table condensed hover className="scopes-inspector-scopes-table">
+          <Table condensed={true} hover={true} className="scopes-inspector-scopes-table">
             <thead>
               <tr>
                 <th>Scopes</th>
@@ -292,31 +284,31 @@ export default React.createClass({
 
   scopeSearchTermChanged() {
     this.setState({
-      scopeSearchTerm: findDOMNode(this.refs.scopeSearchTerm).value
+      scopeSearchTerm: findDOMNode(this.refs.scopeSearchTerm).value,
     });
   },
 
   clearScopeSearchTerm() {
     this.setState({
-      scopeSearchTerm: ''
+      scopeSearchTerm: '',
     });
   },
 
   /** Render row with scope */
   renderScopeRow(scope, index) {
-    const isSelected = (this.state.selectedScope === scope);
+    const isSelected = this.state.selectedScope === scope;
 
     return (
       <tr
         key={index}
         className={isSelected ? 'info' : ''}
-        onClick={this.selectScope.bind(this, scope)}>
-          <td><code>{scope}</code></td>
+        onClick={() => this.selectScope(scope)}>
+        <td><code>{scope}</code></td>
       </tr>
     );
   },
 
   selectScope(scope) {
-    this.setState({ selectedScope: scope });
-  }
+    this.setState({selectedScope: scope});
+  },
 });

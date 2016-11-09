@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button, Glyphicon, Modal, MenuItem } from 'react-bootstrap';
+import {Button, Glyphicon, Modal} from 'react-bootstrap';
 import * as utils from '../utils';
 
 /** Button with an associated confirm dialog */
 const ConfirmAction = React.createClass({
   mixins: [
     // We use loadState to execute the action asynchronously
-    utils.createTaskClusterMixin()
+    utils.createTaskClusterMixin(),
   ],
 
   propTypes: {
@@ -20,12 +20,12 @@ const ConfirmAction = React.createClass({
     children: React.PropTypes.node.isRequired,
     success: React.PropTypes.string.isRequired,
     // Function executing action, returns promise
-    action: React.PropTypes.func.isRequired
+    action: React.PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
     return {
-      disabled: false
+      disabled: false,
     };
   },
 
@@ -35,7 +35,7 @@ const ConfirmAction = React.createClass({
       executing: false,
       resultLoaded: false,
       resultError: null,
-      result: null
+      result: null,
     };
   },
 
@@ -46,8 +46,8 @@ const ConfirmAction = React.createClass({
         bsStyle={this.props.buttonStyle}
         disabled={this.props.disabled}
         onClick={this.openDialog}>
-          <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
-          {this.renderDialog()}
+        <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
+        {this.renderDialog()}
       </Button>
     );
   },
@@ -55,7 +55,7 @@ const ConfirmAction = React.createClass({
   renderDialog() {
     return (
       <Modal bsStyle="primary" show={this.state.showDialog} onHide={this.closeDialog}>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton={true}>
           {this.props.label}
         </Modal.Header>
         <Modal.Body>
@@ -77,9 +77,9 @@ const ConfirmAction = React.createClass({
           {
             !(this.state.executing || this.state.result) ? (
               <Button
-                  onClick={this.executeAction}
-                  bsStyle={this.props.buttonStyle}
-                  hidden={this.state.result}>
+                onClick={this.executeAction}
+                bsStyle={this.props.buttonStyle}
+                hidden={this.state.result}>
                 <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
               </Button>
             ) :
@@ -94,7 +94,7 @@ const ConfirmAction = React.createClass({
   },
 
   openDialog() {
-    this.setState({ showDialog: true });
+    this.setState({showDialog: true});
   },
 
   closeDialog() {
@@ -107,11 +107,11 @@ const ConfirmAction = React.createClass({
       executing: true,
       result: (async () => {
         const result = await this.props.action();
-        this.setState({ executing: false });
+        this.setState({executing: false});
         return result;
-      })()
+      })(),
     });
-  }
+  },
 });
 
 export default ConfirmAction;

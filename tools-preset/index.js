@@ -1,6 +1,6 @@
 'use strict';
 
-const preset = require('neutrino-preset-react');
+const preset = require('neutrino-preset-taskcluster-web');
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
@@ -32,8 +32,6 @@ preset.module.loaders.push(lessLoader);
 preset.module.loaders.push({ test: /JSONStream/, loader: 'shebang-loader' });
 // Don't parse the ws module as it seems to blow up Webpack
 preset.module.noParse = ['ws'];
-// Override the ESLint config file with our own rules
-preset.eslint.configFile = path.join(__dirname, 'eslint.js');
 // Ignore lint problems in these files as they are external resources placed in-tree
 preset.eslint.ignorePattern = [
   'src/display/include/**/*.js',
@@ -48,7 +46,7 @@ if (process.env.NODE_ENV === 'production') {
   // dynamically imported
   preset.plugins.push(new CopyPlugin([{
     context: path.resolve(__dirname, '../src'),
-    from: `display/include/**/*`,
+    from: 'display/include/**/*'
   }]));
 }
 

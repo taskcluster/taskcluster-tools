@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import Service from './service';
 import retrieve from './retrieve';
-import { Grid, Row, Button } from 'react-bootstrap';
+import {Grid, Row, Button} from 'react-bootstrap';
 import './diagnostics.less';
 
 const RawLog = props => (
@@ -12,10 +12,7 @@ const RawLog = props => (
       {
         props.text
           .split('\n')
-          .map((l, key) => l.includes('\u2713') ?
-            <p key={key} className="success">{l}</p> :
-            <p key={key} className="message">{l}</p>
-          )
+          .map((l, key) => <p key={key} className={l.includes('\u2713') ? 'success' : 'message'}>{l}</p>)
       }
     </div>
   </div>
@@ -30,7 +27,7 @@ export default class Diagnostics extends React.Component {
       rawLog: '',
       testId: '',
       testDate: '',
-      showRawLog: false
+      showRawLog: false,
     };
 
     this.toggleShow = this.toggleShow.bind(this);
@@ -45,7 +42,7 @@ export default class Diagnostics extends React.Component {
     this.setState({
       jsonLog,
       testId,
-      testDate
+      testDate,
     });
 
     const prodRaw = await retrieve.getLatestLog('production', 'RAW');
@@ -54,7 +51,7 @@ export default class Diagnostics extends React.Component {
       .replace(/\\r/g, '\n')
       .replace(/\\/g, '');
 
-    this.setState({ rawLog });
+    this.setState({rawLog});
   }
 
   render() {
@@ -79,6 +76,6 @@ export default class Diagnostics extends React.Component {
   }
 
   toggleShow() {
-    this.setState({ showRawLog: !this.state.showRawLog });
+    this.setState({showRawLog: !this.state.showRawLog});
   }
 }

@@ -12,23 +12,23 @@ export default React.createClass({
     // Calls load()
     utils.createTaskClusterMixin({
       clients: {
-        index: taskcluster.Index
+        index: taskcluster.Index,
       },
       // Reload when props.namespace changes, ignore credentials changes
       reloadOnProps: ['namespace'],
-      reloadOnLogin: false
-    })
+      reloadOnLogin: false,
+    }),
   ],
 
   propTypes: {
-    namespace: React.PropTypes.string.isRequired
+    namespace: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
     return {
       task: null,
       taskError: null,
-      taskLoaded: false
+      taskLoaded: false,
     };
   },
 
@@ -37,11 +37,11 @@ export default React.createClass({
       return {
         task: null,
         taskError: null,
-        taskLoaded: true
+        taskLoaded: true,
       };
     }
     return {
-      task: this.index.findTask(this.props.namespace)
+      task: this.index.findTask(this.props.namespace),
     };
   },
 
@@ -94,5 +94,5 @@ export default React.createClass({
         </dl>
       </div>
     );
-  }
+  },
 });

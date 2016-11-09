@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col } from 'react-bootstrap';
+import {Col} from 'react-bootstrap';
 
 export default class Service extends React.Component {
   constructor(props) {
@@ -23,7 +23,7 @@ export default class Service extends React.Component {
       <div>
         <p><strong>Passing:</strong> </p>
         <ul className="container-fluid pass">
-         {this.props.test.pass.map((res, key) => <li key={key}>{res}</li>)}
+          {this.props.test.pass.map((res, key) => <li key={key}>{res}</li>)}
         </ul>
       </div>
     );

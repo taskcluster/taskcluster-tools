@@ -1,7 +1,7 @@
 import React from 'react';
-import { Row, Col, Form, FormGroup, FormControl, Glyphicon, Button } from 'react-bootstrap';
+import {Row, Col, Form, FormGroup, FormControl, Glyphicon, Button} from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
-import { createTaskClusterMixin } from '../utils';
+import {createTaskClusterMixin} from '../utils';
 
 /** Render a terminal and a dropdown menu to select logs from */
 export default React.createClass({
@@ -11,9 +11,9 @@ export default React.createClass({
     createTaskClusterMixin({
       // Need updated clients for Queue
       clients: {
-        queue: taskcluster.Queue
-      }
-    })
+        queue: taskcluster.Queue,
+      },
+    }),
   ],
 
   // Get initial state
@@ -24,7 +24,7 @@ export default React.createClass({
     ) || this.props.logs[0];
 
     return {
-      name: entry ? entry.name : ''
+      name: entry ? entry.name : '',
     };
   },
 
@@ -34,8 +34,8 @@ export default React.createClass({
     taskId: React.PropTypes.string.isRequired,
     runId: React.PropTypes.oneOfType([
       React.PropTypes.string,
-      React.PropTypes.number
-    ]).isRequired
+      React.PropTypes.number,
+    ]).isRequired,
   },
 
   refreshLog() {
@@ -59,28 +59,28 @@ export default React.createClass({
     return (
       <Row>
         <Col sm={12}>
-          <Form inline>
-            <FormGroup style={{ marginRight: 10 }}>
+          <Form inline={true}>
+            <FormGroup style={{marginRight: 10}}>
               <FormControl
                 componentClass="select"
                 value={this.state.name}
                 onChange={this.handleLogChanged}>
-                  {this.props.logs.map((log, key) => (
-                    <option value={log.name} key={key}>{log.name}</option>
-                  ))}
+                {this.props.logs.map((log, key) => (
+                  <option value={log.name} key={key}>{log.name}</option>
+                ))}
               </FormControl>
             </FormGroup>
 
-            <Button bsSize="sm" onClick={this.refreshLog} style={{ marginRight: 10 }}>
+            <Button bsSize="sm" onClick={this.refreshLog} style={{marginRight: 10}}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
-            <a href={src} target="_blank" className="btn btn-default btn-sm">
+            <a href={src} target="_blank" rel="noopener noreferrer" className="btn btn-default btn-sm">
               <Glyphicon glyph="new-window" /> Open in new window
             </a>
           </Form>
         </Col>
 
-        <Col sm={12} style={{ marginTop: 20 }}>
+        <Col sm={12} style={{marginTop: 20}}>
           <iframe
             ref="logFrame"
             height="500"
@@ -93,6 +93,6 @@ export default React.createClass({
   },
 
   handleLogChanged(e) {
-    this.setState({ name: e.target.value });
-  }
+    this.setState({name: e.target.value});
+  },
 });

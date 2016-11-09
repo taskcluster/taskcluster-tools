@@ -1,8 +1,8 @@
 import React from 'react';
-import { findDOMNode } from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
-import { Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button }
+import {Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button}
   from 'react-bootstrap';
 import _ from 'lodash';
 import TaskView from '../lib/ui/taskview';
@@ -21,27 +21,27 @@ export default React.createClass({
       // Need updated clients for Queue and QueueEvents
       clients: {
         queue: taskcluster.Queue,
-        queueEvents: taskcluster.QueueEvents
+        queueEvents: taskcluster.QueueEvents,
       },
       // Reload when state.taskId changes, ignore credential changes
       reloadOnKeys: ['taskId'],
-      reloadOnLogin: false
+      reloadOnLogin: false,
     }),
     // Called handler when state.taskId changes
     utils.createWatchStateMixin({
       onKeys: {
-        updateTaskIdInput: ['taskId']
-      }
+        updateTaskIdInput: ['taskId'],
+      },
     }),
     // Listen for messages, reload bindings() when state.taskId changes
     utils.createWebListenerMixin({
-      reloadOnKeys: ['taskId']
+      reloadOnKeys: ['taskId'],
     }),
     // Serialize state.taskId to location.hash as string
     utils.createLocationHashMixin({
       keys: ['taskId'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   getInitialState() {
@@ -50,7 +50,7 @@ export default React.createClass({
       statusLoaded: true,
       statusError: null,
       status: null,
-      taskIdInput: ''
+      taskIdInput: '',
     };
   },
 
@@ -58,9 +58,9 @@ export default React.createClass({
   load() {
     return this.state.taskId === '' ?
         // Skip loading empty-strings
-      { status: null } :
+      {status: null} :
         // Load task status and take the `status` key from the response
-      { status: this.queue.status(this.state.taskId).then(_.property('status')) };
+      {status: this.queue.status(this.state.taskId).then(_.property('status'))};
   },
 
   /** Return bindings for WebListenerMixin */
@@ -72,7 +72,7 @@ export default React.createClass({
 
     // Construct the routing key pattern
     const routingKey = {
-      taskId: this.state.taskId
+      taskId: this.state.taskId,
     };
 
     // Return all interesting bindings
@@ -83,7 +83,7 @@ export default React.createClass({
       this.queueEvents.artifactCreated(routingKey),
       this.queueEvents.taskCompleted(routingKey),
       this.queueEvents.taskFailed(routingKey),
-      this.queueEvents.taskException(routingKey)
+      this.queueEvents.taskException(routingKey),
     ];
   },
 
@@ -91,7 +91,7 @@ export default React.createClass({
   handleMessage(message) {
     // Update status structure
     this.setState({
-      status: message.payload.status
+      status: message.payload.status,
     });
 
     // If the message origins from the artifact create exchange, we should
@@ -103,14 +103,14 @@ export default React.createClass({
 
   /** When taskId changed we should update the input */
   updateTaskIdInput() {
-    this.setState({ taskIdInput: this.state.taskId });
+    this.setState({taskIdInput: this.state.taskId});
   },
 
   render() {
     const invalidInput = !VALID_INPUT.test(this.state.taskIdInput);
 
     return (
-      <div style={{ marginBottom: 40 }}>
+      <div style={{marginBottom: 40}}>
         <h4>Task Inspector</h4>
         <p>
           Given a <code>taskId</code>, The task inspector lets you load, monitor, and inspect the
@@ -141,21 +141,21 @@ export default React.createClass({
             </Form>
           </Col>
 
-          <Col sm={4} style={{ marginTop: '25px' }}>
+          <Col sm={4} style={{marginTop: '25px'}}>
             <PreviousTasks objectId={this.state.taskId} objectType="taskId" />
           </Col>
         </Row>
 
         <Row>
           <Col xs={12}>
-            {this.renderWaitFor('status') || (this.state.status ? (
+            {
+              this.renderWaitFor('status') || (this.state.status && (
                 <TaskView
                   ref="taskView"
                   status={this.state.status}
-                  hashEntry={this.nextHashEntry()}/>
-              ) :
-              null
-            )}
+                  hashEntry={this.nextHashEntry()} />
+              ))
+            }
           </Col>
         </Row>
       </div>
@@ -165,13 +165,13 @@ export default React.createClass({
   /** Update TaskIdInput to reflect input */
   handleTaskIdInputChange() {
     this.setState({
-      taskIdInput: findDOMNode(this.refs.taskId).value.trim()
+      taskIdInput: findDOMNode(this.refs.taskId).value.trim(),
     });
   },
 
   /** Handle form submission */
   handleSubmit(e) {
     e.preventDefault();
-    this.setState({ taskId: this.state.taskIdInput });
-  }
+    this.setState({taskId: this.state.taskIdInput});
+  },
 });

@@ -2,7 +2,7 @@
 
 const HtmlPlugin = require('html-webpack-plugin');
 const path = require('path');
-const preset = require('neutrino-preset-react');
+const preset = require('neutrino-preset-taskcluster-web');
 
 const SRC = path.join(__dirname, '../src');
 const polyfill = require.resolve('babel-polyfill');

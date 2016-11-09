@@ -8,16 +8,16 @@ const HookBrowser = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        hooks: taskcluster.Hooks
-      }
-    })
+        hooks: taskcluster.Hooks,
+      },
+    }),
   ],
 
   propTypes: {
     group: React.PropTypes.string.isRequired,
     currentHookGroupId: React.PropTypes.string,
     currentHookId: React.PropTypes.string,
-    selectHook: React.PropTypes.func.isRequired
+    selectHook: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -25,7 +25,7 @@ const HookBrowser = React.createClass({
       hooks: null,
       hooksLoading: false,
       hooksLoaded: false,
-      hooksError: null
+      hooksError: null,
     };
   },
 
@@ -41,12 +41,13 @@ const HookBrowser = React.createClass({
           ref="tv"
           defaultCollapsed={true}
           onClick={this.handleClick}>
-            {
-              this.state.hooksError ?
-                this.renderError(this.state.hooksError) :
-                <format.Icon name="spinner" spin />
-            }
-       </TreeView>
+          {
+            this.state.hooksError ?
+              this.renderError(this.state.hooksError) : (
+                <format.Icon name="spinner" spin={true} />
+              )
+          }
+        </TreeView>
       );
     }
 
@@ -57,62 +58,62 @@ const HookBrowser = React.createClass({
         ref="tv"
         defaultCollapsed={false}
         onClick={this.handleClick}>
-          {
-            this.state.hooks.hooks
-              .map(hook => {
-                const isSelected = this.props.group === this.props.currentHookGroupId &&
-                  hook.hookId === this.props.currentHookId;
+        {
+          this.state.hooks.hooks
+            .map(hook => {
+              const isSelected = this.props.group === this.props.currentHookGroupId &&
+                hook.hookId === this.props.currentHookId;
 
-                return (
-                  <div
-                    key={hook.hookId}
-                    className={isSelected ? 'bg-info' : null}
-                    onClick={() => this.props.selectHook(this.props.group, hook.hookId)}>
-                      <code>{this.props.group}/{hook.hookId}</code>
-                  </div>
-                );
-              })
-          }
+              return (
+                <div
+                  key={hook.hookId}
+                  className={isSelected ? 'bg-info' : null}
+                  onClick={() => this.props.selectHook(this.props.group, hook.hookId)}>
+                  <code>{this.props.group}/{hook.hookId}</code>
+                </div>
+              );
+            })
+        }
       </TreeView>
     );
   },
 
   handleClick() {
     if (!this.state.hooksLoading) {
-      this.setState({ hooksLoading: true });
+      this.setState({hooksLoading: true});
       this.loadState({
-        hooks: this.hooks.listHooks(this.props.group)
+        hooks: this.hooks.listHooks(this.props.group),
       });
     }
-  }
+  },
 });
 
 const HookGroupBrowser = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        hooks: taskcluster.Hooks
-      }
-    })
+        hooks: taskcluster.Hooks,
+      },
+    }),
   ],
 
   propTypes: {
     currentHookGroupId: React.PropTypes.string,
     currentHookId: React.PropTypes.string,
-    selectHook: React.PropTypes.func.isRequired
+    selectHook: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
     return {
       groups: null,
       groupsLoaded: false,
-      groupsError: null
+      groupsError: null,
     };
   },
 
   load() {
     return {
-      groups: this.hooks.listHookGroups()
+      groups: this.hooks.listHookGroups(),
     };
   },
 
@@ -140,9 +141,9 @@ const HookGroupBrowser = React.createClass({
         </div>
       );
     } catch (e) {
-      console.log(e);
+      // TODO: Handle error
     }
-  }
+  },
 });
 
 export default HookGroupBrowser;

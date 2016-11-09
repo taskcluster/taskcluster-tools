@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
+import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
 import ClientEditor from './clienteditor';
 import * as utils from '../../lib/utils';
 import * as auth from '../../lib/auth';
@@ -16,14 +16,14 @@ export default React.createClass({
     utils.createTaskClusterMixin({
       reloadOnKeys: ['clientPrefix'],
       clients: {
-        auth: taskcluster.Auth
-      }
+        auth: taskcluster.Auth,
+      },
     }),
     // Serialize state.selectedClientId to location.hash as string
     utils.createLocationHashMixin({
       keys: ['selectedClientId'],
-      type: 'string'
-    })
+      type: 'string',
+    }),
   ],
 
   /** Create an initial state */
@@ -35,7 +35,7 @@ export default React.createClass({
       clientsLoaded: false,
       clientsError: null,
       clients: null,
-      selectedClientId: '' // '' means "add new client"
+      selectedClientId: '', // '' means "add new client"
     };
   },
 
@@ -47,23 +47,24 @@ export default React.createClass({
     // - clients
     return {
       clients: this.auth.listClients(this.state.clientPrefix ?
-        { prefix: this.state.clientPrefix } :
+        {prefix: this.state.clientPrefix} :
         null
-      )
+      ),
     };
   },
 
   /** Render user-interface */
   render() {
     return (
-      <Row style={{ marginTop: 10 }}>
+      <Row style={{marginTop: 10}}>
         <Col md={5}>
           {this.renderPrefixInput()}
           {this.renderClientsTable()}
           <ButtonToolbar>
-            <Button bsStyle="primary"
-                    onClick={this.selectClientId.bind(this, '')}
-                    disabled={this.state.selectedClientId === ''}>
+            <Button
+              bsStyle="primary"
+              onClick={() => this.selectClientId('')}
+              disabled={this.state.selectedClientId === ''}>
               <Glyphicon glyph="plus" /> Add Client
             </Button>
             <Button bsStyle="success" onClick={this.reload} disabled={!this.state.clientsLoaded}>
@@ -81,7 +82,7 @@ export default React.createClass({
   },
 
   renderPrefixInput() {
-    const setPrefix = e => this.setState({ clientPrefix: e.target.value });
+    const setPrefix = e => this.setState({clientPrefix: e.target.value});
     const enterPrefix = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
@@ -96,9 +97,9 @@ export default React.createClass({
           <input
             type="search"
             className="form-control"
-             defaultValue={this.state.clientPrefix}
-             onBlur={setPrefix}
-             onKeyUp={enterPrefix} />
+            defaultValue={this.state.clientPrefix}
+            onBlur={setPrefix}
+            onKeyUp={enterPrefix} />
           <div className="input-group-addon">
             <Glyphicon glyph="search" />
           </div>
@@ -110,7 +111,7 @@ export default React.createClass({
   /** Render table of all clients */
   renderClientsTable() {
     return this.renderWaitFor('clients') || (
-      <Table condensed hover className="client-manager-client-table">
+      <Table condensed={true} hover={true} className="client-manager-client-table">
         <thead>
           <tr>
             <th>ClientId</th>
@@ -130,9 +131,9 @@ export default React.createClass({
     return (
       <tr
         key={index}
-        className={isSelected ? 'info' : undefined}
-        onClick={this.selectClientId.bind(this, client.clientId)}>
-          <td><code>{client.clientId}</code></td>
+        className={isSelected ? 'info' : null}
+        onClick={() => this.selectClientId(client.clientId)}>
+        <td><code>{client.clientId}</code></td>
       </tr>
     );
   },
@@ -161,10 +162,10 @@ export default React.createClass({
       selectedClientId = '';
     }
 
-    this.setState({ clients, selectedClientId });
+    this.setState({clients, selectedClientId});
   },
 
   selectClientId(clientId) {
-    this.setState({ selectedClientId: clientId });
-  }
+    this.setState({selectedClientId: clientId});
+  },
 });

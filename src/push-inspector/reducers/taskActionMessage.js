@@ -1,7 +1,7 @@
 import {
   TASK_ACTIONS_ERROR,
   TASK_ACTIONS_SUCCESS,
-  CLEAR_TASKS_ACTIONS_MESSAGE
+  CLEAR_TASKS_ACTIONS_MESSAGE,
 } from '../actions/types';
 
 export default (state = null, action) => {

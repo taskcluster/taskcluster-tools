@@ -1,15 +1,6 @@
 import React from 'react';
 import {
-  Row,
-  Col,
-  ButtonToolbar,
-  Glyphicon,
-  Table,
-  Button,
-  FormGroup,
-  ControlLabel,
-  FormControl,
-  Alert
+  Row, Col, ButtonToolbar, Glyphicon, Table, Button, FormGroup, ControlLabel, FormControl, Alert,
 } from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import * as format from '../lib/format';
@@ -22,9 +13,9 @@ export default React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        purgeCaches: taskcluster.PurgeCache
-      }
-    })
+        purgeCaches: taskcluster.PurgeCache,
+      },
+    }),
   ],
 
   /** Create an initial state */
@@ -36,7 +27,7 @@ export default React.createClass({
       tableError: null,
       formProvisionerId: '',
       formWorkerType: '',
-      formCacheName: ''
+      formCacheName: '',
     };
   },
 
@@ -44,7 +35,7 @@ export default React.createClass({
     return {
       caches: this.purgeCaches
         .allPurgeRequests()
-        .then(resp => resp.requests)
+        .then(resp => resp.requests),
     };
   },
 
@@ -70,7 +61,7 @@ export default React.createClass({
               bsStyle="success"
               onClick={this.reload}
               disabled={!this.state.cachesLoaded}>
-                <Glyphicon glyph="refresh" /> Refresh All
+              <Glyphicon glyph="refresh" /> Refresh All
             </Button>
           </ButtonToolbar>
         </Col>
@@ -96,7 +87,7 @@ export default React.createClass({
   renderCachesTable() {
     try {
       return this.renderWaitFor('caches') || (
-        <Table condensed hover>
+        <Table condensed={true} hover={true}>
           <thead>
             <tr>
               <th>Provisioner ID</th>
@@ -111,7 +102,7 @@ export default React.createClass({
         </Table>
       );
     } catch (err) {
-      this.setState({ tableError: err });
+      this.setState({tableError: err});
     }
   },
 
@@ -121,7 +112,7 @@ export default React.createClass({
         <td><code>{cache.provisionerId}</code></td>
         <td><code>{cache.workerType}</code></td>
         <td><code>{cache.cacheName}</code></td>
-        <td><format.DateView date={cache.before}/></td>
+        <td><format.DateView date={cache.before} /></td>
       </tr>
     );
   },
@@ -137,8 +128,8 @@ export default React.createClass({
 
     return (
       <div className="form-horizontal">
-        <h4 style={{ marginTop: 7 }}>Create Purge Cache Request</h4>
-        <hr style={{ marginBottom: 20 }}/>
+        <h4 style={{marginTop: 7}}>Create Purge Cache Request</h4>
+        <hr style={{marginBottom: 20}} />
 
         <FormGroup>
           <ControlLabel className="col-md-3">Provisioner ID</ControlLabel>
@@ -182,24 +173,23 @@ export default React.createClass({
           <Button
             bsStyle="primary"
             onClick={this.sendRequest}>
-              <Glyphicon glyph="plus" /> Create request
+            <Glyphicon glyph="plus" /> Create request
           </Button>
         </ButtonToolbar>
-
       </div>
     );
   },
 
   provisionerIdChange(element) {
-    this.setState({ formProvisionerId: element.target.value });
+    this.setState({formProvisionerId: element.target.value});
   },
 
   workerTypeChange(element) {
-    this.setState({ formWorkerType: element.target.value });
+    this.setState({formWorkerType: element.target.value});
   },
 
   cacheNameChange(element) {
-    this.setState({ formCacheName: element.target.value });
+    this.setState({formCacheName: element.target.value});
   },
 
   async sendRequest() {
@@ -207,21 +197,21 @@ export default React.createClass({
       await this.purgeCaches.purgeCache(
         this.state.formProvisionerId,
         this.state.formWorkerType,
-        { cacheName: this.state.formCacheName }
+        {cacheName: this.state.formCacheName}
       );
 
       this.setState({
         formProvisionerId: '',
         formWorkerType: '',
-        formCacheName: ''
+        formCacheName: '',
       });
       this.reload();
     } catch (err) {
-      this.setState({ formError: err });
+      this.setState({formError: err});
     }
   },
 
   dismissError() {
-    this.setState({ formError: null, tableError: null });
-  }
+    this.setState({formError: null, tableError: null});
+  },
 });
