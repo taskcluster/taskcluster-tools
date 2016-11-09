@@ -32,21 +32,22 @@ const LoanerButton = React.createClass({
 
   valid() {
     const payload = this.props.task.payload;
+
     if (!payload || !payload.image) {
       return false;
     }
-    if (!(payload.command instanceof Array)) {
+
+    if (!Array.isArray(payload.command)) {
       return false;
     }
-    if (typeof (payload.maxRunTime) !== 'number') {
-      return false;
-    }
-    return true;
+
+    return typeof payload.maxRunTime === 'number';
   },
 
   render() {
+    // These items are buttons displayed inline-block, so wrapping in a span is correct
     return (
-      <div>
+      <span>
         <ConfirmAction
           glyph="console"
           label="One-Click Loaner"
@@ -74,7 +75,7 @@ const LoanerButton = React.createClass({
           onClick={this.editTask}>
           Edit and Create Loaner Task
         </Button>
-      </div>
+      </span>
     );
   },
 

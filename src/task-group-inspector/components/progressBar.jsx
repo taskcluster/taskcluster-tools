@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 import {ProgressBar} from 'react-bootstrap';
-import {notifications} from '../lib/utils';
+import {notifications, labels} from '../lib/utils';
+import Legend from '../../lib/ui/Legend';
+import LegendItem from '../../lib/ui/LegendItem';
 
 class PushProgressBar extends Component {
   constructor(props) {
@@ -16,8 +18,6 @@ class PushProgressBar extends Component {
     this.running = [];
     // Don't notify users that open an already completed build
     this.notifyFlag = false;
-
-    this.progressBarClicked = this.progressBarClicked.bind(this);
   }
 
   /**
@@ -127,19 +127,27 @@ class PushProgressBar extends Component {
     };
 
     return (
-      <div onClick={this.progressBarClicked}>
-        <ProgressBar className="progressBar">
+      <div>
+        <Legend>
+          {groups.map((group, key) => (
+            <LegendItem bg={labels[group]} key={key}>{group}</LegendItem>
+          ))}
+        </Legend>
+
+        <ProgressBar className="progressBar" onClick={e => this.progressBarClicked(e)}>
           {groups.map((group, index) => {
             const subtasks = this[group];
-            const className = group === 'running' ? `label-${group} active` : `label-${group}`;
             const title = toTitle(group);
+            const bsStyle = labels[group];
             const label = subtasks.length ? `${title[0]}(${subtasks.length})` : '...';
 
             return (
               <ProgressBar
                 key={index}
                 title={title}
-                className={className}
+                bsStyle={group === 'unscheduled' || group === 'running' ? null : bsStyle}
+                style={group === 'unscheduled' ? {background: '#777'} : null}
+                active={group === 'running'}
                 now={getWeightedPercent(percents[index])}
                 label={label} />
             );

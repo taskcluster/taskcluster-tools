@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
+import {Tab, Nav, NavItem} from 'react-bootstrap';
 import Table from './table';
 import {queueEvents, webListener, notifications} from '../lib/utils';
 import _ from 'lodash';
@@ -12,8 +13,16 @@ class Listings extends Component {
     this.listener = null;
     this.bQueue = [];
     this.loop = null;
+    this.state = {activeTab: this.props.params.taskId ? 'inspector' : 'tasks'};
+  }
 
-    this.handleMessage = this.handleMessage.bind(this);
+  componentWillReceiveProps(nextProps) {
+    const {taskId} = this.props.params;
+    const nextTaskId = nextProps.params.taskId;
+
+    if (taskId !== nextTaskId) {
+      this.setState({activeTab: 'inspector'});
+    }
   }
 
   /**
@@ -103,7 +112,7 @@ class Listings extends Component {
   */
   setup() {
     notifications.requestPermission();
-    webListener.startListening(this.props.params.taskGroupId, this.handleMessage);
+    webListener.startListening(this.props.params.taskGroupId, m => this.handleMessage(m));
     this.props.activeTaskGroupId(this.props.params.taskGroupId);
   }
 
@@ -145,22 +154,43 @@ class Listings extends Component {
     }
   }
 
+  handleSelect(key) {
+    this.setState({activeTab: key});
+  }
+
   render() {
     return (
-      <div>
-        <div className="col-xs-6 left-panel">
-          <Table />
+      <Tab.Container
+        id="task-group-listings"
+        onSelect={key => this.handleSelect(key)}
+        activeKey={this.state.activeTab}>
+        <div>
+          <Nav bsStyle="tabs">
+            <NavItem eventKey="tasks">
+              Tasks
+            </NavItem>
+            <NavItem eventKey="inspector" disabled={!this.props.params.taskId}>
+              Task Inspector
+            </NavItem>
+          </Nav>
+          <Tab.Content style={{paddingTop: 20}}>
+            <Tab.Pane eventKey="tasks">
+              <Table />
+            </Tab.Pane>
+            {this.props.params.taskId && (
+              <Tab.Pane eventKey="inspector">
+                {this.props.children}
+              </Tab.Pane>
+            )}
+          </Tab.Content>
         </div>
-        <div className="col-xs-6 right-panel">
-          {this.props.children}
-        </div>
-      </div>
+      </Tab.Container>
     );
   }
 }
 
-const mapStateToProps = ({tasks, tasksRetrievedFully, listTaskGroupInProgress}) => (
-  {tasks, tasksRetrievedFully, listTaskGroupInProgress}
-);
+const mapStateToProps = ({tasks, tasksRetrievedFully, listTaskGroupInProgress}) => ({
+  tasks, tasksRetrievedFully, listTaskGroupInProgress,
+});
 
 export default connect(mapStateToProps, actions)(Listings);

@@ -7,7 +7,6 @@ import {Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button
 import _ from 'lodash';
 import TaskView from '../lib/ui/taskview';
 import PreviousTasks from '../lib/ui/previoustasks';
-import './taskinspector.less';
 
 const VALID_INPUT = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
 

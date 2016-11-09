@@ -11,37 +11,33 @@ class Search extends Component {
     super(props);
 
     this.state = {
-      term: '',
+      term: props.taskGroupId || '',
       prevTerm: '',
     };
-
-    this.onFormSubmit = this.onFormSubmit.bind(this);
-    this.onInputChange = this.onInputChange.bind(this);
   }
 
   /**
    * Handle search query
    */
-  onFormSubmit(event) {
-    const {
-      setDashboardBanner, tasksHaveBeenRetrieved, removeTasks, fetchTasksInSteps,
-    } = this.props;
+  onFormSubmit(e) {
+    e.preventDefault();
+
     const {term, prevTerm} = this.state;
 
-    event.preventDefault();
-
-    if (!this.isInvalid() && prevTerm !== term) {
-      setDashboardBanner(null);
-      tasksHaveBeenRetrieved(false);
-      removeTasks();
-      fetchTasksInSteps(term, true);
-      hashHistory.push(term);
-      this.setState({prevTerm: term});
+    if (this.isInvalid() || prevTerm === term) {
+      return;
     }
+
+    this.props.setDashboardBanner(null);
+    this.props.tasksHaveBeenRetrieved(false);
+    this.props.removeTasks();
+    this.props.fetchTasksInSteps(term, true);
+    hashHistory.push(term);
+    this.setState({prevTerm: term});
   }
 
-  onInputChange(event) {
-    this.setState({term: event.target.value});
+  onInputChange(e) {
+    this.setState({term: e.target.value});
   }
 
   /**
@@ -62,7 +58,7 @@ class Search extends Component {
 
     return (
       <div>
-        <form onSubmit={this.onFormSubmit}>
+        <form onSubmit={e => this.onFormSubmit(e)}>
           <FormGroup validationState={invalidInput ? 'error' : null}>
             <ControlLabel>Task Group ID</ControlLabel>
             <InputGroup>
@@ -71,7 +67,7 @@ class Search extends Component {
                 placeholder="Enter a taskGroupId"
                 bsClass="form-control"
                 value={this.state.term}
-                onChange={this.onInputChange} />
+                onChange={e => this.onInputChange(e)} />
               <InputGroup.Button type="submit">
                 <Button>
                   <i className="fa fa-search" /> Inspect

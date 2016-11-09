@@ -8,7 +8,7 @@ export default class DashboardBanner extends Component {
     return (
       <Alert bsStyle={bsStyle}>
         <h4>{title}</h4>
-        <p>{message}</p>
+        <div>{message}</div>
       </Alert>
     );
   }

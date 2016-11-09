@@ -1,17 +1,12 @@
 import React, {Component} from 'react';
-import ConfirmAction from '../shared/confirmAction';
+import ConfirmAction from './ConfirmAction';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 
-class PurgeCacheButton extends Component {
+class PurgeCache extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      selected: this.props.caches || [],
-    };
-
-    this.update = this.update.bind(this);
+    this.state = {selected: this.props.caches || []};
   }
 
   update(e) {
@@ -23,19 +18,18 @@ class PurgeCacheButton extends Component {
   }
 
   render() {
-    const glyph = 'trash';
-    const label = 'Purger Worker Cache';
-    const successMsg = 'Cache successfully purged!';
     const {caches = [], provisionerId, workerType, purge} = this.props;
     const selectedCaches = this.state.selected;
-    const action = () => purge(provisionerId, workerType, selectedCaches, successMsg);
 
     return (
-      <ConfirmAction label={label} glyph={glyph} action={action}>
+      <ConfirmAction
+        label="Purger Worker Cache"
+        glyph="trash"
+        action={() => purge(provisionerId, workerType, selectedCaches, 'Cache successfully purged!')}>
         <div>
           <p>
             Are you sure you wish to purge caches used in this task across all
-            workers of this workerType?
+            workers of this worker type?
           </p>
           <p>Select the caches to purge:</p>
           <ul>
@@ -59,4 +53,4 @@ class PurgeCacheButton extends Component {
   }
 }
 
-export default connect(null, actions)(PurgeCacheButton);
+export default connect(null, actions)(PurgeCache);

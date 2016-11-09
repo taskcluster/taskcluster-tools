@@ -101,11 +101,13 @@ export const rendering = {
 };
 /* eslint-enable react/display-name */
 
-/**
-* beautified functions
-*/
-export const beautified = {
-  labelClassName: state => `status-label label-${state}`,
+export const labels = {
+  running: 'primary',
+  pending: 'info',
+  unscheduled: 'default',
+  completed: 'success',
+  failed: 'danger',
+  exception: 'warning',
 };
 
 /**
