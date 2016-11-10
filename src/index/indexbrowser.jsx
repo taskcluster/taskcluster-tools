@@ -86,7 +86,7 @@ export default React.createClass({
               </div>
             </FormGroup>
           </form>
-          {this.stats.namespace && (this.renderWaitFor('tasks') || this.renderTasks())}
+          {this.state.namespace && (this.renderWaitFor('tasks') || this.renderTasks())}
           {this.renderWaitFor('namespaces') || this.renderNamespaces()}
         </Col>
         <Col md={6}>
