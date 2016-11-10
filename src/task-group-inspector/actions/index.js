@@ -83,13 +83,26 @@ export const fetchTasksInSteps = (taskGroupId, isLimited) => {
       try {
         response = await queue.listTaskGroup(taskGroupId, options);
 
-        const tasks = response.tasks;
-
         // do not dispatch if taskGroupId changed sometime
         // between the start and end of the async request
         if (taskGroupId !== getState().taskGroup) {
           return;
         }
+
+        const tasks = response.tasks.sort((a, b) => {
+          const nameA = a.task.metadata.name.toUpperCase();
+          const nameB = b.task.metadata.name.toUpperCase();
+
+          if (nameA < nameB) {
+            return -1;
+          }
+
+          if (nameA > nameB) {
+            return 1;
+          }
+
+          return 0;
+        });
 
         // Dispatch tasks
         dispatch({
