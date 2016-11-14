@@ -17,6 +17,7 @@ const entryPoints = [
   'credentials',
   'diagnostics',
   'display',
+  'exchange-inspector',
   'hooks',
   'index',
   'index/artifacts',
