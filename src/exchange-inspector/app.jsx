@@ -8,7 +8,7 @@ const hashManager = utils.createHashManager({separator: '/'});
 
 ReactDOM.render((
   <Layout>
-    <ExchangeViewer hashEntry={hashManager.root()} />
+    <ExchangeInspector hashEntry={hashManager.root()} />
   </Layout>
 ), document.getElementById('root'));
 
