@@ -200,4 +200,11 @@ module.exports = [
     display: true,
     description: 'Display results from diagnostics tests',
   },
+  {
+    title: 'Exchange Inspector',
+    link: '/exchange-inspector/',
+    icon: 'wifi',
+    display: true,
+    description: 'Display Taskcluster-Pulse exchanges',
+  },
 ];
