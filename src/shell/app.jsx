@@ -89,7 +89,7 @@ term.onTerminalReady = async () => {
     term.setCursorVisible(false);
   });
 
-  client.resize(term.screenSize.height, term.screenSize.width);
+  client.resize(term.screenSize.width, term.screenSize.height);
 
   io.onTerminalResize = (c, r) => client.resize(c, r);
   client.stdout.on('data', data => {
