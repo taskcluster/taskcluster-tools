@@ -10,6 +10,7 @@ import {Icon} from './format';
 import OktaMenuItem from './ui/OktaMenuItem';
 import PersonaMenuItem from './ui/PersonaMenuItem';
 import DevelopmentMenuItem from './ui/DevelopmentMenuItem';
+import EmailMenuItem from './ui/EmailMenuItem';
 import ManualMenuItem from './ui/ManualMenuItem';
 import './base-layout.less';
 
@@ -19,6 +20,7 @@ const SIGNIN_MENU_ITEMS = {
   okta: OktaMenuItem,
   persona: PersonaMenuItem,
   development: DevelopmentMenuItem,
+  email: EmailMenuItem,
   manual: ManualMenuItem,
 };
 
