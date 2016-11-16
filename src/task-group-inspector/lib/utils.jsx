@@ -115,13 +115,17 @@ export const labels = {
 */
 export const notifications = {
   notifyUser: message => {
-    /* eslint-disable no-new */
-    new Notification(message, {
-      icon: '/lib/assets/taskcluster-36.png',
-    });
-    /* eslint-enable no-new */
+    if ('Notification' in window) {
+      /* eslint-disable no-new */
+      new Notification(message, {
+        icon: '/lib/assets/taskcluster-36.png',
+      });
+      /* eslint-enable no-new */
+    }
   },
   requestPermission: () => {
-    Notification.requestPermission();
+    if ('Notification' in window) {
+      Notification.requestPermission();
+    }
   },
 };
