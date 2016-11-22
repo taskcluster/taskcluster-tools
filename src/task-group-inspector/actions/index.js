@@ -89,25 +89,10 @@ export const fetchTasksInSteps = (taskGroupId, isLimited) => {
           return;
         }
 
-        const tasks = response.tasks.sort((a, b) => {
-          const nameA = a.task.metadata.name.toUpperCase();
-          const nameB = b.task.metadata.name.toUpperCase();
-
-          if (nameA < nameB) {
-            return -1;
-          }
-
-          if (nameA > nameB) {
-            return 1;
-          }
-
-          return 0;
-        });
-
         // Dispatch tasks
         dispatch({
           type: isLimited ? FETCH_TASKS_IN_STEP : FETCH_TASKS_FULLY,
-          payload: tasks,
+          payload: response.tasks,
         });
 
         // Flag to indicate whether list has been loaded

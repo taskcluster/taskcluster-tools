@@ -41,20 +41,26 @@ class TaskTable extends Component {
           </tr>
         </thead>
         <tbody className="tasks-list-body">
-          {tasks.reduce((rows, task, key) => {
-            if (!activeTaskStatus || task.status.state === activeTaskStatus) {
-              rows.push(
-                <tr onClick={() => this.taskClicked(task)} key={key}>
-                  <td>
-                    <Label bsSize="sm" bsStyle={labels[task.status.state]}>{task.status.state}</Label>
-                  </td>
-                  <td>{task.task.metadata.name}</td>
-                </tr>
-              );
-            }
+          {
+            tasks
+              .sort((a, b) => a.task.metadata.name.localeCompare(b.task.metadata.name, {
+                sensitivity: 'base',
+              }))
+              .reduce((rows, task, key) => {
+                if (!activeTaskStatus || task.status.state === activeTaskStatus) {
+                  rows.push(
+                    <tr onClick={() => this.taskClicked(task)} key={key}>
+                      <td>
+                        <Label bsSize="sm" bsStyle={labels[task.status.state]}>{task.status.state}</Label>
+                      </td>
+                      <td>{task.task.metadata.name}</td>
+                    </tr>
+                  );
+                }
 
-            return rows;
-          }, [])}
+                return rows;
+              }, [])
+          }
         </tbody>
       </Table>
     );
