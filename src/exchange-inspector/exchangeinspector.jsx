@@ -35,7 +35,6 @@ export default React.createClass({
   
   load() {
     return {
-      //TODO: resolve 'Uncaught TypeError: this.pulse.exchanges is not a function' on page load
       exchanges: this.pulse.exchanges(),
     };
   },
@@ -44,7 +43,7 @@ export default React.createClass({
   render() {
     return (
       <Row style={{marginTop: 10}}>
-        <Col mod={5}>
+        <Col md={5}>
           {this.renderExchangesTable()}
           <ButtonToolbar>
             <Button bsStyle="success" onClick={this.reload} disabled={!this.state.exchangesLoaded}>
