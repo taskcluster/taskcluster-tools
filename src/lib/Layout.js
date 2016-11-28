@@ -8,7 +8,6 @@ import menu from '../menu';
 import * as auth from './auth';
 import {Icon} from './format';
 import OktaMenuItem from './ui/OktaMenuItem';
-import PersonaMenuItem from './ui/PersonaMenuItem';
 import DevelopmentMenuItem from './ui/DevelopmentMenuItem';
 import EmailMenuItem from './ui/EmailMenuItem';
 import ManualMenuItem from './ui/ManualMenuItem';
@@ -18,7 +17,6 @@ import './base-layout.less';
 const EXPIRY_WARNING = 5 * 60 * 1000;
 const SIGNIN_MENU_ITEMS = {
   okta: OktaMenuItem,
-  persona: PersonaMenuItem,
   development: DevelopmentMenuItem,
   email: EmailMenuItem,
   manual: ManualMenuItem,
