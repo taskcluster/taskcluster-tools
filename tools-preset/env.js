@@ -26,5 +26,5 @@ module.exports = {
     process.env.UPTIMEROBOT_API_KEY_SECRETS || 'm777577313-6d58b81186c4064cf7a8d1e1'),
 
   SIGN_IN_METHODS: JSON.stringify(process.env.SIGN_IN_METHODS ||
-    process.env.NODE_ENV === 'development' ? 'development' : 'okta persona email manual')
+    process.env.NODE_ENV === 'development' ? 'development' : 'okta email manual')
 };
