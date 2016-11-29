@@ -46,10 +46,7 @@ export default React.createClass({
         <Col md={5}>
           {this.renderExchangesTable()}
           <ButtonToolbar>
-            <Button 
-              bsStyle="success" 
-              onClick={this.reload} 
-              disabled={!this.state.exchangesLoaded}>
+            <Button bsStyle="success" onClick={this.reload} disabled={!this.state.exchangesLoaded}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar> 
@@ -64,10 +61,7 @@ export default React.createClass({
   /** Render table of all exchanges */
   renderExchangesTable() {
     return this.renderWaitFor('exchanges') || (
-      <Table
-        condensed={true}
-        hover={true}
-        className="exchange-inspector-exchanges-table">
+      <Table condensed={true} hover={true} className="exchange-inspector-exchanges-table">
         <thead>
           <tr>
             <th>Exchange Name</th>
