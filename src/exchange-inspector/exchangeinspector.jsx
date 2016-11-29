@@ -46,10 +46,16 @@ export default React.createClass({
         <Col md={5}>
           {this.renderExchangesTable()}
           <ButtonToolbar>
-            <Button bsStyle="success" onClick={this.reload} disabled={!this.state.exchangesLoaded}>
+            <Button 
+              bsStyle="success" 
+              onClick={this.reload} 
+              disabled={!this.state.exchangesLoaded}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar> 
+        </Col>
+        <Col md={5}>
+          {this.renderExchangeDetails()} 
         </Col>
       </Row>
     ); 
@@ -58,7 +64,10 @@ export default React.createClass({
   /** Render table of all exchanges */
   renderExchangesTable() {
     return this.renderWaitFor('exchanges') || (
-      <Table condensed={true} hover={true} className="exchange-inspector-exchanges-table">
+      <Table
+        condensed={true}
+        hover={true}
+        className="exchange-inspector-exchanges-table">
         <thead>
           <tr>
             <th>Exchange Name</th>
@@ -73,20 +82,55 @@ export default React.createClass({
 
   /** Render a row with an exchange*/
   renderExchangesRow(exchange, index) {
-    //TODO: get appropriate field for exchange selection
-    const isSelected = this.state.selectedExchange === exchange.exchangeName; 
-
+    const isSelected = this.state.selectedExchange === exchange;
     return (
       <tr
         key={index}
         className={isSelected ? 'info' : undefined}
-        onClick={this.selectExchange.bind(this, exchange.exchangeName)}>
-        <td><code>{exchange.exchangeName}</code></td>
+        onClick={this.selectExchange.bind(this, exchange)}>
+        <td><code>{exchange.name}</code></td>
+      </tr>
+    );
+  },
+
+  selectExchange(exchange) {
+    this.setState({selectedExchange: exchange});
+  },
+
+  /** Render table of the properties of the selected exchange*/
+  renderExchangeDetails() {
+    const exchangeSelected = this.state.selectedExchange != '';
+    //TODO: List exchange arguments as well
+    if (exchangeSelected) {
+      const exchange = this.state.selectedExchange;
+      const exchangeDetails = Object.entries(exchange).map(([prop, value]) => ({prop, value})).slice(0, 6);
+      return (
+        <Table>
+          <thead>
+            <tr>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {exchangeDetails.map(this.renderDetails)}
+          </tbody>
+        </Table>
+      ); 
+    } else {
+      return (
+        <h6>Select an exchange to view details</h6>
+      );
+    }
+  },
+  
+  /** Render a row containing a property and corresponding value of an exchange*/
+  renderDetails(exchange, index) {
+    return ( 
+      <tr key={index}>
+        <th>{exchange.prop}</th>
+        <td>{`${exchange.value}`}</td>
       </tr>
     );
   },
   
-  selectExchange(exchangeName) {
-    this.setState({selectedExchange: exchangeName});
-  },
 });
