@@ -1,5 +1,6 @@
 import React from 'react';
 import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import ExchangeDetails from './exchangedetails.jsx';
 import * as utils from '../lib/utils';
 import * as auth from '../lib/auth';
 import taskcluster from 'taskcluster-client';
@@ -19,7 +20,7 @@ export default React.createClass({
   // Serialize state.selectedExchange to location.hash as string
     utils.createLocationHashMixin({
       keys: ['selectedExchange'],
-      type: 'string',
+      type: 'json',
     }),
   ],
 
@@ -29,7 +30,7 @@ export default React.createClass({
       exchangesLoaded: false,
       exchangesError: null,
       exchanges: null,
-      selectedExchange: '',
+      selectedExchange: null,
     };
   },
   
@@ -41,9 +42,11 @@ export default React.createClass({
 
   /** Render user-interface */
   render() {
+    const exchangeSelected = this.state.selectedExchange != null && typeof this.state.selectedExchange != 'undefined';
     return (
       <Row style={{marginTop: 10}}>
         <Col md={5}>
+          <h4 style={{marginTop: 0}}>Exchange Name</h4>
           {this.renderExchangesTable()}
           <ButtonToolbar>
             <Button bsStyle="success" onClick={this.reload} disabled={!this.state.exchangesLoaded}>
@@ -52,7 +55,14 @@ export default React.createClass({
           </ButtonToolbar> 
         </Col>
         <Col md={5}>
-          {this.renderExchangeDetails()} 
+          <h4 style={{marginTop: 0}}>Exchange Details</h4>
+          {
+            exchangeSelected ? (
+              <ExchangeDetails currentExchange={this.state.selectedExchange} />
+            ) : (
+              <div>Select an exchange to view details</div>
+            )
+          }
         </Col>
       </Row>
     ); 
@@ -62,11 +72,6 @@ export default React.createClass({
   renderExchangesTable() {
     return this.renderWaitFor('exchanges') || (
       <Table condensed={true} hover={true} className="exchange-inspector-exchanges-table">
-        <thead>
-          <tr>
-            <th>Exchange Name</th>
-          </tr>
-        </thead>
         <tbody>
           {this.state.exchanges.map(this.renderExchangesRow)}
         </tbody>
@@ -91,40 +96,4 @@ export default React.createClass({
     this.setState({selectedExchange: exchange});
   },
 
-  /** Render table of the properties of the selected exchange*/
-  renderExchangeDetails() {
-    const exchangeSelected = this.state.selectedExchange != '';
-    //TODO: List exchange arguments as well
-    if (exchangeSelected) {
-      const exchange = this.state.selectedExchange;
-      const exchangeDetails = Object.entries(exchange).map(([prop, value]) => ({prop, value})).slice(0, 6);
-      return (
-        <Table>
-          <thead>
-            <tr>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {exchangeDetails.map(this.renderDetails)}
-          </tbody>
-        </Table>
-      ); 
-    } else {
-      return (
-        <h6>Select an exchange to view details</h6>
-      );
-    }
-  },
-  
-  /** Render a row containing a property and corresponding value of an exchange*/
-  renderDetails(exchange, index) {
-    return ( 
-      <tr key={index}>
-        <th>{exchange.prop}</th>
-        <td>{`${exchange.value}`}</td>
-      </tr>
-    );
-  },
-  
 });
