@@ -125,8 +125,10 @@ export default React.createClass({
             maintained on the project Wiki, see&nbsp;
             <a href="https://wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges">
               wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
-            </a>. Notice that all exchanges from TaskCluster is formally
+            </a>. Notice that all exchanges from TaskCluster are formally
             documented on <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
+            All routes have the prefix `route.` in addition to the route name configured
+            in the message generator.
           </p>
           <hr />
           {this.renderForm()}
@@ -214,7 +216,7 @@ export default React.createClass({
             <FormControl
               type="text"
               ref="routingKeyPattern"
-              placeholder="#.some-interesting-key.#"
+              placeholder="#route.some-interesting-key.#"
               defaultValue="#" />
           </div>
         </FormGroup>
