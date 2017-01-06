@@ -81,7 +81,7 @@ export default React.createClass({
       deadline.setMinutes(deadline.getMinutes() + 60);
       data.created = new Date().toJSON();
       data.deadline = deadline.toJSON();
-      task = JSON.stringify(data, null, '\t');
+      task = JSON.stringify(data, null, '\t') + '\n';
     } catch (err) {
       debug('Failed to parameterize task, err: %s, %j', err, err, err.stack);
       invalidTask = true;
