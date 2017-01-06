@@ -29,6 +29,7 @@
     "highlight.js": "^9.6.0",
     "hterm-umd": "^1.0.1",
     "jquery": "^3.1.0",
+    "js-yaml": "^3.7.0",
     "less-loader": "^2.2.3",
     "lodash": "^4.15.0",
     "markdown-it": "^7.0.1",
