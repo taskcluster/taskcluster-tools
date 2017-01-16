@@ -1,5 +1,6 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
+import Helmet from 'react-helmet';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import {Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button}
@@ -100,6 +101,14 @@ export default React.createClass({
     }
   },
 
+  getTitle() {
+    if (this.refs.taskView && this.refs.taskView.state.task) {
+      return this.refs.taskView.state.task.metadata.name;
+    }
+
+    return 'Task Inspector';
+  },
+
   /** When taskId changed we should update the input */
   updateTaskIdInput() {
     this.setState({taskIdInput: this.state.taskId});
@@ -110,6 +119,7 @@ export default React.createClass({
 
     return (
       <div style={{marginBottom: 40}}>
+        <Helmet title={this.getTitle()} />
         <h4>Task Inspector</h4>
         <p>
           Given a <code>taskId</code>, The task inspector lets you load, monitor, and inspect the
