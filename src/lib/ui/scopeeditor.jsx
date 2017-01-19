@@ -39,6 +39,7 @@ const ScopeEditor = React.createClass({
     const scopes = findDOMNode(this.refs.scopeText)
       .value
       .split(/[\r\n]+/)
+      .map(s => s.trim())
       .filter(s => s !== '');
 
     return Array.from(new Set(scopes)).sort();
