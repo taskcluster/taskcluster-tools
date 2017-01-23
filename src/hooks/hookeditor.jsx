@@ -478,9 +478,8 @@ const HookEditor = React.createClass({
   },
 
   removeScheduleItem(index) {
-    const schedule = _
-      .cloneDeep(this.state.schedule)
-      .splice(index, 1);
+    const schedule = [...this.state.schedule];
+    schedule.splice(index, 1);
 
     this.setState({schedule});
   },
