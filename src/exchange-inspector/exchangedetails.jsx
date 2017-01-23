@@ -3,11 +3,9 @@ import {Row, Col} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import * as auth from '../lib/auth';
 import taskcluster from 'taskcluster-client';
-import _ from 'lodash';
 import './exchangeinspector.less';
 
 const ExchangeDetails = React.createClass({
-  
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
@@ -36,72 +34,61 @@ const ExchangeDetails = React.createClass({
   },
 
   render() {
-    const args = _.values(this.props.currentExchange.arguments);
-    const argsExist = args.length != 0;
+    const args = Object.values(this.props.currentExchange.arguments);
+
     return (
       <div>
         <Row style={{marginTop: 0}}>
           <label className="control-label col-md-3">Name</label>
-          <div className="col-md-9">
+          <Col md={9}>
             {this.props.currentExchange.name}
-          </div>
+          </Col>
         </Row> 
         <Row>
           <label className="control-label col-md-3">Virtual Host</label>
-          <div className="col-md-9">
+          <Col md={9}>
             {this.props.currentExchange.vhost}
-          </div>
+          </Col>
         </Row>
         <Row>
           <label className="control-label col-md-3">Type</label>
-          <div className="col-md-9">
+          <Col md={9}>
             {this.props.currentExchange.type}
-          </div>
+          </Col>
         </Row>
         <Row>
           <label className="control-label col-md-3">Durable</label>
-          <div className="col-md-9">
+          <Col md={9}>
             {`${this.props.currentExchange.durable}`}
-          </div>
+          </Col>
         </Row>
         <Row>
           <label className="control-label col-md-3">Auto-Delete</label>
-          <div className="col-md-9">
+          <Col md={9}>
             {`${this.props.currentExchange.auto_delete}`}
-          </div>
+          </Col>
         </Row>
         <Row>
           <label className="control-label col-md-3">Internal</label>
-          <div className="col-md-9">
+          <Col md={9}>
             {`${this.props.currentExchange.internal}`}
-          </div>
+          </Col>
         </Row>
         <Row>
           <label className="control-label col-md-3">Arguments</label>
-          <div className="col-md-9">
+          <Col md={9}>
             {
-              argsExist ? (
-                <ul>
-                  {args.map(this.renderArguments)}
-                </ul>
+              args.length ? (
+                <ul>{args.map((arg, key) => <li key={key}><code>{arg}</code></li>)}</ul>
               ) : (
                 <span>No arguments</span>
               )
             }
-          </div>
+          </Col>
         </Row>
       </div>
       ); 
   }, 
-  
-  renderArguments(arg, index) {
-    return (
-      <li key={index}>
-        <code>{`${arg}`}</code>
-      </li>
-    ); 
-  },
-
 });
 
 export default ExchangeDetails;

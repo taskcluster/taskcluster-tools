@@ -10,14 +10,13 @@ import './exchangeinspector.less';
 export default React.createClass({
   displayName: 'ExchangeInspector',
 
-  /** Initialize mixins */
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
         pulse: taskcluster.Pulse,
       },
     }),
-  // Serialize state.selectedExchange to location.hash as string
+    // Serialize state.selectedExchange to location.hash as string
     utils.createLocationHashMixin({
       keys: ['selectedExchange'],
       type: 'json',
@@ -40,9 +39,9 @@ export default React.createClass({
     };
   },
 
-  /** Render user-interface */
   render() {
-    const exchangeSelected = this.state.selectedExchange != null && typeof this.state.selectedExchange != 'undefined';
+    const exchangeSelected = this.state.selectedExchange != null;
+
     return (
       <Row style={{marginTop: 10}}>
         <Col md={5}>
@@ -68,31 +67,26 @@ export default React.createClass({
     ); 
   },
   
-  /** Render table of all exchanges */
   renderExchangesTable() {
     return this.renderWaitFor('exchanges') || (
       <Table condensed={true} hover={true} className="exchange-inspector-exchanges-table">
         <tbody>
-          {this.state.exchanges.map(this.renderExchangesRow)}
+          {
+            this.state.exchanges.map((exchange, key) => (
+              <tr
+                key={key}
+                className={this.state.selectedExchange === exchange ? 'info' : null}
+                onClick={() => this.selectExchange(exchange)}>
+                <td><code>{exchange.name}</code></td>
+              </tr>
+            ))
+          }
         </tbody>
       </Table>
     );
   },
 
-  /** Render a row with an exchange*/
-  renderExchangesRow(exchange, index) {
-    const isSelected = this.state.selectedExchange === exchange;
-    return (
-      <tr
-        key={index}
-        className={isSelected ? 'info' : undefined}
-        onClick={this.selectExchange.bind(this, exchange)}>
-        <td><code>{exchange.name}</code></td>
-      </tr>
-    );
-  },
-
-  selectExchange(exchange) {
+  selectExchange(exchange) { 
     this.setState({selectedExchange: exchange});
   },
 
