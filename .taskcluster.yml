@@ -22,7 +22,7 @@ tasks:
         - "/bin/bash"
         - "--login"
         - "-c"
-        - "git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}} && yarn && yarn test"
+        - "git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}} && npm install -g yarn && yarn && yarn test"
     metadata:
       name: "Integration Beta Tests"
       description: "PRs and pushes"
