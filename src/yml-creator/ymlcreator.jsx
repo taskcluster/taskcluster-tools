@@ -11,8 +11,23 @@ import {
   Button,
   Glyphicon,
 } from 'react-bootstrap';
+import './ymlcreator.less';
 
 export default class YmlCreator extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      rootName: '',
+      rootDescription: '',
+      tasks: [],
+      events: [],
+      image: '',
+      command: [],
+      taskName: '',
+      taskDescription: '',
+    };
+  }
+
   render() {
     return (
       <Grid fluid={true}>
@@ -28,8 +43,8 @@ export default class YmlCreator extends React.Component {
               your file appear at the bottom of this page. All you need to do is to copy it, go to 
               your repository, create a file at its root, paste and save 
               as <code>.taskcluster.yml</code>. Optionally, after you create your file, you can edit 
-              it here or in you favorite editor to add more bells and wistles - please refer to 
-              the <a href="https://docs.taskcluster.net">full documentation on our configuration files</a>.
+              it here or in you favorite editor to add more bells and wistles - please refer to the 
+              <a href="https://docs.taskcluster.net/manual/integrations/github#a-simple-taskcluster-yml-file">full documentation on our configuration files</a>.
             </p>
             <p>
               <em>Attention!</em> TaskCluster begins accepting jobs as soon as a <code>.taskcluster.yml</code> exists 
@@ -96,6 +111,7 @@ export default class YmlCreator extends React.Component {
               <ControlLabel>Events:</ControlLabel>
               <Checkbox>Pull request opened</Checkbox>
               <Checkbox>Pull request merged or closed</Checkbox>
+              <Checkbox>New commit made in an opened pull request</Checkbox>
               <Checkbox>Push</Checkbox>
               <Checkbox>Release or tag created</Checkbox>
             </FormGroup>
