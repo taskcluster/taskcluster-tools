@@ -42,31 +42,35 @@ export default class YmlCreator extends React.Component {
         </Row>
 
         <Row>
-          <h5>Enter the name and desciption of your project or these tasks:</h5>
-          <FormGroup>
-            <ControlLabel>Name:</ControlLabel>
-            <FormControl
-              type="text"
-              placeholder="Name"
-              value=""
-              ref="rootName"
-              onChange="" />
-          </FormGroup>
-          <FormGroup>
-            <ControlLabel>Description:</ControlLabel>
-            <FormControl
-              type="text"
-              placeholder="Description"
-              value=""
-              ref="rootDescription"
-              onChange="" />
-          </FormGroup>
+          <Col sm={12}>
+            <h5>Enter the name and desciption of your project or these tasks:</h5>
+            <FormGroup>
+              <ControlLabel>Name:</ControlLabel>
+              <FormControl
+                type="text"
+                placeholder="Name"
+                value=""
+                ref="rootName"
+                onChange="" />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>Description:</ControlLabel>
+              <FormControl
+                type="text"
+                placeholder="Description"
+                value=""
+                ref="rootDescription"
+                onChange="" />
+            </FormGroup>
+          </Col>
         </Row>
 
         <hr />
 
         <Row>
-          <h5>Define your task:</h5>
+          <Col md={12}>
+            <h5>Define your task:</h5>
+          </Col>
           <Col md={5}>
             <FormGroup>
               <ControlLabel>Name:</ControlLabel>
