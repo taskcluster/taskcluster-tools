@@ -26,6 +26,7 @@ export default class YmlCreator extends React.Component {
       taskName: '',
       taskDescription: '',
     };
+    this.saveInput = this.saveInput.bind(this);
   }
 
   render() {
@@ -64,9 +65,9 @@ export default class YmlCreator extends React.Component {
               <FormControl
                 type="text"
                 placeholder="Name"
-                value=""
-                ref="rootName"
-                onChange="" />
+                defaultValue=""
+                id="rootName"
+                onBlur={this.saveInput} />
             </FormGroup>
             <FormGroup>
               <ControlLabel>Description:</ControlLabel>
@@ -74,8 +75,7 @@ export default class YmlCreator extends React.Component {
                 type="text"
                 placeholder="Description"
                 value=""
-                ref="rootDescription"
-                onChange="" />
+                ref="rootDescription" />
             </FormGroup>
           </Col>
         </Row>
@@ -146,5 +146,11 @@ export default class YmlCreator extends React.Component {
         </ButtonToolbar>
       </Grid>
     );
+  }
+
+  saveInput(event) {
+    this.setState({rootName: event.target.value});
+    console.log(event.target.value);
+    console.log(this.state.rootName);
   }
 }
