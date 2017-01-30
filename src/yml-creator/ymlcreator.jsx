@@ -21,12 +21,19 @@ export default class YmlCreator extends React.Component {
       rootDescription: '',
       tasks: [],
       events: [],
-      image: '',
-      command: [],
+      image: 'node:6',
+      commands: ['/bin/bash',
+        '--login',
+        '-c',
+        'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+        'npm install . && npm test'],
       taskName: '',
       taskDescription: '',
     };
-    this.saveInput = this.saveInput.bind(this);
+    this.saveTextInput = this.saveTextInput.bind(this);
+    this.eventsSelection = this.eventsSelection.bind(this);
+    this.imageSelection = this.imageSelection.bind(this);
+    this.commandsSelection = this.commandsSelection.bind(this);
   }
 
   render() {
@@ -65,17 +72,16 @@ export default class YmlCreator extends React.Component {
               <FormControl
                 type="text"
                 placeholder="Name"
-                defaultValue=""
-                id="rootName"
-                onBlur={this.saveInput} />
+                name="rootName"
+                onBlur={this.saveTextInput} />
             </FormGroup>
             <FormGroup>
               <ControlLabel>Description:</ControlLabel>
               <FormControl
                 type="text"
                 placeholder="Description"
-                value=""
-                ref="rootDescription" />
+                name="rootDescription"
+                onBlur={this.saveTextInput} />
             </FormGroup>
           </Col>
         </Row>
@@ -92,41 +98,74 @@ export default class YmlCreator extends React.Component {
               <FormControl
                 type="text"
                 placeholder="Name of the task"
-                value=""
-                ref="taskName"
-                onChange="" />
+                name="taskName"
+                onBlur={this.saveTextInput} />
             </FormGroup>
             <FormGroup>
               <ControlLabel>Description:</ControlLabel>
               <FormControl
                 type="text"
                 placeholder="Description of the task"
-                value=""
-                ref="taskDescription"
-                onChange="" />
+                name="taskDescription"
+                onBlur={this.saveTextInput} />
             </FormGroup>
           </Col>
+
           <Col md={7}>
             <FormGroup>
               <ControlLabel>Events:</ControlLabel>
-              <Checkbox>Pull request opened</Checkbox>
-              <Checkbox>Pull request merged or closed</Checkbox>
-              <Checkbox>New commit made in an opened pull request</Checkbox>
-              <Checkbox>Push</Checkbox>
-              <Checkbox>Release or tag created</Checkbox>
+              <Checkbox
+                name="- pull_request.opened"
+                onChange={this.eventsSelection}>
+                Pull request opened
+              </Checkbox>
+              <Checkbox
+                name="- pull_request.closed"
+                onChange={this.eventsSelection}>
+                Pull request merged or closed
+              </Checkbox>
+              <Checkbox
+                name="- pull_request.synchronize"
+                onChange={this.eventsSelection}>
+                New commit made in an opened pull request
+              </Checkbox>
+              <Checkbox
+                name="- pull_request.reopened"
+                onChange={this.eventsSelection}>
+                Pull request re-opened
+              </Checkbox>
+              <Checkbox
+                name="- push"
+                onChange={this.eventsSelection}>
+                Push
+              </Checkbox>
+              <Checkbox
+                name="- release"
+                onChange={this.eventsSelection}>
+                Release or tag created
+              </Checkbox>
             </FormGroup>
+
             <FormGroup>
               <ControlLabel>Language:</ControlLabel>
-              <FormControl componentClass="select" placeholder="Pick one...">
-                <option value="node">JavaScript with Node.js</option>
-                <option value="python">Python</option>
+              <FormControl 
+                componentClass="select"
+                name="image"
+                onChange={this.imageSelection}>
+                <option value="node:6">JavaScript with Node.js v.6</option>
+                <option value="rail/python-test-runner">Python</option>
+                <option value="jimmycuadra/rust:latest">Rust</option>
               </FormControl>
             </FormGroup>
+
             <FormGroup>
               <ControlLabel>Commands: </ControlLabel>
-              <FormControl componentClass="select" placeholder="Pick one...">
+              <FormControl
+                componentClass="select"
+                placeholder="Pick one..."
+                onChange={this.commandsSelection}>
                 <option value="standard">Clone repo and run my tests</option>
-                <option value="custom">I need something fussier</option>
+                <option value="custom">I'll define them myself</option>
               </FormControl>
             </FormGroup>
           </Col>
@@ -136,7 +175,8 @@ export default class YmlCreator extends React.Component {
 
         <ButtonToolbar>
           <Button
-            bsStyle="success">
+            bsStyle="success"
+            disabled="true">
             <Glyphicon glyph="plus" /> Define another task
           </Button>
           <Button
@@ -148,9 +188,42 @@ export default class YmlCreator extends React.Component {
     );
   }
 
-  saveInput(event) {
-    this.setState({rootName: event.target.value});
-    console.log(event.target.value);
-    console.log(this.state.rootName);
+  saveTextInput(event) {
+    this.setState({
+      [event.target.name]: event.target.value,
+    });
+    console.log(this.state);
+  }
+
+  eventsSelection(event) {
+    let eventsArray = this.state.events;
+    const eventIndex = eventsArray.indexOf(event.target.name);
+    if (eventIndex == -1) {
+      eventsArray.push(event.target.name);
+    } else {
+      eventsArray.splice(eventIndex, 1);
+    }
+    this.setState({events: eventsArray});
+
+    console.log(eventsArray, this.state.events);
+  }
+
+  imageSelection(event) {
+    this.setState({
+      [event.target.name]: event.target.value});
+  }
+
+  commandsSelection(event) {
+    if (event.target.value == 'standard') {
+      this.setState({commands: [
+        '/bin/bash',
+        '--login',
+        '-c',
+        'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+        'npm install . && npm test',
+      ]});
+    } else {
+      this.setState({commands: []});
+    }
   }
 }
