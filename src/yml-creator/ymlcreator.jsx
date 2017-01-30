@@ -12,6 +12,7 @@ import {
   Glyphicon,
 } from 'react-bootstrap';
 import './ymlcreator.less';
+import CodeMirror from 'react-code-mirror';
 
 export default class YmlCreator extends React.Component {
   constructor(props) {
@@ -29,11 +30,13 @@ export default class YmlCreator extends React.Component {
         'npm install . && npm test'],
       taskName: '',
       taskDescription: '',
+      displayEditor: false,
     };
     this.saveTextInput = this.saveTextInput.bind(this);
     this.eventsSelection = this.eventsSelection.bind(this);
     this.imageSelection = this.imageSelection.bind(this);
     this.commandsSelection = this.commandsSelection.bind(this);
+    this.renderEditor = this.renderEditor.bind(this);
   }
 
   render() {
@@ -180,10 +183,15 @@ export default class YmlCreator extends React.Component {
             <Glyphicon glyph="plus" /> Define another task
           </Button>
           <Button
-            bsStyle="primary">
+            bsStyle="primary"
+            onClick={this.setDisplayEditor.bind(this, true)}>
             <Glyphicon glyph="ok" /> Create file
           </Button>
         </ButtonToolbar>
+
+        <Col sm={12}>
+          {this.state.displayEditor && this.renderEditor()}
+        </Col>
       </Grid>
     );
   }
@@ -225,5 +233,27 @@ export default class YmlCreator extends React.Component {
     } else {
       this.setState({commands: []});
     }
+  }
+
+  setDisplayEditor(bool) {
+    this.setState({displayEditor: bool});
+  }
+
+  renderEditor() {
+    return (
+      <CodeMirror
+        ref="YMLeditor"
+        lineNumbers={true}
+        mode="application/json"
+        textAreaClassName="form-control"
+        textAreaStyle={{minHeight: '20em'}}
+        value="{this.state.yml}"
+        onChange={this.handleYMLChange}
+        indentWithTabs={true}
+        tabSize={2}
+        lint={true}
+        gutters={['CodeMirror-lint-markers']}
+        theme="ambiance" />
+    );
   }
 }
