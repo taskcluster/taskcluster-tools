@@ -148,25 +148,25 @@ export default class YmlCreator extends React.Component {
 
             <FormGroup>
               <ControlLabel>Language:</ControlLabel>
-              <FormControl 
-                componentClass="select"
+              <select
+                class="yml"
                 name="image"
                 onChange={this.imageSelection}>
                 <option value="node:6">JavaScript with Node.js v.6</option>
                 <option value="rail/python-test-runner">Python</option>
                 <option value="jimmycuadra/rust:latest">Rust</option>
-              </FormControl>
+              </select>
             </FormGroup>
 
             <FormGroup>
               <ControlLabel>Commands: </ControlLabel>
-              <FormControl
+              <select
                 componentClass="select"
                 placeholder="Pick one..."
                 onChange={this.commandsSelection}>
                 <option value="standard">Clone repo and run my tests</option>
                 <option value="custom">I'll define them myself</option>
-              </FormControl>
+              </select>
             </FormGroup>
           </Col>
         </Row>
