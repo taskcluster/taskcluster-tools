@@ -94,7 +94,7 @@ export default class YmlCreator extends React.Component {
               <em>Attention!</em> TaskCluster begins accepting jobs as soon as a <code>.taskcluster.yml</code> exists 
               in your repository. However, if you want to see the status of TaskCluster jobs in
               your pushes, releases and pull requests, you have to install 
-              <a href="https://github.com/integration/tc-cat"> TaskCluster-GitHub integration</a>.
+              <a href="https://github.com/integration/taskcluster-staging"> TaskCluster-GitHub integration</a>.
             </p>
             <hr />
           </Col>
@@ -145,9 +145,6 @@ export default class YmlCreator extends React.Component {
                 name="taskDescription"
                 onBlur={this.saveTextInput} />
             </FormGroup>
-          </Col>
-
-          <Col md={7}>
             <FormGroup>
               <ControlLabel>Events:</ControlLabel>
               <Checkbox
@@ -205,6 +202,10 @@ export default class YmlCreator extends React.Component {
               </select>
             </FormGroup>
           </Col>
+
+          <Col md={7}>
+            {this.state.displayEditor && this.renderEditor()}
+          </Col>
         </Row>
 
         <hr />
@@ -222,9 +223,6 @@ export default class YmlCreator extends React.Component {
           </Button>
         </ButtonToolbar>
 
-        <Col sm={12}>
-          {this.state.displayEditor && this.renderEditor()}
-        </Col>
       </Grid>
     );
   }
