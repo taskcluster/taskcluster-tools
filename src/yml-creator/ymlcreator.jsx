@@ -13,6 +13,39 @@ import {
 } from 'react-bootstrap';
 import './ymlcreator.less';
 import CodeMirror from 'react-code-mirror';
+import 'codemirror/mode/javascript/javascript';
+import '../lib/codemirror/json-lint';
+
+const initialYML = {
+  version: 0,
+  metadata: {
+    name: '',
+    description: '',
+    owner: '{{ event.head.user.email }}',
+    source: '{{ event.head.repo.url }}',
+  },
+  tasks: [{
+    provisionerId: '{{ taskcluster.docker.provisionerId }}',
+    workerType: '{{ taskcluster.docker.workerType }}',
+    extra: {
+      github: {
+        env: true,
+        events: [],
+      },
+    },
+    payload: {
+      maxRunTime: 3600,
+      image: 'node:5',
+      command: [],
+    },
+    metadata: {
+      name: '',
+      description: '',
+      owner: '{{ event.head.user.email }}',
+      source: '{{ event.head.repo.url }}',
+    },
+  }],
+};
 
 export default class YmlCreator extends React.Component {
   constructor(props) {
@@ -247,7 +280,7 @@ export default class YmlCreator extends React.Component {
         mode="application/json"
         textAreaClassName="form-control"
         textAreaStyle={{minHeight: '20em'}}
-        value="{this.state.yml}"
+        value={JSON.stringify(initialYML, null, 2)}
         onChange={this.handleYMLChange}
         indentWithTabs={true}
         tabSize={2}
