@@ -317,8 +317,6 @@ export default class YmlCreator extends React.Component {
       rootDescription: '',
       tasks: [],
       events: [],
-      image: 'node:6',
-      commands: standardSet,
       taskName: '',
       taskDescription: '',
       PRoCheckbox: false,
