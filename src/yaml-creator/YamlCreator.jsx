@@ -56,7 +56,6 @@ const standardSet = [
   '--login',
   '-c',
   'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
-  'npm install . && npm test',
 ];
 
 export default class YamlCreator extends React.Component {
