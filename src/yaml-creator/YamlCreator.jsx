@@ -10,8 +10,6 @@ import {
   ButtonToolbar,
   Button,
   Glyphicon,
-  OverlayTrigger,
-  Tooltip,
 } from 'react-bootstrap';
 import './yamlcreator.less';
 import CodeMirror from 'react-code-mirror';
@@ -109,14 +107,6 @@ export default class YamlCreator extends React.Component {
   }
 
   render() {
-    const rootMetadataTooltip = (<Tooltip>
-      These will appear at the top of the file and help the reader understand what they are seeing.
-    </Tooltip>);
-    
-    const dockerImageTooltip = (<Tooltip>
-      This will select a corresponding docker image.
-    </Tooltip>);
-
     return (
       <Grid fluid={true}>
         <Row>
@@ -159,18 +149,12 @@ export default class YamlCreator extends React.Component {
 
         <Row>
           <Col md={5}>
-            <h5>
-              Enter the name and description of your project or these tasks:
-              <OverlayTrigger
-                trigger="click"
-                placement="right"
-                id="rootMetadataTooltip"
-                overlay={rootMetadataTooltip}>
-                <a className="dataInfo" href="#rootMetadataTooltip" >
-                  <Glyphicon glyph="info-sign" />
-                </a>
-              </OverlayTrigger>
-            </h5>
+            <h5>Enter the name and description of your project or these tasks:</h5>
+            <p className="infoText">
+              <Glyphicon glyph="info-sign" />
+              These will appear at the top of the file and help the reader understand what they are seeing.
+            </p>
+            
             <FormGroup>
               <ControlLabel>Name:</ControlLabel>
               <FormControl
@@ -265,16 +249,11 @@ export default class YamlCreator extends React.Component {
             <FormGroup>
               <ControlLabel>
                 Language your project uses:
-                <OverlayTrigger
-                  trigger="click"
-                  placement="right"
-                  id="dockerImageTooltip"
-                  overlay={dockerImageTooltip}>
-                  <a className="dataInfo" href="#dockerImageTooltip" >
-                    <Glyphicon glyph="info-sign" />
-                  </a>
-                </OverlayTrigger>
               </ControlLabel>
+              <p className="infoText">
+                <Glyphicon glyph="info-sign" />
+                This will select a corresponding docker image.
+              </p>
               <select
                 name="image"
                 onChange={e => this.handleImageSelection(e)}>
