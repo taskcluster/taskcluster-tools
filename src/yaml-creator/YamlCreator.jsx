@@ -51,12 +51,37 @@ const initialYaml = {
   ],
 };
 
-const standardSet = [
-  '/bin/bash',
-  '--login',
-  '-c',
-  'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
-];
+const cmdDirectory = {
+    'node:6': [
+      '/bin/bash',
+      '--login',
+      '-c',
+      'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+      'npm install . && npm test',
+    ],
+    'rail/python-test-runner': [
+      '/bin/bash',
+      '--login',
+      '-c',
+      'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+      'python setup.py test',
+    ],
+    'jimmycuadra/rust:latest': [
+      '/bin/bash',
+      '--login',
+      '-c',
+      'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+      'rustc --test unit_test.rs && ./unit_test',
+    ],
+    'golang:1.8': [
+      '/bin/bash',
+      '--login',
+      '-c',
+      '>-',
+      'go get -t github.com/taskcluster/taskcluster-cli/...',
+      '&& cd  /go/src/github.com/taskcluster/taskcluster-cli make && go test ./...',
+    ],
+  };
 
 export default class YamlCreator extends React.Component {
   constructor(props) {
@@ -67,7 +92,8 @@ export default class YamlCreator extends React.Component {
       tasks: [],
       events: [],
       image: 'node:6',
-      commands: standardSet,
+      commands: cmdDirectory['node:6'],
+      currentCmd: cmdDirectory['node:6'],
       taskName: '',
       taskDescription: '',
       pullRequestOpened: false,
@@ -76,7 +102,7 @@ export default class YamlCreator extends React.Component {
       pullRequestReopened: false,
       pushMade: false,
       releaseMade: false,
-      displayEditor: false,
+      displayEditor: true,
       file: initialYaml,
     };
   }
@@ -316,14 +342,16 @@ export default class YamlCreator extends React.Component {
 
   handleImageSelection(event) {
     this.setState({
-      [event.target.name]: event.target.value,
+      image: event.target.value,
+      commands: cmdDirectory[event.target.value],
+      currentCmd: cmdDirectory[event.target.value],
       displayEditor: true,
     });
   }
 
   handleCommandsSelection(event) {
     this.setState({
-      commands: event.target.value === 'standard' ? standardSet : [],
+      commands: event.target.value === 'standard' ? this.state.currentCmd : [],
       displayEditor: true,
     });
   }
