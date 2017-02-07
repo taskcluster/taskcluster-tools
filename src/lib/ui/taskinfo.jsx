@@ -317,7 +317,7 @@ const TaskInfo = React.createClass({
       
       imagePullCmds.push('# Image appears to be a task image');
       imagePullCmds.push('# Download image tarball from task');
-      if (ext === 'zst') {
+      if (ext === '.zst') {
         imagePullCmds.push('# TODO: Install zstd > 1.0.0 from: https://github.com/facebook/zstd/releases');
         imagePullCmds.push(`curl -L https://queue.taskcluster.net/v1/task/${imageTaskId}/artifacts/${imagePath} | zstd -d > image.tar`);
       } else {

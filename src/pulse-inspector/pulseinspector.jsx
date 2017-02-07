@@ -137,7 +137,7 @@ export default React.createClass({
               bsSize="sm"
               bsStyle="danger"
               onClick={this.clearBindings}
-              disabled={!!this.state.bindings.length}>
+              disabled={!this.state.bindings.length}>
               <Glyphicon glyph="trash" /> Clear Bindings
             </Button>
           </ButtonToolbar>

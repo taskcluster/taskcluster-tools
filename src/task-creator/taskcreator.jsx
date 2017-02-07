@@ -6,23 +6,12 @@ import CodeMirror from 'react-code-mirror';
 import createDebugger from 'debug';
 import _ from 'lodash';
 import slugid from 'slugid';
-import jsonlint from 'durable-json-lint';
-import 'codemirror/mode/javascript/javascript';
-import '../lib/codemirror/json-lint';
+import yaml from 'js-yaml';
+import 'codemirror/mode/yaml/yaml';
+import '../lib/codemirror/yaml-lint';
 import './taskcreator.less';
 
 const debug = createDebugger('taskcreator');
-
-/** Parse json with jsonlint and accept corrections, and throw on error */
-const parseJSON = text => {
-  const {json, errors} = jsonlint(text);
-
-  if (errors.length > 0) {
-    throw new Error(errors[0].description || errors[0].message);
-  }
-
-  return JSON.parse(json);
-};
 
 /** Create a task-creator */
 export default React.createClass({
@@ -53,7 +42,7 @@ export default React.createClass({
 
         // Check that'll parse
         try {
-          parseJSON(task);
+          yaml.safeLoad(task);
         } catch (err) {
           task = this.props.initialTaskValue;
         }
@@ -69,19 +58,19 @@ export default React.createClass({
 
   /** Parameterize a task, return state after parameterization attempt */
   parameterizeTask(_task) {
-    // Assume the is valid JSON
+    // Assume the is valid YAML
     let invalidTask = false;
     let task = _task;
 
     // Parameterize with new deadline and created time
     try {
-      const data = parseJSON(task);
+      const data = yaml.safeLoad(task);
       const deadline = new Date();
 
       deadline.setMinutes(deadline.getMinutes() + 60);
       data.created = new Date().toJSON();
       data.deadline = deadline.toJSON();
-      task = JSON.stringify(data, null, '\t');
+      task = yaml.safeDump(data, {noCompatMode: true, noRefs: true}) + '\n';
     } catch (err) {
       debug('Failed to parameterize task, err: %s, %j', err, err, err.stack);
       invalidTask = true;
@@ -142,12 +131,12 @@ export default React.createClass({
         <CodeMirror
           ref="editor"
           lineNumbers={true}
-          mode="application/json"
+          mode="yaml"
           textAreaClassName="form-control"
           textAreaStyle={{minHeight: '20em'}}
           value={this.state.task}
           onChange={this.handleTaskChange}
-          indentWithTabs={true}
+          indentWithTabs={false}
           tabSize={2}
           lint={true}
           gutters={['CodeMirror-lint-markers']}
@@ -174,7 +163,7 @@ export default React.createClass({
     let invalidTask = false;
 
     try {
-      parseJSON(e.target.value);
+      yaml.safeLoad(e.target.value);
     } catch (err) {
       invalidTask = true;
     }
@@ -192,7 +181,7 @@ export default React.createClass({
       .resolve(this.state.task)
       .then(task => {
         const taskId = slugid.nice();
-        const payload = parseJSON(task);
+        const payload = yaml.safeLoad(task);
 
         return this.queue
           .createTask(taskId, payload)

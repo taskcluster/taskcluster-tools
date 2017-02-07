@@ -180,16 +180,16 @@ export default React.createClass({
     );
   },
 
-  provisionerIdChange(element) {
-    this.setState({formProvisionerId: element.target.value});
+  provisionerIdChange(event) {
+    this.setState({formProvisionerId: event.target.value});
   },
 
-  workerTypeChange(element) {
-    this.setState({formWorkerType: element.target.value});
+  workerTypeChange(event) {
+    this.setState({formWorkerType: event.target.value});
   },
 
-  cacheNameChange(element) {
-    this.setState({formCacheName: element.target.value});
+  cacheNameChange(event) {
+    this.setState({formCacheName: event.target.value});
   },
 
   async sendRequest() {
