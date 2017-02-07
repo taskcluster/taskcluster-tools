@@ -94,6 +94,7 @@ export default class YamlCreator extends React.Component {
       image: 'node:6',
       commands: cmdDirectory['node:6'],
       currentCmd: cmdDirectory['node:6'],
+      displayCmds: true,
       taskName: '',
       taskDescription: '',
       pullRequestOpened: false,
@@ -343,17 +344,21 @@ export default class YamlCreator extends React.Component {
   handleImageSelection(event) {
     this.setState({
       image: event.target.value,
-      commands: cmdDirectory[event.target.value],
       currentCmd: cmdDirectory[event.target.value],
       resetActive: true,
     });
+    this.state.displayCmds ? this.setState({commands: cmdDirectory[event.target.value]}) :
+      this.setState({commands: []});
   }
 
   handleCommandsSelection(event) {
     this.setState({
-      commands: event.target.value === 'standard' ? this.state.currentCmd : [],
-      resetActive: true,
+      displayCmds: event.target.value === 'standard',
+      currentCmd: this.state.commands,
     });
+    console.log(this.state.displayCmds, this.state.currentCmd);
+    event.target.value === 'standard' ? this.setState({commands: this.state.currentCmd}) :
+      this.setState({commands: []})
   }
 
   resetAll() {
@@ -402,8 +407,6 @@ export default class YamlCreator extends React.Component {
         },
       },
     };
-
-    console.log(JSON.stringify(initialYaml));
     
     return (
       <div>
