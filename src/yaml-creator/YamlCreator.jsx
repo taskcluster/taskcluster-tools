@@ -102,7 +102,7 @@ export default class YamlCreator extends React.Component {
       pullRequestReopened: false,
       pushMade: false,
       releaseMade: false,
-      displayEditor: true,
+      resetActive: false,
       file: initialYaml,
     };
   }
@@ -299,12 +299,12 @@ export default class YamlCreator extends React.Component {
             <ButtonToolbar>
               <Button
                 bsStyle="danger"
-                disabled={!this.state.displayEditor}
-                onClick={() => this.resetDisplayEditor(false)}>
+                disabled={!this.state.resetActive}
+                onClick={() => this.resetAll()}>
                 <Glyphicon glyph="repeat" /> Reset form and file
               </Button>
             </ButtonToolbar>
-            {this.state.displayEditor && this.renderEditor()}
+            {this.renderEditor()}
           </Col>
         </Row>
 
@@ -326,7 +326,7 @@ export default class YamlCreator extends React.Component {
   saveTextInput(event) {
     this.setState({
       [event.target.name]: event.target.value,
-      displayEditor: true,
+      resetActive: true,
     });
   }
 
@@ -336,7 +336,7 @@ export default class YamlCreator extends React.Component {
     this.setState({
       events: [...events],
       [event.target.id]: !this.state[event.target.id],
-      displayEditor: true,
+      resetActive: true,
     });
   }
 
@@ -345,24 +345,20 @@ export default class YamlCreator extends React.Component {
       image: event.target.value,
       commands: cmdDirectory[event.target.value],
       currentCmd: cmdDirectory[event.target.value],
-      displayEditor: true,
+      resetActive: true,
     });
   }
 
   handleCommandsSelection(event) {
     this.setState({
       commands: event.target.value === 'standard' ? this.state.currentCmd : [],
-      displayEditor: true,
+      resetActive: true,
     });
   }
 
-  setDisplayEditor(bool) {
-    this.setState({displayEditor: bool});
-  }
-
-  resetDisplayEditor(bool) {
+  resetAll() {
     this.setState({
-      displayEditor: bool,
+      resetActive: false,
       rootName: '',
       rootDescription: '',
       tasks: [],
