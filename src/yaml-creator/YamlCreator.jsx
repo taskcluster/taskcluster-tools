@@ -315,7 +315,8 @@ export default class YamlCreator extends React.Component {
           <Button
             bsStyle="info"
             className="bottom"
-            disabled="true">
+            disabled="true"
+            id="anotherTask">
             <Glyphicon glyph="plus" /> Define another task
           </Button>
         </ButtonToolbar>
