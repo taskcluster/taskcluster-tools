@@ -13,8 +13,9 @@ import {
 } from 'react-bootstrap';
 import './yamlcreator.less';
 import CodeMirror from 'react-code-mirror';
-import 'codemirror/mode/javascript/javascript';
-import '../lib/codemirror/json-lint';
+import 'codemirror/mode/yaml/yaml';
+import '../lib/codemirror/yaml-lint';
+import yaml from 'js-yaml';
 
 const initialYaml = {
   version: 0,
@@ -102,7 +103,6 @@ export default class YamlCreator extends React.Component {
       pushMade: false,
       releaseMade: false,
       resetActive: false,
-      file: initialYaml,
     };
   }
 
@@ -360,14 +360,14 @@ export default class YamlCreator extends React.Component {
   }
 
   renderEditor() {
-    const newYaml = {
+    const newYaml = yaml.safeDump({
       ...initialYaml,
       metadata: {
         ...initialYaml.metadata,
         name: this.state.rootName,
         description: this.state.rootDescription,
       },
-      tasks: {
+      tasks: [{
         ...initialYaml.tasks[0],
         ...{
           metadata: {
@@ -385,21 +385,22 @@ export default class YamlCreator extends React.Component {
             image: this.state.image,
           },
         },
-      },
-    };
-    
+      }],
+    });
+
+    console.log(newYaml);
+ 
     return (
       <div>
         <hr />
         <CodeMirror
           ref="yamlEditor"
           lineNumbers={true}
-          mode="application/json"
+          mode="yaml"
           textAreaClassName="form-control"
           textAreaStyle={{minHeight: '20em'}}
-          value={JSON.stringify(newYaml, null, 2)}
-          onChange={this.handleYamlChange}
-          indentWithTabs={true}
+          value={newYaml}
+          indentWithTabs={false}
           tabSize={2}
           lint={true}
           gutters={['CodeMirror-lint-markers']}
