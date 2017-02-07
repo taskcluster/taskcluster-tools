@@ -4,7 +4,7 @@
 module.exports = [
   {
     title: 'GitHub Quick-Start',
-    link: '/yaml-creator/',
+    link: '/quickstart/',
     icon: 'github',
     display: true,
     description: `Create a configuration file \`.taskcluster.yml\` to add to your repository and 

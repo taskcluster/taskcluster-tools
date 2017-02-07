@@ -34,7 +34,7 @@ const entryPoints = [
   'task-graph-inspector', // this page redirects to task-group-inspector
   'task-group-inspector',
   'task-inspector',
-  'yaml-creator',
+  'quickstart',
 ];
 
 /**
