@@ -52,36 +52,36 @@ const initialYaml = {
 };
 
 const cmdDirectory = {
-    'node:6': [
-      '/bin/bash',
-      '--login',
-      '-c',
-      'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
-      'npm install . && npm test',
-    ],
-    'rail/python-test-runner': [
-      '/bin/bash',
-      '--login',
-      '-c',
-      'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
-      'python setup.py test',
-    ],
-    'jimmycuadra/rust:latest': [
-      '/bin/bash',
-      '--login',
-      '-c',
-      'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
-      'rustc --test unit_test.rs && ./unit_test',
-    ],
-    'golang:1.8': [
-      '/bin/bash',
-      '--login',
-      '-c',
-      '>-',
-      'go get -t github.com/taskcluster/taskcluster-cli/...',
-      '&& cd  /go/src/github.com/taskcluster/taskcluster-cli make && go test ./...',
-    ],
-  };
+  'node:6': [
+    '/bin/bash',
+    '--login',
+    '-c',
+    'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+    'npm install . && npm test',
+  ],
+  'rail/python-test-runner': [
+    '/bin/bash',
+    '--login',
+    '-c',
+    'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+    'python setup.py test',
+  ],
+  'jimmycuadra/rust:latest': [
+    '/bin/bash',
+    '--login',
+    '-c',
+    'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}}',
+    'rustc --test unit_test.rs && ./unit_test',
+  ],
+  'golang:1.8': [
+    '/bin/bash',
+    '--login',
+    '-c',
+    '>-',
+    'go get -t github.com/taskcluster/taskcluster-cli/...',
+    '&& cd  /go/src/github.com/taskcluster/taskcluster-cli make && go test ./...',
+  ],
+};
 
 export default class YamlCreator extends React.Component {
   constructor(props) {
@@ -332,7 +332,7 @@ export default class YamlCreator extends React.Component {
   }
 
   handleEventsSelection(event) {
-    let events = new Set(this.state.events);
+    const events = new Set(this.state.events);
     events.has(event.target.name) ? events.delete(event.target.name) : events.add(event.target.name);
     this.setState({
       events: [...events],
@@ -358,7 +358,7 @@ export default class YamlCreator extends React.Component {
     });
     console.log(this.state.displayCmds, this.state.currentCmd);
     event.target.value === 'standard' ? this.setState({commands: this.state.currentCmd}) :
-      this.setState({commands: []})
+      this.setState({commands: []});
   }
 
   resetAll() {
