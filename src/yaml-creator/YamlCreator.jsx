@@ -272,11 +272,6 @@ export default class YamlCreator extends React.Component {
           <Col md={7}>
             <ButtonToolbar>
               <Button
-                bsStyle="primary"
-                onClick={() => this.setDisplayEditor(true)}>
-                <Glyphicon glyph="pencil" /> Reveal file in editor
-              </Button>
-              <Button
                 bsStyle="danger"
                 disabled={!this.state.displayEditor}
                 onClick={() => this.resetDisplayEditor(false)}>
@@ -305,6 +300,7 @@ export default class YamlCreator extends React.Component {
   saveTextInput(event) {
     this.setState({
       [event.target.name]: event.target.value,
+      displayEditor: true,
     });
   }
 
@@ -314,18 +310,21 @@ export default class YamlCreator extends React.Component {
     this.setState({
       events: [...events],
       [event.target.id]: !this.state[event.target.id],
+      displayEditor: true,
     });
   }
 
   handleImageSelection(event) {
     this.setState({
       [event.target.name]: event.target.value,
+      displayEditor: true,
     });
   }
 
   handleCommandsSelection(event) {
     this.setState({
       commands: event.target.value === 'standard' ? standardSet : [],
+      displayEditor: true,
     });
   }
 
