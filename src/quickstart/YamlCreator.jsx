@@ -50,6 +50,7 @@ const initialYaml = {
   ],
 };
 
+/* eslint-disable */
 const cmdDirectory = {
   'node:6': [
     '/bin/bash',
@@ -84,7 +85,7 @@ export default class YamlCreator extends React.Component {
       rootName: '',
       rootDescription: '',
       tasks: [],
-      events: [],
+      events: new Set(),
       image: 'node:6',
       commands: cmdDirectory['node:6'],
       currentCmd: cmdDirectory['node:6'],
@@ -109,26 +110,25 @@ export default class YamlCreator extends React.Component {
             <h4>GitHub Quick-Start</h4>
             <p>
               This tool lets you easily generate a simple generic <code>.taskcluster.yml</code> file, 
-              which should live at the root of your repository. It defines
+              which should live in the root of your repository. It defines
               tasks that you want TaskCluster to run for you. The tasks will run when certain 
               GitHub events happen — you will choose the events you're interested in while 
               creating the file.
             </p>
+            <hr />
             <h5>How to set up your repository with TaskCluster:</h5>
             <ul>
               <li>
-                Fill out the form below. Note that you can press the 
-                <strong>Reveal file in editor</strong> button at any time to see your file. All
-                changes in the form will be instantly show up in the editor.
+                Fill out the form below. All
+                changes in the form will instantly show up in the code field.
               </li>
               <li>
-                When you are done editing, copy the contents of the editor. Go to 
-                your repository, create a file at its root. Paste. Save 
-                as <code>.taskcluster.yml</code>.
+                When you are done editing, copy the contents of the code field and paste it into a file 
+                named <code>.taskcluster.yml</code> in the root of your repository.
               </li>
               <li>
                 Make sure to install 
-                the <a title="bobobob" href="https://github.com/integration/taskcluster-staging"> TaskCluster-GitHub 
+                the <a href="https://github.com/integration/taskcluster"> TaskCluster-GitHub 
                 integration</a>.
               </li>
             </ul>
@@ -146,7 +146,7 @@ export default class YamlCreator extends React.Component {
           <Col md={5}>
             <h5>Enter the name and description of your project or these tasks:</h5>
             <p className="infoText">
-              <Glyphicon glyph="info-sign" />
+              <Glyphicon glyph="info-sign" />&nbsp;
               These will appear at the top of the file and help the reader understand what they are seeing.
             </p>
             
@@ -194,7 +194,7 @@ export default class YamlCreator extends React.Component {
               <Checkbox
                 name="pull_request.opened"
                 id="pullRequestOpened"
-                class="data_checkboxes"
+                className="data_checkboxes"
                 checked={this.state.pullRequestOpened}
                 onChange={e => this.handleEventsSelection(e)}>
                 Pull request opened
@@ -202,7 +202,7 @@ export default class YamlCreator extends React.Component {
               <Checkbox
                 name="pull_request.closed"
                 id="pullRequestClosed"
-                class="data_checkboxes"
+                className="data_checkboxes"
                 checked={this.state.pullRequestClosed}
                 onChange={e => this.handleEventsSelection(e)}>
                 Pull request merged or closed
@@ -210,7 +210,7 @@ export default class YamlCreator extends React.Component {
               <Checkbox
                 name="pull_request.synchronize"
                 id="pullRequestSynchronized"
-                class="data_checkboxes"
+                className="data_checkboxes"
                 checked={this.state.pullRequestSynchronized}
                 onChange={e => this.handleEventsSelection(e)}>
                 New commit made in an opened pull request
@@ -218,7 +218,7 @@ export default class YamlCreator extends React.Component {
               <Checkbox
                 name="pull_request.reopened"
                 id="pullRequestReopened"
-                class="data_checkboxes"
+                className="data_checkboxes"
                 checked={this.state.pullRequestReopened}
                 onChange={e => this.handleEventsSelection(e)}>
                 Pull request re-opened
@@ -226,7 +226,7 @@ export default class YamlCreator extends React.Component {
               <Checkbox
                 name="push"
                 id="pushMade"
-                class="data_checkboxes"
+                className="data_checkboxes"
                 checked={this.state.pushMade}
                 onChange={e => this.handleEventsSelection(e)}>
                 Push
@@ -234,7 +234,7 @@ export default class YamlCreator extends React.Component {
               <Checkbox
                 name="release"
                 id="releaseMade"
-                class="data_checkboxes"
+                className="data_checkboxes"
                 checked={this.state.releaseMade}
                 onChange={e => this.handleEventsSelection(e)}>
                 Release or tag created
@@ -246,7 +246,7 @@ export default class YamlCreator extends React.Component {
                 Language your project uses:
               </ControlLabel>
               <p className="infoText">
-                <Glyphicon glyph="info-sign" />
+                <Glyphicon glyph="info-sign" />&nbsp;
                 This will select a corresponding docker image.
               </p>
               <select
@@ -308,7 +308,10 @@ export default class YamlCreator extends React.Component {
 
   handleEventsSelection(event) {
     const events = new Set(this.state.events);
-    events.has(event.target.name) ? events.delete(event.target.name) : events.add(event.target.name);
+
+    events.has(event.target.name) ?
+      events.delete(event.target.name) :
+      events.add(event.target.name);
     this.setState({
       events: [...events],
       [event.target.id]: !this.state[event.target.id],
@@ -321,18 +324,18 @@ export default class YamlCreator extends React.Component {
       image: event.target.value,
       currentCmd: cmdDirectory[event.target.value],
       resetActive: true,
+      commands: this.state.displayCmds ? cmdDirectory[event.target.value] : [],
     });
-    this.state.displayCmds ? this.setState({commands: cmdDirectory[event.target.value]}) :
-      this.setState({commands: []});
   }
 
   handleCommandsSelection(event) {
     this.setState({
       displayCmds: event.target.value === 'standard',
       currentCmd: this.state.commands,
+      commands: event.target.value === 'standard' ?
+        this.state.commands :
+        [],
     });
-    event.target.value === 'standard' ? this.setState({commands: this.state.currentCmd}) :
-      this.setState({commands: []});
   }
 
   resetAll() {
@@ -341,7 +344,7 @@ export default class YamlCreator extends React.Component {
       rootName: '',
       rootDescription: '',
       tasks: [],
-      events: [],
+      events: new Set(),
       taskName: '',
       taskDescription: '',
       pullRequestOpened: false,

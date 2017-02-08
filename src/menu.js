@@ -3,14 +3,6 @@
 // Note, only entries with a description will be show on the landing page.
 module.exports = [
   {
-    title: 'GitHub Quick-Start',
-    link: '/quickstart/',
-    icon: 'github',
-    display: true,
-    description: `Create a configuration file \`.taskcluster.yml\` to add to your repository and 
-      plug TaskCluster into your project`,
-  },
-  {
     title: 'Task Inspector',
     link: '/task-inspector/',
     icon: 'cube',
@@ -34,6 +26,14 @@ module.exports = [
     display: true,
     description: `Create and submit tasks from the task creator. Created tasks will be persistent
       in \`localStorage\` so you can try again with new parameters`,
+  },
+  {
+    title: 'GitHub Quick-Start',
+    link: '/quickstart/',
+    icon: 'github',
+    display: true,
+    description: `Create a configuration file \`.taskcluster.yml\` to add to your repository and 
+      plug TaskCluster into your project`,
   },
   {
     title: 'AWS Provisioner',
