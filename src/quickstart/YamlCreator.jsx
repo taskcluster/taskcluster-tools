@@ -50,7 +50,6 @@ const initialYaml = {
   ],
 };
 
-/* eslint-disable */
 const cmdDirectory = {
   'node:6': [
     '/bin/bash',
@@ -68,13 +67,15 @@ const cmdDirectory = {
     '/bin/bash',
     '--login',
     '-c',
-    'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}} && rustc --test unit_test.rs && ./unit_test',
+    'git clone {{event.head.repo.url}} repo && cd repo' +
+    '&& git checkout {{event.head.sha}} && rustc --test unit_test.rs && ./unit_test',
   ],
   'golang:1.8': [
     '/bin/bash',
     '--login',
     '-c',
-    'go get -t github.com/taskcluster/taskcluster-cli/... && cd  /go/src/github.com/taskcluster/taskcluster-cli make && go test ./...',
+    'go get -t github.com/taskcluster/taskcluster-cli/... &&' +
+    ' cd  /go/src/github.com/taskcluster/taskcluster-cli make && go test ./...',
   ],
 };
 
