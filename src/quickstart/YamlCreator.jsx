@@ -379,6 +379,7 @@ export default class YamlCreator extends React.Component {
             },
           },
           payload: {
+            ...initialYaml.tasks[0].payload,
             command: this.state.commands,
             image: this.state.image,
           },
