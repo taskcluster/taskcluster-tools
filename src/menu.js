@@ -28,6 +28,14 @@ module.exports = [
       in \`localStorage\` so you can try again with new parameters`,
   },
   {
+    title: 'GitHub Quick-Start',
+    link: '/quickstart/',
+    icon: 'github',
+    display: true,
+    description: `Create a configuration file \`.taskcluster.yml\` to add to your repository and 
+      plug TaskCluster into your project`,
+  },
+  {
     title: 'AWS Provisioner',
     link: '/aws-provisioner/',
     icon: 'server',

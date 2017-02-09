@@ -33,7 +33,8 @@ const entryPoints = [
   'task-creator',
   'task-graph-inspector', // this page redirects to task-group-inspector
   'task-group-inspector',
-  'task-inspector'
+  'task-inspector',
+  'quickstart',
 ];
 
 /**
