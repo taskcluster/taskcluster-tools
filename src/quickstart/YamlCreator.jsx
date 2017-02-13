@@ -136,7 +136,7 @@ export default class YamlCreator extends React.Component {
             <p>
               Optionally, after you create your file, you can edit 
               it here or in you favorite editor to add more functonality. Please refer to 
-              the <a href="https://docs.taskcluster.net/manual/integrations/github#a-simple-taskcluster-yml-file">
+              the <a href="https://docs.taskcluster.net/reference/integrations/github/docs/usage">
               full documentation on our configuration files</a>.
             </p>
             <hr />
