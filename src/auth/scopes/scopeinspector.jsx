@@ -244,10 +244,10 @@ export default React.createClass({
   },
 
   renderScopes() {
-    const scopes = _.uniq(_.flatten(
+    const scopes = _.uniq(_.flattenDeep([
       this.state.roles.map(role => role.expandedScopes),
-      this.state.clients.map(client => client.expandedScopes)
-    ))
+      this.state.clients.map(client => client.expandedScopes),
+    ]))
     .sort()
     .filter(scope => _.includes(scope, this.state.scopeSearchTerm));
 
