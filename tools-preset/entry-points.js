@@ -9,7 +9,6 @@ const polyfill = require.resolve('babel-polyfill');
 const template = path.join(SRC, 'template.ejs');
 
 const entryPoints = [
-  'ami-sets',
   'auth/clients',
   'auth/roles',
   'auth/scopes',
