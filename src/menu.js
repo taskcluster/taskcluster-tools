@@ -44,13 +44,6 @@ module.exports = [
       Nodes`,
   },
   {
-    title: 'AMI sets',
-    link: '/ami-sets/',
-    icon: 'server',
-    display: true,
-    description: 'Manage AMI sets known to the AWS Provisioner',
-  },
-  {
     title: 'Client Manager',
     link: '/auth/clients/',
     icon: 'users',

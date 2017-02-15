@@ -35,7 +35,6 @@ preset.module.noParse = ['ws'];
 // Ignore lint problems in these files as they are external resources placed in-tree
 preset.eslint.ignorePattern = [
   'src/display/include/**/*.js',
-  'src/ami-sets/temp-aws-prov-reference.js',
   'src/lib/assets/bootstrap/**/*.js',
   'src/lib/codemirror/**/*.js',
   'src/lib/persona.js'
