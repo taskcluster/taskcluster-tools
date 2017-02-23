@@ -429,7 +429,7 @@ const ClientEditor = React.createClass({
     } catch (err) {
       this.setState({
         working: false,
-        error: ': Sorry, you are either not logged in or do not have permission to reset access tokens. \n ' + err,
+        error: ': You do not have permission to reset access tokens. Please ensure you are logged in and have sufficient privileges. \n ' + err,
       });
     }
   },
