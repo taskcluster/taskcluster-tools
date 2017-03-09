@@ -427,24 +427,12 @@ const ClientEditor = React.createClass({
         working: false,
       });
     } catch (err) {
-      try {
-        if (this.auth._options.credentials.clientId!=null) {
-          this.setState({
-            working: false,
-            error: ': Sorry, you do not have permission to reset access tokens for this user. '  + err,
-          }); 
-        } else {
-          this.setState({
-            working: false,
-            error: ': Sorry, you need to be logged in to reset access tokens. ' + err,
-          });
-        }
-      } catch (err2) {
-        this.setState({
-          working: false,
-          error: ': Sorry, you need to be logged in to reset access tokens. ' + err,
-        });
-      }
+      this.setState({
+        working: false,
+        error: auth.loadCredentials() ?
+          'You do not have sufficient permission to reset access tokens for this user.' :
+          'You must be logged in and have permission to reset access tokens for this user.',
+      });
     }
   },
 
