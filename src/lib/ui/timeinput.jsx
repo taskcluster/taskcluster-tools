@@ -40,8 +40,8 @@ export default React.createClass({
 
   onChange(e) {
     const value = e.target.value;
-    const parsed = moment(value);
-    const valid = parsed.format(this.props.format) === value;
+    const parsed = moment(value, this.props.format, true); // true enables strict parsing
+    const valid = parsed.isValid();
 
     this.setState({valid});
 
