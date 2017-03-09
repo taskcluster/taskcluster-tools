@@ -57,37 +57,24 @@ const HookStatusDisplay = React.createClass({
       clients: {
         hooks: taskcluster.Hooks,
       },
-      reloadOnProps: ['currentHookId', 'currentHookGroupId'],
+      reloadOnProps: ['currentHookId', 'currentHookGroupId', 'hookStatus'],
     }),
   ],
 
   propTypes: {
     currentHookId: React.PropTypes.string.isRequired,
     currentHookGroupId: React.PropTypes.string.isRequired,
-  },
-
-  getInitialState() {
-    return {
-      hookStatus: null,
-    };
-  },
-
-  /** Load initial state */
-  load() {
-    return {
-      hookStatus: this.hooks
-        .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId),
-    };
+    hookStatus: React.PropTypes.object,
+    refreshHookStatus: React.PropTypes.func.isRequired,
   },
 
   render() {
-    const waitFor = this.renderWaitFor('hookStatus');
+    const stat = this.props.hookStatus;
 
-    if (waitFor) {
-      return waitFor;
+    if (!stat) {
+      return this.renderSpinner();
     }
 
-    const stat = this.state.hookStatus;
     let lastTime;
     let lastResult;
 
@@ -118,7 +105,7 @@ const HookStatusDisplay = React.createClass({
         <dt>Last Fired</dt>
         <dd>
           {lastTime}
-          <Button className="btn-xs" onClick={this.reload}>
+          <Button className="btn-xs" onClick={this.props.refreshHookStatus}>
             <Glyphicon glyph="refresh" />
           </Button>
         </dd>
@@ -182,7 +169,9 @@ const HookDisplay = React.createClass({
         </dl>
         <HookStatusDisplay
           currentHookGroupId={this.props.currentHookGroupId}
-          currentHookId={this.props.currentHookId} />
+          currentHookId={this.props.currentHookId}
+          hookStatus={this.props.hookStatus}
+          refreshHookStatus={this.props.refreshHookStatus} />
         <dl className="dl-horizontal">
           <dt>Task Definition</dt>
           <dd />
@@ -316,7 +305,7 @@ const HookEditor = React.createClass({
                 checked={this.state.emailOnError}
                 onChange={this.onEmailOnErrorChange} />
               <span className="text-info">
-                Email the owner when an error occurs while creating a task.
+                Email the owner when an error occurs while creating a task. Note: to be notifed of tasks that fail once created, use <a href="https://docs.taskcluster.net/reference/core/taskcluster-notify" target="_blank" rel="noopener noreferrer">notify routes</a>.
               </span>
             </div>
           </div>
@@ -555,7 +544,6 @@ const HookEditView = React.createClass({
     currentHookGroupId: React.PropTypes.string,
     refreshHookList: React.PropTypes.func.isRequired,
     selectHook: React.PropTypes.func.isRequired,
-    triggerHook: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -563,6 +551,7 @@ const HookEditView = React.createClass({
       // Currently loaded hook
       hookLoaded: false,
       hookError: null,
+      hookStatus: null,
       hook: null,
       editing: true,
       error: null,
@@ -580,12 +569,15 @@ const HookEditView = React.createClass({
       };
     }
 
+    const hookStatus = this.hooks
+      .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId);
     const hook = this.hooks
       .hook(this.props.currentHookGroupId, this.props.currentHookId)
       .then(stripHookIds);
 
     return {
       hook,
+      hookStatus,
       editing: false,
       error: null,
     };
@@ -633,10 +625,12 @@ const HookEditView = React.createClass({
     return (
       <HookDisplay
         hook={this.state.hook}
+        hookStatus={this.state.hookStatus}
         currentHookId={this.props.currentHookId}
         currentHookGroupId={this.props.currentHookGroupId}
         startEditing={this.startEditing}
-        triggerHook={this.triggerHook} />
+        triggerHook={this.triggerHook}
+        refreshHookStatus={this.refreshHookStatus} />
     );
   },
 
@@ -645,10 +639,22 @@ const HookEditView = React.createClass({
   },
 
   triggerHook() {
+    this.setState({hookStatus: null});
+
     // Payloads are ignored, so we send empty data over
     this.hooks
       .triggerHook(this.props.currentHookGroupId, this.props.currentHookId, {})
+      .then(this.refreshHookStatus)
       .catch(error => this.setState({error}));
+  },
+
+  refreshHookStatus() {
+    this.setState({hookStatus: null});
+    return this.hooks
+      .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId)
+      .then(stat => {
+        this.setState({hookStatus: stat});
+      });
   },
 
   createHook(hookGroupId, hookId, hook) {
