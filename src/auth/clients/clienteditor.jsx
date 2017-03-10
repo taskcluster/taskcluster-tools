@@ -429,7 +429,9 @@ const ClientEditor = React.createClass({
     } catch (err) {
       this.setState({
         working: false,
-        error: err,
+        error: auth.loadCredentials() ?
+          'You do not have sufficient permission to reset access tokens for this user.' :
+          'You must be logged in and have permission to reset access tokens for this user.',
       });
     }
   },
