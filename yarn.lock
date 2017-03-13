@@ -6009,9 +6009,9 @@ tar@~2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
-taskcluster-client@^1.4.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/taskcluster-client/-/taskcluster-client-1.5.0.tgz#3c38186ba93dcb4f15e5fb091dfe9154a16fe9ba"
+taskcluster-client@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/taskcluster-client/-/taskcluster-client-1.6.1.tgz#bab6abeba5c76a3f227de58cb08eb8246d78f186"
   dependencies:
     amqplib "^0.4.1"
     debug "^2.1.3"
