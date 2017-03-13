@@ -132,6 +132,26 @@ const TaskInfo = React.createClass({
             </tr>
 
             <tr>
+              <td>Tags</td>
+              <td>
+                <table className="tag-table">
+                  <tr>
+                    <th>Tag</th><th>Value</th>
+                  </tr>
+                  {
+                    Object
+                      .entries(task.tags)
+                      .map(([key, value]) => (
+                        <tr key={key}>
+                          <td>{key}</td><td>{value}</td>
+                        </tr>
+                      ))
+                  }
+                </table>
+              </td>
+            </tr>
+
+            <tr>
               <td>Requires</td>
               <td>
                 This task will be scheduled when <em>dependencies</em> are
