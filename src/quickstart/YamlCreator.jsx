@@ -39,7 +39,7 @@ const initialYaml = {
       },
       payload: {
         maxRunTime: 3600,
-        image: 'node:6',
+        image: 'node',
         command: [],
       },
       metadata: {
@@ -52,34 +52,62 @@ const initialYaml = {
   ],
 };
 
-const cmdDirectory = {
-  'node:6': [
-    '/bin/bash',
-    '--login',
-    '-c',
-    'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}} && npm install . && npm test',
-  ],
-  'rail/python-test-runner': [
-    '/bin/bash',
-    '--login',
-    '-c',
-    'git clone {{event.head.repo.url}} repo && cd repo && git checkout {{event.head.sha}} && python setup.py test',
-  ],
-  'jimmycuadra/rust:latest': [
-    '/bin/bash',
-    '--login',
-    '-c',
-    'git clone {{event.head.repo.url}} repo && cd repo' +
-    '&& git checkout {{event.head.sha}} && rustc --test unit_test.rs && ./unit_test',
-  ],
-  'golang:1.8': [
-    '/bin/bash',
-    '--login',
-    '-c',
-    'go get -t github.com/taskcluster/taskcluster-cli/... &&' +
-    ' cd  /go/src/github.com/taskcluster/taskcluster-cli make && go test ./...',
-  ],
-};
+const baseCmd = [
+  'git clone {{event.head.repo.url}} repo',
+  'cd repo',
+  'git config advice.detachedHead false',
+  'git checkout {{event.head.sha}}',
+];
+
+function cmdDirectory(type, organization, repository) {
+  const org = organization || '<YOUR_ORG>';
+  const repo = repository || '<YOUR_REPO>';
+  const cmds = {
+    node: [
+      '/bin/bash',
+      '--login',
+      '-c',
+      baseCmd.concat([
+        'npm install .',
+        'npm test',
+      ]).join(' && '),
+    ],
+    python: [
+      '/bin/bash',
+      '--login',
+      '-c',
+      baseCmd.concat([
+        'pip install tox',
+        'tox',
+      ]).join(' && '),
+    ],
+    'jimmycuadra/rust': [
+      '/bin/bash',
+      '--login',
+      '-c',
+      baseCmd.concat([
+        'rustc --test unit_test.rs',
+        './unit_test',
+      ]).join(' && '),
+    ],
+    golang: [
+      '/bin/bash',
+      '--login',
+      '-c',
+      ([
+        `mkdir -p /go/src/github.com/${org}/${repo}`,
+        `cd /go/src/github.com/${org}/${repo}`,
+        'git init',
+        'git fetch {{ event.head.repo.url }} {{ event.head.ref }}',
+        'git config advice.detachedHead false',
+        'git checkout {{ event.head.sha }}',
+        'go install',
+        'go test ./...',
+      ]).join(' && '),
+    ],
+  };
+  return cmds[type];
+}
 
 const githubClient = new Github({});
 
@@ -91,9 +119,9 @@ export default class YamlCreator extends React.Component {
       rootDescription: '',
       tasks: [],
       events: new Set(),
-      image: 'node:6',
-      commands: cmdDirectory['node:6'],
-      currentCmd: cmdDirectory['node:6'],
+      image: 'node',
+      commands: cmdDirectory('node'),
+      currentCmd: cmdDirectory('node'),
       displayCmds: true,
       taskName: '',
       taskDescription: '',
@@ -286,10 +314,10 @@ export default class YamlCreator extends React.Component {
               <select
                 name="image"
                 onChange={e => this.handleImageSelection(e)}>
-                <option value="node:6">JavaScript in Node.js v6</option>
-                <option value="rail/python-test-runner">Python</option>
-                <option value="jimmycuadra/rust:latest">Rust</option>
-                <option value="golang:1.8">Go</option>
+                <option value="node">Nodejs</option>
+                <option value="python">Python</option>
+                <option value="jimmycuadra/rust">Rust</option>
+                <option value="golang">Go</option>
               </select>
             </FormGroup>
 
@@ -354,11 +382,12 @@ export default class YamlCreator extends React.Component {
   }
 
   handleImageSelection(event) {
+    const currentCmd = cmdDirectory(event.target.value, this.state.owner, this.state.repo);
     this.setState({
       image: event.target.value,
-      currentCmd: cmdDirectory[event.target.value],
+      currentCmd,
       resetActive: true,
-      commands: this.state.displayCmds ? cmdDirectory[event.target.value] : [],
+      commands: this.state.displayCmds ? currentCmd : [],
     });
   }
 
