@@ -3,6 +3,7 @@ import {
   Grid,
   Row,
   Col,
+  Form,
   FormGroup,
   FormControl,
   ControlLabel,
@@ -16,6 +17,7 @@ import CodeMirror from 'react-code-mirror';
 import 'codemirror/mode/yaml/yaml';
 import '../lib/codemirror/yaml-lint';
 import yaml from 'js-yaml';
+import {Github} from 'taskcluster-client';
 
 const initialYaml = {
   version: 0,
@@ -79,6 +81,8 @@ const cmdDirectory = {
   ],
 };
 
+const githubClient = new Github({});
+
 export default class YamlCreator extends React.Component {
   constructor(props) {
     super(props);
@@ -100,6 +104,9 @@ export default class YamlCreator extends React.Component {
       pushMade: false,
       releaseMade: false,
       resetActive: false,
+      owner: '',
+      repo: '',
+      installedState: null,
     };
   }
 
@@ -117,7 +124,33 @@ export default class YamlCreator extends React.Component {
               creating the file.
             </p>
             <hr />
-            <h5>How to set up your repository with TaskCluster:</h5>
+            <h5>For organization members: Check if your repository already has TaskCluster</h5>
+            <Form componentClass="fieldset" inline="true">
+              <FormGroup validationState={this.state.installedState}>
+                <FormControl
+                  type="text"
+                  name="owner"
+                  placeholder="Enter organization name"
+                  onChange={e => this.saveTextInput(e)} />
+                <FormControl.Feedback />
+                {' '}/{' '}
+                <FormControl
+                  type="text"
+                  name="repo"
+                  placeholder="Enter repository name"
+                  onChange={e => this.saveTextInput(e)} />
+                <FormControl.Feedback />
+              </FormGroup>
+              {' '}
+              <Button
+                bsStyle="info"
+                onClick={() => this.installedStatus()}>
+                <Glyphicon glyph="question-sign" /> Check
+              </Button>
+              {this.renderInfotext()}
+            </Form>
+            <hr />
+            <h5>For independent developers and organization owners: How to set up your repository with TaskCluster</h5>
             <ul>
               <li>
                 Fill out the form below. All
@@ -403,6 +436,32 @@ export default class YamlCreator extends React.Component {
           gutters={['CodeMirror-lint-markers']}
           theme="ambiance" />
       </div>
+    );
+  }
+
+  async installedStatus() {
+    if (this.state.owner && this.state.repo) {
+      const result = await githubClient.isInstalledFor(this.state.owner, this.state.repo);
+      this.setState({installedState: result.installed ? 'success' : 'error'});
+    } else {
+      this.setState({installedState: null});
+    }
+  }
+
+  renderInfotext() {
+    if (!this.state.installedState) {
+      return null;
+    }
+    
+    return this.state.installedState === 'success' ? (
+      <p className="text-success">
+        You're all set!
+      </p>
+    ) : (
+      <p className="text-danger">
+        The integration has not been set up for this repository.
+        Please contact the organization owner to have it set up!
+      </p>
     );
   }
 }
