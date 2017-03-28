@@ -222,11 +222,30 @@ const ClientEditor = React.createClass({
                 ) : (
                   <div className="form-control-static">
                     <format.DateView date={this.state.client.expires} />
+                    {
+                      this.state.client.deleteOnExpiration && (
+                        <span> (this client will be deleted on expiration)</span>
+                      )
+                    }
                   </div>
                 )
               }
             </div>
           </div>
+          {
+            isEditing && (
+              <div className="form-group">
+                <label className="control-label col-md-3">Delete on Expiration</label>
+                <div className="col-md-9">
+                  <input
+                    type="checkbox"
+                    checked={this.state.client.deleteOnExpiration}
+                    onChange={this.onDOEChange} />
+                  {' '}Automatically delete this client when it expires
+                </div>
+              </div>
+            )
+          }
           {
             _.map({
               created: 'Created',
@@ -409,10 +428,17 @@ const ClientEditor = React.createClass({
 
   /** When expires exchanges in the editor */
   onExpiresChange(date) {
-    const state = _.cloneDeep(this.state);
+    const client = _.cloneDeep(this.state.client);
 
-    state.client.expires = date.toDate().toJSON();
-    this.setState(state);
+    client.expires = date.toDate().toJSON();
+    this.setState({client});
+  },
+
+  onDOEChange() {
+    const client = _.cloneDeep(this.state.client);
+
+    client.deleteOnExpiration = !client.deleteOnExpiration;
+    this.setState({client});
   },
 
   /** Reset accessToken for current client */
@@ -486,6 +512,7 @@ const ClientEditor = React.createClass({
           description: this.state.client.description,
           expires: this.state.client.expires,
           scopes: this.state.client.scopes,
+          deleteOnExpiration: this.state.client.deleteOnExpiration,
         })
         .then(client => {
           this.props.reloadClientId(clientId);
