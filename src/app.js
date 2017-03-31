@@ -8,7 +8,7 @@ import {
 import TaskInspector from './task-inspector';
 import TaskGroupInspector from './task-group-inspector';
 import TaskCreator from './task-creator';
-// import QuickStart from './quickstart';
+import QuickStart from './quickstart';
 // import PurgeCaches from './purge-caches'; // error in console regenerator
 // import IndexBrowser from './index-browser'; // is supposed to work!!!! but once i add index.js, it screws up!
 // import IndexArtifactBrowser from './index-browser/artifacts';
@@ -40,7 +40,7 @@ const App = () => {
         <Route path="/task-inspector" component={TaskInspector} />
         <Route path="/task-group-inspector" component={TaskGroupInspector} />
         <Route path="/task-creator" component={TaskCreator} />
-        {/*<Route path="/quickstart" component={QuickStart} />*/}
+        <Route path="/quickstart" component={QuickStart} />
         {/*<Route path="/purge-caches" component={PurgeCaches} />*/}
         {/*<Route path="/index/artifacts" component={IndexArtifactBrowser} />*/}
         {/*<Route path="/index" component={IndexBrowser} />*/}

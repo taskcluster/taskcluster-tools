@@ -110,10 +110,10 @@ export default class YamlCreator extends React.Component {
           <Col sm={12}>
             <h4>GitHub Quick-Start</h4>
             <p>
-              This tool lets you easily generate a simple generic <code>.taskcluster.yml</code> file, 
+              This tool lets you easily generate a simple generic <code>.taskcluster.yml</code> file,
               which should live in the root of your repository. It defines
-              tasks that you want TaskCluster to run for you. The tasks will run when certain 
-              GitHub events happen — you will choose the events you're interested in while 
+              tasks that you want TaskCluster to run for you. The tasks will run when certain
+              GitHub events happen — you will choose the events you're interested in while
               creating the file.
             </p>
             <hr />
@@ -124,18 +124,18 @@ export default class YamlCreator extends React.Component {
                 changes in the form will instantly show up in the code field.
               </li>
               <li>
-                When you are done editing, copy the contents of the code field and paste it into a file 
+                When you are done editing, copy the contents of the code field and paste it into a file
                 named <code>.taskcluster.yml</code> in the root of your repository.
               </li>
               <li>
-                Make sure to install 
-                the <a href="https://github.com/integration/taskcluster"> TaskCluster-GitHub 
+                Make sure to install
+                the <a href="https://github.com/integration/taskcluster"> TaskCluster-GitHub
                 integration</a>.
               </li>
             </ul>
             <p>
-              Optionally, after you create your file, you can edit 
-              it here or in you favorite editor to add more functonality. Please refer to 
+              Optionally, after you create your file, you can edit
+              it here or in you favorite editor to add more functonality. Please refer to
               the <a href="https://docs.taskcluster.net/reference/integrations/github/docs/usage">
               full documentation on our configuration files</a>.
             </p>
@@ -150,7 +150,7 @@ export default class YamlCreator extends React.Component {
               <Glyphicon glyph="info-sign" />&nbsp;
               These will appear at the top of the file and help the reader understand what they are seeing.
             </p>
-            
+
             <FormGroup>
               <ControlLabel>Name:</ControlLabel>
               <FormControl
@@ -263,7 +263,6 @@ export default class YamlCreator extends React.Component {
             <FormGroup>
               <ControlLabel>Commands: </ControlLabel>
               <select
-                componentClass="select"
                 placeholder="Pick one..."
                 onChange={e => this.handleCommandsSelection(e)}>
                 <option value="standard">Clone repo and run my tests</option>
@@ -290,7 +289,7 @@ export default class YamlCreator extends React.Component {
           <Button
             bsStyle="info"
             className="bottom"
-            disabled="true"
+            disabled={true}
             id="anotherTask">
             <Glyphicon glyph="plus" /> Define another task
           </Button>
@@ -386,7 +385,7 @@ export default class YamlCreator extends React.Component {
         },
       }],
     });
- 
+
     return (
       <div>
         <hr />
