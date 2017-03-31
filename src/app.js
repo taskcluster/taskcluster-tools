@@ -9,9 +9,9 @@ import TaskInspector from './task-inspector';
 import TaskGroupInspector from './task-group-inspector';
 import TaskCreator from './task-creator';
 import QuickStart from './quickstart';
-import PurgeCaches from './purge-caches'; // error in console regenerator
-// import IndexBrowser from './index-browser'; // is supposed to work!!!! but once i add index.js, it screws up!
-// import IndexArtifactBrowser from './index-browser/artifacts';
+import PurgeCaches from './purge-caches';
+import IndexBrowser from './index-browser';
+import IndexArtifactBrowser from './index-browser/artifacts';
 // import Secrets from './secrets';
 // import Status from './status';
 // import Diagnostics from './diagnostics';
@@ -42,8 +42,8 @@ const App = () => {
         <Route path="/task-creator" component={TaskCreator} />
         <Route path="/quickstart" component={QuickStart} />
         <Route path="/purge-caches" component={PurgeCaches} />
-        {/*<Route path="/index/artifacts" component={IndexArtifactBrowser} />*/}
-        {/*<Route path="/index" component={IndexBrowser} />*/}
+        <Route path="/index/artifacts" component={IndexArtifactBrowser} />
+        <Route path="/index" component={IndexBrowser} />
         {/*<Route path="/secret" component={Secrets} />*/}
         {/*<Route path="/status" component={Status} />*/}
         {/*<Route path="/diagnostics" component={Diagnostics} />*/}
