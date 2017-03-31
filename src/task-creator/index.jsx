@@ -22,10 +22,12 @@ const initialTask = {
   },
 };
 
-ReactDOM.render((
+const TaskCreatorView = () => (
   <Layout>
     <TaskCreator
       localStorageKey="task-creator/task"
       initialTaskValue={JSON.stringify(initialTask, null, '\t')} />
   </Layout>
-), document.getElementById('root'));
+);
+
+export default TaskCreatorView;
