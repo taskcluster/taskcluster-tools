@@ -1,13 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {Route} from 'react-router-dom';
 import ClientManager from './clientmanager';
-import * as utils from '../../lib/utils';
 import Layout from '../../lib/Layout';
 
-const hashManager = utils.createHashManager({separator: '/'});
+const AuthClients = ({match}) => {
+  return (
+    <Layout>
+      <Route path={`${match.url}`} render={(props) => <ClientManager {...props} />} />
+    </Layout>
+  );
+};
 
-ReactDOM.render((
-  <Layout>
-    <ClientManager hashEntry={hashManager.root()} />
-  </Layout>
-), document.getElementById('root'));
+export default AuthClients;

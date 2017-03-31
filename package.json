@@ -2,13 +2,28 @@
   "name": "taskcluster-tools",
   "version": "0.0.0-private",
   "private": true,
+  "engines": {
+    "node": ">=6.0.0"
+  },
   "config": {
-    "preset": "tools-preset"
+    "presets": [
+      "neutrino-preset-react",
+      "tools-preset"
+    ],
+    "neutrino": {
+      "entry": {
+        "vendor": [
+          "react",
+          "react-dom",
+          "react-router-dom"
+        ]
+      }
+    }
   },
   "scripts": {
+    "start": "PORT=9000 neutrino start",
     "build": "neutrino build",
     "deploy": "yarn build && s3-deploy './build/**' --cwd './build/' --region us-west-2 --bucket taskcluster-tools --gzip --cache 0",
-    "start": "PORT=9000 neutrino start",
     "test": "yarn build"
   },
   "repository": "taskcluster/taskcluster-tools",
@@ -42,7 +57,7 @@
     "react-helmet": "3.3.0",
     "react-json-inspector": "^7.0.0",
     "react-redux": "^4.4.5",
-    "react-router": "^2.8.1",
+    "react-router-dom": "4.0.0-beta.7",
     "react-tabs": "0.7.0",
     "react-tooltip": "^3.1.8",
     "react-treeview": "0.4.6",
@@ -63,14 +78,12 @@
     "html-webpack-plugin": "^2.22.0",
     "less": "^2.7.1",
     "lodash.clonedeep": "^4.5.0",
-    "neutrino": "^3.0.0",
+    "neutrino": "4.2.1",
+    "neutrino-preset-react": "4.2.2",
     "neutrino-preset-taskcluster-web": "^2.0.0",
     "s3-deploy": "0.6.1",
     "shebang-loader": "0.0.1",
-    "webpack": "^1.13.2",
+    "webpack": "^2.3.2",
     "webpack-dev-server": "^1.15.2"
-  },
-  "engines": {
-    "node": ">=6.0.0"
   }
 }

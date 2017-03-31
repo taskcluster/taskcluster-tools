@@ -121,186 +121,186 @@ const ClientEditor = React.createClass({
     );
 
     return this.renderWaitFor('client') || (
-      <div className="client-editor">
-        <h4 style={{marginTop: 0}}>{title}</h4>
-        <hr style={{marginBottom: 10}} />
-        <div className="form-horizontal">
-          {
-            isCreating ? (
-              <OverlayTrigger
-                placement="bottom"
-                trigger="focus"
-                defaultOverlayShown={clientId !== ''}
-                overlay={tooltip}>
-                <FormGroup validationState={this.validClientId() ? 'success' : 'error'}>
-                  <ControlLabel className="col-md-3">ClientId</ControlLabel>
-                  <div className="col-md-9">
-                    <FormControl
-                      type="text"
-                      ref="clientId"
-                      placeholder="ClientId"
-                      value={this.state.client.clientId}
-                      onChange={this.onChange} />
-                    <FormControl.Feedback />
-                  </div>
-                </FormGroup>
-              </OverlayTrigger>
-            ) : (
-              <div className="form-group">
-                <label className="control-label col-md-3">ClientId</label>
-                <div className="col-md-9">
-                  <div className="form-control-static">
-                    {this.state.client.clientId}
-                  </div>
-                </div>
-              </div>
-            )
-          }
-          {
-            this.state.client.disabled ? (
-              <div className="form-group">
-                <label className="control-label col-md-3">Disabled</label>
-                <div className="col-md-9">
-                  This client is disabled
-                </div>
-              </div>
-            ) :
-            null
-          }
-          {
-            (isEditing && !isCreating) || this.state.accessToken !== null ? (
-              <div className="form-group">
-                {(() => {
-                  if (isEditing && !isCreating) {
-                    return (
-                      <div>
-                        <label className="control-label col-md-3">AccessToken</label>
-                        <div className="col-md-9">
-                          <Button
-                            bsStyle="warning"
-                            onClick={this.resetAccessToken}
-                            disabled={this.state.working}>
-                            <Glyphicon glyph="fire" /> Reset accessToken
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (this.state.accessToken != null) {
-                    return (
-                      <Modal show={this.state.showModal} onHide={this.closeDialog}>
-                        <Modal.Header closeButton={true}>Access Token</Modal.Header>
-                        <Modal.Body>
-                          <p>The access token for this clientId is:</p>
-                          <code>{this.state.accessToken}</code>
-                        </Modal.Body>
-                      </Modal>
-                    );
-                  }
-                })()}
-              </div>
-            ) :
-            null
-          }
-          <div className="form-group">
-            <label className="control-label col-md-3">Description</label>
-            <div className="col-md-9">
-              {isEditing ? this.renderDescEditor() : this.renderDesc()}
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="control-label col-md-3">Expires</label>
-            <div className="col-md-9">
-              {
-                isEditing ? (
-                  <TimeInput
-                    format="YYYY-MM-DD HH:mm:ss ZZ"
-                    value={moment(new Date(this.state.client.expires))}
-                    onChange={this.onExpiresChange}
-                    className="form-control" />
-                ) : (
-                  <div className="form-control-static">
-                    <format.DateView date={this.state.client.expires} />
-                  </div>
-                )
-              }
-            </div>
-          </div>
-          {
-            _.map({
-              created: 'Created',
-              lastModified: 'Last Modified',
-              lastDateUsed: 'Last Date Used',
-              lastRotated: 'Last Rotated',
-            }, (label, prop) => {
-              if (!this.state.client[prop]) {
-                return;
-              }
-
-              return (
-                <div className="form-group" key={prop}>
-                  <label className="control-label col-md-3">{label}</label>
+        <div className="client-editor">
+          <h4 style={{marginTop: 0}}>{title}</h4>
+          <hr style={{marginBottom: 10}} />
+          <div className="form-horizontal">
+            {
+              isCreating ? (
+                <OverlayTrigger
+                  placement="bottom"
+                  trigger="focus"
+                  defaultOverlayShown={clientId !== ''}
+                  overlay={tooltip}>
+                  <FormGroup validationState={this.validClientId() ? 'success' : 'error'}>
+                    <ControlLabel className="col-md-3">ClientId</ControlLabel>
+                    <div className="col-md-9">
+                      <FormControl
+                        type="text"
+                        ref="clientId"
+                        placeholder="ClientId"
+                        value={this.state.client.clientId}
+                        onChange={this.onChange} />
+                      <FormControl.Feedback />
+                    </div>
+                  </FormGroup>
+                </OverlayTrigger>
+              ) : (
+                <div className="form-group">
+                  <label className="control-label col-md-3">ClientId</label>
                   <div className="col-md-9">
                     <div className="form-control-static">
-                      <format.DateView date={this.state.client[prop]} />
+                      {this.state.client.clientId}
                     </div>
                   </div>
                 </div>
-              );
-            })
-          }
-          <div className="form-group">
-            <label className="control-label col-md-3">Client Scopes</label>
-            <div className="col-md-9">
-              <ScopeEditor
-                editing={isEditing}
-                scopes={this.state.client.scopes}
-                scopesUpdated={this.scopesUpdated} />
+              )
+            }
+            {
+              this.state.client.disabled ? (
+                <div className="form-group">
+                  <label className="control-label col-md-3">Disabled</label>
+                  <div className="col-md-9">
+                    This client is disabled
+                  </div>
+                </div>
+              ) :
+                null
+            }
+            {
+              (isEditing && !isCreating) || this.state.accessToken !== null ? (
+                <div className="form-group">
+                  {(() => {
+                    if (isEditing && !isCreating) {
+                      return (
+                        <div>
+                          <label className="control-label col-md-3">AccessToken</label>
+                          <div className="col-md-9">
+                            <Button
+                              bsStyle="warning"
+                              onClick={this.resetAccessToken}
+                              disabled={this.state.working}>
+                              <Glyphicon glyph="fire" /> Reset accessToken
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    if (this.state.accessToken != null) {
+                      return (
+                        <Modal show={this.state.showModal} onHide={this.closeDialog}>
+                          <Modal.Header closeButton={true}>Access Token</Modal.Header>
+                          <Modal.Body>
+                            <p>The access token for this clientId is:</p>
+                            <code>{this.state.accessToken}</code>
+                          </Modal.Body>
+                        </Modal>
+                      );
+                    }
+                  })()}
+                </div>
+              ) :
+                null
+            }
+            <div className="form-group">
+              <label className="control-label col-md-3">Description</label>
+              <div className="col-md-9">
+                {isEditing ? this.renderDescEditor() : this.renderDesc()}
+              </div>
             </div>
-          </div>
-          {
-            !isEditing && !isCreating ? (
-              <div className="form-group">
-                <label className="control-label col-md-3">Expanded Scopes</label>
-                <div className="col-md-9">
+            <div className="form-group">
+              <label className="control-label col-md-3">Expires</label>
+              <div className="col-md-9">
+                {
+                  isEditing ? (
+                    <TimeInput
+                      format="YYYY-MM-DD HH:mm:ss ZZ"
+                      value={moment(new Date(this.state.client.expires))}
+                      onChange={this.onExpiresChange}
+                      className="form-control" />
+                  ) : (
+                    <div className="form-control-static">
+                      <format.DateView date={this.state.client.expires} />
+                    </div>
+                  )
+                }
+              </div>
+            </div>
+            {
+              _.map({
+                created: 'Created',
+                lastModified: 'Last Modified',
+                lastDateUsed: 'Last Date Used',
+                lastRotated: 'Last Rotated',
+              }, (label, prop) => {
+                if (!this.state.client[prop]) {
+                  return;
+                }
+
+                return (
+                  <div className="form-group" key={prop}>
+                    <label className="control-label col-md-3">{label}</label>
+                    <div className="col-md-9">
+                      <div className="form-control-static">
+                        <format.DateView date={this.state.client[prop]} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            }
+            <div className="form-group">
+              <label className="control-label col-md-3">Client Scopes</label>
+              <div className="col-md-9">
+                <ScopeEditor
+                  editing={isEditing}
+                  scopes={this.state.client.scopes}
+                  scopesUpdated={this.scopesUpdated} />
+              </div>
+            </div>
+            {
+              !isEditing && !isCreating ? (
+                <div className="form-group">
+                  <label className="control-label col-md-3">Expanded Scopes</label>
+                  <div className="col-md-9">
                   <span className="text-muted">Expanded scopes are determined from the client
                     scopes, expanding roles for scopes beginning with <code>assume:</code>.
                   </span>
-                  <ScopeEditor scopes={this.state.client.expandedScopes} />
+                    <ScopeEditor scopes={this.state.client.expandedScopes} />
+                  </div>
                 </div>
-              </div>
-            ) :
-            null
-          }
-          <hr />
-          <div className="form-group">
-            <div className="col-md-9 col-md-offset-3">
-              <div className="form-control-static">
-                {(() => {
-                  if (isEditing) {
-                    return isCreating ?
-                      this.renderCreatingToolbar() :
-                      this.renderEditingToolbar();
-                  }
+              ) :
+                null
+            }
+            <hr />
+            <div className="form-group">
+              <div className="col-md-9 col-md-offset-3">
+                <div className="form-control-static">
+                  {(() => {
+                    if (isEditing) {
+                      return isCreating ?
+                        this.renderCreatingToolbar() :
+                        this.renderEditingToolbar();
+                    }
 
-                  return (
-                    <ButtonToolbar>
-                      <Button
-                        bsStyle="success"
-                        onClick={this.startEditing}
-                        disabled={this.state.working}>
-                        <Glyphicon glyph="pencil" /> Edit Client
-                      </Button>
-                    </ButtonToolbar>
-                  );
-                })()}
+                    return (
+                      <ButtonToolbar>
+                        <Button
+                          bsStyle="success"
+                          onClick={this.startEditing}
+                          disabled={this.state.working}>
+                          <Glyphicon glyph="pencil" /> Edit Client
+                        </Button>
+                      </ButtonToolbar>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    );
+      );
   },
 
   /** Determine if clientId is valid */
@@ -429,9 +429,7 @@ const ClientEditor = React.createClass({
     } catch (err) {
       this.setState({
         working: false,
-        error: auth.loadCredentials() ?
-          'You do not have sufficient permission to reset access tokens for this user.' :
-          'You must be logged in and have permission to reset access tokens for this user.',
+        error: err,
       });
     }
   },

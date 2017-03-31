@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
-import {hashHistory} from 'react-router';
+import path from 'path';
 import {FormGroup, FormControl, ControlLabel, InputGroup, Button} from 'react-bootstrap';
 
 const VALID_SLUG = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
@@ -14,6 +14,10 @@ class Search extends Component {
       term: props.taskGroupId || '',
       prevTerm: '',
     };
+  }
+
+  setHistory(pathname) {
+    this.props.history.push(path.join('/task-group-inspector', pathname));
   }
 
   /**
@@ -32,7 +36,7 @@ class Search extends Component {
     this.props.tasksHaveBeenRetrieved(false);
     this.props.removeTasks();
     this.props.fetchTasksInSteps(term, true);
-    hashHistory.push(term);
+    this.setHistory(term);
     this.setState({prevTerm: term});
   }
 

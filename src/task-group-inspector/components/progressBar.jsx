@@ -21,9 +21,9 @@ class PushProgressBar extends Component {
   }
 
   /**
-  * Set notify flag to false when changing taskGroupId so that
-  * one does not get a web notification if a build is already done
-  */
+   * Set notify flag to false when changing taskGroupId so that
+   * one does not get a web notification if a build is already done
+   */
   componentDidUpdate(prevProps) {
     if (prevProps.taskGroupId !== this.props.taskGroupId) {
       this.notifyFlag = false;
@@ -31,8 +31,8 @@ class PushProgressBar extends Component {
   }
 
   /**
-  * Reset states
-  */
+   * Reset states
+   */
   emptyStates() {
     this.completed = [];
     this.failed = [];
@@ -43,8 +43,8 @@ class PushProgressBar extends Component {
   }
 
   /**
-  * Progress bar on click handler
-  */
+   * Progress bar on click handler
+   */
   progressBarClicked(event) {
     const title = event.target.innerText.toLowerCase();
     const status = ['failed', 'completed', 'running', 'pending', 'exception', 'unscheduled']
@@ -56,8 +56,8 @@ class PushProgressBar extends Component {
   }
 
   /**
-  * Separate tasks in different arrays based on their current status
-  */
+   * Separate tasks in different arrays based on their current status
+   */
   separateTasksByState() {
     this.props.tasks.forEach(task => {
       const status = task.status.state;
@@ -69,8 +69,8 @@ class PushProgressBar extends Component {
   }
 
   /**
-  * Notify user if build is done
-  */
+   * Notify user if build is done
+   */
   notifyCheck() {
     const isBuildDone = !this.unscheduled.length && !this.running.length && !this.pending.length;
     const doNotify = this.notifyFlag &&
@@ -89,8 +89,8 @@ class PushProgressBar extends Component {
   }
 
   /**
-  * Render progress bar
-  */
+   * Render progress bar
+   */
   makeProgressBar() {
     const {tasks, tasksRetrievedFully} = this.props;
     const total = tasks.length;

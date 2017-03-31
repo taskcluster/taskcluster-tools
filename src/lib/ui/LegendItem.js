@@ -1,8 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
 
-export default class extends React.Component {
-  static displayName = 'LegendItem';
-
+export default class LegendItem extends Component {
   render() {
     return (
       <li style={{display: 'inline', marginRight: 16}}>

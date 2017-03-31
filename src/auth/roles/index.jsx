@@ -1,13 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {Route} from 'react-router-dom';
 import RoleManager from './rolemanager';
-import * as utils from '../../lib/utils';
 import Layout from '../../lib/Layout';
 
-const hashManager = utils.createHashManager({separator: '/'});
+const AuthRoles = ({match}) => {
+  return (
+    <Layout>
+      <Route path={`${match.url}`} render={(props) => <RoleManager {...props} />} />
+    </Layout>
+  );
+};
 
-ReactDOM.render((
-  <Layout>
-    <RoleManager hashEntry={hashManager.root()} />
-  </Layout>
-), document.getElementById('root'));
+export default AuthRoles;

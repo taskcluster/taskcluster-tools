@@ -1,5 +1,6 @@
 import React from 'react';
 import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import path from 'path';
 import ClientEditor from './clienteditor';
 import * as utils from '../../lib/utils';
 import * as auth from '../../lib/auth';
@@ -18,12 +19,7 @@ export default React.createClass({
       clients: {
         auth: taskcluster.Auth,
       },
-    }),
-    // Serialize state.selectedClientId to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['selectedClientId'],
-      type: 'string',
-    }),
+    })
   ],
 
   /** Create an initial state */
@@ -35,7 +31,7 @@ export default React.createClass({
       clientsLoaded: false,
       clientsError: null,
       clients: null,
-      selectedClientId: '', // '' means "add new client"
+      selectedClientId: this.props.match.params.url, // '' means "add new client"
     };
   },
 
@@ -111,17 +107,17 @@ export default React.createClass({
   /** Render table of all clients */
   renderClientsTable() {
     return this.renderWaitFor('clients') || (
-      <Table condensed={true} hover={true} className="client-manager-client-table">
-        <thead>
+        <Table condensed={true} hover={true} className="client-manager-client-table">
+          <thead>
           <tr>
             <th>ClientId</th>
           </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
           {this.state.clients.map(this.renderClientRow)}
-        </tbody>
-      </Table>
-    );
+          </tbody>
+        </Table>
+      );
   },
 
   /** Render row with client */
@@ -166,6 +162,7 @@ export default React.createClass({
   },
 
   selectClientId(clientId) {
+    this.props.history.push(path.join('/', this.props.match.url, clientId));
     this.setState({selectedClientId: clientId});
   },
 });

@@ -1,5 +1,6 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
+import path from 'path';
 import Helmet from 'react-helmet';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
@@ -56,24 +57,29 @@ export default React.createClass({
 
   /** Return promised state for TaskClusterMixin */
   load() {
-    return this.state.taskId === '' ?
-        // Skip loading empty-strings
+    const taskId = this.props.match.params.taskId;
+
+    this.setState({taskId});
+
+    return !taskId ?
+      // Skip loading empty-strings
       {status: null} :
-        // Load task status and take the `status` key from the response
-      {status: this.queue.status(this.state.taskId).then(_.property('status'))};
+      // Load task status and take the `status` key from the response
+      {status: this.queue.status(taskId).then(_.property('status'))};
+
   },
 
   /** Return bindings for WebListenerMixin */
   bindings() {
+    const taskId = this.props.match.params.taskId;
+
     // Don't bother listening for empty strings, they're pretty boring
-    if (this.state.taskId === '') {
+    if (!taskId) {
       return [];
     }
 
     // Construct the routing key pattern
-    const routingKey = {
-      taskId: this.state.taskId,
-    };
+    const routingKey = {taskId};
 
     // Return all interesting bindings
     return [
@@ -109,13 +115,14 @@ export default React.createClass({
     return 'Task Inspector';
   },
 
-  /** When taskId changed we should update the input */
+  /** When taskId changes, we should update the input */
   updateTaskIdInput() {
     this.setState({taskIdInput: this.state.taskId});
   },
 
   render() {
     const invalidInput = !VALID_INPUT.test(this.state.taskIdInput);
+    const taskId = this.props.match.params.taskId;
 
     return (
       <div style={{marginBottom: 40}}>
@@ -151,7 +158,7 @@ export default React.createClass({
           </Col>
 
           <Col sm={4} style={{marginTop: '25px'}}>
-            <PreviousTasks objectId={this.state.taskId} objectType="taskId" />
+            <PreviousTasks objectId={taskId} objectType="taskId" />
           </Col>
         </Row>
 
@@ -162,7 +169,8 @@ export default React.createClass({
                 <TaskView
                   ref="taskView"
                   status={this.state.status}
-                  hashEntry={this.nextHashEntry()} />
+                  hashEntry={this.nextHashEntry()}
+                  {...this.props} />
               ))
             }
           </Col>
@@ -182,5 +190,6 @@ export default React.createClass({
   handleSubmit(e) {
     e.preventDefault();
     this.setState({taskId: this.state.taskIdInput});
+    this.props.history.push(path.join('/', 'task-inspector', this.state.taskIdInput));
   },
 });

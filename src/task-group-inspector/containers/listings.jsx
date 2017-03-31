@@ -5,6 +5,8 @@ import {Tab, Nav, NavItem} from 'react-bootstrap';
 import Table from './table';
 import {queueEvents, webListener, notifications} from '../lib/utils';
 import _ from 'lodash';
+import {Route} from 'react-router-dom';
+import TabsView from './tabsView';
 
 class Listings extends Component {
   constructor(props) {
@@ -13,12 +15,12 @@ class Listings extends Component {
     this.listener = null;
     this.bQueue = [];
     this.loop = null;
-    this.state = {activeTab: this.props.params.taskId ? 'inspector' : 'tasks'};
+    this.state = {activeTab: this.props.match.params && this.props.match.params.taskId ? 'inspector' : 'tasks'};
   }
 
   componentWillReceiveProps(nextProps) {
-    const {taskId} = this.props.params;
-    const nextTaskId = nextProps.params.taskId;
+    const {taskId} = this.props.match.params;
+    const nextTaskId = nextProps.match.params.taskId;
 
     if (taskId !== nextTaskId) {
       this.setState({activeTab: 'inspector'});
@@ -26,10 +28,10 @@ class Listings extends Component {
   }
 
   /**
-  * Handle message from listener
-  */
+   * Handle message from listener
+   */
   handleMessage(message) {
-    const {taskId} = this.props.params;
+    const {taskId} = this.props.match.params;
 
     // Handle Error
     if (message instanceof Error) {
@@ -69,8 +71,8 @@ class Listings extends Component {
   }
 
   /**
-  * Handle special cases
-  */
+   * Handle special cases
+   */
   handleEdgeCases(message) {
     // Give priority to exceptions to show without waiting for loop to happen
     if (message.exchange === queueEvents.taskException().exchange) {
@@ -83,11 +85,11 @@ class Listings extends Component {
   }
 
   /**
-  * Construct loop that will update the tasks when messages arrive from the web listener
-  */
+   * Construct loop that will update the tasks when messages arrive from the web listener
+   */
   constructLoopForMessages() {
-    const {params, fetchTasksInSteps} = this.props;
-    const {taskGroupId} = params;
+    const {match, fetchTasksInSteps} = this.props;
+    const {taskGroupId} = match.params;
 
     this.loop = setInterval(() => {
       if (this.bQueue.length) {
@@ -98,8 +100,8 @@ class Listings extends Component {
   }
 
   /**
-  * Clear interval, stop weblistener, etc.
-  */
+   * Clear interval, stop weblistener, etc.
+   */
   cleanup() {
     clearInterval(this.loop);
     this.loop = null;
@@ -108,17 +110,17 @@ class Listings extends Component {
   }
 
   /**
-  * Make appropriate setup
-  */
+   * Make appropriate setup
+   */
   setup() {
     notifications.requestPermission();
-    webListener.startListening(this.props.params.taskGroupId, m => this.handleMessage(m));
-    this.props.activeTaskGroupId(this.props.params.taskGroupId);
+    webListener.startListening(this.props.match.params.taskGroupId, m => this.handleMessage(m));
+    this.props.activeTaskGroupId(this.props.match.params.taskGroupId);
   }
 
   /**
-  * Remove the list of tasks that were previously loaded
-  */
+   * Remove the list of tasks that were previously loaded
+   */
   componentWillUnmount() {
     this.cleanup();
     this.props.removeTasks();
@@ -126,7 +128,7 @@ class Listings extends Component {
 
   componentDidUpdate(prevProps) {
     // Clean up + setup when user changes taskGroupId
-    if (prevProps.params.taskGroupId !== this.props.params.taskGroupId) {
+    if (prevProps.match.params.taskGroupId !== this.props.match.params.taskGroupId) {
       this.cleanup();
       this.setup();
     }
@@ -138,10 +140,10 @@ class Listings extends Component {
   }
 
   /**
-  * Fetch list of tasks and start the web listener
-  */
+   * Fetch list of tasks and start the web listener
+   */
   componentWillMount() {
-    const {taskGroupId} = this.props.params;
+    const {taskGroupId} = this.props.match.params;
 
     if (!this.props.listTaskGroupInProgress) {
       this.props.fetchTasksInSteps(taskGroupId, true);
@@ -169,17 +171,17 @@ class Listings extends Component {
             <NavItem eventKey="tasks">
               Tasks
             </NavItem>
-            <NavItem eventKey="inspector" disabled={!this.props.params.taskId}>
+            <NavItem eventKey="inspector" disabled={!this.props.match.params.taskId}>
               Task Inspector
             </NavItem>
           </Nav>
           <Tab.Content style={{paddingTop: 20}}>
             <Tab.Pane eventKey="tasks">
-              <Table />
+              <Table {...this.props} />
             </Tab.Pane>
-            {this.props.params.taskId && (
+            {this.props.match.params.taskId && (
               <Tab.Pane eventKey="inspector">
-                {this.props.children}
+                <Route path={`/task-group-inspector/:taskGroupId/:taskId/:run?/:section?`} render={(props) => <TabsView {...props} />} />
               </Tab.Pane>
             )}
           </Tab.Content>

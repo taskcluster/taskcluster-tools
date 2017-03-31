@@ -1,13 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TaskInspector from './taskinspector';
-import * as utils from '../lib/utils';
 import Layout from '../lib/Layout';
+import {Route} from 'react-router-dom';
 
-const hashManager = utils.createHashManager({separator: '/'});
+const TaskInspectorView = ({match}) => {
+  return (
+    <Layout>
+      <Route path={`${match.url}/:taskId?/:run?/:section?`} render={(props) => <TaskInspector {...props} />} />
+    </Layout>
+  );
+};
 
-ReactDOM.render((
-  <Layout>
-    <TaskInspector hashEntry={hashManager.root()} />
-  </Layout>
-), document.getElementById('root'));
+export default TaskInspectorView;

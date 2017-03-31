@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {OverlayTrigger, Tooltip, NavItem, Glyphicon} from 'react-bootstrap';
 
-export default class extends React.Component {
+export default class EmailMenuItem extends Component {
   // This authenticates with Auth0's passwordless lock by opening a new Window
   // where Auth0 will do its thing, then closing that window once creds are
   // acquired.

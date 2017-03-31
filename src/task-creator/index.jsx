@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TaskCreator from './taskcreator';
 import Layout from '../lib/Layout';
 

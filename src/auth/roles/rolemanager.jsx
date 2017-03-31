@@ -1,5 +1,6 @@
 import React from 'react';
 import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import path from 'path';
 import RoleEditor from './roleeditor';
 import * as utils from '../../lib/utils';
 import taskcluster from 'taskcluster-client';
@@ -15,12 +16,7 @@ const RoleManager = React.createClass({
       clients: {
         auth: taskcluster.Auth,
       },
-    }),
-    // Serialize state.selectedRoleId to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['selectedRoleId'],
-      type: 'string',
-    }),
+    })
   ],
 
   /** Create an initial state */
@@ -29,7 +25,7 @@ const RoleManager = React.createClass({
       rolesLoaded: false,
       rolesError: undefined,
       roles: undefined,
-      selectedRoleId: '',   // '' means "add new role"
+      selectedRoleId: this.props.match.params.url,   // '' means "add new role"
     };
   },
 
@@ -75,17 +71,17 @@ const RoleManager = React.createClass({
   /** Render table of all roles */
   renderRolesTable() {
     return this.renderWaitFor('roles') || (
-      <Table condensed={true} hover={true} className="role-manager-role-table">
-        <thead>
+        <Table condensed={true} hover={true} className="role-manager-role-table">
+          <thead>
           <tr>
             <th>RoleId</th>
           </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
           {this.state.roles.map(this.renderRoleRow)}
-        </tbody>
-      </Table>
-    );
+          </tbody>
+        </Table>
+      );
   },
 
   /** Render row with role */
@@ -126,6 +122,7 @@ const RoleManager = React.createClass({
   },
 
   selectRoleId(roleId) {
+    this.props.history.push(path.join('/', this.props.match.url, roleId));
     this.setState({selectedRoleId: roleId});
   },
 });

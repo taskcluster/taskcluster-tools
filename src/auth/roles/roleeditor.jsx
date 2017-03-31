@@ -95,109 +95,109 @@ const RoleEditor = React.createClass({
 
     try {
       return this.renderWaitFor('role') || (
-        <div className="role-editor">
-          <h4 style={{marginTop: 0}}>{title}</h4>
-          <hr style={{marginBottom: 10}} />
-          <div className="form-horizontal">
-            {
-              isCreating ? (
-                <FormGroup validationState={this.validRoleId() ? 'success' : 'error'}>
-                  <ControlLabel className="col-md-3">RoleId</ControlLabel>
-                  <div className="col-md-9">
-                    <FormControl
-                      type="text"
-                      ref="roleId"
-                      placeholder="RoleId"
-                      value={this.state.role.roleId}
-                      onChange={this.onChange} />
-                    <FormControl.Feedback />
-                  </div>
-                </FormGroup>
-              ) : (
-                <div className="form-group">
-                  <label className="control-label col-md-3">RoleId</label>
-                  <div className="col-md-9">
-                    <div className="form-control-static">
-                      <code>{this.state.role.roleId}</code>
+          <div className="role-editor">
+            <h4 style={{marginTop: 0}}>{title}</h4>
+            <hr style={{marginBottom: 10}} />
+            <div className="form-horizontal">
+              {
+                isCreating ? (
+                  <FormGroup validationState={this.validRoleId() ? 'success' : 'error'}>
+                    <ControlLabel className="col-md-3">RoleId</ControlLabel>
+                    <div className="col-md-9">
+                      <FormControl
+                        type="text"
+                        ref="roleId"
+                        placeholder="RoleId"
+                        value={this.state.role.roleId}
+                        onChange={this.onChange} />
+                      <FormControl.Feedback />
                     </div>
-                  </div>
-                </div>
-              )
-            }
-            <div className="form-group">
-              <label className="control-label col-md-3">Description</label>
-              <div className="col-md-9">
-                {isEditing ? this.renderDescEditor() : this.renderDesc()}
-              </div>
-            </div>
-            {
-              _.map({created: 'Created', lastModified: 'Last Modified'}, (label, prop) => {
-                if (!this.state.role[prop]) {
-                  return;
-                }
-
-                return (
-                  <div className="form-group" key={prop}>
-                    <label className="control-label col-md-3">{label}</label>
+                  </FormGroup>
+                ) : (
+                  <div className="form-group">
+                    <label className="control-label col-md-3">RoleId</label>
                     <div className="col-md-9">
                       <div className="form-control-static">
-                        <format.DateView date={this.state.role[prop]} />
+                        <code>{this.state.role.roleId}</code>
                       </div>
                     </div>
                   </div>
-                );
-              })
-            }
-            <div className="form-group">
-              <label className="control-label col-md-3">Scopes</label>
-              <div className="col-md-9">
-                <ScopeEditor
-                  editing={isEditing}
-                  scopes={this.state.role.scopes}
-                  scopesUpdated={this.scopesUpdated} />
-              </div>
-            </div>
-            {
-              !isEditing && !isCreating && this.state.role.expandedScopes ? (
-                <div className="form-group">
-                  <label className="control-label col-md-3">
-                    Expanded Scopes
-                  </label>
-                  <div className="col-md-9">
-                    <ScopeEditor scopes={this.state.role.expandedScopes} />
-                  </div>
+                )
+              }
+              <div className="form-group">
+                <label className="control-label col-md-3">Description</label>
+                <div className="col-md-9">
+                  {isEditing ? this.renderDescEditor() : this.renderDesc()}
                 </div>
-              ) :
-              null
-            }
-            <hr />
-            <div className="form-group">
-              <div className="col-md-9 col-md-offset-3">
-                <div className="form-control-static">
-                  {(() => {
-                    if (isEditing) {
-                      return isCreating ?
-                        this.renderCreatingToolbar() :
-                        this.renderEditingToolbar();
-                    }
+              </div>
+              {
+                _.map({created: 'Created', lastModified: 'Last Modified'}, (label, prop) => {
+                  if (!this.state.role[prop]) {
+                    return;
+                  }
 
-                    return (
-                      <ButtonToolbar>
-                        <Button
-                          bsStyle="success"
-                          onClick={this.startEditing}
-                          disabled={this.state.working}>
-                          <Glyphicon glyph="pencil" /> Edit Role
-                        </Button>
-                      </ButtonToolbar>
-                    );
-                  })()}
+                  return (
+                    <div className="form-group" key={prop}>
+                      <label className="control-label col-md-3">{label}</label>
+                      <div className="col-md-9">
+                        <div className="form-control-static">
+                          <format.DateView date={this.state.role[prop]} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              }
+              <div className="form-group">
+                <label className="control-label col-md-3">Scopes</label>
+                <div className="col-md-9">
+                  <ScopeEditor
+                    editing={isEditing}
+                    scopes={this.state.role.scopes}
+                    scopesUpdated={this.scopesUpdated} />
+                </div>
+              </div>
+              {
+                !isEditing && !isCreating && this.state.role.expandedScopes ? (
+                  <div className="form-group">
+                    <label className="control-label col-md-3">
+                      Expanded Scopes
+                    </label>
+                    <div className="col-md-9">
+                      <ScopeEditor scopes={this.state.role.expandedScopes} />
+                    </div>
+                  </div>
+                ) :
+                  null
+              }
+              <hr />
+              <div className="form-group">
+                <div className="col-md-9 col-md-offset-3">
+                  <div className="form-control-static">
+                    {(() => {
+                      if (isEditing) {
+                        return isCreating ?
+                          this.renderCreatingToolbar() :
+                          this.renderEditingToolbar();
+                      }
+
+                      return (
+                        <ButtonToolbar>
+                          <Button
+                            bsStyle="success"
+                            onClick={this.startEditing}
+                            disabled={this.state.working}>
+                            <Glyphicon glyph="pencil" /> Edit Role
+                          </Button>
+                        </ButtonToolbar>
+                      );
+                    })()}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      );
+        );
     } catch (e) {
       // TODO: Handle error
     }
@@ -354,4 +354,3 @@ const RoleEditor = React.createClass({
 });
 
 export default RoleEditor;
-
