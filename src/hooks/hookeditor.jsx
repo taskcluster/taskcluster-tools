@@ -56,25 +56,37 @@ const HookStatusDisplay = React.createClass({
     utils.createTaskClusterMixin({
       clients: {
         hooks: taskcluster.Hooks,
-      },
-      reloadOnProps: ['currentHookId', 'currentHookGroupId', 'hookStatus'],
+      }
     }),
   ],
 
   propTypes: {
     currentHookId: React.PropTypes.string.isRequired,
     currentHookGroupId: React.PropTypes.string.isRequired,
-    hookStatus: React.PropTypes.object,
-    refreshHookStatus: React.PropTypes.func.isRequired,
+  },
+
+  getInitialState() {
+    return {
+      hookStatus: null
+    };
+  },
+
+  /** Load initial state */
+  load() {
+    return {
+      hookStatus: this.hooks
+        .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId),
+    };
   },
 
   render() {
-    const stat = this.props.hookStatus;
+    const waitFor = this.renderWaitFor('hookStatus');
 
-    if (!stat) {
-      return this.renderSpinner();
+    if (waitFor) {
+      return waitFor;
     }
 
+    const stat = this.state.hookStatus;
     let lastTime;
     let lastResult;
 
@@ -105,7 +117,7 @@ const HookStatusDisplay = React.createClass({
         <dt>Last Fired</dt>
         <dd>
           {lastTime}
-          <Button className="btn-xs" onClick={this.props.refreshHookStatus}>
+          <Button className="btn-xs" onClick={this.reload}>
             <Glyphicon glyph="refresh" />
           </Button>
         </dd>
@@ -169,9 +181,7 @@ const HookDisplay = React.createClass({
         </dl>
         <HookStatusDisplay
           currentHookGroupId={this.props.currentHookGroupId}
-          currentHookId={this.props.currentHookId}
-          hookStatus={this.props.hookStatus}
-          refreshHookStatus={this.props.refreshHookStatus} />
+          currentHookId={this.props.currentHookId} />
         <dl className="dl-horizontal">
           <dt>Task Definition</dt>
           <dd />
@@ -209,8 +219,6 @@ const HookEditor = React.createClass({
       this.props.hook;
 
     return {
-      hookGroupId: this.props.currentHookGroupId,
-      hookId: this.props.currentHookId,
       name: hook.metadata.name,
       description: hook.metadata.description,
       owner: hook.metadata.owner,
@@ -218,7 +226,7 @@ const HookEditor = React.createClass({
       schedule: _.cloneDeep(hook.schedule),
       expires: hook.expires,
       deadline: hook.deadline,
-      task: JSON.stringify(hook.task, null, 2),
+      task: JSON.stringify(hook.task, null, 2)
     };
   },
 
@@ -236,7 +244,6 @@ const HookEditor = React.createClass({
                   <input
                     type="text"
                     className="form-control"
-                    onChange={this.onHookGroupIdChange}
                     placeholder="hookGroupId" />
                 ) : (
                   <div className="form-control-static">
@@ -254,7 +261,6 @@ const HookEditor = React.createClass({
                   <input
                     type="text"
                     className="form-control"
-                    onChange={this.onHookIdChange}
                     placeholder="hookId" />
                 ) : (
                   <div className="form-control-static">
@@ -305,7 +311,7 @@ const HookEditor = React.createClass({
                 checked={this.state.emailOnError}
                 onChange={this.onEmailOnErrorChange} />
               <span className="text-info">
-                Email the owner when an error occurs while creating a task. Note: to be notifed of tasks that fail once created, use <a href="https://docs.taskcluster.net/reference/core/taskcluster-notify" target="_blank" rel="noopener noreferrer">notify routes</a>.
+                Email the owner when an error occurs while creating a task.
               </span>
             </div>
           </div>
@@ -426,8 +432,10 @@ const HookEditor = React.createClass({
   },
 
   validHook() {
-    const isValid = ['hookGroupId', 'hookId', 'name', 'description', 'owner', 'deadline']
-      .every(s => this.state[s]);
+    const isValid = ['name', 'description', 'owner', 'deadline']
+      .every(s => this.state[s]) &&
+      this.props.currentHookId &&
+      this.props.currentHookGroupId;
 
     if (!isValid) {
       return false;
@@ -440,14 +448,6 @@ const HookEditor = React.createClass({
     } catch (err) {
       return false;
     }
-  },
-
-  onHookGroupIdChange(e) {
-    this.setState({hookGroupId: e.target.value});
-  },
-
-  onHookIdChange(e) {
-    this.setState({hookId: e.target.value});
   },
 
   onNameChange(e) {
@@ -519,7 +519,7 @@ const HookEditor = React.createClass({
 
   createHook() {
     // TODO: reflect these into state with onChange hooks
-    this.props.createHook(this.state.hookGroupId, this.state.hookId, this.getHookDefinition());
+    this.props.createHook(this.props.currentHookGroupId, this.props.currentHookId, this.getHookDefinition());
   },
 
   updateHook() {
@@ -544,6 +544,7 @@ const HookEditView = React.createClass({
     currentHookGroupId: React.PropTypes.string,
     refreshHookList: React.PropTypes.func.isRequired,
     selectHook: React.PropTypes.func.isRequired,
+    triggerHook: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -551,7 +552,6 @@ const HookEditView = React.createClass({
       // Currently loaded hook
       hookLoaded: false,
       hookError: null,
-      hookStatus: null,
       hook: null,
       editing: true,
       error: null,
@@ -560,8 +560,10 @@ const HookEditView = React.createClass({
 
   /** Load initial state */
   load() {
+    const {hookId, hookGroupId} = this.props.match.params;
+
     // Create a new hook if we don't have the hookGroupId and hookId
-    if (!this.props.currentHookId || !this.props.currentHookGroupId) {
+    if (!hookId || !hookGroupId) {
       return {
         hook: null,
         editing: true,
@@ -569,15 +571,12 @@ const HookEditView = React.createClass({
       };
     }
 
-    const hookStatus = this.hooks
-      .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId);
     const hook = this.hooks
-      .hook(this.props.currentHookGroupId, this.props.currentHookId)
+      .hook(hookGroupId, hookId)
       .then(stripHookIds);
 
     return {
       hook,
-      hookStatus,
       editing: false,
       error: null,
     };
@@ -607,14 +606,15 @@ const HookEditView = React.createClass({
       return waitFor;
     }
 
-    const isCreating = !this.props.currentHookId || !this.props.currentHookGroupId;
+    const {hookId, hookGroupId} = this.props.match.params;
+    const isCreating = !hookId || !hookGroupId;
 
     if (this.state.editing) {
       return (
         <HookEditor
           hook={this.state.hook}
-          currentHookId={this.props.currentHookId}
-          currentHookGroupId={this.props.currentHookGroupId}
+          currentHookId={hookId || ''}
+          currentHookGroupId={hookGroupId || ''}
           isCreating={isCreating}
           createHook={this.createHook}
           updateHook={this.updateHook}
@@ -625,12 +625,10 @@ const HookEditView = React.createClass({
     return (
       <HookDisplay
         hook={this.state.hook}
-        hookStatus={this.state.hookStatus}
-        currentHookId={this.props.currentHookId}
-        currentHookGroupId={this.props.currentHookGroupId}
+        currentHookId={hookId || ''}
+        currentHookGroupId={hookGroupId || ''}
         startEditing={this.startEditing}
-        triggerHook={this.triggerHook}
-        refreshHookStatus={this.refreshHookStatus} />
+        triggerHook={this.triggerHook} />
     );
   },
 
@@ -639,22 +637,10 @@ const HookEditView = React.createClass({
   },
 
   triggerHook() {
-    this.setState({hookStatus: null});
-
     // Payloads are ignored, so we send empty data over
     this.hooks
-      .triggerHook(this.props.currentHookGroupId, this.props.currentHookId, {})
-      .then(this.refreshHookStatus)
+      .triggerHook(this.props.match.params.hookGroupId, this.props.match.params.hookId, {})
       .catch(error => this.setState({error}));
-  },
-
-  refreshHookStatus() {
-    this.setState({hookStatus: null});
-    return this.hooks
-      .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId)
-      .then(stat => {
-        this.setState({hookStatus: stat});
-      });
   },
 
   createHook(hookGroupId, hookId, hook) {
@@ -673,7 +659,7 @@ const HookEditView = React.createClass({
 
   async updateHook(hook) {
     try {
-      await this.hooks.updateHook(this.props.currentHookGroupId, this.props.currentHookId, hook);
+      await this.hooks.updateHook(this.props.match.params.hookGroupId, this.props.match.params.hookId, hook);
 
       this.setState({
         hook: stripHookIds(hook),
@@ -686,7 +672,7 @@ const HookEditView = React.createClass({
   },
 
   async deleteHook() {
-    await this.hooks.removeHook(this.props.currentHookGroupId, this.props.currentHookId);
+    await this.hooks.removeHook(this.props.match.params.hookGroupId, this.props.match.params.hookId);
     this.props.selectHook();
     this.props.refreshHookList();
   },

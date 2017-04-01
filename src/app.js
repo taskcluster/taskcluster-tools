@@ -16,7 +16,7 @@ import Secrets from './secrets';
 import Login from './login';
 import Status from './status';
 import Diagnostics from './diagnostics';
-// import Hooks from './hooks';
+import Hooks from './hooks';
 // import OneClickLoaner from './one-click-loaner';
 // import OneClickLoanerConnect from './one-click-loaner/connect';
 // import Credentials from './credentials';
@@ -48,7 +48,7 @@ const App = () => {
         <Route path="/login" component={Login} />
         <Route path="/status" component={Status} />
         <Route path="/diagnostics" component={Diagnostics} />
-        {/*<Route path="/hooks" component={Hooks} />*/}
+        <Route path="/hooks" component={Hooks} />
         {/*<Route path="/one-click-loaner/connect" component={OneClickLoanerConnect} />*/}
         {/*<Route path="/one-click-loaner" component={OneClickLoaner} />*/}
         {/*<Route path="/credentials" component={Credentials} />*/}

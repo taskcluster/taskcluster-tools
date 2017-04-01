@@ -1,5 +1,6 @@
 import React from 'react';
 import {Row, Col, ButtonToolbar, Button, Glyphicon} from 'react-bootstrap';
+import path from 'path';
 import HookGroupBrowser from './hookgroupbrowser';
 import HookEditView from './hookeditor';
 import * as utils from '../lib/utils';
@@ -15,24 +16,21 @@ export default React.createClass({
       clients: {
         hooks: taskcluster.Hooks,
       },
-    }),
-    utils.createLocationHashMixin({
-      keys: ['currentHookGroupId', 'currentHookId'],
-      type: 'string',
-    }),
+    })
   ],
 
   /** Create an initial state */
   getInitialState() {
     return {
-      currentHookGroupId: null,
-      currentHookId: null,
+      currentHookGroupId: this.props.match.params.hookGroupId,
+      currentHookId: this.props.match.params.hookId,
     };
   },
 
   /** Render the main layout of the hooks manager page */
   render() {
-    const creating = this.state.currentHookGroupId == null && this.state.currentHookId == null;
+    const {hookId, hookGroupId} = this.props.match.params;
+    const creating = !hookGroupId && !hookId;
 
     return (
       <Row>
@@ -41,8 +39,8 @@ export default React.createClass({
           <hr />
           <HookGroupBrowser
             ref="hookgroupbrowser"
-            currentHookGroupId={this.state.currentHookGroupId}
-            currentHookId={this.state.currentHookId}
+            currentHookGroupId={hookGroupId}
+            currentHookId={hookId}
             selectHook={this.selectHook} />
           <hr />
           <ButtonToolbar>
@@ -59,10 +57,11 @@ export default React.createClass({
         </Col>
         <Col md={8}>
           <HookEditView
-            currentHookId={this.state.currentHookId}
-            currentHookGroupId={this.state.currentHookGroupId}
+            currentHookId={hookId}
+            currentHookGroupId={hookGroupId}
             refreshHookList={this.refreshHookList}
-            selectHook={this.selectHook} />
+            selectHook={this.selectHook}
+            {...this.props} />
         </Col>
       </Row>
     );
@@ -73,9 +72,6 @@ export default React.createClass({
   },
 
   selectHook(hookGroupId, hookId) {
-    this.setState({
-      currentHookGroupId: hookGroupId,
-      currentHookId: hookId,
-    });
+    this.props.history.push(path.join('/', 'hooks', hookGroupId ? hookGroupId : '', hookId ? hookId : ''));
   },
 });
