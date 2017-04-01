@@ -14,7 +14,7 @@ import IndexBrowser from './index-browser';
 import IndexArtifactBrowser from './index-browser/artifacts';
 import Secrets from './secrets';
 import Login from './login';
-// import Status from './status';
+import Status from './status';
 // import Diagnostics from './diagnostics';
 // import Hooks from './hooks';
 // import OneClickLoaner from './one-click-loaner';
@@ -46,7 +46,7 @@ const App = () => {
         <Route path="/index" component={IndexBrowser} />
         <Route path="/secret" component={Secrets} />
         <Route path="/login" component={Login} />
-        {/*<Route path="/status" component={Status} />*/}
+        <Route path="/status" component={Status} />
         {/*<Route path="/diagnostics" component={Diagnostics} />*/}
         {/*<Route path="/hooks" component={Hooks} />*/}
         {/*<Route path="/one-click-loaner/connect" component={OneClickLoanerConnect} />*/}
