@@ -12,11 +12,11 @@ import QuickStart from './quickstart';
 import PurgeCaches from './purge-caches';
 import IndexBrowser from './index-browser';
 import IndexArtifactBrowser from './index-browser/artifacts';
-// import Secrets from './secrets';
+import Secrets from './secrets';
+import Login from './login';
 // import Status from './status';
 // import Diagnostics from './diagnostics';
 // import Hooks from './hooks';
-// import Login from './login';
 // import OneClickLoaner from './one-click-loaner';
 // import OneClickLoanerConnect from './one-click-loaner/connect';
 // import Credentials from './credentials';
@@ -44,11 +44,11 @@ const App = () => {
         <Route path="/purge-caches" component={PurgeCaches} />
         <Route path="/index/artifacts" component={IndexArtifactBrowser} />
         <Route path="/index" component={IndexBrowser} />
-        {/*<Route path="/secret" component={Secrets} />*/}
+        <Route path="/secret" component={Secrets} />
+        <Route path="/login" component={Login} />
         {/*<Route path="/status" component={Status} />*/}
         {/*<Route path="/diagnostics" component={Diagnostics} />*/}
         {/*<Route path="/hooks" component={Hooks} />*/}
-        {/*<Route path="/login" component={Login} />*/}
         {/*<Route path="/one-click-loaner/connect" component={OneClickLoanerConnect} />*/}
         {/*<Route path="/one-click-loaner" component={OneClickLoaner} />*/}
         {/*<Route path="/credentials" component={Credentials} />*/}
