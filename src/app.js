@@ -4,7 +4,6 @@ import {
   Route,
   Switch
 } from 'react-router-dom';
-//
 import TaskInspector from './task-inspector';
 import TaskGroupInspector from './task-group-inspector';
 import TaskCreator from './task-creator';

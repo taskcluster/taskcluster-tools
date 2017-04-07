@@ -35,8 +35,7 @@ export default React.createClass({
 
   getInitialState() {
     const namespace = this.props.match.params.ns || '';
-    // location.pathname.split('/').filter((p) => p.length).slice(1).join()
-    console.log('this.props ', this.props);
+
     return {
       namespace,
       namespaceInput: '',
@@ -218,8 +217,10 @@ export default React.createClass({
     });
   },
 
-  setHistory(pathname) {
-    this.props.history.push(path.join(this.props.match.url, pathname));
+  setHistory(ns) {
+    const isIndexedArtifact = this.props.match.url.includes('/index/artifacts');
+
+    this.props.history.push(path.join('/', 'index', isIndexedArtifact ? 'artifacts' : '', ns));
   },
 
   /** Browse a namespace */
@@ -240,7 +241,7 @@ export default React.createClass({
       current: ns,
     });
 
-    this.setHistory('index', ns);
+    this.setHistory(ns);
   },
 
   /** Load from namespace input field */
