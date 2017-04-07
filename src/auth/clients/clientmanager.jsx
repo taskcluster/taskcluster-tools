@@ -25,13 +25,17 @@ export default React.createClass({
   /** Create an initial state */
   getInitialState() {
     const creds = auth.loadCredentials();
+    const selectedClientId = this.props.location.pathname
+      .split(path.join(this.props.match.url, '/'))
+      .filter(path => path.length)
+      .join();
 
     return {
       clientPrefix: creds ? `${creds.clientId}/` : '',
       clientsLoaded: false,
       clientsError: null,
       clients: null,
-      selectedClientId: this.props.match.params.url, // '' means "add new client"
+      selectedClientId, // '' means "add new client"
     };
   },
 
@@ -162,6 +166,7 @@ export default React.createClass({
   },
 
   selectClientId(clientId) {
+    console.log('hello : ', clientId);
     this.props.history.push(path.join('/', this.props.match.url, clientId));
     this.setState({selectedClientId: clientId});
   },
