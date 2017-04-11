@@ -11,7 +11,7 @@ const ArtifactView = React.createClass({
         queue: taskcluster.Queue,
       },
       // Reload when props.taskId changes, ignore credentials changes
-      reloadOnProps: ['taskId'],
+      reloadOnProps: ['taskId', 'indexNamespace'],
       reloadOnLogin: false,
     }),
   ],
@@ -26,6 +26,7 @@ const ArtifactView = React.createClass({
 
   propTypes: {
     taskId: React.PropTypes.string.isRequired,
+    indexNamespace: React.PropTypes.string.isRequired,
   },
 
   load() {
@@ -38,6 +39,7 @@ const ArtifactView = React.createClass({
     return this.renderWaitFor('artifacts') || (
       <ArtifactList
         taskId={this.props.taskId}
+        indexNamespace={this.props.indexNamespace}
         artifacts={this.state.artifacts.artifacts} />
     );
   },
@@ -112,7 +114,7 @@ const EntryView = React.createClass({
         <dl className="dl-horizontal">
           <dt>Latest Artifacts</dt>
           <dd>
-            <ArtifactView taskId={this.state.task.taskId} />
+            <ArtifactView taskId={this.state.task.taskId} indexNamespace={this.state.task.namespace} />
             <br />
             <div className="alert alert-info" role="alert">
               <strong>Latest Artifacts</strong>&nbsp;
