@@ -106,7 +106,7 @@ export default React.createClass({
         queue: taskcluster.Queue,
       },
       // Reload when taskId changes or runId
-      reloadOnProps: ['taskId', 'runId', 'artifacts'],
+      reloadOnProps: ['taskId', 'runId', 'indexNamespace', 'artifacts'],
       reloadOnLogin: true,
     }),
   ],
@@ -139,25 +139,26 @@ export default React.createClass({
       let icon;
 
       if (/^public\//.test(artifact.name)) {
-        url = 'https://queue.taskcluster.net/v1/task/';
-        if (this.props.runId != null) {
-          url += `${this.props.taskId}/runs/${this.props.runId}/artifacts/${artifact.name}`;
-          // We could use queue.buildUrl as follows, but this creates URLs where artifact name
+        if (this.props.indexNamespace) {
+          // if we have a namespace, use a URL via that namespace to make it easier for users to copy/paste
+          // index URLs
+          url = `https://index.taskcluster.net/v1/task/${this.props.indexNamespace}/artifacts/${artifact.name}`;
+        } else {
+          // We could use queue.buildUrl, but this creates URLs where artifact name
           // has slashes encoded. For artifacts we specifically allow slashes in the name not
           // to be encoded, as this make things like: $ wget <url> create files with nice names.
-          // url = this.queue.buildUrl(
-          //   this.queue.getArtifact,
-          //   this.props.taskId,
-          //   this.props.runId,
-          //   artifact.name
-          // );
-        } else {
-          url += `${this.props.taskId}/artifacts/${artifact.name}`;
+          url = 'https://queue.taskcluster.net/v1/task/';
+          if (this.props.runId != null) {
+            url += `${this.props.taskId}/runs/${this.props.runId}/artifacts/${artifact.name}`;
+          } else {
+            url += `${this.props.taskId}/artifacts/${artifact.name}`;
+          }
         }
 
         icon = getIconFromMime(artifact.contentType);
       } else if (auth.hasCredentials()) {
-        // If we have credentials we create a signed URL
+        // If we have credentials we create a signed URL; note that signed URLs always point to the
+        // task directly, as they are not useful for users copy/pasting
         if (this.props.runId != null) {
           url = this.queue.buildSignedUrl(
             this.queue.getArtifact,
