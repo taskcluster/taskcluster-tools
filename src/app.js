@@ -22,7 +22,7 @@ import AuthClients from './auth/clients';
 // import OneClickLoaner from './one-click-loaner';
 // import OneClickLoanerConnect from './one-click-loaner/connect';
 // import Credentials from './credentials';
-// import PulseInspector from './pulse-inspector';
+import PulseInspector from './pulse-inspector';
 // import Interactive from './interactive';
 // import OneClickLoaner from './one-click-loaner';
 // import Shell from './shell';
@@ -51,10 +51,10 @@ const App = () => {
         <Route path="/auth/roles" component={AuthRoles} />
         <Route path="/auth/clients" component={AuthClients} />
         {/*<Route path="/auth/scopes" component={AuthScopes} />*/}
+        <Route path="/pulse-inspector" component={PulseInspector} />
         {/*<Route path="/one-click-loaner/connect" component={OneClickLoanerConnect} />*/}
         {/*<Route path="/one-click-loaner" component={OneClickLoaner} />*/}
         {/*<Route path="/credentials" component={Credentials} />*/}
-        {/*<Route path="/pulse-inspector" component={PulseInspector} />*/}
         {/*<Route path="/awsprovisioner" component={AwsProvisioner} />*/}
         {/*<Route path="/shell" component={Shell} />*/}
         {/*<Route path="/interactive" component={Interactive} />*/}
