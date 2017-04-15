@@ -18,7 +18,7 @@ import Diagnostics from './diagnostics';
 import Hooks from './hooks';
 import AuthRoles from './auth/roles';
 import AuthClients from './auth/clients';
-// import AuthScopes from './auth/scopes';
+import AuthScopes from './auth/scopes';
 // import OneClickLoaner from './one-click-loaner';
 // import OneClickLoanerConnect from './one-click-loaner/connect';
 import Credentials from './credentials';
@@ -50,7 +50,7 @@ const App = () => {
         <Route path="/hooks" component={Hooks} />
         <Route path="/auth/roles" component={AuthRoles} />
         <Route path="/auth/clients" component={AuthClients} />
-        {/*<Route path="/auth/scopes" component={AuthScopes} />*/}
+        <Route path="/auth/scopes" component={AuthScopes} />
         <Route path="/pulse-inspector" component={PulseInspector} />
         <Route path="/credentials" component={Credentials} />
         {/*<Route path="/one-click-loaner/connect" component={OneClickLoanerConnect} />*/}

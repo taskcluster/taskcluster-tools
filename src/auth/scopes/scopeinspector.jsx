@@ -1,5 +1,6 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
+import path from 'path';
 import {Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table} from 'react-bootstrap';
 import * as utils from '../../lib/utils';
 import taskcluster from 'taskcluster-client';
@@ -18,16 +19,15 @@ export default React.createClass({
       clients: {
         auth: taskcluster.Auth,
       },
-    }),
-    // Serialize selectedScope and selectedEntity to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['selectedScope', 'selectedEntity'],
-      type: 'string',
-    }),
+    })
   ],
 
   /** Create an initial state */
   getInitialState() {
+    const {params} = this.props.match;
+    const selectedScope = params.selectedScope ? decodeURIComponent(params.selectedScope) : '';
+    const selectedEntity= params.selectedEntity ? decodeURIComponent(params.selectedEntity) : '';
+
     return {
       rolesLoaded: false,
       rolesError: null,
@@ -35,8 +35,8 @@ export default React.createClass({
       clientsLoaded: false,
       clientsError: null,
       clients: null,
-      selectedScope: '',
-      selectedEntity: '',
+      selectedScope,
+      selectedEntity,
       scopeSearchTerm: '',
       entitySearchMode: 'Has Scope',
     };
@@ -66,6 +66,14 @@ export default React.createClass({
       this.renderSelectedScope() ||
       this.renderScopes()
     );
+  },
+
+  updatePath(replace = false) {
+    const selectedScope = this.state.selectedScope ? encodeURIComponent(this.state.selectedScope) : '';
+    const selectedEntity = this.state.selectedEntity ? encodeURIComponent(this.state.selectedEntity) : '';
+    const url = path.join('/', 'auth', 'scopes', selectedScope, selectedEntity);
+
+    return replace ? this.props.history.replace(url) : this.props.history.push(url);
   },
 
   renderSelectedEntity() {
@@ -108,7 +116,7 @@ export default React.createClass({
   },
 
   clearSelectedEntity() {
-    this.setState({selectedEntity: ''});
+    this.setState({selectedEntity: ''}, this.updatePath);
   },
 
   renderSelectedScope() {
@@ -224,9 +232,7 @@ export default React.createClass({
   },
 
   selectEntity(value) {
-    this.setState({
-      selectedEntity: value,
-    });
+    this.setState({selectedEntity: value}, this.updatePath);
   },
 
   selectedScopeChanged() {
@@ -240,7 +246,7 @@ export default React.createClass({
   },
 
   clearSelectedScope() {
-    this.setState({selectedScope: ''});
+    this.setState({selectedScope: ''}, () => this.updatePath(true));
   },
 
   renderScopes() {
@@ -309,6 +315,6 @@ export default React.createClass({
   },
 
   selectScope(scope) {
-    this.setState({selectedScope: scope});
+    this.setState({selectedScope: scope}, this.updatePath);
   },
 });

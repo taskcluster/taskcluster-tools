@@ -1,16 +1,12 @@
 import React from 'react';
 import ScopeInspector from './scopeinspector';
-import * as utils from '../../lib/utils';
+import {Route} from 'react-router-dom';
 import Layout from '../../lib/Layout';
 
-const hashManager = utils.createHashManager({separator: '/'});
-
-const AuthScopes = () => {
-  return (
-    <Layout>
-      <ScopeInspector hashEntry={hashManager.root()} />
-    </Layout>
-  );
-};
+const AuthScopes = ({match}) => (
+  <Layout>
+    <Route path={`${match.url}/:selectedScope?/:selectedEntity?`} render={(props) => <ScopeInspector {...props} />} />
+  </Layout>
+);
 
 export default AuthScopes;
