@@ -6,7 +6,7 @@ import Layout from '../../lib/Layout';
 const AuthRoles = ({match}) => {
   return (
     <Layout>
-      <Route path={`${match.url}`} render={(props) => <RoleManager {...props} />} />
+      <Route path={`${match.url}/:roleId?`} render={props => <RoleManager {...props} />} />
     </Layout>
   );
 };

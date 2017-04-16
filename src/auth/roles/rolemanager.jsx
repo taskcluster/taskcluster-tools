@@ -21,11 +21,15 @@ const RoleManager = React.createClass({
 
   /** Create an initial state */
   getInitialState() {
+    const selectedRoleId = this.props.match.params.roleId ?
+      decodeURIComponent(this.props.match.params.roleId) :
+      '';
+
     return {
       rolesLoaded: false,
       rolesError: undefined,
       roles: undefined,
-      selectedRoleId: this.props.match.params.url,   // '' means "add new role"
+      selectedRoleId,   // '' means "add new role"
     };
   },
 
@@ -122,7 +126,7 @@ const RoleManager = React.createClass({
   },
 
   selectRoleId(roleId) {
-    this.props.history.push(path.join('/', this.props.match.url, roleId));
+    this.props.history.push(path.join('/auth/roles', encodeURIComponent(roleId)));
     this.setState({selectedRoleId: roleId});
   },
 });
