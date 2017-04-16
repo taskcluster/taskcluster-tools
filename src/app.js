@@ -26,7 +26,7 @@ import PulseInspector from './pulse-inspector';
 // import Interactive from './interactive';
 // import OneClickLoaner from './one-click-loaner';
 // import Shell from './shell';
-// import AwsProvisioner from './aws-provisioner';
+import AwsProvisioner from './aws-provisioner';
 
 import LandingPage from './landingpage';
 
@@ -53,9 +53,9 @@ const App = () => {
         <Route path="/auth/scopes" component={AuthScopes} />
         <Route path="/pulse-inspector" component={PulseInspector} />
         <Route path="/credentials" component={Credentials} />
+        <Route path="/aws-provisioner" component={AwsProvisioner} />
         {/*<Route path="/one-click-loaner/connect" component={OneClickLoanerConnect} />*/}
         {/*<Route path="/one-click-loaner" component={OneClickLoaner} />*/}
-        {/*<Route path="/awsprovisioner" component={AwsProvisioner} />*/}
         {/*<Route path="/shell" component={Shell} />*/}
         {/*<Route path="/interactive" component={Interactive} />*/}
       </Switch>

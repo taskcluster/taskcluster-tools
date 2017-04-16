@@ -1,5 +1,6 @@
 import React from 'react';
 import {OverlayTrigger, ProgressBar, Tooltip, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import path from 'path';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
@@ -207,12 +208,8 @@ export default React.createClass({
       },
       reloadOnProps: [
         'provisionerId',
-      ],
-    }),
-    utils.createLocationHashMixin({
-      keys: ['selected'],
-      type: 'string',
-    }),
+      ]
+    })
   ],
 
   propTypes: {
@@ -223,7 +220,7 @@ export default React.createClass({
     return {
       // selected workerType identifier (string)
       // or 'create:worker-type' to indicate creation of workerType
-      selected: '',
+      selected: this.props.match.params.workerType || '',
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
       workerTypeSummariesError: null,
@@ -239,6 +236,7 @@ export default React.createClass({
 
   setSelected(workerType) {
     this.setState({selected: workerType});
+    this.props.history.push(path.join('/aws-provisioner', workerType, this.props.match.params.currentTab || ''));
   },
 
   render() {
@@ -335,9 +333,9 @@ export default React.createClass({
         <WorkerTypeView
           provisionerId={this.props.provisionerId}
           workerType={this.state.selected}
-          hashEntry={this.nextHashEntry()}
           reload={this.reload}
-          updateSummary={this.updateSummary} />
+          updateSummary={this.updateSummary}
+          {...this.props} />
       </div>
     );
   },

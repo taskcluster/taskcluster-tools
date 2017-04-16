@@ -1,5 +1,6 @@
 import React from 'react';
 import {Table, Nav, NavItem} from 'react-bootstrap';
+import path from 'path';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import * as _ from 'lodash';
@@ -292,10 +293,8 @@ const WorkerTypeView = React.createClass({
         'provisionerId',
       ],
     }),
-    utils.createLocationHashMixin({
-      keys: ['currentTab'],
-      type: 'string',
-    }),
+    //
+
   ],
 
   propTypes: {
@@ -309,7 +308,7 @@ const WorkerTypeView = React.createClass({
 
   getInitialState() {
     return {
-      currentTab: '',
+      currentTab: this.props.match.params.currentTab || '',
       pendingTasks: {pendingTasks: 0},
       pendingTasksLoaded: false,
       pendingTasksError: null,
@@ -357,9 +356,8 @@ const WorkerTypeView = React.createClass({
 
   setCurrentTab(tab) {
     // Update state
-    this.setState({
-      currentTab: tab,
-    });
+    this.setState({currentTab: tab});
+    this.props.history.push(path.join('/aws-provisioner', this.props.match.params.workerType, tab));
   },
 
   renderCurrentTab() {
