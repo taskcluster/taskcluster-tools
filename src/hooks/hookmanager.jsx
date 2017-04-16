@@ -72,6 +72,6 @@ export default React.createClass({
   },
 
   selectHook(hookGroupId, hookId) {
-    this.props.history.push(path.join('/', 'hooks', hookGroupId ? hookGroupId : '', hookId ? hookId : ''));
+    this.props.history.push(path.join('/hooks', hookGroupId ? hookGroupId : '', hookId ? hookId : ''));
   },
 });

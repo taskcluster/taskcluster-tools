@@ -5,7 +5,7 @@ import {Route} from 'react-router-dom';
 
 const Hooks = () => (
   <Layout>
-    <Route path="/hooks/:hookGroupId?/:hookId?" render={(props) => <HookManager {...props} />} />
+    <Route path="/hooks/:hookGroupId?/:hookId?" render={props => <HookManager {...props} />} />
   </Layout>
 );
 
