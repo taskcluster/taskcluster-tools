@@ -5,7 +5,7 @@ import Layout from '../lib/Layout';
 
 const Secrets = () => (
   <Layout>
-    <Route path="/secret" render={(props) => <SecretManager {...props} />} />
+    <Route path={`/secrets/:secretId?`} render={props => <SecretManager {...props} />} />
   </Layout>
 );
 

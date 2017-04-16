@@ -107,7 +107,7 @@ module.exports = [
   },
   {
     title: 'Secrets Manager',
-    link: '/secret',
+    link: '/secrets',
     icon: 'user-secret',
     display: true,
     description: 'Manage secrets: values that can only be retrieved with the appropriate scopes.',

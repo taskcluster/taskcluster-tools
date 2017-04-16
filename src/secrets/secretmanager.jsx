@@ -19,10 +19,9 @@ const SecretsManager = React.createClass({
 
   /** Create an initial state */
   getInitialState() {
-    const selectedSecretId = this.props.history.location.pathname
-      .split('/')
-      .filter(term => term.length)
-      .slice(1).join('/');
+    const selectedSecretId = this.props.match.params.secretId ?
+      decodeURIComponent(this.props.match.params.secretId) :
+      '';
 
     return {
       selectedSecretId,
@@ -99,7 +98,7 @@ const SecretsManager = React.createClass({
   },
 
   selectSecretId(secretId) {
-    this.props.history.push(path.join('/', 'secret', secretId));
+    this.props.history.push(path.join('/secrets', encodeURIComponent(secretId)));
     this.setState({selectedSecretId: secretId});
   },
 

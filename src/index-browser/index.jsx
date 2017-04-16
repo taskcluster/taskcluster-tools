@@ -6,7 +6,7 @@ import Layout from '../lib/Layout';
 
 const IndexBrowserView = () => (
   <Layout>
-    <Route path={`/index/:ns?/`} render={(props) => <IndexBrowser entryView={EntryView} {...props} />} />
+    <Route path={`/index/:ns?/`} render={props => <IndexBrowser entryView={EntryView} {...props} />} />
   </Layout>
 );
 

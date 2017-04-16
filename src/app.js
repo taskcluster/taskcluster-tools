@@ -43,7 +43,7 @@ const App = () => {
         <Route path="/purge-caches" component={PurgeCaches} />
         <Route path="/index/artifacts" component={IndexArtifactBrowser} />
         <Route path="/index" component={IndexBrowser} />
-        <Route path="/secret" component={Secrets} />
+        <Route path="/secrets" component={Secrets} />
         <Route path="/login" component={Login} />
         <Route path="/status" component={Status} />
         <Route path="/diagnostics" component={Diagnostics} />

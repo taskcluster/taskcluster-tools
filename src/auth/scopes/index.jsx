@@ -5,7 +5,7 @@ import Layout from '../../lib/Layout';
 
 const AuthScopes = ({match}) => (
   <Layout>
-    <Route path={`${match.url}/:selectedScope?/:selectedEntity?`} render={(props) => <ScopeInspector {...props} />} />
+    <Route path={`${match.url}/:selectedScope?/:selectedEntity?`} render={props => <ScopeInspector {...props} />} />
   </Layout>
 );
 
