@@ -6,7 +6,7 @@ import Layout from '../../lib/Layout';
 const AuthClients = ({match}) => {
   return (
     <Layout>
-      <Route path={`${match.url}`} render={(props) => <ClientManager {...props} />} />
+      <Route path={`${match.url}/:selectedClientId?`} render={(props) => <ClientManager {...props} />} />
     </Layout>
   );
 };
