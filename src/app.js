@@ -30,7 +30,9 @@ import AwsProvisioner from './aws-provisioner';
 
 import LandingPage from './landingpage';
 
-const RedirectToTaskGroupInspector = () => <Redirect to="/task-group-inspector" />;
+const RedirectToTaskGroupInspector = ({match}) => (
+  <Redirect to={window.location.pathname.replace(match.url, '/task-group-inspector')} />
+);
 
 const App = () => (
   <Router>
