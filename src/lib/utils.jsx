@@ -272,7 +272,9 @@ export const createTaskClusterMixin = opts => {
     renderSpinner() {
       return (
         <div style={{textAlign: 'center', margin: 20}}>
-          <format.Icon name="spinner" size="2x" spin={true} />
+          <object type="image/svg+xml" data="/lib/assets/taskcluster-spinner.svg">
+            <format.Icon name="spinner" size="2x" spin={true} />
+          </object>
         </div>
       );
     },
