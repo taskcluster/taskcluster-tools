@@ -1,6 +1,11 @@
 const env = require('./env');
 const DefinePlugin = require('webpack').DefinePlugin;
+const HtmlPlugin = require('html-webpack-plugin');
 const path = require('path');
+
+const SRC = path.join(__dirname, '../src');
+const template = path.join(SRC, 'template.ejs');
+console.log('template: ', template);
 
 module.exports = neutrino => {
   // Turn off HMR
@@ -23,6 +28,23 @@ module.exports = neutrino => {
   neutrino.config
     .plugin('env')
     .use(DefinePlugin, { 'process.env': env });
+
+  // Template
+  neutrino.config
+    .plugin('html')
+    .use(HtmlPlugin, {
+      template,
+      inject: true,
+      appMountId: 'root',
+      xhtml: true,
+      mobile: true,
+      minify: {
+        useShortDoctype: true,
+        keepClosingSlash: true,
+        collapseWhitespace: true,
+        preserveLineBreaks: true
+      }
+    });
 
   // Fix issue with nested routes e.g /index/garbage
   neutrino.config.output.publicPath('/');
