@@ -6,15 +6,11 @@ import * as actions from '../actions';
 import {labels} from '../lib/utils';
 
 class TaskTable extends Component {
-  setHistory(pathname) {
-    this.props.history.push(path.join('/task-group-inspector', pathname));
-  }
-
   /**
    * Navigate to appropriate route
    */
   taskClicked(task) {
-    this.setHistory(`${task.status.taskGroupId}/${task.status.taskId}`);
+    this.props.history.push(path.join('/task-group-inspector', task.status.taskGroupId, task.status.taskId));
   }
 
   /**

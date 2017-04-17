@@ -92,7 +92,7 @@ const TaskView = React.createClass({
               integration process scheduling this task may cause your code to land with broken
               tests.
             </ConfirmActionMenuItem>
-            <RetriggerMenuItem task={this.state.task} taskId={this.props.status.taskId} />
+            <RetriggerMenuItem task={this.state.task} taskId={this.props.status.taskId} {...this.props} />
             <ConfirmActionMenuItem
               disabled={isResolved}
               glyph="stop"

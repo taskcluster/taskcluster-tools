@@ -86,7 +86,6 @@ class TabsView extends Component {
 
   setCurrentTab(tab) {
     const {taskGroupId, taskId, run} = this.props.match.params;
-    const directory = this.props.match.url.split('/').filter(p => p.length)[0];
     let section = '';
 
     // Persist the section path of the URL if user is only switching between runs
@@ -99,7 +98,7 @@ class TabsView extends Component {
       section = 'details';
     }
 
-    this.props.history.push(path.join('/', directory, taskGroupId, taskId, tab, section));
+    this.props.history.push(path.join('/task-group-inspector', taskGroupId, taskId, tab, section));
   }
 
   renderCurrentTab() {

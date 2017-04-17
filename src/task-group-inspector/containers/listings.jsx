@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
+import {Route} from 'react-router-dom';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 import {Tab, Nav, NavItem} from 'react-bootstrap';
 import Table from './table';
 import {queueEvents, webListener, notifications} from '../lib/utils';
 import _ from 'lodash';
-import {Route} from 'react-router-dom';
 import TabsView from './tabsView';
 
 class Listings extends Component {

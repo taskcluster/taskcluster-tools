@@ -16,10 +16,6 @@ class Search extends Component {
     };
   }
 
-  setHistory(pathname) {
-    this.props.history.push(path.join('/task-group-inspector', pathname));
-  }
-
   /**
    * Handle search query
    */
@@ -36,8 +32,8 @@ class Search extends Component {
     this.props.tasksHaveBeenRetrieved(false);
     this.props.removeTasks();
     this.props.fetchTasksInSteps(term, true);
-    this.setHistory(term);
     this.setState({prevTerm: term});
+    this.props.history.push(path.join('/task-group-inspector', term));
   }
 
   onInputChange(e) {

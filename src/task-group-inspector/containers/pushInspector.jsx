@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Route} from 'react-router-dom';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 import Search from './search';
@@ -7,12 +8,6 @@ import Loading from '../shared/loading';
 import DashboardBanner from '../shared/dashboardBanner';
 import {authentication, rendering} from '../lib/utils';
 import Listings from './listings';
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Link
-} from 'react-router-dom';
 
 class PushInspector extends Component {
   componentWillMount() {

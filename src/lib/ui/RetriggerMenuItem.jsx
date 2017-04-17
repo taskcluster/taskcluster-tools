@@ -68,6 +68,6 @@ export default React.createClass({
     task.retries = 0;
 
     await this.queue.createTask(taskId, task);
-    window.location = `/task-inspector/#${taskId}`;
+    window.location = `/task-inspector/${taskId}`;
   },
 });

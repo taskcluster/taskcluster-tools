@@ -11,16 +11,14 @@ import PushInspector from './containers/pushInspector';
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 
-const TaskGroupInspector = ({match}) => {
-  return (
-    <Layout>
-      <Provider store={createStoreWithMiddleware(reducers)}>
-        <div>
-          <Route path={`${match.url}/:taskGroupId?/:taskId?/:run?/:section?`} render={(props) => <PushInspector {...props} />} />
-        </div>
-      </Provider>
-    </Layout>
-  );
-};
+const TaskGroupInspector = ({match}) => (
+  <Layout>
+    <Provider store={createStoreWithMiddleware(reducers)}>
+      <div>
+        <Route path={`${match.url}/:taskGroupId?/:taskId?/:run?/:section?`} render={(props) => <PushInspector {...props} />} />
+      </div>
+    </Provider>
+  </Layout>
+);
 
 export default TaskGroupInspector;
