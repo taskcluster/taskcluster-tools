@@ -37,12 +37,7 @@ export default React.createClass({
     // Listen for messages, reload bindings() when state.taskId changes
     utils.createWebListenerMixin({
       reloadOnKeys: ['taskId'],
-    }),
-    // Serialize state.taskId to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['taskId'],
-      type: 'string',
-    }),
+    })
   ],
 
   getInitialState() {
@@ -169,7 +164,6 @@ export default React.createClass({
                 <TaskView
                   ref="taskView"
                   status={this.state.status}
-                  hashEntry={this.nextHashEntry()}
                   {...this.props} />
               ))
             }
