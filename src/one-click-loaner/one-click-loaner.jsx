@@ -3,7 +3,7 @@ import {findDOMNode} from 'react-dom';
 import {FormGroup, FormControl, ControlLabel, InputGroup, Button} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
-import LoanerButton from '../lib/ui/loaner-button';
+import LoanerButton from '../lib/ui/LoanerButton';
 
 const VALID_INPUT = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
 
@@ -88,18 +88,27 @@ export default React.createClass({
             </InputGroup>
           </FormGroup>
         </form>
-        <br /><br />
-        {!invalidInput && (
-          <div className="text-center">
-            {this.renderWaitFor('task') || (this.state.task && (
+        {!invalidInput && (this.renderWaitFor('task') || (this.state.task && (
+          <div>
+            This will duplicate the task and create it under a different <code>taskId</code>.
+            <br /><br />
+            The new task will be altered as to:
+            <ul>
+              <li>Set <code>task.payload.features.interactive = true</code></li>
+              <li>Strip <code>task.payload.caches</code> to avoid poisoning</li>
+              <li>Ensures <code>task.payload.maxRunTime</code> is minimum 60 minutes</li>
+              <li>Strip <code>task.routes</code> to avoid side-effects</li>
+              <li>Set the environment variable<code>TASKCLUSTER_INTERACTIVE=true</code></li>
+            </ul>
+            Note: this may not work with all tasks.
+            <div className="text-center">
               <LoanerButton
                 buttonStyle="primary"
-                buttonSize="large"
                 taskId={this.state.taskId}
                 task={this.state.task} />
-            ))}
+            </div>
           </div>
-        )}
+        )))}
       </div>
     );
   },
