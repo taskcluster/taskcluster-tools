@@ -217,6 +217,15 @@ const TaskInfo = React.createClass({
             </tr>
 
             <tr>
+              <td>Extra</td>
+              <td>
+                <Code language="json">
+                  {JSON.stringify(task.extra, null, 2)}
+                </Code>
+              </td>
+            </tr>
+
+            <tr>
               <td>Debug</td>
               <td>
                 <ConfirmAction
