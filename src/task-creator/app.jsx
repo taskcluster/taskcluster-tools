@@ -2,13 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TaskCreator from './taskcreator';
 import Layout from '../lib/Layout';
+import {fromNow} from 'taskcluster-client';
 
 // Initial task, if nothing is stored in localStorage
 const initialTask = {
   provisionerId: 'aws-provisioner-v1',
   workerType: 'tutorial',
-  created: null, // later
-  deadline: null, // later
+  created: fromNow('0 seconds'),
+  deadline: fromNow('1 day'),
   payload: {
     image: 'ubuntu:13.10',
     command: ['/bin/bash', '-c', 'echo "hello World"'],

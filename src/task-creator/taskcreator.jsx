@@ -3,15 +3,12 @@ import {Button, ButtonToolbar, Glyphicon, Row, Col} from 'react-bootstrap';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import CodeMirror from 'react-code-mirror';
-import createDebugger from 'debug';
 import _ from 'lodash';
 import slugid from 'slugid';
 import yaml from 'js-yaml';
 import 'codemirror/mode/yaml/yaml';
 import '../lib/codemirror/yaml-lint';
 import './taskcreator.less';
-
-const debug = createDebugger('taskcreator');
 
 /** Create a task-creator */
 export default React.createClass({
@@ -62,17 +59,40 @@ export default React.createClass({
     let invalidTask = false;
     let task = _task;
 
-    // Parameterize with new deadline and created time
+    // Parameterize by offsetting everything so that the created timestamp is
+    // now
     try {
       const data = yaml.safeLoad(task);
-      const deadline = new Date();
+      const nowMs = new Date().getTime();
+      const createdMs = new Date(data.created).getTime();
+      const offset = nowMs - createdMs;
+      const jsonDate = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 
-      deadline.setMinutes(deadline.getMinutes() + 60);
-      data.created = new Date().toJSON();
-      data.deadline = deadline.toJSON();
-      task = yaml.safeDump(data, {noCompatMode: true, noRefs: true}) + '\n';
+      // increment all timestamps in the task by offset
+      const iter = obj => {
+        switch (typeof obj) {
+          case 'object':
+            if (Array.isArray(obj)) {
+              return obj.map(iter);
+            } else {
+              return Object
+                .entries(obj)
+                .reduce((o, [key, value]) => ({...o, [key]: iter(value)}), {});
+            }
+
+          case 'string':
+            if (jsonDate.test(obj)) {
+              return new Date(new Date(obj).getTime() + offset).toJSON();
+            } else {
+              return obj;
+            }
+
+          default:
+            return obj;
+        }
+      };
+      task = yaml.safeDump(iter(data), {noCompatMode: true, noRefs: true}) + '\n';
     } catch (err) {
-      debug('Failed to parameterize task, err: %s, %j', err, err, err.stack);
       invalidTask = true;
     }
 
