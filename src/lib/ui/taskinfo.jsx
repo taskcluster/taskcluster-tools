@@ -216,7 +216,7 @@ const TaskInfo = React.createClass({
               </td>
             </tr>
 
-            {task.extra.length > 0 && 
+            {Object.keys(task.extra).length > 0 && ( 
               <tr>
                 <td>Extra</td>
                 <td>
@@ -225,7 +225,7 @@ const TaskInfo = React.createClass({
                   </Code>
                 </td>
               </tr>
-            }
+            )}
 
             <tr>
               <td>Debug</td>
