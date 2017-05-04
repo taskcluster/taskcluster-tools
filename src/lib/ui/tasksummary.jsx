@@ -55,35 +55,35 @@ const TaskSummary = React.createClass({
     };
 
     return this.renderWaitFor('task') || (
-      <div>
-        <dl className="dl-horizontal">
-          <dt>Name</dt>
-          <dd>
-            <format.Markdown>
-              {task.metadata.name}
-            </format.Markdown>
-          </dd>
-          <dt>Description</dt>
-          <dd>
-            <format.Markdown>
-              {task.metadata.description}
-            </format.Markdown>
-          </dd>
-          <dt>State</dt>
-          <dd>
+        <div>
+          <dl className="dl-horizontal">
+            <dt>Name</dt>
+            <dd>
+              <format.Markdown>
+                {task.metadata.name}
+              </format.Markdown>
+            </dd>
+            <dt>Description</dt>
+            <dd>
+              <format.Markdown>
+                {task.metadata.description}
+              </format.Markdown>
+            </dd>
+            <dt>State</dt>
+            <dd>
             <span className={taskStateLabel[status.state]}>
               {status.state}
             </span>
-          </dd>
-          <dt>Task Inspector</dt>
-          <dd>
-            <a href={`../task-inspector/#${status.taskId}`} target="_blank" rel="noopener noreferrer">
-              {status.taskId} <i className="fa fa-external-link" />
-            </a>
-          </dd>
-        </dl>
-      </div>
-    );
+            </dd>
+            <dt>Task Inspector</dt>
+            <dd>
+              <a href={`../task-inspector/#${status.taskId}`} target="_blank" rel="noopener noreferrer">
+                {status.taskId} <i className="fa fa-external-link" />
+              </a>
+            </dd>
+          </dl>
+        </div>
+      );
   },
 });
 

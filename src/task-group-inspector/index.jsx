@@ -1,20 +1,24 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, {Component} from 'react';
 import {Provider} from 'react-redux';
-import {Router, hashHistory} from 'react-router';
+import {Route} from 'react-router-dom';
 import {createStore, applyMiddleware} from 'redux';
 import reducers from './reducers';
 import thunk from 'redux-thunk';
-import routes from './routes';
 import Layout from '../lib/Layout';
 import './app.less';
 
+import PushInspector from './containers/pushInspector';
+
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 
-ReactDOM.render((
+const TaskGroupInspector = ({match}) => (
   <Layout>
     <Provider store={createStoreWithMiddleware(reducers)}>
-      <Router history={hashHistory} routes={routes} />
+      <div>
+        <Route path={`${match.url}/:taskGroupId?/:taskId?/:run?/:section?`} render={(props) => <PushInspector {...props} />} />
+      </div>
     </Provider>
   </Layout>
-), document.getElementById('root'));
+);
+
+export default TaskGroupInspector;

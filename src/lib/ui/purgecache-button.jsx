@@ -44,19 +44,19 @@ const PurgeCacheButton = React.createClass({
           <p>Select the caches to purge:</p>
           <ul>
             {(this.props.caches || []).map(cache => (
-               <li className="checkbox" key={cache}>
-                 <label>
-                   <input
-                     name="cache"
-                     type="checkbox"
-                     onChange={this.update}
-                     checked={this.state.selected === null ?
-                       false :
-                       this.state.selected.includes(cache)}
-                     value={cache} />
-                   {cache}
-                 </label>
-               </li>
+              <li className="checkbox" key={cache}>
+                <label>
+                  <input
+                    name="cache"
+                    type="checkbox"
+                    onChange={this.update}
+                    checked={this.state.selected === null ?
+                      false :
+                      this.state.selected.includes(cache)}
+                    value={cache} />
+                  {cache}
+                </label>
+              </li>
             ))}
           </ul>
         </div>

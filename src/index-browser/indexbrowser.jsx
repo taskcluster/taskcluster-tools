@@ -4,6 +4,7 @@ import {Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl} 
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import './indexbrowser.less';
+import path from 'path';
 
 /** Generic Index Browser with a custom entryView */
 export default React.createClass({
@@ -25,26 +26,22 @@ export default React.createClass({
         updateNamespaceInput: ['namespace', 'current'],
         clearContinuationTokens: ['namespace'],
       },
-    }),
-    // Serialize state.taskId to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['namespace', 'current'],
-      type: 'string',
-    }),
+    })
   ],
 
   propTypes: {
     entryView: React.PropTypes.func.isRequired,
-    hasHashEntry: React.PropTypes.bool.isRequired,
   },
 
   getInitialState() {
+    const namespace = this.props.match.params.ns || '';
+
     return {
-      namespace: '',
+      namespace,
       namespaceInput: '',
       namespaceToken: null, // namespace continuationToken
       tasksToken: null, // tasks continuationToken
-      current: '', // selected task
+      current: namespace, // selected task
       namespaces: {namespaces: []},
       namespacesLoaded: true,
       namespacesError: null,
@@ -90,9 +87,7 @@ export default React.createClass({
           {this.renderWaitFor('namespaces') || this.renderNamespaces()}
         </Col>
         <Col md={6}>
-          <this.props.entryView
-            namespace={this.state.current}
-            hashEntry={this.props.hasHashEntry ? this.nextHashEntry() : null} />
+          <this.props.entryView namespace={this.state.current} />
         </Col>
       </Row>
     );
@@ -222,6 +217,12 @@ export default React.createClass({
     });
   },
 
+  setHistory(ns) {
+    const isIndexedArtifact = this.props.match.url.includes('/index/artifacts');
+
+    this.props.history.push(path.join('/', 'index', isIndexedArtifact ? 'artifacts' : '', ns));
+  },
+
   /** Browse a namespace */
   browse(ns) {
     this.setState({
@@ -230,6 +231,8 @@ export default React.createClass({
       tasksToken: null,
       namespaceToken: null,
     });
+
+    this.setHistory(ns);
   },
 
   /** Set current tasks */
@@ -237,6 +240,8 @@ export default React.createClass({
     this.setState({
       current: ns,
     });
+
+    this.setHistory(ns);
   },
 
   /** Load from namespace input field */

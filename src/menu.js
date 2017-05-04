@@ -4,7 +4,7 @@
 module.exports = [
   {
     title: 'Task Inspector',
-    link: '/task-inspector/',
+    link: '/task-inspector',
     icon: 'cube',
     display: true,
     description: `The task inspector lets you load, monitor, and inspect the state, runs, artifacts,
@@ -13,7 +13,7 @@ module.exports = [
   },
   {
     title: 'Task Group Inspector',
-    link: '/task-group-inspector/',
+    link: '/task-group-inspector',
     icon: 'cubes',
     display: true,
     description: `Inspect task groups, monitor progress, view dependencies and states, and inspect
@@ -21,7 +21,7 @@ module.exports = [
   },
   {
     title: 'Task Creator',
-    link: '/task-creator/',
+    link: '/task-creator',
     icon: 'pencil-square-o',
     display: true,
     description: `Create and submit tasks from the task creator. Created tasks will be persistent
@@ -29,7 +29,7 @@ module.exports = [
   },
   {
     title: 'GitHub Quick-Start',
-    link: '/quickstart/',
+    link: '/quickstart',
     icon: 'github',
     display: true,
     description: `Create a configuration file \`.taskcluster.yml\` to add to your repository and 
@@ -37,7 +37,7 @@ module.exports = [
   },
   {
     title: 'AWS Provisioner',
-    link: '/aws-provisioner/',
+    link: '/aws-provisioner',
     icon: 'server',
     display: true,
     description: `Manage workertypes known to the AWS Provisioner and check on the status of AWS
@@ -69,7 +69,7 @@ module.exports = [
   },
   {
     title: 'Pulse Inspector',
-    link: '/pulse-inspector/',
+    link: '/pulse-inspector',
     icon: 'wifi',
     display: true,
     description: `Bind to Pulse exchanges in your browser, observe messages arriving and inspect
@@ -77,14 +77,14 @@ module.exports = [
   },
   {
     title: 'Cache Purge Inspector',
-    link: '/purge-caches/',
+    link: '/purge-caches',
     icon: 'bolt',
     display: true,
     description: 'View currently active cache purges and schedule a new one if needed.',
   },
   {
     title: 'Index Browser',
-    link: '/index/',
+    link: '/index',
     icon: 'sitemap',
     display: true,
     description: `The generic index browser lets you browse through the hierarchy of namespaces in
@@ -100,14 +100,14 @@ module.exports = [
   },
   {
     title: 'Hooks Manager',
-    link: '/hooks/',
+    link: '/hooks',
     icon: 'repeat',
     display: true,
     description: 'Manage hooks: tasks that are created in response to events within TaskCluster.',
   },
   {
     title: 'Secrets Manager',
-    link: '/secrets/',
+    link: '/secrets',
     icon: 'user-secret',
     display: true,
     description: 'Manage secrets: values that can only be retrieved with the appropriate scopes.',
@@ -118,28 +118,28 @@ module.exports = [
   },
   {
     title: 'Interactive Shell',
-    link: '/interactive/',
+    link: '/interactive',
     icon: 'terminal',
     display: false,
     description: 'Open interactive shell within tasks.',
   },
   {
     title: 'Interactive Shell',
-    link: '/shell/',
+    link: '/shell',
     icon: 'terminal',
     display: false,
     description: 'Open interactive shell within tasks.',
   },
   {
     title: 'Interactive Display',
-    link: '/display/',
+    link: '/display',
     icon: 'television',
     display: false,
     description: 'Connect to an interactive display within tasks.',
   },
   {
     title: 'One-Click Loaner',
-    link: '/one-click-loaner/',
+    link: '/one-click-loaner',
     icon: 'terminal',
     display: false,
     description: 'Create a loaner from an existing task.',
@@ -181,14 +181,14 @@ module.exports = [
   },
   {
     title: 'Credentials',
-    link: '/credentials/',
+    link: '/credentials',
     icon: 'key',
     display: false,
     description: 'Manage credentials stored in the browser.',
   },
   {
     title: 'Status',
-    link: '/status/',
+    link: '/status',
     icon: 'cogs',
     display: true,
     description: `Display the status of Taskcluster services and underlying services Taskcluster
@@ -196,7 +196,7 @@ module.exports = [
   },
   {
     title: 'Diagnostics',
-    link: '/diagnostics/',
+    link: '/diagnostics',
     icon: 'cogs',
     display: true,
     description: 'Display results from diagnostics tests',

@@ -1,6 +1,7 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 import {FormGroup, FormControl, ControlLabel, InputGroup, Button} from 'react-bootstrap';
+import path from 'path';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import LoanerButton from '../lib/ui/loaner-button';
@@ -25,21 +26,16 @@ export default React.createClass({
       onKeys: {
         updateTaskIdInput: ['taskId'],
       },
-    }),
-    // Serialize state.taskId to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['taskId'],
-      type: 'string',
-    }),
+    })
   ],
 
   getInitialState() {
     return {
-      taskId: '',
+      taskId: this.props.match.params.taskId || '',
       taskLoaded: true,
       taskError: null,
       task: null,
-      taskIdInput: '',
+      taskIdInput: this.props.match.params.taskId || '',
     };
   },
 
@@ -96,7 +92,8 @@ export default React.createClass({
                 buttonStyle="primary"
                 buttonSize="large"
                 taskId={this.state.taskId}
-                task={this.state.task} />
+                task={this.state.task}
+                {...this.props} />
             ))}
           </div>
         )}
@@ -123,5 +120,6 @@ export default React.createClass({
   handleSubmit(e) {
     e.preventDefault();
     this.setState({taskId: this.state.taskIdInput});
+    this.props.history.push(path.join('/one-click-loaner', this.state.taskIdInput));
   },
 });

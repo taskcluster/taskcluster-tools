@@ -7,6 +7,7 @@ import taskcluster from 'taskcluster-client';
 import LogView from './logview';
 import ArtifactList from './artifactlist';
 import './runinfo.less';
+import path from 'path';
 
 /** Displays information about a run in a tab page */
 const RunInfo = React.createClass({
@@ -87,10 +88,17 @@ const RunInfo = React.createClass({
     this.setState({artifacts});
   },
 
+  onTabSelect(tab) {
+    const {taskGroupId, taskId, run} = this.props.match.params;
+    const pathSoFar = taskGroupId ? path.join(taskGroupId, taskId, run) : path.join(taskId, run);
+    const directory = this.props.match.url.split('/').filter(e => e.length)[0];
+
+    this.props.history.push(path.join('/', directory, pathSoFar, tab));
+  },
+
   // Render run
   render() {
-    const run = this.props.run;
-
+    const {run, activeTabOnInit} = this.props;
     const stateLabelMap = {
       pending: 'info',
       running: 'primary',
@@ -100,11 +108,11 @@ const RunInfo = React.createClass({
     };
 
     return (
-      <Tab.Container id="run-container" defaultActiveKey="details">
+      <Tab.Container onSelect={this.onTabSelect} id="run-container" defaultActiveKey={activeTabOnInit || 'details'}>
         <Row>
           <Col sm={12}>
             <Nav bsStyle="pills">
-              <NavItem eventKey="details">Run {this.props.run.runId} Details</NavItem>
+              <NavItem eventKey="details">Run {run.runId} Details</NavItem>
               <NavItem eventKey="artifacts">Artifacts</NavItem>
               <NavItem eventKey="logs">Logs</NavItem>
             </Nav>
@@ -114,74 +122,74 @@ const RunInfo = React.createClass({
               <Tab.Pane eventKey="details">
                 <Table>
                   <tbody>
-                    <tr>
-                      <td>State</td>
-                      <td>
-                        <Label bsStyle={stateLabelMap[run.state]}>{run.state}</Label>
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>State</td>
+                    <td>
+                      <Label bsStyle={stateLabelMap[run.state]}>{run.state}</Label>
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td>Reason Created</td>
-                      <td><code>{run.reasonCreated}</code></td>
-                    </tr>
+                  <tr>
+                    <td>Reason Created</td>
+                    <td><code>{run.reasonCreated}</code></td>
+                  </tr>
 
-                    <tr>
-                      <td>Reason Resolved</td>
-                      <td>
-                        {run.reasonResolved ? <code>{run.reasonResolved}</code> : '-'}
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>Reason Resolved</td>
+                    <td>
+                      {run.reasonResolved ? <code>{run.reasonResolved}</code> : '-'}
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td>Scheduled</td>
-                      <td>
-                        <format.DateView date={run.scheduled} />
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>Scheduled</td>
+                    <td>
+                      <format.DateView date={run.scheduled} />
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td>Started</td>
-                      <td>
-                        {
-                          run.started ?
-                            <format.DateView date={run.started} since={run.scheduled} /> :
-                            '-'
-                        }
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>Started</td>
+                    <td>
+                      {
+                        run.started ?
+                          <format.DateView date={run.started} since={run.scheduled} /> :
+                          '-'
+                      }
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td>Resolved</td>
-                      <td>
-                        {
-                          run.resolved ?
-                            <format.DateView date={run.resolved} since={run.started} /> :
-                            '-'
-                        }
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>Resolved</td>
+                    <td>
+                      {
+                        run.resolved ?
+                          <format.DateView date={run.resolved} since={run.started} /> :
+                          '-'
+                      }
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td>WorkerGroup</td>
-                      <td>
-                        {run.workerGroup ? <code>{run.workerGroup}</code> : '-'}
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>WorkerGroup</td>
+                    <td>
+                      {run.workerGroup ? <code>{run.workerGroup}</code> : '-'}
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td>WorkerId</td>
-                      <td>
-                        {run.workerId ? <code>{run.workerId}</code> : '-'}
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>WorkerId</td>
+                    <td>
+                      {run.workerId ? <code>{run.workerId}</code> : '-'}
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td>TakenUntil</td>
-                      <td>
-                        {run.takenUntil ? <format.DateView date={run.takenUntil} /> : '-'}
-                      </td>
-                    </tr>
+                  <tr>
+                    <td>TakenUntil</td>
+                    <td>
+                      {run.takenUntil ? <format.DateView date={run.takenUntil} /> : '-'}
+                    </td>
+                  </tr>
                   </tbody>
                 </Table>
               </Tab.Pane>

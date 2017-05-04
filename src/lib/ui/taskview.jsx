@@ -1,6 +1,7 @@
 import React from 'react';
 import {Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
 import _ from 'lodash';
+import path from 'path';
 import taskcluster from 'taskcluster-client';
 import * as utils from '../utils';
 import TaskInfo from './taskinfo';
@@ -22,19 +23,12 @@ const TaskView = React.createClass({
       // Reload when props.status.taskId changes, ignore credential changes
       reloadOnProps: ['status.taskId'],
       reloadOnLogin: false,
-    }),
-    // Serialize state.currentTab to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['currentTab'],
-      type: 'string',
-    }),
+    })
   ],
 
   // Get initial state
   getInitialState() {
     return {
-      // Empty string is the task view
-      currentTab: this.props.initialTab,
       task: null,
       taskLoaded: false,
       taskError: null,
@@ -70,19 +64,21 @@ const TaskView = React.createClass({
 
   // Render tabs and current tab
   render() {
+    const currentTab = this.isNumber(this.props.match.params.run) ? this.props.match.params.run : '';
+
     if (!this.state.task) {
       return null;
     }
 
     const isResolved = [
-      'completed',
-      'failed',
-      'exception',
-    ].indexOf(this.props.status.state) !== -1;
+        'completed',
+        'failed',
+        'exception',
+      ].indexOf(this.props.status.state) !== -1;
 
     return (
       <div className="task-view">
-        <Nav bsStyle="tabs" activeKey={`${this.state.currentTab}`} onSelect={this.setCurrentTab}>
+        <Nav bsStyle="tabs" activeKey={currentTab} onSelect={this.setCurrentTab}>
           <NavItem eventKey="" key="">Task Details</NavItem>
           <NavDropdown title="Actions" id="task-view-actions">
             <ConfirmActionMenuItem
@@ -96,16 +92,16 @@ const TaskView = React.createClass({
               integration process scheduling this task may cause your code to land with broken
               tests.
             </ConfirmActionMenuItem>
-            <RetriggerMenuItem task={this.state.task} taskId={this.props.status.taskId} />
+            <RetriggerMenuItem task={this.state.task} taskId={this.props.status.taskId} {...this.props} />
             <ConfirmActionMenuItem
               disabled={isResolved}
               glyph="stop"
               label="Cancel Task"
               action={this.cancelTask}
               success="Successfully canceled task!">
-                Are you sure you wish to cancel this task? Note that another process or developer
-                may still be able to schedule a rerun. All existing runs will be aborted and any
-                scheduling process will not be able to schedule the task.
+              Are you sure you wish to cancel this task? Note that another process or developer
+              may still be able to schedule a rerun. All existing runs will be aborted and any
+              scheduling process will not be able to schedule the task.
             </ConfirmActionMenuItem>
             <PurgeCacheMenuItem
               caches={_.keys(((this.state.task || {}).payload || {}).cache || {})}
@@ -131,13 +127,15 @@ const TaskView = React.createClass({
 
   /** Render current tab */
   renderCurrentTab() {
+    const currentTab = this.isNumber(this.props.match.params.run) ? this.props.match.params.run : '';
+
     // Empty string is the task tab, but zero is a possible value
-    if (this.state.currentTab === '') {
-      return <TaskInfo status={this.props.status} task={this.state.task} />;
+    if (currentTab === '') {
+      return <TaskInfo {...this.props} task={this.state.task} />;
     }
 
     // Check if we have the run in current tab
-    const run = this.props.status.runs[this.state.currentTab];
+    const run = this.props.status.runs[currentTab];
 
     if (!run) {
       return (
@@ -148,15 +146,31 @@ const TaskView = React.createClass({
     }
 
     // return a RunInfo
-    return <RunInfo status={this.props.status} run={run} ref="runInfo" />;
+    return <RunInfo
+      {...this.props} run={run} ref="runInfo" activeTabOnInit={this.props.match.params.section} />;
+  },
+
+  isNumber(term) {
+    return !isNaN(parseInt(term));
   },
 
   // Set currentTab
   setCurrentTab(tab) {
-    // Update state
-    this.setState({
-      currentTab: tab,
-    });
+    const {taskId, run} = this.props.match.params;
+    const directory = this.props.match.url.split('/').filter(p => p.length)[0];
+    let section = '';
+
+    // Persist the section path of the URL if user is only switching between runs
+    if (this.props.match.params.section && this.isNumber(tab) && this.isNumber(run)) {
+      section = this.props.match.params.section;
+    }
+
+    // Add 'details' section to the URL if a run has no section path
+    else if (!this.props.match.params.section && this.isNumber(tab)) {
+      section = 'details';
+    }
+
+    this.props.history.push(path.join('/', directory, taskId, tab, section));
   },
 
   // Tell child that we got an artifact created message

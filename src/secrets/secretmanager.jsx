@@ -1,5 +1,6 @@
 import React from 'react';
 import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import path from 'path';
 import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import SecretEditor from './secreteditor';
@@ -11,19 +12,19 @@ const SecretsManager = React.createClass({
   mixins: [
     utils.createTaskClusterMixin({
       clients: {
-        secrets: taskcluster.Secrets,
-      },
-    }),
-    utils.createLocationHashMixin({
-      keys: ['selectedSecretId'],
-      type: 'string',
-    }),
+        secrets: taskcluster.Secrets
+      }
+    })
   ],
 
   /** Create an initial state */
   getInitialState() {
+    const selectedSecretId = this.props.match.params.secretId ?
+      decodeURIComponent(this.props.match.params.secretId) :
+      '';
+
     return {
-      selectedSecretId: '',
+      selectedSecretId,
       secrets: undefined,
       secretsLoaded: false,
       secretsError: null,
@@ -70,17 +71,17 @@ const SecretsManager = React.createClass({
 
   renderSecretsTable() {
     return this.renderWaitFor('secrets') || (
-      <Table condensed={true} hover={true}>
-        <thead>
+        <Table condensed={true} hover={true}>
+          <thead>
           <tr>
             <th>SecretId</th>
           </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
           {this.state.secrets.map(this.renderSecretRow)}
-        </tbody>
-      </Table>
-    );
+          </tbody>
+        </Table>
+      );
   },
 
   renderSecretRow(secretId, index) {
@@ -97,6 +98,7 @@ const SecretsManager = React.createClass({
   },
 
   selectSecretId(secretId) {
+    this.props.history.push(path.join('/secrets', encodeURIComponent(secretId)));
     this.setState({selectedSecretId: secretId});
   },
 

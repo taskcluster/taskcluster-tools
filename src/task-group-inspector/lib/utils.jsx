@@ -4,20 +4,20 @@ import React from 'react';
 import taskcluster from 'taskcluster-client';
 
 /**
-* Creation of queue. If credentials are available, we use them at the start of the application
-*/
+ * Creation of queue. If credentials are available, we use them at the start of the application
+ */
 export let queue = localStorage.credentials ?
   new taskcluster.Queue({credentials: JSON.parse(localStorage.credentials)}) :
   new taskcluster.Queue();
 
 /**
-* Creation of queueEvents
-*/
+ * Creation of queueEvents
+ */
 export const queueEvents = new taskcluster.QueueEvents();
 
 /**
-* Authentication
-*/
+ * Authentication
+ */
 export const authentication = {
   login: credentials => {
     queue = new taskcluster.Queue({credentials});
@@ -25,9 +25,9 @@ export const authentication = {
 };
 
 /**
-* WebListener
-* Setup bindings and event callbacks
-*/
+ * WebListener
+ * Setup bindings and event callbacks
+ */
 let listener = new taskcluster.WebListener();
 
 export const webListener = {
@@ -62,8 +62,8 @@ export const webListener = {
 };
 
 /**
-* Rendering Erorr and Success messages
-*/
+ * Rendering Erorr and Success messages
+ */
 /* eslint-disable react/display-name */
 export const rendering = {
   renderError: err => {
@@ -111,8 +111,8 @@ export const labels = {
 };
 
 /**
-* Push notifications
-*/
+ * Push notifications
+ */
 export const notifications = {
   notifyUser: message => {
     if ('Notification' in window) {

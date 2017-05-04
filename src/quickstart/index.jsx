@@ -1,10 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import YamlCreator from './YamlCreator';
 import Layout from '../lib/Layout';
 
-ReactDOM.render((
+const QuickStart = () => (
   <Layout>
     <YamlCreator />
   </Layout>
-), document.getElementById('root'));
+);
+
+export default QuickStart;

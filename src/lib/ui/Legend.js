@@ -1,8 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
 
-export default class extends React.Component {
-  static displayName = 'Legend';
-
+export default class Legend extends Component {
   render() {
     return (
       <ul style={{listStyle: 'none', display: 'block', height: 20, padding: 0, textAlign: 'right'}}>
