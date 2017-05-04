@@ -1,10 +1,8 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {OverlayTrigger, Tooltip, NavItem, Glyphicon} from 'react-bootstrap';
 import {buildLoginURL} from '../auth';
 
-export default class extends React.Component {
-  static displayName = 'DevelopmentMenuItem';
-
+export default class DevelopmentMenuItem extends Component {
   signIn() {
     // This uses `auth.buildLoginURL()` to generate a URL to the production login service, so this
     // development instance of tools acts as a third-party to the production instance

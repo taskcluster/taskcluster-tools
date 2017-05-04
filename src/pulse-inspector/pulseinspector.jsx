@@ -4,6 +4,7 @@ import {
   Row, Col, ButtonToolbar, Button, Glyphicon, Table, Alert,
   FormGroup, FormControl, ControlLabel,
 } from 'react-bootstrap';
+import qs from 'qs';
 import * as utils from '../lib/utils';
 import _ from 'lodash';
 import JSONInspector from 'react-json-inspector';
@@ -86,11 +87,7 @@ export default React.createClass({
   mixins: [
     utils.createWebListenerMixin({
       reloadOnKeys: ['bindings', 'doListen'],
-    }),
-    utils.createLocationHashMixin({
-      keys: ['bindings'],
-      type: 'json',
-    }),
+    })
   ],
 
   getDefaultProps() {
@@ -101,9 +98,12 @@ export default React.createClass({
 
   /** Create initial state */
   getInitialState() {
+    const query = qs.parse(this.props.location.search.slice(1));
+    const bindings = Object.keys(query).map(key => query[key]);
+
     return {
       doListen: false, // Do start listening
-      bindings: [], // List of bindings
+      bindings, // List of bindings
       messages: [], // List of messages received
       expandedMessage: null, // _idForInspector of current message
       listening: false, // State of listening, set by WebListenerMixin
@@ -176,6 +176,7 @@ export default React.createClass({
   /** Clear all bindings */
   clearBindings() {
     this.setState({bindings: [], doListen: false});
+    this.props.history.push(this.props.location.pathname);
   },
 
   /** Render list of bindings */
@@ -246,14 +247,16 @@ export default React.createClass({
     );
   },
 
-  /** Add binding to list of bindings */
+  /** Add binding to list of bindings and update URL */
   addBinding() {
     const binding = {
       exchange: findDOMNode(this.refs.exchange).value,
       routingKeyPattern: findDOMNode(this.refs.routingKeyPattern).value,
     };
+    const newBindings = this.state.bindings.concat([binding]);
 
     this.setState({bindings: this.state.bindings.concat([binding])});
+    this.props.history.push(`${this.props.location.pathname}?${qs.stringify(newBindings)}`);
   },
 
   dontListen() {

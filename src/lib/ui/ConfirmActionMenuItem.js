@@ -1,17 +1,18 @@
 import React from 'react';
-import {Button, Glyphicon, Modal, MenuItem} from 'react-bootstrap';
+import {Button, Glyphicon, Modal} from 'react-bootstrap';
 import * as utils from '../utils';
 
 /** Button with an associated confirm dialog */
-export default React.createClass({
-  displayName: 'ConfirmActionMenuItem',
-
+const ConfirmAction = React.createClass({
   mixins: [
     // We use loadState to execute the action asynchronously
     utils.createTaskClusterMixin(),
   ],
 
   propTypes: {
+    // Button size, style, glyph and disabled
+    buttonSize: React.PropTypes.string,
+    buttonStyle: React.PropTypes.string.isRequired,
     disabled: React.PropTypes.bool.isRequired,
     glyph: React.PropTypes.string.isRequired,
     label: React.PropTypes.string.isRequired,
@@ -40,10 +41,14 @@ export default React.createClass({
 
   render() {
     return (
-      <MenuItem disabled={this.props.disabled} onClick={this.openDialog}>
+      <Button
+        bsSize={this.props.buttonSize}
+        bsStyle={this.props.buttonStyle}
+        disabled={this.props.disabled}
+        onClick={this.openDialog}>
         <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
         {this.renderDialog()}
-      </MenuItem>
+      </Button>
     );
   },
 
@@ -65,7 +70,7 @@ export default React.createClass({
                 </span>
               </div>
             ) :
-            null
+              null
           }
         </Modal.Body>
         <Modal.Footer>
@@ -108,3 +113,5 @@ export default React.createClass({
     });
   },
 });
+
+export default ConfirmAction;

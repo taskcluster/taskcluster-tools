@@ -40,4 +40,3 @@ export default class Service extends React.Component {
     );
   }
 }
-

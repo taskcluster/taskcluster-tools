@@ -1,9 +1,7 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {OverlayTrigger, Tooltip, NavItem, Glyphicon} from 'react-bootstrap';
 
-export default class extends React.Component {
-  static displayName = 'ManualMenuItem';
-
+export default class ManualMenuItem extends Component {
   render() {
     const tooltip = (
       <Tooltip id="manual-signin">

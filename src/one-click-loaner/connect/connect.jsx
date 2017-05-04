@@ -35,17 +35,12 @@ export default React.createClass({
     // Listen for messages, reload bindings() when state.taskId changes
     utils.createWebListenerMixin({
       reloadOnKeys: ['taskId'],
-    }),
-    // Serialize state.taskId to location.hash as string
-    utils.createLocationHashMixin({
-      keys: ['taskId'],
-      type: 'string',
-    }),
+    })
   ],
 
   getInitialState() {
     return {
-      taskId: '',
+      taskId: this.props.match.params.taskId || '',
       statusLoaded: true,
       statusError: null,
       status: null,

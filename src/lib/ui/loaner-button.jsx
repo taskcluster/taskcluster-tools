@@ -3,6 +3,7 @@ import taskcluster from 'taskcluster-client';
 import ConfirmAction from './confirmaction';
 import * as utils from '../utils';
 import slugid from 'slugid';
+import path from 'path';
 import _ from 'lodash';
 import {Button} from 'react-bootstrap';
 
@@ -131,7 +132,7 @@ const LoanerButton = React.createClass({
     const task = this.parameterizeTask();
 
     await this.queue.createTask(taskId, task);
-    window.location = `/one-click-loaner/connect/#${taskId}`;
+    this.props.history.push(path.join('/one-click-loaner/connect', taskId));
   },
 
   editTask() {
@@ -141,7 +142,7 @@ const LoanerButton = React.createClass({
     localStorage.setItem('task-creator/task', JSON.stringify(task));
 
     // ..and go there
-    window.location.href = '/task-creator/';
+    this.props.history.push(path.join('/task-creator'));
   },
 });
 

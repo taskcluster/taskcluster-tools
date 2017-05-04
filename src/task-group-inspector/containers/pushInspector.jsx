@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Route} from 'react-router-dom';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 import Search from './search';
@@ -6,6 +7,7 @@ import ProgressBar from '../components/progressBar';
 import Loading from '../shared/loading';
 import DashboardBanner from '../shared/dashboardBanner';
 import {authentication, rendering} from '../lib/utils';
+import Listings from './listings';
 
 class PushInspector extends Component {
   componentWillMount() {
@@ -14,7 +16,7 @@ class PushInspector extends Component {
 
   render() {
     const {tasks, dashboardBanner} = this.props;
-    const {taskGroupId} = this.props.params;
+    const {taskGroupId} = this.props.match.params;
 
     return (
       <div>
@@ -24,7 +26,7 @@ class PushInspector extends Component {
           the individual tasks that make up the task group using the embedded task-inspector.
         </p>
         <hr />
-        <Search taskGroupId={taskGroupId} />
+        <Search taskGroupId={taskGroupId} {...this.props} />
         <hr />
         {
           dashboardBanner ? (
@@ -42,7 +44,7 @@ class PushInspector extends Component {
                   setActiveTaskStatus={this.props.setActiveTaskStatus}
                   tasksRetrievedFully={this.props.tasksRetrievedFully} />
                 <hr />
-                {this.props.children}
+                <Route path={`/task-group-inspector/:taskGroupId/:taskId?/:run?/:section?`} render={(props) => <Listings {...props} />} />
               </div>
             </div>
           )

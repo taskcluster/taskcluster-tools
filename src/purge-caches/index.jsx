@@ -1,10 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import CacheManager from './cachemanager';
 import Layout from '../lib/Layout';
 
-ReactDOM.render((
+const PurgeCaches = () => (
   <Layout>
     <CacheManager />
   </Layout>
-), document.getElementById('root'));
+);
+
+export default PurgeCaches;

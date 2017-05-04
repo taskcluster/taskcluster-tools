@@ -70,7 +70,7 @@ const ConfirmAction = React.createClass({
                 </span>
               </div>
             ) :
-            null
+              null
           }
         </Modal.Body>
         <Modal.Footer>
@@ -83,7 +83,7 @@ const ConfirmAction = React.createClass({
                 <Glyphicon glyph={this.props.glyph} /> <span>{this.props.label}</span>
               </Button>
             ) :
-            null
+              null
           }
           <Button onClick={this.closeDialog} bsStyle="default">
             <Glyphicon glyph="remove" /> Close

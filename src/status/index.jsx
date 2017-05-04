@@ -1,10 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {TaskClusterDashboard} from './status';
 import Layout from '../lib/Layout';
 
-ReactDOM.render((
+const Status = () => (
   <Layout>
     <TaskClusterDashboard />
   </Layout>
-), document.getElementById('root'));
+);
+
+export default Status;

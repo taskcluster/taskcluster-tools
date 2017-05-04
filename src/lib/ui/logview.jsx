@@ -19,9 +19,9 @@ export default React.createClass({
   // Get initial state
   getInitialState() {
     const entry = this.props.logs.find(log =>
-      log.name === 'public/logs/terminal.log' ||
-      log.name === 'public/logs/live.log'
-    ) || this.props.logs[0];
+        log.name === 'public/logs/terminal.log' ||
+        log.name === 'public/logs/live.log'
+      ) || this.props.logs[0];
 
     return {
       name: entry ? entry.name : '',

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 import {Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
+import path from 'path';
 import CancelTask from '../menus/CancelTask';
 import PurgeCache from '../menus/PurgeCache';
 import Retrigger from '../menus/Retrigger';
@@ -10,36 +11,42 @@ import RunInfo from '../../lib/ui/runinfo';
 import TaskInfo from '../../lib/ui/taskinfo';
 
 class TabsView extends Component {
-  constructor() {
-    super();
-    this.state = {currentTab: ''};
-  }
-
   fetchTaskData() {
-    const {params, fetchArtifacts, fetchTask, fetchStatus} = this.props;
+    const {match, fetchArtifacts, fetchTask, fetchStatus} = this.props;
 
-    fetchArtifacts(params.taskId);
-    fetchTask(params.taskId);
-    fetchStatus(params.taskId);
+    fetchArtifacts(match.params.taskId);
+    fetchTask(match.params.taskId);
+    fetchStatus(match.params.taskId);
   }
 
   componentWillMount() {
+    const {run}= this.props.match.params;
+
     this.fetchTaskData();
+
+    if (this.isNumber(run)) {
+      this.setCurrentTab(run)
+    }
   }
 
   /**
-  * Handle case where user picks another task to show
-  */
+   * Handle case where user picks another task to show
+   */
   componentDidUpdate(prevProps) {
     //  This can happen when retriggering a task or clicking on a task
-    if (prevProps.params.taskId !== this.props.params.taskId) {
+    if (prevProps.match.params.taskId !== this.props.match.params.taskId) {
       this.fetchTaskData();
       this.setCurrentTab('');
     }
   }
 
+  isNumber(term) {
+    return !isNaN(parseInt(term));
+  }
+
   render() {
-    const {task, status} = this.props;
+    const {task, status, match} = this.props;
+    const currentTab = this.isNumber(match.params.run) ? match.params.run : '';
 
     if (!task || !status) {
       return null;
@@ -47,7 +54,7 @@ class TabsView extends Component {
 
     return (
       <div>
-        <Nav bsStyle="tabs" activeKey={`${this.state.currentTab}`} onSelect={tab => this.setCurrentTab(tab)}>
+        <Nav bsStyle="tabs" activeKey={currentTab} onSelect={tab => this.setCurrentTab(tab)}>
           <NavItem eventKey="" key="">Task Details</NavItem>
           <NavDropdown title="Actions" id="task-view-actions">
             <ScheduleTask />
@@ -78,19 +85,33 @@ class TabsView extends Component {
   }
 
   setCurrentTab(tab) {
-    this.setState({currentTab: tab});
+    const {taskGroupId, taskId, run} = this.props.match.params;
+    let section = '';
+
+    // Persist the section path of the URL if user is only switching between runs
+    if (this.props.match.params.section && this.isNumber(tab) && this.isNumber(run)) {
+      section = this.props.match.params.section;
+    }
+
+    // Add 'details' section to the URL if a run has no section path
+    else if (!this.props.match.params.section && this.isNumber(tab)) {
+      section = 'details';
+    }
+
+    this.props.history.push(path.join('/task-group-inspector', taskGroupId, taskId, tab, section));
   }
 
   renderCurrentTab() {
-    const {task, status} = this.props;
+    const {task, status, match} = this.props;
+    const currentTab = this.isNumber(match.params.run) ? match.params.run : '';
 
     // Empty string is the task tab, but zero is a possible value
-    if (this.state.currentTab === '') {
+    if (currentTab === '') {
       return <TaskInfo status={status} task={task} />;
     }
 
-    // Check if we have the run in current tab
-    const run = status.runs[this.state.currentTab];
+    // Select first run if no run is specified in URL
+    const run = status.runs[currentTab];
 
     if (!run) {
       return (
@@ -100,7 +121,12 @@ class TabsView extends Component {
       );
     }
 
-    return <RunInfo status={status} run={run} ref="runInfo" />;
+    return <RunInfo
+      status={status}
+      run={run} ref="runInfo"
+      activeTabOnInit={this.props.match.params.section}
+      {...this.props}
+    />;
   }
 }
 

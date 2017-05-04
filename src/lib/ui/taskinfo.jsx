@@ -112,7 +112,7 @@ const TaskInfo = React.createClass({
             <tr>
               <td>TaskGroupId</td>
               <td>
-                <a href={`../task-group-inspector/#/${task.taskGroupId}`}>{task.taskGroupId}</a>
+                <a href={`${path.join(__dirname, 'task-group-inspector', task.taskGroupId)}`}>{task.taskGroupId}</a>
               </td>
             </tr>
 
@@ -123,7 +123,7 @@ const TaskInfo = React.createClass({
                   task.dependencies.length ?
                     task.dependencies.map((dependency, key) => (
                       <div key={key}>
-                        <a href={`../task-inspector/#${dependency}`}>{dependency}</a>
+                        <a href={`${path.join(__dirname, 'taskinspector', '#' + dependency)}`}>{dependency}</a>
                       </div>
                     )) :
                     '-'

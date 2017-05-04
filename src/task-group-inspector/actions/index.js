@@ -21,12 +21,13 @@ import {
   createTask,
 } from './helper';
 import {queue} from '../lib/utils';
+import path from 'path';
 
 // Modules
 import taskcluster from 'taskcluster-client';
 import slugid from 'slugid';
 import _ from 'lodash';
-import {hashHistory} from 'react-router';
+// import {hashHistory} from 'react-router';
 
 export const setDashboardBanner = msg => ({
   type: SET_DASHBOARD_BANNER,
@@ -57,10 +58,10 @@ export const listTaskGroup = isFetching => ({
 });
 
 /**
-* Get the list of tasks in small steps
-* Set isLimited to true if you want to fetch in steps
-* Set to false otherwise
-*/
+ * Get the list of tasks in small steps
+ * Set isLimited to true if you want to fetch in steps
+ * Set to false otherwise
+ */
 export const fetchTasksInSteps = (taskGroupId, isLimited) => {
   const options = {};
   const limit = 200;
@@ -82,7 +83,6 @@ export const fetchTasksInSteps = (taskGroupId, isLimited) => {
       /* eslint-disable babel/no-await-in-loop */
       try {
         response = await queue.listTaskGroup(taskGroupId, options);
-
         // do not dispatch if taskGroupId changed sometime
         // between the start and end of the async request
         if (taskGroupId !== getState().taskGroup) {
@@ -111,8 +111,8 @@ export const fetchTasksInSteps = (taskGroupId, isLimited) => {
 };
 
 /**
-* Get task definition
-*/
+ * Get task definition
+ */
 export const fetchTask = taskId => async dispatch => {
   try {
     const task = await queue.task(taskId);
@@ -153,10 +153,10 @@ export const fetchStatus = taskId => async dispatch => {
 };
 
 /**
-* Filter the list of tasks by setting the status wanted.
-* The status filter option can be one of the following states:
-* (completed, pending, exception, unscheduled, running, failed)
-*/
+ * Filter the list of tasks by setting the status wanted.
+ * The status filter option can be one of the following states:
+ * (completed, pending, exception, unscheduled, running, failed)
+ */
 export const setActiveTaskStatus = status => ({
   type: ACTIVE_TASK_STATUS,
   payload: status,
@@ -168,8 +168,8 @@ export const activeTaskGroupId = taskGroupId => ({
 });
 
 /**
-* Purge a task
-*/
+ * Purge a task
+ */
 export const purge = (provisionerId, workerType, selectedCaches, successMessage) => {
   // Setup purgeCache
   const purgeCache = localStorage.credentials ?
@@ -211,7 +211,8 @@ export const retriggerTask = (list, toClone, successMessage) => {
     try {
       const response = await queue.createTask(taskId, task);
 
-      hashHistory.push(`${task.taskGroupId}/${response.status.taskId}`);
+      // hashHistory.push(`${task.taskGroupId}/${response.status.taskId}`);
+      history.pushState(`${task.taskGroupId}/${response.status.taskId}`);
       // Update current list of tasks
       dispatch(createTask(list, {task, status: response.status}));
       // Update modal message
@@ -319,7 +320,7 @@ export const loanerCreateTask = (list, id, toClone, successMessage) => {
     try {
       const response = await queue.createTask(taskId, task);
 
-      hashHistory.push(`${task.taskGroupId}/${response.status.taskId}`);
+      this.props.history.push(path.join('/','task-group-inspector', `${task.taskGroupId}/${response.status.taskId}`));
       window.open(`${location.protocol}//${location.host}/one-click-loaner/connect/#${response.status.taskId}`);
 
       // Update current list of tasks

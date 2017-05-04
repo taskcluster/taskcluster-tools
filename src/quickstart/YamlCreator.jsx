@@ -324,7 +324,6 @@ export default class YamlCreator extends React.Component {
             <FormGroup>
               <ControlLabel>Commands: </ControlLabel>
               <select
-                componentClass="select"
                 placeholder="Pick one..."
                 onChange={e => this.handleCommandsSelection(e)}>
                 <option value="standard">Clone repo and run my tests</option>
@@ -351,7 +350,7 @@ export default class YamlCreator extends React.Component {
           <Button
             bsStyle="info"
             className="bottom"
-            disabled="true"
+            disabled={true}
             id="anotherTask">
             <Glyphicon glyph="plus" /> Define another task
           </Button>

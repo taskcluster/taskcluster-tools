@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TaskCreator from './taskcreator';
 import Layout from '../lib/Layout';
 
@@ -22,10 +21,12 @@ const initialTask = {
   },
 };
 
-ReactDOM.render((
+const TaskCreatorView = () => (
   <Layout>
     <TaskCreator
       localStorageKey="task-creator/task"
       initialTaskValue={JSON.stringify(initialTask, null, '\t')} />
   </Layout>
-), document.getElementById('root'));
+);
+
+export default TaskCreatorView;
