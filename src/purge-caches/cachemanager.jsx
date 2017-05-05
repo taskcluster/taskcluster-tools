@@ -1,26 +1,17 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {
   Row, Col, ButtonToolbar, Glyphicon, Table, Button, FormGroup, ControlLabel, FormControl, Alert,
 } from 'react-bootstrap';
-import * as utils from '../lib/utils';
+import {TaskClusterEnhance} from '../lib/utils';
 import * as format from '../lib/format';
 import taskcluster from 'taskcluster-client';
 
-export default React.createClass({
-  displayName: 'CacheManager',
 
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        purgeCaches: taskcluster.PurgeCache,
-      },
-    }),
-  ],
+class CacheManager extends Component {
+  constructor(props) {
+    super(props);
 
-  /** Create an initial state */
-  getInitialState() {
-    return {
+    this.state = {
       caches: null,
       cachesLoaded: false,
       formError: null,
@@ -29,15 +20,45 @@ export default React.createClass({
       formWorkerType: '',
       formCacheName: '',
     };
-  },
 
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+    this.onTaskClusterReload = this.onTaskClusterReload.bind(this);
+    this.load = this.load.bind(this);
+    this.provisionerIdChange = this.provisionerIdChange.bind(this);
+    this.cacheNameChange = this.cacheNameChange.bind(this);
+    this.workerTypeChange = this.workerTypeChange.bind(this);
+    this.dismissError = this.dismissError.bind(this);
+    this.sendRequest = this.sendRequest.bind(this);
+  }
+
+  /** Use TaskClusterEnhance to load caches */
   load() {
-    return {
-      caches: this.purgeCaches
+    const promisedState = {
+      caches: this.props.clients.purgeCaches
         .allPurgeRequests()
         .then(resp => resp.requests),
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    this.setState(detail);
+  }
+
+  onTaskClusterReload() {
+    this.load();
+  }
 
   /** Render the main layout of the cache manager page */
   render() {
@@ -59,7 +80,7 @@ export default React.createClass({
             <Button
               bsSize="sm"
               bsStyle="success"
-              onClick={this.reload}
+              onClick={this.load}
               disabled={!this.state.cachesLoaded}>
               <Glyphicon glyph="refresh" /> Refresh All
             </Button>
@@ -82,11 +103,11 @@ export default React.createClass({
         </Col>
       </Row>
     );
-  },
+  }
 
   renderCachesTable() {
     try {
-      return this.renderWaitFor('caches') || (
+      return this.props.renderWaitFor('caches') || (
         <Table condensed={true} hover={true}>
           <thead>
             <tr>
@@ -97,14 +118,14 @@ export default React.createClass({
             </tr>
           </thead>
           <tbody>
-            {this.state.caches.map(this.renderCacheRow)}
+            {this.state.caches && this.state.caches.map(this.renderCacheRow)}
           </tbody>
         </Table>
-      );
+        );
     } catch (err) {
       this.setState({tableError: err});
     }
-  },
+  }
 
   renderCacheRow(cache, index) {
     return (
@@ -115,7 +136,7 @@ export default React.createClass({
         <td><format.DateView date={cache.before} /></td>
       </tr>
     );
-  },
+  }
 
   renderForm() {
     if (this.state.formError) {
@@ -178,23 +199,23 @@ export default React.createClass({
         </ButtonToolbar>
       </div>
     );
-  },
+  }
 
   provisionerIdChange(event) {
     this.setState({formProvisionerId: event.target.value});
-  },
+  }
 
   workerTypeChange(event) {
     this.setState({formWorkerType: event.target.value});
-  },
+  }
 
   cacheNameChange(event) {
     this.setState({formCacheName: event.target.value});
-  },
+  }
 
   async sendRequest() {
     try {
-      await this.purgeCaches.purgeCache(
+      await this.props.clients.purgeCaches.purgeCache(
         this.state.formProvisionerId,
         this.state.formWorkerType,
         {cacheName: this.state.formCacheName}
@@ -205,13 +226,22 @@ export default React.createClass({
         formWorkerType: '',
         formCacheName: '',
       });
-      this.reload();
+      this.load();
     } catch (err) {
       this.setState({formError: err});
     }
-  },
+  }
 
   dismissError() {
     this.setState({formError: null, tableError: null});
-  },
-});
+  }
+}
+
+const taskclusterOpts = {
+  // Need updated clients for Queue and QueueEvents
+  clients: {
+    purgeCaches: taskcluster.PurgeCache
+  }
+};
+
+export default TaskClusterEnhance(CacheManager, taskclusterOpts);
