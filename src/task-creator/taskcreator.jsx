@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Button, ButtonToolbar, Glyphicon, Row, Col} from 'react-bootstrap';
-import * as utils from '../lib/utils';
+import {TaskClusterEnhance} from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import CodeMirror from 'react-code-mirror';
 import createDebugger from 'debug';
@@ -14,25 +14,31 @@ import './taskcreator.less';
 const debug = createDebugger('taskcreator');
 
 /** Create a task-creator */
-export default React.createClass({
-  displayName: 'TaskCreator',
+class TaskCreator extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        queue: taskcluster.Queue,
-      },
-    }),
-  ],
+    this.state = this.initialState();
 
-  getDefaultProps() {
-    return {
-      localStorageKey: undefined,
-      initialTaskValue: '{}',
-    };
-  },
+    this.handleUpdateTimestamps = this.handleUpdateTimestamps.bind(this);
+    this.handleCreateTask = this.handleCreateTask.bind(this);
+    this.handleReset = this.handleReset.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
 
-  getInitialState() {
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    this.setState(detail);
+  }
+
+  initialState() {
     // Get initial task value
     let task = this.props.initialTaskValue;
 
@@ -54,7 +60,7 @@ export default React.createClass({
       createdTaskIdError: undefined,
       createdTaskId: null,
     });
-  },
+  }
 
   /** Parameterize a task, return state after parameterization attempt */
   parameterizeTask(_task) {
@@ -81,14 +87,14 @@ export default React.createClass({
       task,
       invalidTask,
     };
-  },
+  }
 
   render() {
     // If loaded, then either redirect to task-inspector
     // we'll show errors later if there are errors
     if (this.state.createdTaskIdLoaded) {
       if (!this.state.createdTaskIdError && this.state.createdTaskId) {
-        const link = `/task-inspector/#${this.state.createdTaskId}/`;
+        const link = `/task-inspector/${this.state.createdTaskId}/`;
 
         window.location = link;
 
@@ -118,11 +124,11 @@ export default React.createClass({
           come back and easily try a new variation.
         </p>
         <hr />
-        {this.state.createdTaskIdError ? this.renderError(this.state.createdTaskIdError) : null}
-        {this.state.createdTaskIdLoaded === null ? this.renderSpinner() : this.renderEditor()}
+        {this.state.createdTaskIdError ? this.props.renderError(this.state.createdTaskIdError) : null}
+        {this.state.createdTaskIdLoaded === null ? this.props.renderSpinner() : this.renderEditor()}
       </Col>
     );
-  },
+  }
 
   /** Render task editor */
   renderEditor() {
@@ -155,7 +161,7 @@ export default React.createClass({
         </ButtonToolbar>
       </div>
     );
-  },
+  }
 
   /** Update state when task is modified */
   handleTaskChange(e) {
@@ -172,7 +178,7 @@ export default React.createClass({
       invalidTask,
       task: e.target.value,
     });
-  },
+  }
 
   /** Create task and redirect */
   handleCreateTask() {
@@ -183,7 +189,7 @@ export default React.createClass({
         const taskId = slugid.nice();
         const payload = yaml.safeLoad(task);
 
-        return this.queue
+        return this.props.clients.queue
           .createTask(taskId, payload)
           .then(() => {
             // Save task definition to localStorage
@@ -195,25 +201,32 @@ export default React.createClass({
           });
       });
 
-    // Load state from promise (see TaskClusterMixin)
-    this.loadState({
-      createdTaskId: taskCreated,
-    });
-  },
+    // Load state from promise (see TaskClusterEnhance)
+    this.props.loadState({createdTaskId: taskCreated});
+  }
 
   /** Reset timestamps in the task **/
   handleUpdateTimestamps() {
     // Create task and get taskId of created task
-    // Load state from promise (see TaskClusterMixin)
+    // Load state from promise (see TaskClusterEnhance)
     Promise
       .resolve(this.state.task)
       .then(task => {
         this.setState(this.parameterizeTask(task));
       });
-  },
+  }
 
   /** Reset to initialTaskValue */
   handleReset() {
     this.setState(this.parameterizeTask(this.props.initialTaskValue));
-  },
-});
+  }
+}
+
+const taskclusterOpts = {
+  // Need updated clients for Queue and QueueEvents
+  clients: {
+    queue: taskcluster.Queue
+  }
+};
+
+export default TaskClusterEnhance(TaskCreator, taskclusterOpts);

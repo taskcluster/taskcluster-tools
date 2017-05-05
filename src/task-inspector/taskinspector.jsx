@@ -27,15 +27,15 @@ class TaskInspector extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.bindings = this.bindings.bind(this);
     this.onListenerMessage = this.onListenerMessage.bind(this);
-    this.onTaskclusterReload = this.onTaskclusterReload.bind(this);
+    this.onTaskClusterReload = this.onTaskClusterReload.bind(this);
     this.onWatchStateReload = this.onWatchStateReload.bind(this);
-    this.onTaskclusterUpdate = this.onTaskclusterUpdate.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
   }
 
   /** Setup required event listeners for HOC */
   componentWillMount() {
-    document.addEventListener('taskcluster-update', this.onTaskclusterUpdate, false);
-    document.addEventListener('taskcluster-reload', this.onTaskclusterReload, false);
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
     document.addEventListener('listener-message', this.onListenerMessage, false);
     document.addEventListener('watch-reload', this.onWatchStateReload, false);
 
@@ -58,11 +58,11 @@ class TaskInspector extends React.Component {
     this.props.watchStateProps(this.props);
   }
 
-  onTaskclusterReload() {
+  onTaskClusterReload() {
     this.load();
   }
 
-  onTaskclusterUpdate({detail}) {
+  onTaskClusterUpdate({detail}) {
     this.setState(detail);
   }
 
@@ -82,8 +82,8 @@ class TaskInspector extends React.Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('taskcluster-update', this.onTaskclusterUpdate, false);
-    document.removeEventListener('taskcluster-reload', this.onTaskclusterReload, false);
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.onTaskClusterReload, false);
     document.removeEventListener('listener-message', this.onListenerMessage, false);
     document.removeEventListener('watch-reload', this.onWatchStateReload, false);
   }

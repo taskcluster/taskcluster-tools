@@ -57,10 +57,14 @@ const hasChanged = (paths, obj1, obj2) => {
 /**
  * Logic for loading state using taskcluster-client
  *
- * This component will dispatch the event `taskcluster-reload` when:
+ * This component will dispatch the event
+ * `taskcluster-reload` when:
  *  - `componentDidMount` triggers
  *  - A key in reloadOnKeys changes
  *  - Credentials change given `reloadOnLogin` option is set to true
+ *
+ *  `taskcluster-update` when:
+ *  - state changes i.e., when key is resolved/rejects
  *
  * Implementors can call `loadState({key: promise})` with a mapping from key to promise.
  * example: this.props.loadState({key: promise})
@@ -130,7 +134,7 @@ export const TaskClusterEnhance = (Component, opts) => (
     }
 
     componentDidUpdate(prevProps, prevState) {
-      if (hasChanged(this.options.reloadOnKeys, this.props.match.params, prevProps.match.params)) {
+      if (this.props.match && hasChanged(this.options.reloadOnKeys, this.props.match.params, prevProps.match.params)) {
         this.reload();
       }
     }
@@ -139,7 +143,7 @@ export const TaskClusterEnhance = (Component, opts) => (
     handleCredentialsChanged(e) {
       // Update clients with new credentials
       this._createClients(e.detail);
-      this.setState({createdTaskIdError: null});
+      this.setState({createdTaskIdError: null}, this.updateWrappedState);
 
       if (this.options.reloadOnLogin) {
         // Reload state now that we have new credentials
@@ -313,7 +317,13 @@ export const TaskClusterEnhance = (Component, opts) => (
 
     render() {
       return (
-        <Component {...this.props} clients={this.clients} loadState={this.loadState} renderWaitFor={this.renderWaitFor} />
+        <Component
+          {...this.props}
+          clients={this.clients}
+          loadState={this.loadState}
+          renderWaitFor={this.renderWaitFor}
+          renderError={this.renderError}
+          renderSpinner={this.renderSpinner} />
       )
     }
   }
