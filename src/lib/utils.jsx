@@ -114,9 +114,13 @@ export const TaskClusterEnhance = (Component, opts) => (
       this.clients = {};
       this.state = {};
 
+      this.componentProps = {};
+      this.componentKeys = {};
+
       this.handleCredentialsChanged = this.handleCredentialsChanged.bind(this);
       this.renderWaitFor = this.renderWaitFor.bind(this);
       this.loadState = this.loadState.bind(this);
+      this.taskclusterState = this.taskclusterState.bind(this);
     }
 
     componentWillMount() {
@@ -133,10 +137,15 @@ export const TaskClusterEnhance = (Component, opts) => (
       this.reload();
     }
 
-    componentDidUpdate(prevProps, prevState) {
-      if (this.props.match && hasChanged(this.options.reloadOnKeys, this.props.match.params, prevProps.match.params)) {
+    /** Reload if props/keys change */
+    taskclusterState(keys, props) {
+      if ((keys && hasChanged(this.options.reloadOnKeys, keys, this.componentKeys)) ||
+        (props && hasChanged(this.options.reloadOnProps, props, this.componentProps))) {
         this.reload();
       }
+
+      this.componentKeys = keys;
+      this.componentProps = props;
     }
 
     /** handle changes to credentials */
@@ -320,6 +329,7 @@ export const TaskClusterEnhance = (Component, opts) => (
         <Component
           {...this.props}
           clients={this.clients}
+          taskclusterState={this.taskclusterState}
           loadState={this.loadState}
           renderWaitFor={this.renderWaitFor}
           renderError={this.renderError}
@@ -652,17 +662,23 @@ export const CreateWebListener = (Component, opts) => (
         listeningError: null
       };
 
+      this.componentKeys = {};
+      this.componentProps = {};
+      this.componentBindings = null;
+
       this.handleMessage = this.handleMessage.bind(this);
       this.startListening = this.startListening.bind(this);
       this.stopListening = this.stopListening.bind(this);
+      this.listenerState = this.listenerState.bind(this);
     }
 
     componentDidMount() {
       this.__listener = null;
       this.__bindings = [];
+      this.componentBindings = this.child.bindings;
 
-      if (this.child.bindings instanceof Function) {
-        this.startListening(this.child.bindings());
+      if (this.componentBindings instanceof Function) {
+        this.startListening(this.componentBindings());
       }
     }
 
@@ -671,20 +687,26 @@ export const CreateWebListener = (Component, opts) => (
       this.stopListening();
     }
 
+    listenerState(keys, props) {
+      // No need to check state if this.child.bindings() isn't implemented
+      if (!this.componentBindings instanceof Function) {
+        return;
+      }
+
+      if ((keys && hasChanged(this.options.reloadOnKeys, keys, this.componentKeys) ||
+        (props && hasChanged(this.options.reloadOnProps, props, this.componentProps)))) {
+        this.listenerReload();
+      }
+
+      this.componentKeys = keys;
+      this.componentProps = props;
+
+    }
+
     /** Reload listener if bindings changed */
-    componentDidUpdate(prevProps, prevState) {
-      // No need to check state if this.bindings() isn't implemented
-      if (!(this.child.bindings instanceof Function)) {
-        return;
-      }
-
-      if (!hasChanged(this.options.reloadOnProps, this.props, prevProps) &&
-        !hasChanged(this.options.reloadOnKeys, this.props.match.params, prevProps.match.params)) {
-        return;
-      }
-
+    listenerReload() {
       // Get new bindings
-      const bindings = this.child.bindings();
+      const bindings = this.componentBindings();
 
       // Find bindings removed
       const bindingsRemoved = this.__bindings
@@ -809,7 +831,12 @@ export const CreateWebListener = (Component, opts) => (
     }
 
     render() {
-      return <Component {...this.props} ref={instance => {this.child = instance}} startListening={this.startListening} stopListening={this.stopListening} />;
+      return <Component
+        {...this.props}
+        ref={instance => {this.child = instance}}
+        startListening={this.startListening}
+        stopListening={this.stopListening}
+        listenerState={this.listenerState} />;
     }
   }
 );
@@ -1405,55 +1432,45 @@ export const CreateWatchState = (Component, opts) => (
         this.options.onKeys[key] = parsePaths(paths);
       });
 
-      this.componentPrevProps = {};
-      this.componentProps = {};
       this.componentKeys = {};
+      this.componentProps = {};
 
-      this.watchStateProps = this.watchStateProps.bind(this);
+      this.watchState = this.watchState.bind(this);
     }
 
-    /** Separate component props from component keys and trigger watch handler **/
-    watchStateProps(props) {
-      this.componentKeys = _.cloneDeep(props.match.params);
-      this.componentProps = _.cloneDeep(props);
-
-      // Separate the keys from props
-      delete this.componentProps.match.params;
-
-      this.triggerWatchHandler();
-      this.componentPrevProps = this.componentProps;
-      this.componentPrevKeys = this.componentKeys;
-    }
-
-    /** Check if handlers need to be triggered */
-    triggerWatchHandler() {
+    /** Check if handlers needs to be triggered given keys and props */
+    watchState(keys, props) {
       // Build a list of handlers to call
       const handlers = [];
 
       // Find handlers triggered by state changes
       _.forIn(this.options.onKeys, (paths, method) => {
-        if (!_.includes(handlers, method) && hasChanged(paths, this.componentKeys, this.componentPrevKeys)) {
+        if (!_.includes(handlers, method) && hasChanged(paths, keys, this.componentKeys)) {
           handlers.push(method);
         }
       });
 
       // Find handlers triggered by property changes
       _.forIn(this.options.onProps, (paths, method) => {
-        if (!_.includes(handlers, method) && hasChanged(paths, this.componentProps, this.componentPrevProps)) {
+        if (!_.includes(handlers, method) && hasChanged(paths, props, this.componentProps)) {
           handlers.push(method);
         }
       });
 
-      // Dispatch event in order to invoke handlers
+      // Dispatch event to invoke handlers
       const uniqueHandlers = _.uniq(handlers);
 
       if (uniqueHandlers.length) {
         document.dispatchEvent(new CustomEvent('watch-reload', {detail: uniqueHandlers}));
       }
+
+      // Update previous props & keys
+      this.componentKeys = {...keys};
+      this.componentProps = {...props};
     }
 
     render() {
-      return <Component {...this.props} watchStateProps={this.watchStateProps} />;
+      return <Component {...this.props} watchState={this.watchState} />;
     }
   }
 );
