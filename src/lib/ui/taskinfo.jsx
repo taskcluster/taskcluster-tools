@@ -277,11 +277,7 @@ const TaskInfo = React.createClass({
   },
 
   editTask() {
-    const newTask = {
-      // filled in by task creator on load
-      created: null,
-      deadline: null,
-    };
+    const newTask = {};
     // copy fields from the parent task, intentionally excluding some
     // fields which might cause confusion if left unchanged
     const exclude = [
@@ -289,8 +285,6 @@ const TaskInfo = React.createClass({
       'taskGroupId',
       'schedulerId',
       'priority',
-      'created',
-      'deadline',
       'dependencies',
       'requires',
     ];

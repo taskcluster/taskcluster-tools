@@ -66,7 +66,7 @@ export default React.createClass({
       const nowMs = new Date().getTime();
       const createdMs = new Date(data.created).getTime();
       const offset = nowMs - createdMs;
-      const jsonDate = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+      const jsonDate = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d+)?Z/;
 
       // increment all timestamps in the task by offset
       const iter = obj => {
