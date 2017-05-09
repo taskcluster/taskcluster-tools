@@ -102,6 +102,7 @@ export const TaskClusterEnhance = (Component, opts) => (
         reloadOnProps: [], // List of properties to reload on
         reloadOnKeys: [], // List of state keys to reload on
         reloadOnLogin: false, // Reload when credentials are changed
+        name: '', // Name of wrapped component
         ...opts,
       };
 
@@ -141,7 +142,7 @@ export const TaskClusterEnhance = (Component, opts) => (
     taskclusterState(keys, props) {
       if ((keys && hasChanged(this.options.reloadOnKeys, keys, this.componentKeys)) ||
         (props && hasChanged(this.options.reloadOnProps, props, this.componentProps))) {
-        this.reload();
+        this.reload(this.options.name);
       }
 
       this.componentKeys = keys;
@@ -227,7 +228,7 @@ export const TaskClusterEnhance = (Component, opts) => (
           setLoaded(key, undefined, err || new Error('Unknown Error'));
         }));
 
-      // Return promise all promises are resolved
+      // Return promise when all promises are resolved
       return Promise
         .all(promises)
         .then(() => {})
@@ -236,8 +237,8 @@ export const TaskClusterEnhance = (Component, opts) => (
         });
     }
 
-    reload() {
-      document.dispatchEvent(new CustomEvent('taskcluster-reload'));
+    reload(name) {
+      document.dispatchEvent(new CustomEvent('taskcluster-reload', {detail: {name}}));
     }
 
     updateWrappedState() {
