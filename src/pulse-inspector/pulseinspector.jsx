@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {findDOMNode} from 'react-dom';
 import {
   Row, Col, ButtonToolbar, Button, Glyphicon, Table, Alert,
   FormGroup, FormControl, ControlLabel,
 } from 'react-bootstrap';
 import qs from 'qs';
-import * as utils from '../lib/utils';
+import {CreateWebListener} from '../lib/utils';
 import _ from 'lodash';
 import JSONInspector from 'react-json-inspector';
 import slugid from 'slugid';
@@ -22,7 +22,13 @@ import './pulseinspector.less';
  * Note, this relies on message._idForInspector to decide when to update.
  * In general there is no reason to reuse these instances.
  */
-const MessageRow = React.createClass({
+class MessageRow extends Component {
+  constructor(props) {
+    super(props);
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
   /** Only update when strictly necessary */
   shouldComponentUpdate(nextProps) {
     // Just compare the _idForInspector
@@ -31,7 +37,13 @@ const MessageRow = React.createClass({
     }
 
     return this.props.expanded !== nextProps.expanded;
-  },
+  }
+
+  /** handleClick */
+  handleClick() {
+    // Do this indirectly so we don't have to render if the event handler changes
+    this.props.onClick();
+  }
 
   /** Render a message row*/
   render() {
@@ -66,42 +78,22 @@ const MessageRow = React.createClass({
               </dd>
             ) : null}
           </dl>
-          <JSONInspector data={message.payload} />
+          <JSONInspector data={message.payload}/>
           <br />
         </td>
       </tr>
     );
-  },
+  }
+}
 
-  /** handleClick */
-  handleClick() {
-    // Do this indirectly so we don't have to render if the event handler changes
-    this.props.onClick();
-  },
-});
+class PulseInspector extends Component {
+  constructor(props) {
+    super(props);
 
-export default React.createClass({
-  displayName: 'PulseInspector',
-
-  /** Initialize mixins */
-  mixins: [
-    utils.createWebListenerMixin({
-      reloadOnKeys: ['bindings', 'doListen'],
-    })
-  ],
-
-  getDefaultProps() {
-    return {
-      hashIndex: 0,
-    };
-  },
-
-  /** Create initial state */
-  getInitialState() {
     const query = qs.parse(this.props.location.search.slice(1));
     const bindings = Object.keys(query).map(key => query[key]);
 
-    return {
+    this.state = {
       doListen: false, // Do start listening
       bindings, // List of bindings
       messages: [], // List of messages received
@@ -109,7 +101,29 @@ export default React.createClass({
       listening: false, // State of listening, set by WebListenerMixin
       listeningError: null, // Listening error set by WebListenerMixin
     };
-  },
+
+    this.bindings = this.bindings.bind(this);
+    this.createDownload = this.createDownload.bind(this);
+    this.clearBindings = this.clearBindings.bind(this);
+    this.addBinding = this.addBinding.bind(this);
+    this.dontListen = this.dontListen.bind(this);
+    this.doListen = this.doListen.bind(this);
+    this.dismissListeningError = this.dismissListeningError.bind(this);
+    this.onListenerMessage = this.onListenerMessage.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('listener-message', this.onListenerMessage, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('listener-message', this.onListenerMessage, false);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // Send keys to higher order component
+    this.props.listenerState(this.state, this.props);
+  }
 
   /** Render User Interface */
   render() {
@@ -130,7 +144,7 @@ export default React.createClass({
           </p>
           <hr />
           {this.renderForm()}
-          {this.state.listeningError ? this.renderListeningError() : null}
+          {this.props.listeningError ? this.renderListeningError() : null}
           <hr />
           <ButtonToolbar className="pull-right">
             <Button
@@ -163,7 +177,7 @@ export default React.createClass({
         </Col>
       </Row>
     );
-  },
+  }
 
   createDownload() {
     const params = btoa(JSON.stringify(this.state.messages.map(message => _.pick(
@@ -171,13 +185,13 @@ export default React.createClass({
     ), null, 2));
 
     this.refs.downloadLink.href = `data:application/json;base64,${params}`;
-  },
+  }
 
   /** Clear all bindings */
   clearBindings() {
     this.setState({bindings: [], doListen: false});
     this.props.history.push(this.props.location.pathname);
-  },
+  }
 
   /** Render list of bindings */
   renderBindings() {
@@ -195,7 +209,7 @@ export default React.createClass({
         ))}
       </ul>
     );
-  },
+  }
 
   renderForm() {
     return (
@@ -225,10 +239,10 @@ export default React.createClass({
               <Button
                 bsStyle="primary"
                 onClick={this.addBinding}
-                disabled={this.state.listening === null}>
+                disabled={this.props.listening === null}>
                 <Glyphicon glyph="plus" /> Add binding
               </Button>
-              {this.state.listening ? (
+              {this.props.listening ? (
                 <Button bsStyle="danger" onClick={this.dontListen}>
                   <Glyphicon glyph="stop" /> Stop Listening
                 </Button>
@@ -236,7 +250,7 @@ export default React.createClass({
                 <Button
                   bsStyle="success"
                   onClick={this.doListen}
-                  disabled={this.state.listening === null}>
+                  disabled={this.props.listening === null}>
                   <Glyphicon glyph="play" /> Start Listening
                 </Button>
               )}
@@ -245,7 +259,7 @@ export default React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
   /** Add binding to list of bindings and update URL */
   addBinding() {
@@ -257,28 +271,29 @@ export default React.createClass({
 
     this.setState({bindings: this.state.bindings.concat([binding])});
     this.props.history.push(`${this.props.location.pathname}?${qs.stringify(newBindings)}`);
-  },
+  }
 
   dontListen() {
     this.setState({doListen: false});
-  },
+  }
 
   doListen() {
     this.setState({doListen: true});
-  },
+  }
 
   /** return bindings for WebListenerMixin */
   bindings() {
     return !this.state.doListen ? [] : this.state.bindings;
-  },
+  }
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
-  handleMessage(message) {
+  onListenerMessage({detail}) {
+    console.log('message: ', detail);
     this.setState({messages: [{
-      ...message,
+      ...detail,
       _idForInspector: slugid.nice(),
     }].concat(this.state.messages)});
-  },
+  }
 
   /** Render table of messages */
   renderMessages() {
@@ -287,49 +302,58 @@ export default React.createClass({
     return (
       <Table condensed={true} hover={true}>
         <thead>
-          <tr>
-            <th>Exchange</th>
-            <th>Routing Key</th>
-          </tr>
+        <tr>
+          <th>Exchange</th>
+          <th>Routing Key</th>
+        </tr>
         </thead>
         <tbody>
-          {this.state.messages.map(message => {
-            const msgId = message._idForInspector;
-            const expanded = msgId === expandedMsgId;
+        {this.state.messages.map(message => {
+          const msgId = message._idForInspector;
+          const expanded = msgId === expandedMsgId;
 
-            return (
-              <MessageRow
-                key={msgId}
-                expanded={expanded}
-                message={message}
-                onClick={this.expandMessage.bind(this, msgId)} />
-            );
-          })}
+          return (
+            <MessageRow
+              key={msgId}
+              expanded={expanded}
+              message={message}
+              onClick={this.expandMessage.bind(this, msgId)} />
+          );
+        })}
         </tbody>
       </Table>
     );
-  },
+  }
 
   /** Set expended message, note we rely on object reference comparison here */
   expandMessage(idForInspector) {
     this.setState({expandedMessage: idForInspector});
-  },
+  }
 
   /** Render a listening error */
   renderListeningError() {
     return (
       <Alert bsStyle="danger" onDismiss={this.dismissListeningError}>
-        <strong>Listening Error,</strong> {this.state.listeningError.message}
+        <strong>Listening Error,</strong> {this.props.listeningError.message}
       </Alert>
     );
-  },
+  }
 
   /** Dismiss a listening error, basically reset error state */
   dismissListeningError() {
     this.setState({listeningError: null});
 
-    if (!this.state.listening) {
+    if (!this.props.listening) {
       this.setState({doListen: false});
     }
-  },
-});
+  }
+}
+
+PulseInspector.defaultProps = {hashIndex: 0};
+
+// Listen for messages, reload bindings() when state.taskId changes
+const webListenerOpts = {
+  reloadOnKeys: ['bindings', 'doListen']
+};
+
+export default CreateWebListener(PulseInspector, webListenerOpts);

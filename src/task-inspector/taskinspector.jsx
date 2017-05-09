@@ -28,7 +28,7 @@ class TaskInspector extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.bindings = this.bindings.bind(this);
     this.onListenerMessage = this.onListenerMessage.bind(this);
-    this.onTaskClusterReload = this.onTaskClusterReload.bind(this);
+    this.load = this.load.bind(this);
     this.onWatchReload = this.onWatchReload.bind(this);
     this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
   }
@@ -36,12 +36,20 @@ class TaskInspector extends React.Component {
   /** Setup required event listeners for HOC */
   componentWillMount() {
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
-    document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
     document.addEventListener('listener-message', this.onListenerMessage, false);
     document.addEventListener('watch-reload', this.onWatchReload, false);
 
     // Send props to CreateWatchState here in order to trigger on mount.
     this.props.watchState(this.state, this.props);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    // Send props and keys to each higher order component
+    this.props.watchState(this.state, this.props);
+    this.props.taskclusterState(this.state, this.props);
+    this.props.listenerState(this.state, this.props);
   }
 
   /** Use TaskClusterEnhance to load taskId */
@@ -55,18 +63,6 @@ class TaskInspector extends React.Component {
     const promisedState = {status: this.props.clients.queue.status(taskId).then(_.property('status'))};
 
     this.props.loadState(promisedState);
-  }
-
-  /** Send new props to CreateWatchState */
-  componentDidUpdate(prevProps, prevState) {
-    // Send props and keys to each higher order component
-    this.props.watchState(this.state, this.props);
-    this.props.taskclusterState(this.state, this.props);
-    this.props.listenerState(this.state, this.props);
-  }
-
-  onTaskClusterReload() {
-    this.load();
   }
 
   onTaskClusterUpdate({detail}) {
@@ -90,7 +86,7 @@ class TaskInspector extends React.Component {
 
   componentWillUnmount() {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
-    document.removeEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
     document.removeEventListener('listener-message', this.onListenerMessage, false);
     document.removeEventListener('watch-reload', this.onWatchReload, false);
   }

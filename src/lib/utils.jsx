@@ -659,7 +659,7 @@ export const CreateWebListener = (Component, opts) => (
       this.options.reloadOnKeys = parsePaths(this.options.reloadOnKeys);
 
       this.state = {
-        listening: null,
+        listening: false,
         listeningError: null
       };
 
@@ -834,6 +834,7 @@ export const CreateWebListener = (Component, opts) => (
     render() {
       return <Component
         {...this.props}
+        {...this.state}
         ref={instance => {this.child = instance}}
         startListening={this.startListening}
         stopListening={this.stopListening}
