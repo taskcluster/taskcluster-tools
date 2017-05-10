@@ -78,7 +78,7 @@ class MessageRow extends Component {
               </dd>
             ) : null}
           </dl>
-          <JSONInspector data={message.payload}/>
+          <JSONInspector data={message.payload} />
           <br />
         </td>
       </tr>
@@ -288,7 +288,6 @@ class PulseInspector extends Component {
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
   onListenerMessage({detail}) {
-    console.log('message: ', detail);
     this.setState({messages: [{
       ...detail,
       _idForInspector: slugid.nice(),
@@ -308,18 +307,18 @@ class PulseInspector extends Component {
         </tr>
         </thead>
         <tbody>
-        {this.state.messages.map(message => {
-          const msgId = message._idForInspector;
-          const expanded = msgId === expandedMsgId;
+          {this.state.messages.map(message => {
+            const msgId = message._idForInspector;
+            const expanded = msgId === expandedMsgId;
 
-          return (
-            <MessageRow
-              key={msgId}
-              expanded={expanded}
-              message={message}
-              onClick={this.expandMessage.bind(this, msgId)} />
-          );
-        })}
+            return (
+              <MessageRow
+                key={msgId}
+                expanded={expanded}
+                message={message}
+                onClick={this.expandMessage.bind(this, msgId)} />
+            );
+          })}
         </tbody>
       </Table>
     );
