@@ -4,9 +4,9 @@ import IndexBrowser from './indexbrowser';
 import EntryView from './entryview';
 import Layout from '../lib/Layout';
 
-const IndexBrowserView = () => (
+const IndexBrowserView = ({match}) => (
   <Layout>
-    <Route path={`/index/:ns?/`} render={props => <IndexBrowser entryView={EntryView} {...props} />} />
+    <Route path={`${match.url}/:ns?`} render={props => <IndexBrowser entryView={EntryView} {...props} />} />
   </Layout>
 );
 

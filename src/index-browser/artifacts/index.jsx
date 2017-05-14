@@ -4,9 +4,9 @@ import IndexBrowser from '../indexbrowser';
 import EntryView from './entryview';
 import Layout from '../../lib/Layout';
 
-const IndexArtifactBrowser = () => (
+const IndexArtifactBrowser = ({match}) => (
   <Layout>
-    <Route path={`/index/artifacts/:ns?`} render={props => <IndexBrowser entryView={EntryView} {...props} />} />
+    <Route path={`${match.url}/:ns?`} render={props => <IndexBrowser entryView={EntryView} {...props} />} />
   </Layout>
 );
 

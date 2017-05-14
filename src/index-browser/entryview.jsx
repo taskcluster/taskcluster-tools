@@ -1,49 +1,60 @@
-import React from 'react';
-import * as utils from '../lib/utils';
+import React, {Component} from 'react';
+import {TaskClusterEnhance} from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import * as format from '../lib/format';
 import JSONInspector from 'react-json-inspector';
 import './entryview.less';
 
-export default React.createClass({
-  displayName: 'EntryView',
+class EntryView extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    // Calls load()
-    utils.createTaskClusterMixin({
-      clients: {
-        index: taskcluster.Index,
-      },
-      // Reload when props.namespace changes, ignore credentials changes
-      reloadOnProps: ['namespace'],
-      reloadOnLogin: false,
-    }),
-  ],
-
-  propTypes: {
-    namespace: React.PropTypes.string.isRequired,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       task: null,
       taskError: null,
-      taskLoaded: false,
+      taskLoaded: false
     };
-  },
 
-  load() {
-    if (this.props.namespace === '') {
-      return {
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    this.setState(detail);
+  }
+
+  load(data) {
+    if (data && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    const promisedState = this.props.namespace === '' ?
+      {
         task: null,
         taskError: null,
         taskLoaded: true,
+      } :
+      {
+        task: this.props.clients.index.findTask(this.props.namespace),
       };
-    }
-    return {
-      task: this.index.findTask(this.props.namespace),
-    };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   render() {
     return (
@@ -58,18 +69,18 @@ export default React.createClass({
               No task is indexed under <code>{this.props.namespace}</code>.
             </div>
           ) :
-          this.renderWaitFor('task') || this.renderTask()
+          this.props.renderWaitFor('task') || this.renderTask()
         }
       </div>
     );
-  },
+  }
 
   renderTask() {
     if (!this.state.task) {
       return;
     }
 
-    const inspectLink = `https://tools.taskcluster.net/task-inspector/#${this.state.task.taskId}/`;
+    const inspectLink = `https://tools.taskcluster.net/task-inspector/${this.state.task.taskId}/`;
 
     return (
       <div>
@@ -94,5 +105,19 @@ export default React.createClass({
         </dl>
       </div>
     );
+  }
+}
+
+const taskclusterOpts = {
+  clients: {
+    index: taskcluster.Index,
   },
-});
+  // Reload when props.namespace changes, ignore credentials changes
+  reloadOnProps: ['namespace'],
+  reloadOnLogin: false,
+  name: EntryView.name
+};
+
+EntryView.propTypes = {namespace: React.PropTypes.string.isRequired};
+
+export default TaskClusterEnhance(EntryView, taskclusterOpts);
