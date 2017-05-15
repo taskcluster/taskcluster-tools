@@ -1,5 +1,5 @@
-import React from 'react';
-import * as utils from '../utils';
+import React, {Component} from 'react';
+import {TaskClusterEnhance} from '../utils';
 import taskcluster from 'taskcluster-client';
 import * as auth from '../auth';
 
@@ -96,39 +96,30 @@ const getIconFromMime = contentType => {
 };
 
 /** Displays a list of artifacts */
-export default React.createClass({
-  displayName: 'ArtifactList',
+class ArtifactList extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue
-      clients: {
-        queue: taskcluster.Queue,
-      },
-      // Reload when taskId changes or runId
-      reloadOnProps: ['taskId', 'runId', 'indexNamespace', 'artifacts'],
-      reloadOnLogin: true,
-    }),
-  ],
-
-  // Validate properties
-  propTypes: {
-    artifacts: React.PropTypes.array.isRequired,
-    taskId: React.PropTypes.string.isRequired,
-    // If not provided, latestArtifact is used
-    runId: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
-    ]),
-  },
-
-  /** Get initial state */
-  getInitialState() {
-    return {
+    this.state = {
       // list of artifacts with url built
       artifacts: [],
     };
-  },
+
+    this.load = this.load.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-reload', this.load, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
 
   /** Build the right url for artifacts */
   load() {
@@ -160,15 +151,15 @@ export default React.createClass({
         // If we have credentials we create a signed URL; note that signed URLs always point to the
         // task directly, as they are not useful for users copy/pasting
         if (this.props.runId != null) {
-          url = this.queue.buildSignedUrl(
-            this.queue.getArtifact,
+          url = this.props.clients.queue.buildSignedUrl(
+            this.props.clients.queue.getArtifact,
             this.props.taskId,
             this.props.runId,
             artifact.name
           );
         } else {
-          url = this.queue.buildSignedUrl(
-            this.queue.getLatestArtifact,
+          url = this.props.clients.queue.buildSignedUrl(
+            this.props.clients.queue.getLatestArtifact,
             this.props.taskId,
             artifact.name
           );
@@ -182,15 +173,17 @@ export default React.createClass({
         icon = 'lock';
       }
 
-      return {
+      const promisedState = {
         url,
         icon,
-        name: artifact.name,
+        name: artifact.name
       };
+
+      return this.props.loadState(promisedState);
     });
 
     this.setState({artifacts});
-  },
+  }
 
   render() {
     return (
@@ -203,5 +196,28 @@ export default React.createClass({
         ))}
       </div>
     );
+  }
+}
+
+ArtifactList.propTypes = {
+  artifacts: React.PropTypes.array.isRequired,
+  taskId: React.PropTypes.string.isRequired,
+  // If not provided, latestArtifact is used
+  runId: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.number,
+  ])
+};
+
+const taskclusterOpts = {
+  // Need updated clients for Queue
+  clients: {
+    queue: taskcluster.Queue,
   },
-});
+  // Reload when taskId changes or runId
+  reloadOnProps: ['taskId', 'runId', 'indexNamespace', 'artifacts'],
+  reloadOnLogin: true,
+  name: ArtifactList.name
+};
+
+export default TaskClusterEnhance(ArtifactList, taskclusterOpts);
