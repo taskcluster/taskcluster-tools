@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Button, Table, Label} from 'react-bootstrap';
 import ConfirmAction from './confirmaction';
 import LoanerButton from './loaner-button';
@@ -8,22 +8,19 @@ import path from 'path';
 import './taskinfo.less';
 
 /** Displays information about a task in a tab page */
-const TaskInfo = React.createClass({
-  // Validate properties
-  propTypes: {
-    status: React.PropTypes.object.isRequired,
-    task: React.PropTypes.object.isRequired,
-  },
+class TaskInfo extends Component {
+  constructor(props) {
+    super(props);
 
-  getInitialState() {
-    return {
-      showRunLocallyScript: false,
-    };
-  },
+    this.state = {showRunLocallyScript: false};
+
+    this.editTask = this.editTask.bind(this);
+    this.handleRunLocally = this.handleRunLocally.bind(this);
+  }
 
   handleRunLocally() {
     this.setState({showRunLocallyScript: !this.state.showRunLocallyScript});
-  },
+  }
 
   render() {
     const {status, task} = this.props;
@@ -136,14 +133,16 @@ const TaskInfo = React.createClass({
               <td>
                 <table className="tag-table">
                   <tr>
-                    <th>Tag</th><th>Value</th>
+                    <th>Tag</th>
+                    <th>Value</th>
                   </tr>
                   {
                     Object
                       .entries(task.tags)
                       .map(([key, value]) => (
                         <tr key={key}>
-                          <td>{key}</td><td>{value}</td>
+                          <td>{key}</td>
+                          <td>{value}</td>
                         </tr>
                       ))
                   }
@@ -216,7 +215,7 @@ const TaskInfo = React.createClass({
               </td>
             </tr>
 
-            {Object.keys(task.extra).length > 0 && ( 
+            {Object.keys(task.extra).length > 0 && (
               <tr>
                 <td>Extra</td>
                 <td>
@@ -270,11 +269,7 @@ const TaskInfo = React.createClass({
         </Table>
       </div>
     );
-  },
-
-  rerunTask() {
-    return this.queue.rerunTask(this.props.status.taskId);
-  },
+  }
 
   editTask() {
     const newTask = {
@@ -306,7 +301,7 @@ const TaskInfo = React.createClass({
 
     // ..and go there
     window.location.href = '../task-creator';
-  },
+  }
 
   /** Render script illustrating how to run locally */
   renderRunLocallyScript() {
@@ -345,7 +340,7 @@ const TaskInfo = React.createClass({
       const imagePath = payload.image.path;
       const imageTaskId = payload.image.taskId;
       const ext = path.extname(payload.image.path);
-      
+
       imagePullCmds.push('# Image appears to be a task image');
       imagePullCmds.push('# Download image tarball from task');
       if (ext === '.zst') {
@@ -493,7 +488,12 @@ const TaskInfo = React.createClass({
     cmds.push('docker rm -v "${container_name}"');
 
     return cmds.join('\n');
-  },
-});
+  }
+}
+
+TaskInfo.propTypes = {
+  status: React.PropTypes.object.isRequired,
+  task: React.PropTypes.object.isRequired
+};
 
 export default TaskInfo;

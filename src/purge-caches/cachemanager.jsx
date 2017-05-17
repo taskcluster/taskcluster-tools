@@ -241,7 +241,8 @@ const taskclusterOpts = {
   // Need updated clients for Queue and QueueEvents
   clients: {
     purgeCaches: taskcluster.PurgeCache
-  }
+  },
+  name: CacheManager.name
 };
 
 export default TaskClusterEnhance(CacheManager, taskclusterOpts);

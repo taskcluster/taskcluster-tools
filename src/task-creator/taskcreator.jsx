@@ -226,7 +226,8 @@ const taskclusterOpts = {
   // Need updated clients for Queue and QueueEvents
   clients: {
     queue: taskcluster.Queue
-  }
+  },
+  name: TaskCreator.name
 };
 
 export default TaskClusterEnhance(TaskCreator, taskclusterOpts);

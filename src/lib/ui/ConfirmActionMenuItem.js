@@ -1,43 +1,41 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Button, Glyphicon, Modal} from 'react-bootstrap';
-import * as utils from '../utils';
+import {TaskClusterEnhance} from '../utils';
 
 /** Button with an associated confirm dialog */
-const ConfirmAction = React.createClass({
-  mixins: [
-    // We use loadState to execute the action asynchronously
-    utils.createTaskClusterMixin(),
-  ],
+class ConfirmActionMenuItem extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    // Button size, style, glyph and disabled
-    buttonSize: React.PropTypes.string,
-    buttonStyle: React.PropTypes.string.isRequired,
-    disabled: React.PropTypes.bool.isRequired,
-    glyph: React.PropTypes.string.isRequired,
-    label: React.PropTypes.string.isRequired,
-    // Text explaining action and success text for successful action
-    children: React.PropTypes.node.isRequired,
-    success: React.PropTypes.string.isRequired,
-    // Function executing action, returns promise
-    action: React.PropTypes.func.isRequired,
-  },
+    this.state = this.initialState();
 
-  getDefaultProps() {
-    return {
-      disabled: false,
-    };
-  },
+    this.openDialog = this.openDialog.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
+    this.executeAction = this.executeAction.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
 
-  getInitialState() {
+  initialState() {
     return {
       showDialog: false,
       executing: false,
       resultLoaded: false,
       resultError: null,
-      result: null,
-    };
-  },
+      result: null
+    }
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    this.setState(detail);
+  }
 
   render() {
     return (
@@ -50,7 +48,7 @@ const ConfirmAction = React.createClass({
         {this.renderDialog()}
       </Button>
     );
-  },
+  }
 
   renderDialog() {
     return (
@@ -66,7 +64,7 @@ const ConfirmAction = React.createClass({
                 <hr />
                 <h4>Status</h4>
                 <span>
-                  {this.renderWaitFor('result') || this.props.success}
+                  {this.props.renderWaitFor('result') || this.props.success}
                 </span>
               </div>
             ) :
@@ -91,27 +89,46 @@ const ConfirmAction = React.createClass({
         </Modal.Footer>
       </Modal>
     );
-  },
+  }
 
   openDialog() {
     this.setState({showDialog: true});
-  },
+  }
 
   closeDialog() {
-    this.setState(this.getInitialState());
-  },
+    this.setState(this.initialState());
+  }
 
   /** Execute asynchronous action */
   executeAction() {
-    this.loadState({
+    this.props.loadState({
       executing: true,
       result: (async () => {
         const result = await this.props.action();
+
         this.setState({executing: false});
+
         return result;
       })(),
     });
-  },
-});
+  }
+}
 
-export default ConfirmAction;
+ConfirmActionMenuItem.propTypes = {
+  // Button size, style, glyph and disabled
+  buttonSize: React.PropTypes.string,
+  buttonStyle: React.PropTypes.string.isRequired,
+  disabled: React.PropTypes.bool.isRequired,
+  glyph: React.PropTypes.string.isRequired,
+  label: React.PropTypes.string.isRequired,
+  // Text explaining action and success text for successful action
+  children: React.PropTypes.node.isRequired,
+  success: React.PropTypes.string.isRequired,
+  // Function executing action, returns promise
+  action: React.PropTypes.func.isRequired
+};
+
+ConfirmActionMenuItem.defaultProps = {disabled: false};
+
+// TaskClusterEnhance is used so we can use loadState to execute the action asynchronously
+export default TaskClusterEnhance(ConfirmActionMenuItem);

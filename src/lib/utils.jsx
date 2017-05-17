@@ -135,18 +135,20 @@ export const TaskClusterEnhance = (Component, opts) => (
       // Listen for changes to credentials
       window.addEventListener('credentials-changed', this.handleCredentialsChanged, false);
       // Initial load
-      this.reload();
+      // this.reload();
     }
 
     /** Reload if props/keys change */
     taskclusterState(keys, props) {
       if ((keys && hasChanged(this.options.reloadOnKeys, keys, this.componentKeys)) ||
         (props && hasChanged(this.options.reloadOnProps, props, this.componentProps))) {
+
+        this.componentKeys = keys;
+        this.componentProps = props;
+
         this.reload(this.options.name);
       }
 
-      this.componentKeys = keys;
-      this.componentProps = props;
     }
 
     /** handle changes to credentials */
@@ -164,6 +166,15 @@ export const TaskClusterEnhance = (Component, opts) => (
     /** Stop listening for events */
     componentWillUnmount() {
       window.removeEventListener('credentials-changed', this.handleCredentialsChanged, false);
+    }
+
+    /** Re-render component only if URL changes */
+    shouldComponentUpdate(nextProps, nextState) {
+      if (this.props.match && !_.eq(this.props.match.url, nextProps.match.url)) {
+        return true;
+      }
+
+      return false;
     }
 
     /** Load state from a map from property to promise */
@@ -681,6 +692,15 @@ export const CreateWebListener = (Component, opts) => (
       if (this.componentBindings instanceof Function) {
         this.startListening(this.componentBindings());
       }
+    }
+
+    /** Re-render component only if URL changes */
+    shouldComponentUpdate(nextProps, nextState) {
+      if (this.props.match && !_.eq(this.props.match.url, nextProps.match.url)) {
+        return true;
+      }
+
+      return false;
     }
 
     /** Stop listening */
@@ -1438,6 +1458,15 @@ export const CreateWatchState = (Component, opts) => (
       this.componentProps = {};
 
       this.watchState = this.watchState.bind(this);
+    }
+
+    /** Re-render component only if URL changes */
+    shouldComponentUpdate(nextProps, nextState) {
+      if (this.props.match && !_.eq(this.props.match.url, nextProps.match.url)) {
+        return true;
+      }
+
+      return false;
     }
 
     /** Check if handlers needs to be triggered given keys and props */

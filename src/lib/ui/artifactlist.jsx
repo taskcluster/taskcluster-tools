@@ -102,7 +102,7 @@ class ArtifactList extends Component {
 
     this.state = {
       // list of artifacts with url built
-      artifacts: [],
+      artifacts: this.props.artifacts || [],
     };
 
     this.load = this.load.bind(this);
@@ -122,7 +122,11 @@ class ArtifactList extends Component {
   }
 
   /** Build the right url for artifacts */
-  load() {
+  load(data) {
+    if (data && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     // Build the Urls where so that they'll be updated, if when people login
     // with credentials
     const artifacts = this.props.artifacts.map(artifact => {
@@ -173,13 +177,11 @@ class ArtifactList extends Component {
         icon = 'lock';
       }
 
-      const promisedState = {
+      return {
         url,
         icon,
         name: artifact.name
       };
-
-      return this.props.loadState(promisedState);
     });
 
     this.setState({artifacts});

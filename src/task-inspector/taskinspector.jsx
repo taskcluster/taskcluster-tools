@@ -42,6 +42,7 @@ class TaskInspector extends React.Component {
 
     // Send props to CreateWatchState here in order to trigger on mount.
     this.props.watchState(this.state, this.props);
+    this.load();
   }
 
   /** Update values for reloadOnProps and reloadOnKeys */
@@ -53,7 +54,11 @@ class TaskInspector extends React.Component {
   }
 
   /** Use TaskClusterEnhance to load taskId */
-  load() {
+  load(data) {
+    if (data && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     const taskId = this.props.match.params.taskId;
 
     if (!taskId) {
@@ -79,8 +84,8 @@ class TaskInspector extends React.Component {
 
     // If the message origins from the artifact create exchange, we should
     // notify our children
-    if (detail.exchange === this.props.clients.queueEvents.artifactCreated().exchange && this.refs.taskView) {
-      this.refs.taskView.handleArtifactCreatedMessage(detail);
+    if (detail.exchange === this.props.clients.queueEvents.artifactCreated().exchange && this.taskViewRef) {
+      this.taskViewRef.handleArtifactCreatedMessage(detail);
     }
   }
 
@@ -90,7 +95,6 @@ class TaskInspector extends React.Component {
     document.removeEventListener('listener-message', this.onListenerMessage, false);
     document.removeEventListener('watch-reload', this.onWatchReload, false);
   }
-
 
   bindings() {
     const taskId = this.props.match.params.taskId;
@@ -117,8 +121,8 @@ class TaskInspector extends React.Component {
 
 
   getTitle() {
-    if (this.refs.taskView && this.refs.taskView.state.task) {
-      return this.refs.taskView.state.task.metadata.name;
+    if (this.taskViewRef && this.taskViewRef.state.task) {
+      return this.taskViewRef.state.task.metadata.name;
     }
 
     return 'Task Inspector';
@@ -177,7 +181,7 @@ class TaskInspector extends React.Component {
             {
               taskId && this.props.renderWaitFor('status') || (this.state.status && (
                 <TaskView
-                  ref="taskView"
+                  ref={instance => {this.taskViewRef = instance}}
                   status={this.state.status}
                   {...this.props} />
               ))
@@ -211,7 +215,8 @@ const taskclusterOpts = {
   },
   // Reload when props.match.params.taskId changes, ignore credential changes
   reloadOnKeys: ['taskId'],
-  reloadOnLogin: false
+  reloadOnLogin: false,
+  name: TaskInspector.name
 };
 
 // Listen for messages, reload bindings() when state.taskId changes
