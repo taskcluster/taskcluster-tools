@@ -32,6 +32,8 @@ class SecretManager extends Component {
   componentWillMount() {
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
     document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
   }
 
   componentWillUnmount() {
@@ -41,7 +43,7 @@ class SecretManager extends Component {
 
   load(data) {
     // A component may have nested components. `data.detail.name` will identify
-    // which component (possibly nested) needs to load.
+    // which component (possibly nested) needs to reload.
     if (data && data.detail.name && data.detail.name !== this.constructor.name) {
       return;
     }
