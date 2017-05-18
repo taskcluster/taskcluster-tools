@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Layout from '../lib/Layout';
 import {hterm, lib} from 'hterm-umd';
 import url from 'url';
@@ -13,11 +12,13 @@ const args = qs.parse(url.parse(window.location.href).query);
 // Set default storage engine for hterm
 hterm.defaultStorage = new lib.Storage.Local();
 
-ReactDOM.render((
+const Terminal = () => (
   <Layout>
-    <div id="terminal" />
+    <div id="terminal"></div>
   </Layout>
-), document.getElementById('root'));
+);
+
+export default Terminal;
 
 const term = new hterm.Terminal('interactive');
 
@@ -102,4 +103,10 @@ term.onTerminalReady = async () => {
   client.stderr.resume();
 };
 
-term.decorate(document.getElementById('terminal'));
+const decorate = () => {
+  console.log('terminal');
+  term.decorate(document.getElementById('terminal'));
+};
+
+setTimeout(decorate, 3000);
+
