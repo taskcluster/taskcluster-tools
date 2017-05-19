@@ -34,7 +34,11 @@ class ConfirmAction extends Component {
   }
 
   onTaskClusterUpdate({detail}) {
-    this.setState(detail);
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
   }
 
   render() {
@@ -130,5 +134,9 @@ ConfirmAction.propTypes = {
 
 ConfirmAction.defaultProps = {disabled: false};
 
+const taskclusterOpts = {
+  name: ConfirmAction.name
+};
+
 // TaskClusterEnhance is used so we can use loadState to execute the action asynchronously
-export default TaskClusterEnhance(ConfirmAction);
+export default TaskClusterEnhance(ConfirmAction, taskclusterOpts);

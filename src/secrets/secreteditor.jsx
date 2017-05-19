@@ -52,13 +52,17 @@ class SecretEditor extends Component {
   }
 
   onTaskClusterUpdate({detail}) {
-    this.setState(detail);
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
   }
 
   load(data) {
     // A component may have nested components. `data.detail.name` will identify
     // which component (possibly nested) needs to load.
-    if (data && data.detail.name && data.detail.name !== this.constructor.name) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
       return;
     }
 

@@ -53,7 +53,11 @@ class CacheManager extends Component {
   }
 
   onTaskClusterUpdate({detail}) {
-    this.setState(detail);
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
   }
 
   onTaskClusterReload() {

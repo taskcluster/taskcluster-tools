@@ -123,7 +123,7 @@ class ArtifactList extends Component {
 
   /** Build the right url for artifacts */
   load(data) {
-    if (data && data.detail.name && data.detail.name !== this.constructor.name) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
       return;
     }
 

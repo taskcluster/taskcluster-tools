@@ -5,9 +5,9 @@ import Layout from '../lib/Layout';
 
 const PROVISIONER_ID = 'aws-provisioner-v1';
 
-const awsProvisioner = () => (
+const awsProvisioner = ({match}) => (
   <Layout>
-    <Route path="/aws-provisioner/:workerType?/:currentTab?" render={props => (
+    <Route path={`${match.url}/:workerType?/:currentTab?`} render={props => (
       <WorkerTypeTable provisionerId={PROVISIONER_ID} {...props} />
     )} />
   </Layout>

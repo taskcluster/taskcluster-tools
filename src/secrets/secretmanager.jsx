@@ -44,7 +44,7 @@ class SecretManager extends Component {
   load(data) {
     // A component may have nested components. `data.detail.name` will identify
     // which component (possibly nested) needs to reload.
-    if (data && data.detail.name && data.detail.name !== this.constructor.name) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
       return;
     }
 
@@ -54,7 +54,11 @@ class SecretManager extends Component {
   }
 
   onTaskClusterUpdate({detail}) {
-    this.setState(detail);
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
   }
 
   /** Render the main layout of the secrets manager page */

@@ -142,13 +142,11 @@ export const TaskClusterEnhance = (Component, opts) => (
     taskclusterState(keys, props) {
       if ((keys && hasChanged(this.options.reloadOnKeys, keys, this.componentKeys)) ||
         (props && hasChanged(this.options.reloadOnProps, props, this.componentProps))) {
-
-        this.componentKeys = keys;
-        this.componentProps = props;
-
         this.reload(this.options.name);
       }
 
+      this.componentKeys = {...keys};
+      this.componentProps = {...props};
     }
 
     /** handle changes to credentials */
@@ -253,7 +251,12 @@ export const TaskClusterEnhance = (Component, opts) => (
     }
 
     updateWrappedState() {
-      document.dispatchEvent(new CustomEvent('taskcluster-update', {detail: this.state}));
+      const detail = {
+        name: this.options.name,
+        state: this.state
+      };
+
+      document.dispatchEvent(new CustomEvent('taskcluster-update', {detail}));
     }
 
     /**

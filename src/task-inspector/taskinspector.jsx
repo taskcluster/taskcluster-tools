@@ -55,7 +55,7 @@ class TaskInspector extends React.Component {
 
   /** Use TaskClusterEnhance to load taskId */
   load(data) {
-    if (data && data.detail.name && data.detail.name !== this.constructor.name) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
       return;
     }
 
@@ -71,7 +71,11 @@ class TaskInspector extends React.Component {
   }
 
   onTaskClusterUpdate({detail}) {
-    this.setState(detail);
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
   }
 
   onWatchReload({detail}) {

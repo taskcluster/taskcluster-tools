@@ -34,7 +34,11 @@ class ConfirmActionMenuItem extends Component {
   }
 
   onTaskClusterUpdate({detail}) {
-    this.setState(detail);
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
   }
 
   render() {
@@ -130,5 +134,9 @@ ConfirmActionMenuItem.propTypes = {
 
 ConfirmActionMenuItem.defaultProps = {disabled: false};
 
+const taskclusterOpts = {
+  name: ConfirmActionMenuItem.name
+};
+
 // TaskClusterEnhance is used so we can use loadState to execute the action asynchronously
-export default TaskClusterEnhance(ConfirmActionMenuItem);
+export default TaskClusterEnhance(ConfirmActionMenuItem, taskclusterOpts);

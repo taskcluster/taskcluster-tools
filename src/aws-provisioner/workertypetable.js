@@ -1,62 +1,66 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {OverlayTrigger, ProgressBar, Tooltip, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
 import path from 'path';
-import * as utils from '../lib/utils';
+import {TaskClusterEnhance} from '../lib/utils';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 import WorkerTypeView from './workertypeview';
 import WorkerTypeEditor from './workertypeeditor';
 import './aws-provisioner.less';
 
-const WorkerTypeRow = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        queue: taskcluster.Queue,
-        awsProvisioner: taskcluster.AwsProvisioner,
-      },
-      clientOpts: {
-        awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
-        },
-      },
-      reloadOnProps: [
-        'provisionerId',
-        'workerType',
-      ],
-    }),
-  ],
+class WorkerTypeRow extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    provisionerId: React.PropTypes.string.isRequired,
-    workerType: React.PropTypes.shape({
-      workerType: React.PropTypes.string.isRequired,
-      minCapacity: React.PropTypes.number.isRequired,
-      maxCapacity: React.PropTypes.number.isRequired,
-      requestedCapacity: React.PropTypes.number.isRequired,
-      pendingCapacity: React.PropTypes.number.isRequired,
-      runningCapacity: React.PropTypes.number.isRequired,
-    }).isRequired,
-    selected: React.PropTypes.bool.isRequired,
-    onClick: React.PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       pendingTasks: {pendingTasks: 0},
       pendingTasksLoaded: false,
-      pendingTasksError: null,
+      pendingTasksError: null
     };
-  },
 
-  load() {
-    return {
-      pendingTasks: this.queue.pendingTasks(
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+
+    this.count = 1;
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    const promisedState = {
+      pendingTasks: this.props.clients.queue.pendingTasks(
         this.props.provisionerId,
         this.props.workerType.workerType
-      ),
+      )
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   render() {
     return (
@@ -73,7 +77,7 @@ const WorkerTypeRow = React.createClass({
         <td>{this.state.pendingTasksLoaded ? this.state.pendingTasks.pendingTasks : '...'}</td>
       </tr>
     );
-  },
+  }
 
   renderCapacityBar() {
     const progress = this.doMath();
@@ -98,7 +102,7 @@ const WorkerTypeRow = React.createClass({
     }
 
     return <ProgressBar>{progressBars}</ProgressBar>;
-  },
+  }
 
   /* Return an object which has the fuzzed percentages to use for creating
    * progress bars and the unfuzzed capacities.  If we have a state with 0%, we
@@ -139,9 +143,9 @@ const WorkerTypeRow = React.createClass({
       s: spotPer * 100,
       rc: runningCap,
       pc: pendingCap,
-      sc: spotReqCap,
+      sc: spotReqCap
     };
-  },
+  }
 
   tooltip() {
     return (
@@ -153,8 +157,41 @@ const WorkerTypeRow = React.createClass({
         handle {this.props.workerType.requestedCapacity || '0'} tasks in parallel.
       </Tooltip>
     );
+  }
+}
+
+const workerTypeRowTaskclusterOpts = {
+  clients: {
+    queue: taskcluster.Queue,
+    awsProvisioner: taskcluster.AwsProvisioner
   },
-});
+  clientOpts: {
+    awsProvisioner: {
+      baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
+    },
+  },
+  reloadOnProps: [
+    'provisionerId',
+    'workerType'
+  ],
+  name: WorkerTypeRow.name
+};
+
+WorkerTypeRow.propTypes = {
+  provisionerId: React.PropTypes.string.isRequired,
+  workerType: React.PropTypes.shape({
+    workerType: React.PropTypes.string.isRequired,
+    minCapacity: React.PropTypes.number.isRequired,
+    maxCapacity: React.PropTypes.number.isRequired,
+    requestedCapacity: React.PropTypes.number.isRequired,
+    pendingCapacity: React.PropTypes.number.isRequired,
+    runningCapacity: React.PropTypes.number.isRequired
+  }).isRequired,
+  selected: React.PropTypes.bool.isRequired,
+  onClick: React.PropTypes.func.isRequired
+};
+
+const WorkerTypeRowEnhanced = TaskClusterEnhance(WorkerTypeRow, workerTypeRowTaskclusterOpts);
 
 const defaultWorkerType = {
   minCapacity: 0,
@@ -172,8 +209,8 @@ const defaultWorkerType = {
       secrets: {},
       scopes: [],
       userData: {},
-      launchSpec: {},
-    },
+      launchSpec: {}
+    }
   ],
   regions: [
     {
@@ -183,61 +220,78 @@ const defaultWorkerType = {
       userData: {},
       launchSpec: {
         ImageId: 'ami-xx',
-      },
-    },
+      }
+    }
   ],
   userData: {},
   launchSpec: {},
   secrets: {},
-  scopes: [],
+  scopes: []
 };
 
 /** Table of workerTypes */
-export default React.createClass({
-  displayName: 'WorkerTypeTable',
+class WorkerTypeTable extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        awsProvisioner: taskcluster.AwsProvisioner,
-      },
-      clientOpts: {
-        awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
-        },
-      },
-      reloadOnProps: [
-        'provisionerId',
-      ]
-    })
-  ],
-
-  propTypes: {
-    provisionerId: React.PropTypes.string.isRequired,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       // selected workerType identifier (string)
       // or 'create:worker-type' to indicate creation of workerType
       selected: this.props.match.params.workerType || '',
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
       workerTypeSummariesError: null,
-      workerTypeContains: '',
+      workerTypeContains: ''
     };
-  },
 
-  load() {
-    return {
-      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries(),
+    this.updateSummary = this.updateSummary.bind(this);
+    this.workerTypeCreated = this.workerTypeCreated.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    const promisedState = {
+      workerTypeSummaries: this.props.clients.awsProvisioner.listWorkerTypeSummaries()
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
+
 
   setSelected(workerType) {
     this.setState({selected: workerType});
     this.props.history.push(path.join('/aws-provisioner', workerType, this.props.match.params.currentTab || ''));
-  },
+  }
 
   render() {
     return (
@@ -256,10 +310,10 @@ export default React.createClass({
             <Glyphicon glyph="plus" /> Create WorkerType
           </Button>
         </ButtonToolbar>
-        <span>{this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()}</span>
+        <span>{this.props.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()}</span>
       </div>
     );
-  },
+  }
 
   renderTypeInput() {
     const setWorkerType = e => this.setState({workerTypeContains: e.target.value});
@@ -286,7 +340,7 @@ export default React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
   renderWorkerTypeTable() {
     return (
@@ -303,10 +357,10 @@ export default React.createClass({
           </thead>
           <tbody>
             {
-              this.state.workerTypeSummaries
+              this.state.workerTypeSummaries && this.state.workerTypeSummaries
                 .filter(workerType => workerType.workerType.includes(this.state.workerTypeContains))
                 .map(workerType => (
-                  <WorkerTypeRow
+                  <WorkerTypeRowEnhanced
                     key={workerType.workerType}
                     provisionerId={this.props.provisionerId}
                     workerType={workerType}
@@ -319,7 +373,7 @@ export default React.createClass({
         </Table>
       </div>
     );
-  },
+  }
 
   renderWorkerTypeView() {
     if (!_.find(this.state.workerTypeSummaries, {workerType: this.state.selected})) {
@@ -331,14 +385,15 @@ export default React.createClass({
         <h4>Worker Type: <code>{this.state.selected}</code></h4>
         <hr />
         <WorkerTypeView
+          history={this.props.history}
+          match={this.props.match}
           provisionerId={this.props.provisionerId}
           workerType={this.state.selected}
-          reload={this.reload}
-          updateSummary={this.updateSummary}
-          {...this.props} />
+          reload={this.load}
+          updateSummary={this.updateSummary}  />
       </div>
     );
-  },
+  }
 
   updateSummary(workerType, summary) {
     // work around https://github.com/taskcluster/aws-provisioner/pull/70
@@ -349,7 +404,7 @@ export default React.createClass({
       );
 
     this.setState({workerTypeSummaries});
-  },
+  }
 
   renderWorkerTypeCreator() {
     return (
@@ -361,10 +416,30 @@ export default React.createClass({
           updated={this.workerTypeCreated} />
       </div>
     );
-  },
+  }
 
   async workerTypeCreated(workerType) {
-    await this.reload();
+    await this.load();
+
     this.setSelected(workerType);
+  }
+}
+
+const WorkerTypeTableTaskclusterOpts = {
+  clients: {
+    awsProvisioner: taskcluster.AwsProvisioner
   },
-});
+  clientOpts: {
+    awsProvisioner: {
+      baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
+    },
+  },
+  reloadOnProps: [
+    'provisionerId'
+  ],
+  name: WorkerTypeTable.name
+};
+
+WorkerTypeTable.propTypes = {provisionerId: React.PropTypes.string.isRequired};
+
+export default TaskClusterEnhance(WorkerTypeTable, WorkerTypeTableTaskclusterOpts);
