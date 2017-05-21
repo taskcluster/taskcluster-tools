@@ -142,18 +142,18 @@ export const TaskClusterEnhance = (Component, opts) => (
     taskclusterState(keys, props) {
       if ((keys && hasChanged(this.options.reloadOnKeys, keys, this.componentKeys)) ||
         (props && hasChanged(this.options.reloadOnProps, props, this.componentProps))) {
+        this.componentKeys = keys;
+        this.componentProps = props;
+
         this.reload(this.options.name);
       }
-
-      this.componentKeys = {...keys};
-      this.componentProps = {...props};
     }
 
     /** handle changes to credentials */
     handleCredentialsChanged(e) {
       // Update clients with new credentials
       this._createClients(e.detail);
-      this.setState({createdTaskIdError: null}, this.updateWrappedState);
+      this.setState({createdTaskIdError: null});
 
       if (this.options.reloadOnLogin) {
         // Reload state now that we have new credentials
