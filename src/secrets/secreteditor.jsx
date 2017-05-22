@@ -40,6 +40,8 @@ class SecretEditor extends Component {
   componentWillMount() {
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
     document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
   }
 
   componentWillUnmount() {

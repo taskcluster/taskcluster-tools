@@ -45,6 +45,8 @@ class CacheManager extends Component {
   componentWillMount() {
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
     document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+
+    this.load();
   }
 
   componentWillUnmount() {
