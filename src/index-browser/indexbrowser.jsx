@@ -42,6 +42,8 @@ class IndexBrowser extends Component {
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
     document.addEventListener('taskcluster-reload', this.load, false);
     document.addEventListener('watch-reload', this.onWatchReload, false);
+
+    this.load();
   }
 
   componentWillUnmount() {
@@ -110,7 +112,7 @@ class IndexBrowser extends Component {
           {this.props.renderWaitFor('namespaces') || this.renderNamespaces()}
         </Col>
         <Col md={6}>
-          <this.props.entryView namespace={this.state.current} />
+          <this.props.entryView {...this.props} namespace={this.state.current} />
         </Col>
       </Row>
     );
