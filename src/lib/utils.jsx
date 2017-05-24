@@ -166,18 +166,10 @@ export const TaskClusterEnhance = (Component, opts) => (
       window.removeEventListener('credentials-changed', this.handleCredentialsChanged, false);
     }
 
-    /** Re-render component only if URL changes */
-    shouldComponentUpdate(nextProps, nextState) {
-      if (this.props.match && !_.eq(this.props.match.url, nextProps.match.url)) {
-        return true;
-      }
-
-      return false;
-    }
-
     /** Load state from a map from property to promise */
     loadState(promisedState) {
       assert(promisedState instanceof Object, 'Expected an object');
+      this.canUpdate = true;
 
       // map from promised state property to load iteration count, so that old
       // loads that are resolved after newer requests aren't overwriting newer
