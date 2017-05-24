@@ -22,7 +22,6 @@ class CacheManager extends Component {
     };
 
     this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
-    this.onTaskClusterReload = this.onTaskClusterReload.bind(this);
     this.load = this.load.bind(this);
     this.provisionerIdChange = this.provisionerIdChange.bind(this);
     this.cacheNameChange = this.cacheNameChange.bind(this);
@@ -44,14 +43,14 @@ class CacheManager extends Component {
 
   componentWillMount() {
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
-    document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
 
     this.load();
   }
 
   componentWillUnmount() {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
-    document.removeEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
   }
 
   onTaskClusterUpdate({detail}) {
@@ -60,10 +59,6 @@ class CacheManager extends Component {
     }
 
     this.setState(detail.state);
-  }
-
-  onTaskClusterReload() {
-    this.load();
   }
 
   /** Render the main layout of the cache manager page */
