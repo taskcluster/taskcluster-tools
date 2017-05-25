@@ -31,7 +31,11 @@ class CacheManager extends Component {
   }
 
   /** Use TaskClusterEnhance to load caches */
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     const promisedState = {
       caches: this.props.clients.purgeCaches
         .allPurgeRequests()

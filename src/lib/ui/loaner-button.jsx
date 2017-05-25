@@ -1,35 +1,19 @@
-import React from 'react';
+import React, {Component} from 'react';
 import taskcluster from 'taskcluster-client';
 import ConfirmAction from './confirmaction';
-import * as utils from '../utils';
+import {TaskClusterEnhance} from '../utils';
 import slugid from 'slugid';
 import path from 'path';
 import _ from 'lodash';
 import {Button} from 'react-bootstrap';
 
-const LoanerButton = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue
-      clients: {
-        queue: taskcluster.Queue,
-      },
-    }),
-  ],
+class LoanerButton extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    taskId: React.PropTypes.string.isRequired,
-    task: React.PropTypes.object.isRequired,
-    buttonSize: React.PropTypes.string.isRequired,
-    buttonStyle: React.PropTypes.string.isRequired,
-    disabled: React.PropTypes.bool,
-  },
-
-  getDefaultProps() {
-    return {
-      disabled: false,
-    };
-  },
+    this.editTask = this.editTask.bind(this);
+    this.createTask = this.createTask.bind(this);
+  }
 
   valid() {
     const payload = this.props.task.payload;
@@ -43,7 +27,7 @@ const LoanerButton = React.createClass({
     }
 
     return typeof payload.maxRunTime === 'number';
-  },
+  }
 
   render() {
     // These items are buttons displayed inline-block, so wrapping in a span is correct
@@ -78,7 +62,7 @@ const LoanerButton = React.createClass({
         </Button>
       </span>
     );
-  },
+  }
 
   parameterizeTask() {
     const task = _.cloneDeep(this.props.task);
@@ -125,15 +109,15 @@ const LoanerButton = React.createClass({
     task.retries = 0;
 
     return task;
-  },
+  }
 
   async createTask() {
     const taskId = slugid.nice();
     const task = this.parameterizeTask();
 
-    await this.queue.createTask(taskId, task);
+    await this.props.clients.queue.createTask(taskId, task);
     this.props.history.push(path.join('/one-click-loaner/connect', taskId));
-  },
+  }
 
   editTask() {
     const task = this.parameterizeTask();
@@ -143,7 +127,25 @@ const LoanerButton = React.createClass({
 
     // ..and go there
     this.props.history.push(path.join('/task-creator'));
-  },
-});
+  }
+}
 
-export default LoanerButton;
+LoanerButton.defaultProps = {disabled: false};
+
+LoanerButton.propTypes = {
+  taskId: React.PropTypes.string.isRequired,
+  task: React.PropTypes.object.isRequired,
+  buttonSize: React.PropTypes.string.isRequired,
+  buttonStyle: React.PropTypes.string.isRequired,
+  disabled: React.PropTypes.bool
+};
+
+const taskclusterOpts = {
+  // Need updated clients for Queue
+  clients: {
+    queue: taskcluster.Queue,
+  },
+  name: LoanerButton.name
+};
+
+export default TaskClusterEnhance(LoanerButton, taskclusterOpts);

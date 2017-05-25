@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Alert} from 'react-bootstrap';
-import * as utils from '../../lib/utils';
+import {TaskClusterEnhance, CreateWebListener} from '../../lib/utils';
 import * as format from '../../lib/format';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
@@ -17,29 +17,11 @@ const taskStateLabel = {
   exception: 'label label-warning',
 };
 
-export default React.createClass({
-  displayName: 'Connect',
+class Connect extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    // Calls load() initially and on reload()
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue and QueueEvents
-      clients: {
-        queue: taskcluster.Queue,
-        queueEvents: taskcluster.QueueEvents,
-      },
-      // Reload when state.taskId changes, ignore credential changes
-      reloadOnKeys: ['taskId'],
-      reloadOnLogin: false,
-    }),
-    // Listen for messages, reload bindings() when state.taskId changes
-    utils.createWebListenerMixin({
-      reloadOnKeys: ['taskId'],
-    })
-  ],
-
-  getInitialState() {
-    return {
+    this.state = {
       taskId: this.props.match.params.taskId || '',
       statusLoaded: true,
       statusError: null,
@@ -50,31 +32,75 @@ export default React.createClass({
       taskError: null,
       task: null,
     };
-  },
 
-  load() {
-    // Skip loading empty-strings
-    if (this.state.taskId === '') {
-      return {
-        status: null,
-      };
+    this.openShell = this.openShell.bind(this);
+    this.openDisplay = this.openDisplay.bind(this);
+    this.load = this.load.bind(this);
+    this.onListenerMessage = this.onListenerMessage.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+    this.listening = this.listening.bind(this);
+    this.bindings = this.bindings.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+    document.addEventListener('listener-message', this.onListenerMessage, false);
+    document.addEventListener('listener-listening', this.listening, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+    document.removeEventListener('listener-message', this.onListenerMessage, false);
+    document.removeEventListener('listener-listening', this.listening, false);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    if (detail.name !== this.constructor.name) {
+      return;
     }
 
-    this.queue
+    this.setState(detail.state);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // Send keys to higher order component
+    this.props.taskclusterState(this.state, this.props);
+    this.props.listenerState(this.state, this.props);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    // Skip loading empty-strings
+    if (this.state.taskId === '') {
+      const promisedState = {status: null};
+
+      return this.props.loadState(promisedState);
+    }
+
+    this.props.clients.queue
       .listLatestArtifacts(this.state.taskId)
       .then(result => {
         result.artifacts.forEach(a => this.processArtifact(a, false));
       });
 
     // Reload status structure
-    return {
+    const promisedState = {
       // Load task status and take the `status` key from the response
-      status: this.queue
+      status: this.props.clients.queue
         .status(this.state.taskId)
         .then(_.property('status')),
-      task: this.queue.task(this.state.taskId),
+      task: this.props.clients.queue.task(this.state.taskId),
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   bindings() {
     // Don't bother listening for empty strings, they're pretty boring
@@ -83,45 +109,41 @@ export default React.createClass({
     }
 
     // Construct the routing key pattern
-    const routingKey = {
-      taskId: this.state.taskId,
-    };
+    const routingKey = {taskId: this.state.taskId};
 
     // Return all interesting bindings
     return [
-      this.queueEvents.taskDefined(routingKey),
-      this.queueEvents.taskPending(routingKey),
-      this.queueEvents.taskRunning(routingKey),
-      this.queueEvents.artifactCreated(routingKey),
-      this.queueEvents.taskCompleted(routingKey),
-      this.queueEvents.taskFailed(routingKey),
-      this.queueEvents.taskException(routingKey),
+      this.props.clients.queueEvents.taskDefined(routingKey),
+      this.props.clients.queueEvents.taskPending(routingKey),
+      this.props.clients.queueEvents.taskRunning(routingKey),
+      this.props.clients.queueEvents.artifactCreated(routingKey),
+      this.props.clients.queueEvents.taskCompleted(routingKey),
+      this.props.clients.queueEvents.taskFailed(routingKey),
+      this.props.clients.queueEvents.taskException(routingKey)
     ];
-  },
+  }
 
   listening() {
-    this.queue
+    this.props.clients.queue
       .listLatestArtifacts(this.state.taskId)
       .then(result => {
         result.artifacts.forEach(a => this.processArtifact(a, false));
       });
-  },
+  }
 
-  handleMessage(message) {
+  onListenerMessage({detail}) {
     // Update status structure
-    this.setState({
-      status: message.payload.status,
-    });
+    this.setState({status: detail.payload.status});
 
     // If the message origins from the artifact create exchange,
     // we should look for the shell.html artifact :)
-    if (message.exchange === this.queueEvents.artifactCreated().exchange) {
-      const name = message.payload.artifact.name;
+    if (detail.exchange === this.props.clients.queueEvents.artifactCreated().exchange) {
+      const name = detail.payload.artifact.name;
 
       debug('Received artifact: %s', name);
-      this.processArtifact(message.payload.artifact, true);
+      this.processArtifact(detail.payload.artifact, true);
     }
-  },
+  }
 
   processArtifact(artifact, notify) {
     const name = artifact.name;
@@ -129,7 +151,7 @@ export default React.createClass({
     if (/shell\.html$/.test(name)) {
       this.setState({
         shellUrl: [
-          this.queue.getLatestArtifact,
+          this.props.clients.queue.getLatestArtifact,
           this.state.taskId,
           name,
         ],
@@ -143,7 +165,7 @@ export default React.createClass({
     if (/display\.html$/.test(name)) {
       this.setState({
         displayUrl: [
-          this.queue.getLatestArtifact,
+          this.props.clients.queue.getLatestArtifact,
           this.state.taskId,
           name,
         ],
@@ -153,7 +175,7 @@ export default React.createClass({
         this.notify();
       }
     }
-  },
+  }
 
   render() {
     if (this.state.taskId === '') {
@@ -232,56 +254,58 @@ export default React.createClass({
         {this.renderStatus()}
       </div>
     );
-  },
+  }
 
   renderStatus() {
-    return this.renderWaitFor('status') || (this.state.status ? (
-      <div>
-        <dl className="dl-horizontal">
-          <dt>taskId</dt>
-          <dd>
-            <code><a href={`/task-inspector#${this.state.taskId}`}>{this.state.taskId}</a></code>
-          </dd>
-          <dt>Status</dt>
-          <dd>
+    return this.props.renderWaitFor('status') || (this.state.status ? (
+        <div>
+          <dl className="dl-horizontal">
+            <dt>taskId</dt>
+            <dd>
+              <code><a href={`/task-inspector/${this.state.taskId}`}>{this.state.taskId}</a></code>
+            </dd>
+            <dt>Status</dt>
+            <dd>
             <span className={taskStateLabel[this.state.status.state]}>
               {this.state.status.state}
             </span>
-          </dd>
-          {
-            this.state.task ? (
-              <div>
-                <dt>Name</dt>
-                <dd>
-                  <format.Markdown>
-                    {this.state.task.metadata.name}
-                  </format.Markdown>
-                </dd>
-                <dt>Description</dt>
-                <dd>
-                  <format.Markdown>
-                    {this.state.task.metadata.description}
-                  </format.Markdown>
-                </dd>
-              </div>
-            ) :
-            null
-          }
-        </dl>
-      </div>
-    ) :
-    null);
-  },
+            </dd>
+            {
+              this.state.task ? (
+                <div>
+                  <dt>Name</dt>
+                  <dd>
+                    <format.Markdown>
+                      {this.state.task.metadata.name}
+                    </format.Markdown>
+                  </dd>
+                  <dt>Description</dt>
+                  <dd>
+                    <format.Markdown>
+                      {this.state.task.metadata.description}
+                    </format.Markdown>
+                  </dd>
+                </div>
+              ) :
+              null
+            }
+          </dl>
+        </div>
+      ) :
+      null);
+  }
 
   openShell() {
-    const url = this.queue.buildSignedUrl(...this.state.shellUrl);
+    const url = this.props.clients.queue.buildSignedUrl(...this.state.shellUrl);
+
     window.open(url, '_blank');
-  },
+  }
 
   openDisplay() {
-    const url = this.queue.buildSignedUrl(...this.state.displayUrl);
+    const url = this.props.clients.queue.buildSignedUrl(...this.state.displayUrl);
+
     window.open(url, '_blank');
-  },
+  }
 
   requestNotificationPermission() {
     const shouldRequest = window.Notification &&
@@ -292,7 +316,7 @@ export default React.createClass({
       this._notificationPermissionRequest = true;
       window.Notification.requestPermission();
     }
-  },
+  }
 
   notify() {
     // Don't notify if we don't have permission or already did so
@@ -316,5 +340,23 @@ export default React.createClass({
         window.focus();
       });
     }
+  }
+}
+
+const taskclusterOpts = {
+  // Need updated clients for Queue and QueueEvents
+  clients: {
+    queue: taskcluster.Queue,
+    queueEvents: taskcluster.QueueEvents,
   },
-});
+  // Reload when state.taskId changes, ignore credential changes
+  reloadOnKeys: ['taskId'],
+  reloadOnLogin: false,
+  name: Connect.name
+};
+
+const webListenerOpts = {
+  reloadOnKeys: ['taskId']
+};
+
+export default TaskClusterEnhance(CreateWebListener(Connect, webListenerOpts), taskclusterOpts);

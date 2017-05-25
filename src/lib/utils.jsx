@@ -169,7 +169,6 @@ export const TaskClusterEnhance = (Component, opts) => (
     /** Load state from a map from property to promise */
     loadState(promisedState) {
       assert(promisedState instanceof Object, 'Expected an object');
-      this.canUpdate = true;
 
       // map from promised state property to load iteration count, so that old
       // loads that are resolved after newer requests aren't overwriting newer
@@ -716,7 +715,6 @@ export const CreateWebListener = (Component, opts) => (
 
       this.componentKeys = keys;
       this.componentProps = props;
-
     }
 
     /** Reload listener if bindings changed */
