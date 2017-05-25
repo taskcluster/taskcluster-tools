@@ -60,6 +60,8 @@ module.exports = neutrino => {
   // Don't parse the ws module as it seems to blow up Webpack
   // neutrino.config.module.noParse.add(/ws/);
 
+  neutrino.config.externals(['bindings']);
+
   // Allow url to contain dot
   neutrino.config.devServer.historyApiFallback({ disableDotRule: true });
 };
