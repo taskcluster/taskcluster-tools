@@ -122,6 +122,7 @@ export const TaskClusterEnhance = (Component, opts) => (
       this.renderWaitFor = this.renderWaitFor.bind(this);
       this.loadState = this.loadState.bind(this);
       this.taskclusterState = this.taskclusterState.bind(this);
+      this.getWrappedInstance = this.getWrappedInstance.bind(this);
     }
 
     componentWillMount() {
@@ -330,11 +331,18 @@ export const TaskClusterEnhance = (Component, opts) => (
       });
     }
 
+    /** Access the wrapped component */
+    getWrappedInstance() {
+      return this.wrappedInstance;
+    }
+
     render() {
       return (
         <Component
           {...this.props}
           clients={this.clients}
+          ref={instance => this.wrappedInstance = instance}
+          getWrappedInstance={this.getWrappedInstance}
           taskclusterState={this.taskclusterState}
           loadState={this.loadState}
           renderWaitFor={this.renderWaitFor}
@@ -676,12 +684,13 @@ export const CreateWebListener = (Component, opts) => (
       this.startListening = this.startListening.bind(this);
       this.stopListening = this.stopListening.bind(this);
       this.listenerState = this.listenerState.bind(this);
+      this.getWrappedInstance = this.getWrappedInstance.bind(this);
     }
 
     componentDidMount() {
       this.__listener = null;
       this.__bindings = [];
-      this.componentBindings = this.child.bindings;
+      this.componentBindings = this.wrappedInstance.bindings;
 
       if (this.componentBindings instanceof Function) {
         this.startListening(this.componentBindings());
@@ -700,6 +709,11 @@ export const CreateWebListener = (Component, opts) => (
     /** Stop listening */
     componentWillUnmount() {
       this.stopListening();
+    }
+
+    /** Access the wrapped component */
+    getWrappedInstance() {
+      return this.wrappedInstance;
     }
 
     listenerState(keys, props) {
@@ -848,7 +862,8 @@ export const CreateWebListener = (Component, opts) => (
       return <Component
         {...this.props}
         {...this.state}
-        ref={instance => {this.child = instance}}
+        ref={instance => this.wrappedInstance = instance}
+        getWrappedInstance={this.getWrappedInstance}
         startListening={this.startListening}
         stopListening={this.stopListening}
         listenerState={this.listenerState} />;
@@ -1451,6 +1466,7 @@ export const CreateWatchState = (Component, opts) => (
       this.componentProps = {};
 
       this.watchState = this.watchState.bind(this);
+      this.getWrappedInstance = this.getWrappedInstance.bind(this);
     }
 
     /** Re-render component only if URL changes */
@@ -1460,6 +1476,11 @@ export const CreateWatchState = (Component, opts) => (
       }
 
       return false;
+    }
+
+    /** Access the wrapped component */
+    getWrappedInstance() {
+      return this.wrappedInstance;
     }
 
     /** Check if handlers needs to be triggered given keys and props */
@@ -1494,7 +1515,11 @@ export const CreateWatchState = (Component, opts) => (
     }
 
     render() {
-      return <Component {...this.props} watchState={this.watchState} />;
+      return <Component
+        {...this.props}
+        ref={instance => this.wrappedInstance = instance}
+        getWrappedInstance={this.getWrappedInstance}
+        watchState={this.watchState} />;
     }
   }
 );
