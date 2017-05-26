@@ -15,7 +15,9 @@ class Interactive extends Component {
     // Set default storage engine for hterm
     hterm.defaultStorage = new lib.Storage.Local();
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener('DOMContentLoaded', function contentLoaded() {
+      document.removeEventListener('DOMContentLoaded', contentLoaded);
+
       const term = new hterm.Terminal('interactive');
 
       term.onTerminalReady = async () => {
