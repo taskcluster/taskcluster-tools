@@ -5,6 +5,7 @@ import {
   Switch,
   Redirect
 } from 'react-router-dom';
+import LandingPage from './landingpage';
 import TaskInspector from './task-inspector';
 import TaskGroupInspector from './task-group-inspector';
 import TaskCreator from './task-creator';
@@ -24,11 +25,10 @@ import OneClickLoaner from './one-click-loaner';
 import OneClickLoanerConnect from './one-click-loaner/connect';
 import Credentials from './credentials';
 import PulseInspector from './pulse-inspector';
-// import Interactive from './interactive/app';
-// import Shell from './shell/app';
 import AwsProvisioner from './aws-provisioner';
-
-import LandingPage from './landingpage';
+import Interactive from './interactive';
+import Shell from './shell';
+import Display from './display';
 
 const RedirectToTaskGroupInspector = ({match}) => (
   <Redirect to={window.location.pathname.replace(match.url, '/task-group-inspector')} />
@@ -58,8 +58,9 @@ const App = () => (
       <Route path="/aws-provisioner" component={AwsProvisioner} />
       <Route path="/one-click-loaner/connect" component={OneClickLoanerConnect} />
       <Route path="/one-click-loaner" component={OneClickLoaner} />
-      {/*<Route path="/shell" component={Shell} />*/}
-      {/*<Route path="/interactive" component={Interactive} />*/}
+      <Route path="/shell" component={Shell} />
+      <Route path="/interactive" component={Interactive} />
+      <Route path="/display" component={Display} />
 
       {/* Redirects */}
       <Route path="/task-graph-inspector" component={RedirectToTaskGroupInspector}/>
