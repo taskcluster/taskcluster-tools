@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
 import _ from 'lodash';
 import path from 'path';
 import taskcluster from 'taskcluster-client';
-import * as utils from '../utils';
+import {TaskClusterEnhance} from '../utils';
 import TaskInfo from './taskinfo';
 import RunInfo from './runinfo';
 import ConfirmActionMenuItem from './ConfirmActionMenuItem';
@@ -12,55 +12,65 @@ import PurgeCacheMenuItem from './PurgeCacheMenuItem';
 import './taskview.less';
 
 /** Takes a task status structure and renders tabs for taskInfo and runInfo */
-const TaskView = React.createClass({
-  mixins: [
-    // Calls load() initially and on reload()
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue
-      clients: {
-        queue: taskcluster.Queue,
-      },
-      // Reload when props.status.taskId changes, ignore credential changes
-      reloadOnProps: ['status.taskId'],
-      reloadOnLogin: false,
-    })
-  ],
+class TaskView extends Component {
+  constructor(props) {
+    super(props);
 
-  // Get initial state
-  getInitialState() {
-    return {
+    this.state = {
       task: null,
       taskLoaded: false,
       taskError: null,
     };
-  },
 
-  // Create default properties
-  getDefaultProps() {
-    return {
-      // Initial tab to show (empty string is task view)
-      initialTab: '',
-    };
-  },
+    this.scheduleTask = this.scheduleTask.bind(this);
+    this.cancelTask = this.cancelTask.bind(this);
+    this.setCurrentTab = this.setCurrentTab.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+    this.handleArtifactCreatedMessage = this.handleArtifactCreatedMessage.bind(this);
+  }
 
-  // Validate properties
-  propTypes: {
-    status: React.PropTypes.object.isRequired,
-  },
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
 
   scheduleTask() {
-    return this.queue.scheduleTask(this.props.status.taskId);
-  },
+    return this.props.clients.queue.scheduleTask(this.props.status.taskId);
+  }
 
   cancelTask() {
-    return this.queue.cancelTask(this.props.status.taskId);
-  },
+    return this.props.clients.queue.cancelTask(this.props.status.taskId);
+  }
 
-  load() {
-    return {
-      task: this.queue.task(this.props.status.taskId),
-    };
-  },
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    const promisedState = {task: this.props.clients.queue.task(this.props.status.taskId)};
+
+    this.props.loadState(promisedState);
+  }
 
   // Render tabs and current tab
   render() {
@@ -123,7 +133,7 @@ const TaskView = React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
   /** Render current tab */
   renderCurrentTab() {
@@ -147,12 +157,15 @@ const TaskView = React.createClass({
 
     // return a RunInfo
     return <RunInfo
-      {...this.props} run={run} ref="runInfo" activeTabOnInit={this.props.match.params.section} />;
-  },
+      {...this.props}
+      ref={instance => { this.runInfoInstance = instance; }}
+      run={run}
+      activeTabOnInit={this.props.match.params.section} />;
+  }
 
   isNumber(term) {
     return !isNaN(parseInt(term));
-  },
+  }
 
   // Set currentTab
   setCurrentTab(tab) {
@@ -171,14 +184,32 @@ const TaskView = React.createClass({
     }
 
     this.props.history.push(path.join('/', directory, taskId, tab, section));
-  },
+  }
 
   // Tell child that we got an artifact created message
   handleArtifactCreatedMessage(message) {
-    if (this.refs.runInfo) {
-      this.refs.runInfo.handleArtifactCreatedMessage(message);
+    if (this.runInfoInstance) {
+      this.runInfoInstance.getWrappedInstance().handleArtifactCreatedMessage(message);
     }
-  },
-});
+  }
+}
 
-export default TaskView;
+TaskView.defaultProps = {
+  // Initial tab to show (empty string is task view)
+  initialTab: ''
+};
+
+TaskView.propTypes = {status: React.PropTypes.object.isRequired};
+
+const taskclusterOpts = {
+  // Need updated clients for Queue
+  clients: {
+    queue: taskcluster.Queue,
+  },
+  // Reload when props.status.taskId changes, ignore credential changes
+  reloadOnProps: ['status.taskId'],
+  reloadOnLogin: false,
+  name: TaskView.name
+};
+
+export default TaskClusterEnhance(TaskView, taskclusterOpts);

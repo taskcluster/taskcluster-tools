@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Table, Label, Tab, Nav, NavItem, Row, Col} from 'react-bootstrap';
-import * as utils from '../utils';
+import {TaskClusterEnhance} from '../utils';
 import * as format from '../format';
 import _ from 'lodash';
 import taskcluster from 'taskcluster-client';
@@ -10,46 +10,68 @@ import './runinfo.less';
 import path from 'path';
 
 /** Displays information about a run in a tab page */
-const RunInfo = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue
-      clients: {
-        queue: taskcluster.Queue,
-      },
-      // Reload when status.taskId changes or run.runId
-      reloadOnProps: ['status.taskId', 'run.runId'],
-      reloadOnLogin: true,
-    }),
-  ],
+class RunInfo extends Component {
+  constructor(props) {
+    super(props);
 
-  // Validate properties
-  propTypes: {
-    status: React.PropTypes.object.isRequired,
-    run: React.PropTypes.object.isRequired,
-  },
-
-  // Get initial state
-  getInitialState() {
-    return {
+    this.state = {
       artifactsLoaded: true,
       artifactsError: null,
       artifacts: [],
     };
-  },
+
+    this.onTabSelect = this.onTabSelect.bind(this);
+    this.handleArtifactCreatedMessage = this.handleArtifactCreatedMessage.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterReload = this.onTaskClusterReload.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterReload() {
+    this.load();
+  }
+
+  onTaskClusterUpdate({detail}) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
 
   /** Load list of artifacts */
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     const runId = this.props.run.runId;
     const taskId = this.props.status.taskId;
-
-    return {
+    const promisedState = {
       // Get list of artifacts, and take the `artifacts` property from the response
-      artifacts: this.queue
+      artifacts: this.props.clients.queue
         .listArtifacts(taskId, runId)
-        .then(_.property('artifacts')),
+        .then(_.property('artifacts'))
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   /** Handle artifact created messages, provided by parents */
   handleArtifactCreatedMessage(message) {
@@ -86,7 +108,7 @@ const RunInfo = React.createClass({
 
     // Update state
     this.setState({artifacts});
-  },
+  }
 
   onTabSelect(tab) {
     const {taskGroupId, taskId, run} = this.props.match.params;
@@ -94,7 +116,7 @@ const RunInfo = React.createClass({
     const directory = this.props.match.url.split('/').filter(e => e.length)[0];
 
     this.props.history.push(path.join('/', directory, pathSoFar, tab));
-  },
+  }
 
   // Render run
   render() {
@@ -194,22 +216,22 @@ const RunInfo = React.createClass({
                 </Table>
               </Tab.Pane>
               <Tab.Pane eventKey="artifacts">
-                {this.renderWaitFor('artifacts') || this.renderArtifacts()}
+                {this.props.renderWaitFor('artifacts') || this.renderArtifacts()}
               </Tab.Pane>
               <Tab.Pane eventKey="logs" unmountOnExit={true}>
-                {this.renderWaitFor('artifacts') || this.renderLogView()}
+                {this.props.renderWaitFor('artifacts') || this.renderLogView()}
               </Tab.Pane>
             </Tab.Content>
           </Col>
         </Row>
       </Tab.Container>
     );
-  },
+  }
 
   /** Render list of artifacts */
   renderArtifacts() {
     // Show dash to indicate empty list of artifacts
-    if (this.state.artifacts.length === 0) {
+    if (!this.state.artifacts || (this.state.artifacts && this.state.artifacts.length === 0)) {
       return '-';
     }
 
@@ -219,11 +241,13 @@ const RunInfo = React.createClass({
         runId={this.props.run.runId}
         artifacts={this.state.artifacts} />
     );
-  },
+  }
 
   /** Render log viewer */
   renderLogView() {
-    const logs = this.state.artifacts.filter(artifact => /^public\/logs\//.test(artifact.name));
+    const logs = this.state.artifacts ?
+      this.state.artifacts.filter(artifact => /^public\/logs\//.test(artifact.name)) :
+      [];
 
     if (logs.length === 0) {
       return;
@@ -235,7 +259,23 @@ const RunInfo = React.createClass({
         taskId={this.props.status.taskId}
         runId={this.props.run.runId} />
     );
-  },
-});
+  }
+}
 
-export default RunInfo;
+RunInfo.propTypes = {
+  status: React.PropTypes.object.isRequired,
+  run: React.PropTypes.object.isRequired
+};
+
+const taskclusterOpts = {
+  // Need updated clients for Queue
+  clients: {
+    queue: taskcluster.Queue,
+  },
+  // Reload when status.taskId changes or run.runId
+  reloadOnProps: ['status.taskId', 'run.runId'],
+  reloadOnLogin: true,
+  name: RunInfo.name
+};
+
+export default TaskClusterEnhance(RunInfo, taskclusterOpts);
