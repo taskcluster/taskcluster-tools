@@ -1,48 +1,69 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
 import path from 'path';
 import RoleEditor from './roleeditor';
-import * as utils from '../../lib/utils';
+import {TaskClusterEnhance} from '../../lib/utils';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 
 import './rolemanager.less';
 
 /** Create role manager */
-const RoleManager = React.createClass({
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        auth: taskcluster.Auth,
-      },
-    })
-  ],
+class RoleManager extends Component {
+  constructor(props) {
+    super(props);
 
-  /** Create an initial state */
-  getInitialState() {
     const selectedRoleId = this.props.match.params.roleId ?
       decodeURIComponent(this.props.match.params.roleId) :
       '';
 
-    return {
+    this.state = {
       rolesLoaded: false,
       rolesError: undefined,
       roles: undefined,
       selectedRoleId,   // '' means "add new role"
     };
-  },
+
+    this.reloadRoleId = this.reloadRoleId.bind(this);
+    this.renderRoleRow = this.renderRoleRow.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
 
   /** Load state from auth (using TaskClusterMixin) */
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     // Creates state properties:
     // - rolesLoaded
     // - rolesError
     // - roles
-    return {
-      roles: this.auth.listRoles(),
+    const promisedState = {
+      roles: this.props.clients.auth.listRoles(),
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   /** Render user-interface */
   render() {
@@ -59,7 +80,7 @@ const RoleManager = React.createClass({
             </Button>
             <Button
               bsStyle="success"
-              onClick={this.reload}
+              onClick={this.load}
               disabled={!this.state.rolesLoaded}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
@@ -70,11 +91,11 @@ const RoleManager = React.createClass({
         </Col>
       </Row>
     );
-  },
+  }
 
   /** Render table of all roles */
   renderRolesTable() {
-    return this.renderWaitFor('roles') || (
+    return this.props.renderWaitFor('roles') || (this.state.roles && (
         <Table condensed={true} hover={true} className="role-manager-role-table">
           <thead>
           <tr>
@@ -85,8 +106,8 @@ const RoleManager = React.createClass({
           {this.state.roles.map(this.renderRoleRow)}
           </tbody>
         </Table>
-      );
-  },
+      ));
+  }
 
   /** Render row with role */
   renderRoleRow(role, index) {
@@ -100,11 +121,11 @@ const RoleManager = React.createClass({
         <td><code>{role.roleId}</code></td>
       </tr>
     );
-  },
+  }
 
   async reloadRoleId(roleId) {
     // Load role ignore errors (assume role doesn't exist)
-    const role = await this.auth.role(roleId);
+    const role = await this.props.clients.auth.role(roleId);
     let selectedRoleId = roleId;
     let roles = _.cloneDeep(this.state.roles);
     const index = _.findIndex(roles, r => r.roleId === roleId);
@@ -123,12 +144,19 @@ const RoleManager = React.createClass({
 
     roles.sort((a, b) => a.roleId > b.roleId);
     this.setState({roles, selectedRoleId});
-  },
+  }
 
   selectRoleId(roleId) {
     this.props.history.push(path.join('/auth/roles', encodeURIComponent(roleId)));
     this.setState({selectedRoleId: roleId});
-  },
-});
+  }
+}
 
-export default RoleManager;
+const taskclusterOpts = {
+  clients: {
+    auth: taskcluster.Auth,
+  },
+  name: RoleManager.name
+};
+
+export default TaskClusterEnhance(RoleManager, taskclusterOpts);
