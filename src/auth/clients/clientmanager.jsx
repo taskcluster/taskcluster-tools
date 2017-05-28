@@ -1,56 +1,81 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
 import path from 'path';
 import ClientEditor from './clienteditor';
-import * as utils from '../../lib/utils';
+import {TaskClusterEnhance} from '../../lib/utils';
 import * as auth from '../../lib/auth';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 import './clientmanager.less';
 
 /** Create client manager */
-export default React.createClass({
-  displayName: 'ClientManager',
+class ClientManager extends Component {
+  constructor(props) {
+    super(props);
 
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      reloadOnKeys: ['clientPrefix'],
-      clients: {
-        auth: taskcluster.Auth,
-      },
-    })
-  ],
-
-  /** Create an initial state */
-  getInitialState() {
     const creds = auth.loadCredentials();
     const selectedClientId = this.props.match.params.selectedClientId ?
       decodeURIComponent(this.props.match.params.selectedClientId) :
       '';
 
-    return {
+    this.state = {
       clientPrefix: creds ? `${creds.clientId}/` : '',
       clientsLoaded: false,
       clientsError: null,
       clients: null,
       selectedClientId, // '' means "add new client"
     };
-  },
+
+    this.reloadClientId = this.reloadClientId.bind(this);
+    this.renderClientRow = this.renderClientRow.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({detail}) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
 
   /** Load state from auth (using TaskClusterMixin) */
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     // Creates state properties:
     // - clientsLoaded
     // - clientsError
     // - clients
-    return {
-      clients: this.auth.listClients(this.state.clientPrefix ?
+    const promisedState = {
+      clients: this.props.clients.auth.listClients(this.state.clientPrefix ?
         {prefix: this.state.clientPrefix} :
         null
-      ),
+      )
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   /** Render user-interface */
   render() {
@@ -66,7 +91,7 @@ export default React.createClass({
               disabled={this.state.selectedClientId === ''}>
               <Glyphicon glyph="plus" /> Add Client
             </Button>
-            <Button bsStyle="success" onClick={this.reload} disabled={!this.state.clientsLoaded}>
+            <Button bsStyle="success" onClick={this.load} disabled={!this.state.clientsLoaded}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar>
@@ -78,7 +103,7 @@ export default React.createClass({
         </Col>
       </Row>
     );
-  },
+  }
 
   renderPrefixInput() {
     const setPrefix = e => this.setState({clientPrefix: e.target.value});
@@ -105,11 +130,11 @@ export default React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
   /** Render table of all clients */
   renderClientsTable() {
-    return this.renderWaitFor('clients') || (
+    return this.props.renderWaitFor('clients') || (this.state.clients && (
         <Table condensed={true} hover={true} className="client-manager-client-table">
           <thead>
           <tr>
@@ -120,8 +145,8 @@ export default React.createClass({
           {this.state.clients.map(this.renderClientRow)}
           </tbody>
         </Table>
-      );
-  },
+      ));
+  }
 
   /** Render row with client */
   renderClientRow(client, index) {
@@ -135,11 +160,11 @@ export default React.createClass({
         <td><code>{client.clientId}</code></td>
       </tr>
     );
-  },
+  }
 
   async reloadClientId(clientId) {
     // Load client ignore errors (assume client doesn't exist)
-    const client = await this.auth
+    const client = await this.props.clients.auth
       .client(clientId)
       .catch(() => null);
     let selectedClientId = clientId;
@@ -162,10 +187,20 @@ export default React.createClass({
     }
 
     this.setState({clients, selectedClientId});
-  },
+  }
 
   selectClientId(clientId) {
     this.props.history.push(path.join('/auth/clients', encodeURIComponent(clientId)));
     this.setState({selectedClientId: clientId});
+  }
+}
+
+const taskclusterOpts = {
+  reloadOnKeys: ['clientPrefix'],
+  clients: {
+    auth: taskcluster.Auth,
   },
-});
+  name: ClientManager.name
+};
+
+export default TaskClusterEnhance(ClientManager, taskclusterOpts);
