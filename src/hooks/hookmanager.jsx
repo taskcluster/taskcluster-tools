@@ -31,7 +31,7 @@ class HookManager extends Component {
           <h4>Hooks</h4>
           <hr />
           <HookGroupBrowser
-            ref="hookgroupbrowser"
+            ref={instance => { this.hookGroupBrowserInstance = instance; }}
             currentHookGroupId={hookGroupId}
             currentHookId={hookId}
             selectHook={this.selectHook} />
@@ -61,7 +61,7 @@ class HookManager extends Component {
   }
 
   refreshHookList() {
-    this.refs.hookgroupbrowser.reload();
+    this.hookGroupBrowserInstance.getWrappedInstance().load();
   }
 
   selectHook(hookGroupId, hookId) {

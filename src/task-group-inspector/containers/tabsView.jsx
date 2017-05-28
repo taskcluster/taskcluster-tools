@@ -123,7 +123,8 @@ class TabsView extends Component {
 
     return <RunInfo
       status={status}
-      run={run} ref="runInfo"
+      ref="runInfo"
+      run={run}
       activeTabOnInit={this.props.match.params.section}
       {...this.props}
     />;

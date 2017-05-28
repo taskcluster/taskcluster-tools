@@ -369,7 +369,7 @@ class HookEditor extends Component {
                   type="text"
                   className="form-control"
                   placeholder="* * * * * *"
-                  ref="newSch" />
+                  ref={instance => { this.newSchInstance = instance; }} />
                 <span className="input-group-btn">
                   <button
                     className="btn btn-success"
@@ -506,7 +506,7 @@ class HookEditor extends Component {
   }
 
   onNewScheduleItem() {
-    const sch = findDOMNode(this.refs.newSch).value;
+    const sch = findDOMNode(this.newSchInstance).value;
 
     if (sch !== '') {
       const schedule = _.cloneDeep(this.state.schedule);
@@ -515,7 +515,7 @@ class HookEditor extends Component {
       this.setState({schedule});
     }
 
-    findDOMNode(this.refs.newSch).value = '';
+    findDOMNode(this.newSchInstance).value = '';
   }
 
   onScheduleTextChange(e) {

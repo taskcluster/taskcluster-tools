@@ -37,14 +37,14 @@ class HookBrowser extends Component {
 
   render() {
     // forward clicks on the label on to the TreeView's handleClick (undocumented..)
-    const label = <code onClick={() => this.refs.tv.handleClick()}>{this.props.group}</code>;
+    const label = <code onClick={() => this.tvInstance.handleClick()}>{this.props.group}</code>;
 
     if (!this.state.hooksLoaded || this.state.hooksError) {
       return (
         <TreeView
           key={this.props.group}
           nodeLabel={label}
-          ref="tv"
+          ref={instance => { this.tvInstance = instance; }}
           defaultCollapsed={true}
           onClick={this.handleClick}>
           {
@@ -61,7 +61,7 @@ class HookBrowser extends Component {
       <TreeView
         key={this.props.group}
         nodeLabel={label}
-        ref="tv"
+        ref={instance => { this.tvInstance = instance; }}
         defaultCollapsed={false}
         onClick={this.handleClick}>
         {
