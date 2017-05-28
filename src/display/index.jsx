@@ -37,6 +37,10 @@ class Display extends Component {
     document.removeEventListener('watch-reload', this.onWatchReload, false);
   }
 
+  componentDidMount() {
+    this.props.watchState(this.state, this.props);
+  }
+
   componentDidUpdate(prevProps, prevState) {
     this.props.watchState(this.state, this.props);
   }
@@ -48,7 +52,7 @@ class Display extends Component {
   render() {
     return (
       <div style={{textAlign: 'center'}}>
-        <canvas ref="display">Canvas not supported!</canvas>
+        <canvas ref={instance => { this.displayInstance = instance; }}>Canvas not supported!</canvas>
       </div>
     );
   }
@@ -66,7 +70,7 @@ class Display extends Component {
     // Create remote frame buffer
     try {
       this.rfb = new RFB({
-        target: this.refs.display,
+        target: this.displayInstance,
         encrypt: opts.protocol === 'wss:',
         true_color: true,
         local_cursor: true,
@@ -211,7 +215,11 @@ class DisplayList extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     const promisedState = {
       displays: $.getJSON(this.props.displaysUrl),
       display: null,
