@@ -5,34 +5,36 @@ import {
   Switch,
   Redirect
 } from 'react-router-dom';
-import LandingPage from './landingpage';
-import TaskInspector from './task-inspector';
-import TaskGroupInspector from './task-group-inspector';
-import TaskCreator from './task-creator';
-import QuickStart from './quickstart';
-import PurgeCaches from './purge-caches';
-import IndexBrowser from './index-browser';
-import IndexArtifactBrowser from './index-browser/artifacts';
-import Secrets from './secrets';
-import Login from './login';
-import Status from './status';
-import Diagnostics from './diagnostics';
-import Hooks from './hooks';
-import AuthRoles from './auth/roles';
-import AuthClients from './auth/clients';
-import AuthScopes from './auth/scopes';
-import OneClickLoaner from './one-click-loaner';
-import OneClickLoanerConnect from './one-click-loaner/connect';
-import Credentials from './credentials';
-import PulseInspector from './pulse-inspector';
-import AwsProvisioner from './aws-provisioner';
-import Interactive from './interactive';
-import Shell from './shell';
-import Display from './display';
+import asyncComponent from './asyncComponent';
 
 const RedirectToTaskGroupInspector = ({match}) => (
   <Redirect to={window.location.pathname.replace(match.url, '/task-group-inspector')} />
 );
+
+const LandingPage = asyncComponent(() => import('./landingpage').then(module => module.default));
+const TaskInspector = asyncComponent(() => import('./task-inspector').then(module => module.default));
+const TaskGroupInspector = asyncComponent(() => import('./task-group-inspector').then(module => module.default));
+const TaskCreator = asyncComponent(() => import('./task-creator').then(module => module.default));
+const QuickStart = asyncComponent(() => import('./quickstart').then(module => module.default));
+const PurgeCaches = asyncComponent(() => import('./purge-caches').then(module => module.default));
+const IndexArtifactBrowser = asyncComponent(() => import('./index-browser/artifacts').then(module => module.default));
+const IndexBrowser = asyncComponent(() => import('./index-browser').then(module => module.default));
+const Secrets = asyncComponent(() => import('./secrets').then(module => module.default));
+const Login = asyncComponent(() => import('./login').then(module => module.default));
+const Status = asyncComponent(() => import('./status').then(module => module.default));
+const Diagnostics = asyncComponent(() => import('./diagnostics').then(module => module.default));
+const Hooks = asyncComponent(() => import('./hooks').then(module => module.default));
+const AuthRoles = asyncComponent(() => import('./auth/roles').then(module => module.default));
+const AuthClients = asyncComponent(() => import('./auth/clients').then(module => module.default));
+const AuthScopes = asyncComponent(() => import('./auth/scopes').then(module => module.default));
+const PulseInspector = asyncComponent(() => import('./pulse-inspector').then(module => module.default));
+const Credentials = asyncComponent(() => import('./credentials').then(module => module.default));
+const AwsProvisioner = asyncComponent(() => import('./aws-provisioner').then(module => module.default));
+const OneClickLoanerConnect = asyncComponent(() => import('./one-click-loaner/connect').then(module => module.default));
+const OneClickLoaner = asyncComponent(() => import('./one-click-loaner').then(module => module.default));
+const Shell = asyncComponent(() => import('./shell').then(module => module.default));
+const Interactive = asyncComponent(() => import('./interactive').then(module => module.default));
+const Display = asyncComponent(() => import('./display').then(module => module.default));
 
 const App = () => (
   <Router>

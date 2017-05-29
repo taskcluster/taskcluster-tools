@@ -6,16 +6,48 @@
     "node": ">=6.0.0"
   },
   "neutrino": {
-    "use": [
-      "neutrino-preset-react",
-      "tools-preset"
-    ],
+    "use": ["tools-preset"],
     "config": {
       "entry": {
         "vendor": [
           "react",
+          "ansi-regex",
+          "ansi_up",
+          "assume",
+          "bootstrap",
+          "change-case",
+          "classnames",
+          "codemirror",
+          "concat-stream",
+          "debug",
+          "docker-exec-websocket-server",
+          "durable-json-lint",
+          "exorcist",
+          "highlight.js",
+          "hterm-umd",
+          "jquery",
+          "js-yaml",
+          "less-loader",
+          "lodash",
+          "markdown-it",
+          "moment",
+          "redux",
+          "react-helmet",
+          "redux-thunk",
+          "react-bootstrap",
+          "react-code-mirror",
+          "react-datepicker",
           "react-dom",
-          "react-router-dom"
+          "react-router-dom",
+          "react-helmet",
+          "react-json-inspector",
+          "react-redux",
+          "react-tabs",
+          "react-tooltip",
+          "react-treeview",
+          "taskcluster-client",
+          "www-authenticate",
+          "xml2js"
         ]
       }
     }
