@@ -80,7 +80,8 @@ PurgeCacheMenuItem.propTypes = {
 const taskclusterOpts = {
   clients: {
     purgeCache: taskcluster.PurgeCache,
-  }
+  },
+  name: PurgeCacheMenuItem.name
 };
 
 export default TaskClusterEnhance(PurgeCacheMenuItem, taskclusterOpts);

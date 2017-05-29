@@ -67,7 +67,8 @@ const taskclusterOpts = {
   // Need updated clients for Queue
   clients: {
     queue: taskcluster.Queue,
-  }
+  },
+  name: RetriggerMenuItem.name
 };
 
 export default TaskClusterEnhance(RetriggerMenuItem, taskclusterOpts);
