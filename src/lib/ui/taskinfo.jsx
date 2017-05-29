@@ -109,7 +109,7 @@ class TaskInfo extends Component {
             <tr>
               <td>TaskGroupId</td>
               <td>
-                <a href={`${path.join(__dirname, 'task-group-inspector', task.taskGroupId)}`}>{task.taskGroupId}</a>
+                <a href={`/task-group-inspector/${task.taskGroupId}`}>{task.taskGroupId}</a>
               </td>
             </tr>
 
@@ -120,7 +120,7 @@ class TaskInfo extends Component {
                   task.dependencies.length ?
                     task.dependencies.map((dependency, key) => (
                       <div key={key}>
-                        <a href={`${path.join(__dirname, 'taskinspector', '#' + dependency)}`}>{dependency}</a>
+                        <a href={`/task-inspector/${dependency}`}>{dependency}</a>
                       </div>
                     )) :
                     '-'
@@ -300,7 +300,7 @@ class TaskInfo extends Component {
     localStorage.setItem('task-creator/task', JSON.stringify(newTask));
 
     // ..and go there
-    window.location.href = '../task-creator';
+    window.location.href = '/task-creator';
   }
 
   /** Render script illustrating how to run locally */
