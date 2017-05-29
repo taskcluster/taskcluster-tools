@@ -88,8 +88,8 @@ class TaskInspector extends React.Component {
 
     // If the message origins from the artifact create exchange, we should
     // notify our children
-    if (detail.exchange === this.props.clients.queueEvents.artifactCreated().exchange && this.taskViewRef) {
-      this.taskViewRef.handleArtifactCreatedMessage(detail);
+    if (detail.exchange === this.props.clients.queueEvents.artifactCreated().exchange && this.taskViewInstance) {
+      this.taskViewInstance.getWrappedInstance().handleArtifactCreatedMessage(detail);
     }
   }
 
@@ -119,14 +119,14 @@ class TaskInspector extends React.Component {
       this.props.clients.queueEvents.artifactCreated(routingKey),
       this.props.clients.queueEvents.taskCompleted(routingKey),
       this.props.clients.queueEvents.taskFailed(routingKey),
-      this.props.clients.queueEvents.taskException(routingKey),
+      this.props.clients.queueEvents.taskException(routingKey)
     ];
   }
 
 
   getTitle() {
-    if (this.taskViewRef && this.taskViewRef.state.task) {
-      return this.taskViewRef.state.task.metadata.name;
+    if (this.taskViewInstance && this.taskViewInstance.getWrappedInstance().state.task) {
+      return this.taskViewInstance.getWrappedInstance().state.task.metadata.name;
     }
 
     return 'Task Inspector';
@@ -185,7 +185,7 @@ class TaskInspector extends React.Component {
             {
               taskId && this.props.renderWaitFor('status') || (this.state.status && (
                 <TaskView
-                  ref={instance => {this.taskViewRef = instance}}
+                  ref={instance => {this.taskViewInstance = instance}}
                   status={this.state.status}
                   {...this.props} />
               ))
