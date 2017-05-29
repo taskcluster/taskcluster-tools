@@ -434,9 +434,7 @@ const WorkerTypeTableTaskclusterOpts = {
       baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
     },
   },
-  reloadOnProps: [
-    'provisionerId'
-  ],
+  reloadOnProps: ['provisionerId'],
   name: WorkerTypeTable.name
 };
 

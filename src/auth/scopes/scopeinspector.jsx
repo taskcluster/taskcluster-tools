@@ -44,14 +44,12 @@ class ScopeInspector extends Component {
 
   componentWillMount() {
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
-    document.addEventListener('taskcluster-reload', this.load, false);
 
     this.load();
   }
 
   componentWillUnmount() {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
-    document.removeEventListener('taskcluster-reload', this.load, false);
   }
 
   onTaskClusterUpdate({detail}) {
@@ -134,7 +132,7 @@ class ScopeInspector extends Component {
             _.startsWith(this.state.selectedEntity, 'role:') ? (
               <RoleEditor
                 currentRoleId={this.state.selectedEntity.slice('role:'.length)}
-                reloadRoleId={this.reload} />
+                reloadRoleId={this.load} />
             ) : (
               <ClientEditor
                 currentClientId={this.state.selectedEntity.slice('client:'.length)}
