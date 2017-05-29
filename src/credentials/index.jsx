@@ -2,9 +2,9 @@ import React from 'react';
 import CredentialManager from './credentials';
 import Layout from '../lib/Layout';
 
-const Credentials = () => (
+const Credentials = (props) => (
   <Layout>
-    <CredentialManager />
+    <CredentialManager {...props} />
   </Layout>
 );
 
