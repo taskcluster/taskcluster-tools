@@ -1,5 +1,6 @@
 const rpWeb = require('neutrino-preset-mozilla-rpweb');
 const env = require('neutrino-middleware-env');
+const webpack = require('webpack');
 
 module.exports = neutrino => {
   const envs = {
@@ -64,6 +65,14 @@ module.exports = neutrino => {
     .test(/JSONStream/)
     .use('shebang')
     .loader('shebang-loader');
+
+  // Make variables `$` and `jQuery` available
+  neutrino.config
+    .plugin('jquery')
+    .use(webpack.ProvidePlugin, [{
+      $: "jquery",
+      jQuery: "jquery"
+    }]);
 
   neutrino.config.externals(['bindings']);
 
