@@ -47,7 +47,8 @@
           "react-treeview",
           "taskcluster-client",
           "www-authenticate",
-          "xml2js"
+          "xml2js",
+          "qs"
         ]
       }
     }
@@ -84,6 +85,7 @@
     "moment": "^2.15.0",
     "neutrino-middleware-env": "^5.8.0",
     "neutrino-preset-mozilla-rpweb": "^3.0.1",
+    "qs": "^6.4.0",
     "react": "^15.3.1",
     "react-bootstrap": "0.30.5",
     "react-code-mirror": "^3.1.0",

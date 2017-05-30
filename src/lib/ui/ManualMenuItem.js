@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {OverlayTrigger, Tooltip, NavItem, Glyphicon} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
 
 export default class ManualMenuItem extends Component {
   render() {

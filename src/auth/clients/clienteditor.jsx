@@ -1,17 +1,17 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import taskcluster from 'taskcluster-client';
 import moment from 'moment';
-import {TaskClusterEnhance} from '../../lib/utils';
-import * as format from '../../lib/format';
 import _ from 'lodash';
+import {
+  Alert, OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar
+} from 'react-bootstrap';
+import { TaskClusterEnhance } from '../../lib/utils';
+import * as format from '../../lib/format';
 import ConfirmAction from '../../lib/ui/confirmaction';
 import ScopeEditor from '../../lib/ui/scopeeditor';
 import TimeInput from '../../lib/ui/timeinput';
 import * as auth from '../../lib/auth';
-import {
-  Alert, OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar,
-} from 'react-bootstrap';
 import './clienteditor.less';
 
 /** Create client editor/viewer (same thing) */
@@ -29,7 +29,7 @@ class ClientEditor extends Component {
       // Operation details, if currently doing anything
       working: false,
       error: null,
-      showModal: true,
+      showModal: true
     };
 
     this.dismissError = this.dismissError.bind(this);
@@ -66,7 +66,7 @@ class ClientEditor extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -85,21 +85,19 @@ class ClientEditor extends Component {
       const creds = auth.loadCredentials();
       const clientId = creds ? `${creds.clientId}/` : '';
 
-      const promisedState = {
+      return this.props.loadState({
         client: {
           clientId,
           expires: new Date(3017, 1, 1),
           description: '',
           scopes: [],
-          expandedScopes: [],
+          expandedScopes: []
         },
         accessToken: null,
         editing: true,
         working: false,
-        error: null,
-      };
-
-      return this.props.loadState(promisedState);
+        error: null
+      });
     }
 
     // Load currentClientId, but avoid doing so after creating a new client
@@ -107,7 +105,7 @@ class ClientEditor extends Component {
       this.setState({
         editing: false,
         working: false,
-        error: null,
+        error: null
       });
 
       const promisedState = {};
@@ -120,7 +118,7 @@ class ClientEditor extends Component {
       accessToken: null,
       editing: false,
       working: false,
-      error: null,
+      error: null
     };
 
     this.props.loadState(promisedState);
@@ -157,8 +155,8 @@ class ClientEditor extends Component {
 
     return (
       <div className="client-editor">
-        <h4 style={{marginTop: 0}}>{title}</h4>
-        <hr style={{marginBottom: 10}} />
+        <h4 style={{ marginTop: 0 }}>{title}</h4>
+        <hr style={{ marginBottom: 10 }} />
         <div className="form-horizontal">
           {
             isCreating ? (
@@ -286,7 +284,7 @@ class ClientEditor extends Component {
               created: 'Created',
               lastModified: 'Last Modified',
               lastDateUsed: 'Last Date Used',
-              lastRotated: 'Last Rotated',
+              lastRotated: 'Last Rotated'
             }, (label, prop) => {
               if (!this.state.client[prop]) {
                 return;
@@ -318,9 +316,9 @@ class ClientEditor extends Component {
               <div className="form-group">
                 <label className="control-label col-md-3">Expanded Scopes</label>
                 <div className="col-md-9">
-                <span className="text-muted">Expanded scopes are determined from the client
-                  scopes, expanding roles for scopes beginning with <code>assume:</code>.
-                </span>
+                  <span className="text-muted">Expanded scopes are determined from the client
+                    scopes, expanding roles for scopes beginning with <code>assume:</code>.
+                  </span>
                   <ScopeEditor scopes={this.state.client.expandedScopes} />
                 </div>
               </div>
@@ -458,7 +456,7 @@ class ClientEditor extends Component {
     const client = _.cloneDeep(this.state.client);
 
     client.scopes = scopes;
-    this.setState({client});
+    this.setState({ client });
   }
 
   /** When expires exchanges in the editor */
@@ -466,14 +464,14 @@ class ClientEditor extends Component {
     const client = _.cloneDeep(this.state.client);
 
     client.expires = date.toDate().toJSON();
-    this.setState({client});
+    this.setState({ client });
   }
 
   onDOEChange() {
     const client = _.cloneDeep(this.state.client);
 
     client.deleteOnExpiration = !client.deleteOnExpiration;
-    this.setState({client});
+    this.setState({ client });
   }
 
   /** Reset accessToken for current client */
@@ -485,38 +483,38 @@ class ClientEditor extends Component {
         client,
         accessToken: client.accessToken,
         editing: false,
-        working: false,
+        working: false
       });
     } catch (err) {
       this.setState({
         working: false,
         error: auth.loadCredentials() ?
           'You do not have sufficient permission to reset access tokens for this user.' :
-          'You must be logged in and have permission to reset access tokens for this user.',
+          'You must be logged in and have permission to reset access tokens for this user.'
       });
     }
   }
 
   /** Close modal */
   closeDialog() {
-    this.setState({accessToken: null});
+    this.setState({ accessToken: null });
   }
 
   /** Start editing */
   startEditing() {
-    this.setState({editing: true});
+    this.setState({ editing: true });
   }
 
   /** Create new client */
   async createClient() {
-    this.setState({working: true});
+    this.setState({ working: true });
 
     try {
       const clientId = this.state.client.clientId;
       const client = await this.props.clients.auth.createClient(clientId, {
         description: this.state.client.description,
         expires: this.state.client.expires,
-        scopes: this.state.client.scopes,
+        scopes: this.state.client.scopes
       });
 
       this.setState({
@@ -524,14 +522,14 @@ class ClientEditor extends Component {
         accessToken: client.accessToken,
         editing: false,
         working: false,
-        error: null,
+        error: null
       });
 
       this.props.reloadClientId(clientId);
     } catch (err) {
       this.setState({
         working: false,
-        error: err,
+        error: err
       });
     }
   }
@@ -547,13 +545,13 @@ class ClientEditor extends Component {
           description: this.state.client.description,
           expires: this.state.client.expires,
           scopes: this.state.client.scopes,
-          deleteOnExpiration: this.state.client.deleteOnExpiration,
+          deleteOnExpiration: this.state.client.deleteOnExpiration
         })
         .then(client => {
           this.props.reloadClientId(clientId);
 
           return client;
-        }),
+        })
     });
   }
 
@@ -583,7 +581,7 @@ class ClientEditor extends Component {
   dismissError() {
     this.setState({
       working: false,
-      error: null,
+      error: null
     });
   }
 }
@@ -599,9 +597,7 @@ ClientEditor.defaultProps = {
 };
 
 const taskclusterOpts = {
-  clients: {
-    auth: taskcluster.Auth,
-  },
+  clients: { auth: taskcluster.Auth },
   reloadOnProps: ['currentClientId'],
   name: ClientEditor.name
 };

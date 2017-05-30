@@ -1,11 +1,10 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Row, Col, ButtonToolbar, Glyphicon, Table, Button, FormGroup, ControlLabel, FormControl, Alert,
 } from 'react-bootstrap';
-import {TaskClusterEnhance} from '../lib/utils';
-import * as format from '../lib/format';
 import taskcluster from 'taskcluster-client';
-
+import { TaskClusterEnhance } from '../lib/utils';
+import * as format from '../lib/format';
 
 class CacheManager extends Component {
   constructor(props) {
@@ -18,7 +17,7 @@ class CacheManager extends Component {
       tableError: null,
       formProvisionerId: '',
       formWorkerType: '',
-      formCacheName: '',
+      formCacheName: ''
     };
 
     this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
@@ -36,13 +35,11 @@ class CacheManager extends Component {
       return;
     }
 
-    const promisedState = {
+    this.props.loadState({
       caches: this.props.clients.purgeCaches
         .allPurgeRequests()
-        .then(resp => resp.requests),
-    };
-
-    this.props.loadState(promisedState);
+        .then(resp => resp.requests)
+    });
   }
 
   componentWillMount() {
@@ -55,7 +52,7 @@ class CacheManager extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -126,7 +123,7 @@ class CacheManager extends Component {
         </Table>
         );
     } catch (err) {
-      this.setState({tableError: err});
+      this.setState({ tableError: err });
     }
   }
 
@@ -152,8 +149,8 @@ class CacheManager extends Component {
 
     return (
       <div className="form-horizontal">
-        <h4 style={{marginTop: 7}}>Create Purge Cache Request</h4>
-        <hr style={{marginBottom: 20}} />
+        <h4 style={{ marginTop: 7 }}>Create Purge Cache Request</h4>
+        <hr style={{ marginBottom: 20 }} />
 
         <FormGroup>
           <ControlLabel className="col-md-3">Provisioner ID</ControlLabel>
@@ -205,15 +202,15 @@ class CacheManager extends Component {
   }
 
   provisionerIdChange(event) {
-    this.setState({formProvisionerId: event.target.value});
+    this.setState({ formProvisionerId: event.target.value });
   }
 
   workerTypeChange(event) {
-    this.setState({formWorkerType: event.target.value});
+    this.setState({ formWorkerType: event.target.value });
   }
 
   cacheNameChange(event) {
-    this.setState({formCacheName: event.target.value});
+    this.setState({ formCacheName: event.target.value });
   }
 
   async sendRequest() {
@@ -221,22 +218,22 @@ class CacheManager extends Component {
       await this.props.clients.purgeCaches.purgeCache(
         this.state.formProvisionerId,
         this.state.formWorkerType,
-        {cacheName: this.state.formCacheName}
+        { cacheName: this.state.formCacheName }
       );
 
       this.setState({
         formProvisionerId: '',
         formWorkerType: '',
-        formCacheName: '',
+        formCacheName: ''
       });
       this.load();
     } catch (err) {
-      this.setState({formError: err});
+      this.setState({ formError: err });
     }
   }
 
   dismissError() {
-    this.setState({formError: null, tableError: null});
+    this.setState({ formError: null, tableError: null });
   }
 }
 

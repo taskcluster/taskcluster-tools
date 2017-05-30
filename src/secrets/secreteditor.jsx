@@ -1,13 +1,13 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
-import {Alert, Button, ButtonToolbar, Glyphicon} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../lib/utils';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
+import _ from 'lodash';
+import moment from 'moment';
+import {TaskClusterEnhance} from '../lib/utils';
 import * as format from '../lib/format';
 import ConfirmAction from '../lib/ui/confirmaction';
 import TimeInput from '../lib/ui/timeinput';
-import _ from 'lodash';
-import moment from 'moment';
 
 class SecretEditor extends Component {
   constructor(props) {
@@ -23,7 +23,7 @@ class SecretEditor extends Component {
       // Operation details, if currently doing anything
       working: false,
       error: null,
-      showSecret: false,
+      showSecret: false
     };
 
     this.onExpiresChange = this.onExpiresChange.bind(this);
@@ -53,7 +53,7 @@ class SecretEditor extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -69,25 +69,23 @@ class SecretEditor extends Component {
     }
 
     // If there is currentSecretId, we load it. Otherwise we create a new secret
-    const promisedState = this.props.currentSecretId === '' ?
-      {
-        secretId: '',
-        secret: {
-          secret: {},
-          expires: taskcluster.fromNow('1 day'),
-        },
-        editing: true,
-        working: false,
-        error: null,
-      } :
-      {
-        secretId: this.props.currentSecretId,
-        secret: this.props.clients.secrets.get(this.props.currentSecretId),
-        editing: false,
-        working: false,
-        error: null,
-        showSecret: false
-      };
+    const promisedState = this.props.currentSecretId === '' ? {
+      secretId: '',
+      secret: {
+        secret: {},
+        expires: taskcluster.fromNow('1 day')
+      },
+      editing: true,
+      working: false,
+      error: null
+    } : {
+      secretId: this.props.currentSecretId,
+      secret: this.props.clients.secrets.get(this.props.currentSecretId),
+      editing: false,
+      working: false,
+      error: null,
+      showSecret: false
+    };
 
     this.props.loadState(promisedState);
   }
@@ -189,7 +187,7 @@ class SecretEditor extends Component {
 
                     return (
                       <Button onClick={this.openSecret} bsStyle="warning">
-                        <format.Icon name="user-secret" style={{padding: '.15em'}} /> Show secret
+                        <format.Icon name="user-secret" style={{ padding: '.15em' }} /> Show secret
                       </Button>
                     );
                   }
@@ -243,11 +241,11 @@ class SecretEditor extends Component {
   }
 
   startEditing() {
-    this.setState({editing: true});
+    this.setState({ editing: true });
   }
 
   openSecret() {
-    this.setState({showSecret: true});
+    this.setState({ showSecret: true });
   }
 
   async saveSecret() {
@@ -275,7 +273,7 @@ class SecretEditor extends Component {
     const expires = this.state.secret.expires;
 
     this.props.clients.secrets
-      .set(secretId, {secret, expires})
+      .set(secretId, { secret, expires })
       .then(() => {
         const newSecret = _.cloneDeep(this.state.secret);
 
@@ -285,7 +283,7 @@ class SecretEditor extends Component {
         this.setState({
           secretId,
           editing: false,
-          secret: newSecret,
+          secret: newSecret
         });
 
         if (shouldReload) {
@@ -307,14 +305,14 @@ class SecretEditor extends Component {
     this.setState({
       error: err,
       // clear the value, just to be safe
-      value: null,
+      value: null
     });
   }
 
   dismissError() {
     this.setState({
       secretError: null,
-      error: null,
+      error: null
     });
   }
 }
@@ -330,9 +328,7 @@ SecretEditor.defaultProps = {
 };
 
 const taskclusterOpts = {
-  clients: {
-    secrets: taskcluster.Secrets,
-  },
+  clients: { secrets: taskcluster.Secrets },
   reloadOnProps: ['currentSecretId'],
   name: SecretEditor.name
 };

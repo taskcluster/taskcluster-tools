@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {Row, Col, ButtonToolbar, Button, Glyphicon} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import path from 'path';
+import taskcluster from 'taskcluster-client';
 import HookGroupBrowser from './hookgroupbrowser';
 import HookEditView from './hookeditor';
-import {TaskClusterEnhance} from '../lib/utils';
-import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../lib/utils';
 import './hookmanager.less';
 
 class HookManager extends Component {
@@ -22,7 +22,7 @@ class HookManager extends Component {
 
   /** Render the main layout of the hooks manager page */
   render() {
-    const {hookId, hookGroupId} = this.props.match.params;
+    const { hookId, hookGroupId } = this.props.match.params;
     const creating = !hookGroupId && !hookId;
 
     return (
@@ -70,9 +70,7 @@ class HookManager extends Component {
 }
 
 const taskclusterOpts = {
-  clients: {
-    hooks: taskcluster.Hooks,
-  },
+  clients: { hooks: taskcluster.Hooks },
   name: HookManager.name
 };
 

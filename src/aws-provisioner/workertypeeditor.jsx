@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
-import {ButtonToolbar, FormGroup, ControlLabel, FormControl} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../lib/utils';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import { ButtonToolbar, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 import CodeMirror from 'react-code-mirror';
-import ConfirmAction from '../lib/ui/confirmaction';
 import 'codemirror/mode/javascript/javascript';
+import { TaskClusterEnhance } from '../lib/utils';
+import ConfirmAction from '../lib/ui/confirmaction';
 import '../lib/codemirror/json-lint';
 
 /* eslint-disable no-param-reassign */
@@ -70,7 +70,7 @@ class WorkerTypeEditor extends Component {
           lineNumbers={true}
           mode="application/json"
           textAreaClassName="form-control"
-          textAreaStyle={{minHeight: '20em'}}
+          textAreaStyle={{ minHeight: '20em' }}
           value={this.state.definition}
           onChange={this.handleChange}
           indentWithTabs={true}
@@ -121,14 +121,12 @@ class WorkerTypeEditor extends Component {
 
     this.setState({
       definition: e.target.value,
-      invalidDefinition: invalid,
+      invalidDefinition: invalid
     });
   }
 
   workerTypeChange() {
-    this.setState({
-      workerType: findDOMNode(this.refs.workerType).value,
-    });
+    this.setState({ workerType: findDOMNode(this.refs.workerType).value });
   }
 
   workerTypeValidationState() {
@@ -187,13 +185,11 @@ WorkerTypeEditor.propTypes = {
 };
 
 const taskclusterOpts = {
-  clients: {
-    awsProvisioner: taskcluster.AwsProvisioner
-  },
+  clients: { awsProvisioner: taskcluster.AwsProvisioner },
   clientOpts: {
     awsProvisioner: {
       baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-    },
+    }
   },
   reloadOnProps: ['definition', 'workerType'],
   name: WorkerTypeEditor.name

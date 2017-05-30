@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import path from 'path';
-import ClientEditor from './clienteditor';
-import {TaskClusterEnhance} from '../../lib/utils';
-import * as auth from '../../lib/auth';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
+import ClientEditor from './clienteditor';
+import { TaskClusterEnhance } from '../../lib/utils';
+import * as auth from '../../lib/auth';
 import './clientmanager.less';
 
 /** Create client manager */
@@ -23,7 +23,7 @@ class ClientManager extends Component {
       clientsLoaded: false,
       clientsError: null,
       clients: null,
-      selectedClientId, // '' means "add new client"
+      selectedClientId // '' means "add new client"
     };
 
     this.reloadClientId = this.reloadClientId.bind(this);
@@ -49,7 +49,7 @@ class ClientManager extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -67,20 +67,18 @@ class ClientManager extends Component {
     // - clientsLoaded
     // - clientsError
     // - clients
-    const promisedState = {
+    this.props.loadState({
       clients: this.props.clients.auth.listClients(this.state.clientPrefix ?
-        {prefix: this.state.clientPrefix} :
+        { prefix: this.state.clientPrefix } :
         null
       )
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
   /** Render user-interface */
   render() {
     return (
-      <Row style={{marginTop: 10}}>
+      <Row style={{ marginTop: 10 }}>
         <Col md={5}>
           {this.renderPrefixInput()}
           {this.renderClientsTable()}
@@ -106,7 +104,7 @@ class ClientManager extends Component {
   }
 
   renderPrefixInput() {
-    const setPrefix = e => this.setState({clientPrefix: e.target.value});
+    const setPrefix = e => this.setState({ clientPrefix: e.target.value });
     const enterPrefix = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
@@ -135,17 +133,17 @@ class ClientManager extends Component {
   /** Render table of all clients */
   renderClientsTable() {
     return this.props.renderWaitFor('clients') || (this.state.clients && (
-        <Table condensed={true} hover={true} className="client-manager-client-table">
-          <thead>
+      <Table condensed={true} hover={true} className="client-manager-client-table">
+        <thead>
           <tr>
             <th>ClientId</th>
           </tr>
-          </thead>
-          <tbody>
+        </thead>
+        <tbody>
           {this.state.clients.map(this.renderClientRow)}
-          </tbody>
-        </Table>
-      ));
+        </tbody>
+      </Table>
+    ));
   }
 
   /** Render row with client */
@@ -186,20 +184,18 @@ class ClientManager extends Component {
       selectedClientId = '';
     }
 
-    this.setState({clients, selectedClientId});
+    this.setState({ clients, selectedClientId });
   }
 
   selectClientId(clientId) {
     this.props.history.push(path.join('/auth/clients', encodeURIComponent(clientId)));
-    this.setState({selectedClientId: clientId});
+    this.setState({ selectedClientId: clientId });
   }
 }
 
 const taskclusterOpts = {
   reloadOnKeys: ['clientPrefix'],
-  clients: {
-    auth: taskcluster.Auth,
-  },
+  clients: { auth: taskcluster.Auth },
   name: ClientManager.name
 };
 

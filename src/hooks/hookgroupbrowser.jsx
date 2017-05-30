@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import {TaskClusterEnhance} from '../lib/utils';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
-import * as format from '../lib/format';
 import TreeView from 'react-treeview';
+import { TaskClusterEnhance } from '../lib/utils';
+import * as format from '../lib/format';
 
 class HookBrowser extends Component {
   constructor(props) {
@@ -27,7 +27,7 @@ class HookBrowser extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -86,9 +86,9 @@ class HookBrowser extends Component {
 
   handleClick() {
     if (!this.state.hooksLoading) {
-      this.setState({hooksLoading: true});
+      this.setState({ hooksLoading: true });
       this.props.loadState({
-        hooks: this.props.clients.hooks.listHooks(this.props.group),
+        hooks: this.props.clients.hooks.listHooks(this.props.group)
       });
     }
   }
@@ -102,9 +102,7 @@ HookBrowser.propTypes = {
 };
 
 const hookBrowserTaskclusterOpts = {
-  clients: {
-    hooks: taskcluster.Hooks,
-  },
+  clients: { hooks: taskcluster.Hooks },
   name: HookBrowser.name
 };
 
@@ -134,7 +132,7 @@ class HookGroupBrowser extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -147,9 +145,7 @@ class HookGroupBrowser extends Component {
       return;
     }
 
-    const promisedState = {groups: this.props.clients.hooks.listHookGroups()};
-
-    this.props.loadState(promisedState);
+    this.props.loadState({ groups: this.props.clients.hooks.listHookGroups() });
   }
 
   render() {
@@ -186,9 +182,7 @@ HookGroupBrowser.propTypes = {
 };
 
 const hookGroupBrowserTaskclusterOpts = {
-  clients: {
-    hooks: taskcluster.Hooks,
-  },
+  clients: { hooks: taskcluster.Hooks },
   name: HookGroupBrowser.name
 };
 

@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import path from 'path';
-import {TaskClusterEnhance} from '../lib/utils';
 import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../lib/utils';
 import SecretEditor from './secreteditor';
 
 import './secretmanager.less';
@@ -19,7 +19,7 @@ class SecretManager extends Component {
       selectedSecretId,
       secrets: undefined,
       secretsLoaded: false,
-      secretsError: null,
+      secretsError: null
     };
 
     this.renderSecretRow = this.renderSecretRow.bind(this);
@@ -46,12 +46,12 @@ class SecretManager extends Component {
       return;
     }
 
-    const promisedState = {secrets: this.props.clients.secrets.list().then(resp => resp.secrets)};
-
-    this.props.loadState(promisedState);
+    this.props.loadState({
+      secrets: this.props.clients.secrets.list().then(resp => resp.secrets)
+    });
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -97,17 +97,17 @@ class SecretManager extends Component {
 
   renderSecretsTable() {
     return this.props.renderWaitFor('secrets') || (
-        <Table condensed={true} hover={true}>
-          <thead>
+      <Table condensed={true} hover={true}>
+        <thead>
           <tr>
             <th>SecretId</th>
           </tr>
-          </thead>
-          <tbody>
+        </thead>
+        <tbody>
           {this.state.secrets && this.state.secrets.map(this.renderSecretRow)}
-          </tbody>
-        </Table>
-      );
+        </tbody>
+      </Table>
+    );
   }
 
   renderSecretRow(secretId, index) {
@@ -125,7 +125,7 @@ class SecretManager extends Component {
 
   selectSecretId(secretId) {
     this.props.history.push(path.join('/secrets', encodeURIComponent(secretId)));
-    this.setState({selectedSecretId: secretId});
+    this.setState({ selectedSecretId: secretId });
   }
 
   reloadSecrets() {
@@ -135,9 +135,7 @@ class SecretManager extends Component {
 }
 
 const taskclusterOpts = {
-  clients: {
-    secrets: taskcluster.Secrets
-  },
+  clients: { secrets: taskcluster.Secrets },
   name: SecretManager.name
 };
 

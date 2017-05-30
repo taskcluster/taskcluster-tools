@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import asyncComponent from './asyncComponent';
 
-const RedirectToTaskGroupInspector = ({match}) => (
+const RedirectToTaskGroupInspector = ({ match }) => (
   <Redirect to={window.location.pathname.replace(match.url, '/task-group-inspector')} />
 );
 
@@ -65,8 +65,8 @@ const App = () => (
       <Route path="/display" component={Display} />
 
       {/* Redirects */}
-      <Route path="/task-graph-inspector" component={RedirectToTaskGroupInspector}/>
-      <Route path="/push-inspector" component={RedirectToTaskGroupInspector}/>
+      <Route path="/task-graph-inspector" component={RedirectToTaskGroupInspector} />
+      <Route path="/push-inspector" component={RedirectToTaskGroupInspector} />
     </Switch>
   </Router>
 );

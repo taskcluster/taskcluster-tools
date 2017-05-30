@@ -1,12 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
-import * as auth from './auth';
 import createDebugger from 'debug';
 import assert from 'assert';
-import * as format from './format';
 import taskcluster from 'taskcluster-client';
 import * as bs from 'react-bootstrap';
 import changeCase from 'change-case';
+import * as auth from './auth';
+import * as format from './format';
 
 const debug = createDebugger('lib:utils');
 
@@ -102,7 +102,7 @@ export const TaskClusterEnhance = (Component, opts) => (
         reloadOnKeys: [], // List of state keys to reload on
         reloadOnLogin: false, // Reload when credentials are changed
         name: null, // Name of wrapped component
-        ...opts,
+        ...opts
       };
 
       assert(Array.isArray(this.options.reloadOnProps), 'reloadOnProps must be an array');
@@ -154,7 +154,7 @@ export const TaskClusterEnhance = (Component, opts) => (
     handleCredentialsChanged(e) {
       // Update clients with new credentials
       this._createClients(e.detail);
-      this.setState({createdTaskIdError: null});
+      this.setState({ createdTaskIdError: null });
 
       if (this.options.reloadOnLogin) {
         // Reload state now that we have new credentials
@@ -212,7 +212,7 @@ export const TaskClusterEnhance = (Component, opts) => (
           this.setState({
             [`${key}Loaded`]: true,
             [`${key}Error`]: err,
-            [key]: result,
+            [key]: result
           }, this.updateWrappedState);
         }
       };
@@ -239,7 +239,7 @@ export const TaskClusterEnhance = (Component, opts) => (
     }
 
     reload(name) {
-      document.dispatchEvent(new CustomEvent('taskcluster-reload', {detail: {name}}));
+      document.dispatchEvent(new CustomEvent('taskcluster-reload', { detail: { name } }));
     }
 
     updateWrappedState() {
@@ -248,7 +248,7 @@ export const TaskClusterEnhance = (Component, opts) => (
         state: this.state
       };
 
-      document.dispatchEvent(new CustomEvent('taskcluster-update', {detail}));
+      document.dispatchEvent(new CustomEvent('taskcluster-update', { detail }));
     }
 
     /**
@@ -272,7 +272,7 @@ export const TaskClusterEnhance = (Component, opts) => (
     /** Render a spinner */
     renderSpinner() {
       return (
-        <div style={{textAlign: 'center', margin: 20}}>
+        <div style={{ textAlign: 'center', margin: 20 }}>
           <format.Icon name="spinner" size="2x" spin={true} />
         </div>
       );
@@ -327,7 +327,7 @@ export const TaskClusterEnhance = (Component, opts) => (
     /** Initialize client objects requested in options */
     _createClients(credentials) {
       _.forIn(this.options.clients, (Client, key) => {
-        this.clients[key] = new Client({credentials, ...this.options.clientOpts[key]});
+        this.clients[key] = new Client({ credentials, ...this.options.clientOpts[key] });
       });
     }
 
@@ -341,14 +341,14 @@ export const TaskClusterEnhance = (Component, opts) => (
         <Component
           {...this.props}
           clients={this.clients}
-          ref={instance => this.wrappedInstance = instance}
+          ref={instance => { this.wrappedInstance = instance; }}
           getWrappedInstance={this.getWrappedInstance}
           taskclusterState={this.taskclusterState}
           loadState={this.loadState}
           renderWaitFor={this.renderWaitFor}
           renderError={this.renderError}
           renderSpinner={this.renderSpinner} />
-      )
+      );
     }
   }
 );
@@ -382,7 +382,7 @@ export const CreateWebListener = (Component, opts) => (
       this.options = {
         reloadOnProps: [], // List of properties to reload on
         reloadOnKeys: [], // List of state keys to reload on
-        ...opts,
+        ...opts
       };
 
       assert(this.options.reloadOnProps instanceof Array, 'reloadOnProps must be an array');
@@ -472,7 +472,7 @@ export const CreateWebListener = (Component, opts) => (
 
     // Dispatch listener message to subscriber
     handleMessage(message) {
-      document.dispatchEvent(new CustomEvent('listener-message', {detail: message}));
+      document.dispatchEvent(new CustomEvent('listener-message', { detail: message }));
     }
 
     /** Start listening */
@@ -489,7 +489,7 @@ export const CreateWebListener = (Component, opts) => (
         this.__listener.on('message', this.handleMessage);
         this.__listener.on('error', err => {
           debug('Error while listening: %s, %j', err, err);
-          this.setState({listeningError: err || new Error('Unknown error')});
+          this.setState({ listeningError: err || new Error('Unknown error') });
           this.stopListening();
         });
 
@@ -501,7 +501,7 @@ export const CreateWebListener = (Component, opts) => (
 
         this.setState({
           listening: null,
-          listeningError: null,
+          listeningError: null
         });
 
         return Promise
@@ -519,7 +519,7 @@ export const CreateWebListener = (Component, opts) => (
           })
           .catch(err => {
             debug('Error while listening: %s, %j', err, err);
-            this.setState({listeningError: err || new Error('Unknown error')});
+            this.setState({ listeningError: err || new Error('Unknown error') });
 
             return this.stopListening();
           });
@@ -540,7 +540,7 @@ export const CreateWebListener = (Component, opts) => (
         .then(() => {
           this.setState({
             listening: true,
-            listeningError: null,
+            listeningError: null
           });
 
           // Notify that listener is listening
@@ -548,7 +548,7 @@ export const CreateWebListener = (Component, opts) => (
         })
         .catch(err => {
           debug('Error while listening: %s, %j', err, err);
-          this.setState({listeningError: err || new Error('Unknown error')});
+          this.setState({ listeningError: err || new Error('Unknown error') });
 
           return this.stopListening();
         });
@@ -556,7 +556,7 @@ export const CreateWebListener = (Component, opts) => (
 
     /** Stop listening, if already listening */
     stopListening() {
-      this.setState({listening: false});
+      this.setState({ listening: false });
 
       if (this.__listener) {
         const closed = this.__listener.close();
@@ -570,14 +570,16 @@ export const CreateWebListener = (Component, opts) => (
     }
 
     render() {
-      return <Component
-        {...this.props}
-        {...this.state}
-        ref={instance => this.wrappedInstance = instance}
-        getWrappedInstance={this.getWrappedInstance}
-        startListening={this.startListening}
-        stopListening={this.stopListening}
-        listenerState={this.listenerState} />;
+      return (
+        <Component
+          {...this.props}
+          {...this.state}
+          ref={instance => this.wrappedInstance = instance}
+          getWrappedInstance={this.getWrappedInstance}
+          startListening={this.startListening}
+          stopListening={this.stopListening}
+          listenerState={this.listenerState} />
+      );
     }
   }
 );
@@ -618,7 +620,7 @@ export const CreateWatchState = (Component, opts) => (
       this.options = {
         onProps: {},
         onKeys: {},
-        ...opts,
+        ...opts
       };
 
       _.forIn(this.options.onProps, (paths, key) => {
@@ -666,20 +668,22 @@ export const CreateWatchState = (Component, opts) => (
       const uniqueHandlers = _.uniq(handlers);
 
       if (uniqueHandlers.length) {
-        document.dispatchEvent(new CustomEvent('watch-reload', {detail: uniqueHandlers}));
+        document.dispatchEvent(new CustomEvent('watch-reload', { detail: uniqueHandlers }));
       }
 
       // Update previous props & keys
-      this.componentKeys = {...keys};
-      this.componentProps = {...props};
+      this.componentKeys = { ...keys };
+      this.componentProps = { ...props };
     }
 
     render() {
-      return <Component
-        {...this.props}
-        ref={instance => this.wrappedInstance = instance}
-        getWrappedInstance={this.getWrappedInstance}
-        watchState={this.watchState} />;
+      return (
+        <Component
+          {...this.props}
+          ref={instance => this.wrappedInstance = instance}
+          getWrappedInstance={this.getWrappedInstance}
+          watchState={this.watchState} />
+      );
     }
   }
 );

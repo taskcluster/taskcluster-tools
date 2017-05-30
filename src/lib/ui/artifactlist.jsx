@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {TaskClusterEnhance} from '../utils';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../utils';
 import * as auth from '../auth';
 
 // Matching patterns for finding an icon from a mimetype, most specific
@@ -8,7 +8,7 @@ import * as auth from '../auth';
 const MIMETYPE_ICONS = [
   {
     icon: 'file-pdf-o',
-    matches: ['application/pdf', 'application/postscript'],
+    matches: ['application/pdf', 'application/postscript']
   }, {
     icon: 'file-archive-o',
     matches: [
@@ -25,18 +25,18 @@ const MIMETYPE_ICONS = [
       'application/x-apple-diskimage',
       'application/vnd.ms-cab-compressed',
       'application/vnd.android.package-archive',
-      'application/x-gtar',
+      'application/x-gtar'
 
-    ],
+    ]
   }, {
     icon: 'file-word-o',
-    matches: ['text/rtf', 'text/html'],
+    matches: ['text/rtf', 'text/html']
   }, {
     icon: 'file-excel-o',
-    matches: ['text/csv'],
+    matches: ['text/csv']
   }, {
     icon: 'file-powerpoint-o',
-    matches: [],
+    matches: []
   }, {
     icon: 'file-code-o',
     matches: [
@@ -46,33 +46,33 @@ const MIMETYPE_ICONS = [
       'text/css',
       'text/javascript',
       'text/xml',
-      'application/ecmascript',
-    ],
+      'application/ecmascript'
+    ]
   }, {
     icon: 'file-video-o',
-    matches: [/^video\//],
+    matches: [/^video\//]
   }, {
     icon: 'file-image-o',
-    matches: [/^image\//],
+    matches: [/^image\//]
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//],
+    matches: [/^text\//]
   }, {
     icon: 'file-audio-o',
-    matches: [/^audio\//],
+    matches: [/^audio\//]
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//],
+    matches: [/^text\//]
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//],
+    matches: [/^text\//]
   }, {
     icon: 'file-archive-o',
-    matches: [/compressed/, /tar/, /zip/],
+    matches: [/compressed/, /tar/, /zip/]
   }, {
     icon: 'file-o',
-    matches: [/.*/],
-  },
+    matches: [/.*/]
+  }
 ];
 
 /** Get icon from mimetype */
@@ -102,7 +102,7 @@ class ArtifactList extends Component {
 
     this.state = {
       // list of artifacts with url built
-      artifacts: this.props.artifacts || [],
+      artifacts: this.props.artifacts || []
     };
 
     this.load = this.load.bind(this);
@@ -184,15 +184,15 @@ class ArtifactList extends Component {
       };
     });
 
-    this.setState({artifacts});
+    this.setState({ artifacts });
   }
 
   render() {
     return (
-      <div style={{fontSize: 14}}>
+      <div style={{ fontSize: 14 }}>
         {this.state.artifacts.map((artifact, key) => (
-          <div key={key} style={{marginBottom: 8}}>
-            <i className={`fa fa-${artifact.icon}`} style={{marginRight: 5}} />
+          <div key={key} style={{ marginBottom: 8 }}>
+            <i className={`fa fa-${artifact.icon}`} style={{ marginRight: 5 }} />
             <a href={artifact.url} target="_blank" rel="noopener noreferrer">{artifact.name}</a>
           </div>
         ))}
@@ -207,15 +207,13 @@ ArtifactList.propTypes = {
   // If not provided, latestArtifact is used
   runId: React.PropTypes.oneOfType([
     React.PropTypes.string,
-    React.PropTypes.number,
+    React.PropTypes.number
   ])
 };
 
 const taskclusterOpts = {
   // Need updated clients for Queue
-  clients: {
-    queue: taskcluster.Queue,
-  },
+  clients: { queue: taskcluster.Queue },
   // Reload when taskId changes or runId
   reloadOnProps: ['taskId', 'runId', 'indexNamespace', 'artifacts'],
   reloadOnLogin: true,

@@ -1,13 +1,13 @@
-import React, {Component} from 'react';
-import {Table, Label, Tab, Nav, NavItem, Row, Col} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../utils';
-import * as format from '../format';
-import _ from 'lodash';
+import React, { Component } from 'react';
+import { Table, Label, Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
+import _ from 'lodash';
+import path from 'path';
+import { TaskClusterEnhance } from '../utils';
+import * as format from '../format';
 import LogView from './logview';
 import ArtifactList from './artifactlist';
 import './runinfo.less';
-import path from 'path';
 
 /** Displays information about a run in a tab page */
 class RunInfo extends Component {
@@ -17,7 +17,7 @@ class RunInfo extends Component {
     this.state = {
       artifactsLoaded: true,
       artifactsError: null,
-      artifacts: [],
+      artifacts: []
     };
 
     this.onTabSelect = this.onTabSelect.bind(this);
@@ -47,7 +47,7 @@ class RunInfo extends Component {
     this.load();
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -92,7 +92,7 @@ class RunInfo extends Component {
     // This in case we overwrite an artifact, only possible for reference
     // artifacts, but a use-case...
     let index = _.findIndex(this.state.artifacts, {
-      name: message.payload.artifact.name,
+      name: message.payload.artifact.name
     });
 
     // If not present in the list, we index to length, as this equals appending
@@ -107,11 +107,11 @@ class RunInfo extends Component {
     artifacts[index] = message.payload.artifact;
 
     // Update state
-    this.setState({artifacts});
+    this.setState({ artifacts });
   }
 
   onTabSelect(tab) {
-    const {taskGroupId, taskId, run} = this.props.match.params;
+    const { taskGroupId, taskId, run } = this.props.match.params;
     const pathSoFar = taskGroupId ? path.join(taskGroupId, taskId, run) : path.join(taskId, run);
     const directory = this.props.match.url.split('/').filter(e => e.length)[0];
 
@@ -120,13 +120,13 @@ class RunInfo extends Component {
 
   // Render run
   render() {
-    const {run, activeTabOnInit} = this.props;
+    const { run, activeTabOnInit } = this.props;
     const stateLabelMap = {
       pending: 'info',
       running: 'primary',
       completed: 'success',
       failed: 'danger',
-      exception: 'warning',
+      exception: 'warning'
     };
 
     return (
@@ -144,74 +144,74 @@ class RunInfo extends Component {
               <Tab.Pane eventKey="details">
                 <Table>
                   <tbody>
-                  <tr>
-                    <td>State</td>
-                    <td>
-                      <Label bsStyle={stateLabelMap[run.state]}>{run.state}</Label>
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>State</td>
+                      <td>
+                        <Label bsStyle={stateLabelMap[run.state]}>{run.state}</Label>
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td>Reason Created</td>
-                    <td><code>{run.reasonCreated}</code></td>
-                  </tr>
+                    <tr>
+                      <td>Reason Created</td>
+                      <td><code>{run.reasonCreated}</code></td>
+                    </tr>
 
-                  <tr>
-                    <td>Reason Resolved</td>
-                    <td>
-                      {run.reasonResolved ? <code>{run.reasonResolved}</code> : '-'}
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>Reason Resolved</td>
+                      <td>
+                        {run.reasonResolved ? <code>{run.reasonResolved}</code> : '-'}
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td>Scheduled</td>
-                    <td>
-                      <format.DateView date={run.scheduled} />
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>Scheduled</td>
+                      <td>
+                        <format.DateView date={run.scheduled} />
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td>Started</td>
-                    <td>
-                      {
-                        run.started ?
-                          <format.DateView date={run.started} since={run.scheduled} /> :
-                          '-'
-                      }
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>Started</td>
+                      <td>
+                        {
+                          run.started ?
+                            <format.DateView date={run.started} since={run.scheduled} /> :
+                            '-'
+                        }
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td>Resolved</td>
-                    <td>
-                      {
-                        run.resolved ?
-                          <format.DateView date={run.resolved} since={run.started} /> :
-                          '-'
-                      }
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>Resolved</td>
+                      <td>
+                        {
+                          run.resolved ?
+                            <format.DateView date={run.resolved} since={run.started} /> :
+                            '-'
+                        }
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td>WorkerGroup</td>
-                    <td>
-                      {run.workerGroup ? <code>{run.workerGroup}</code> : '-'}
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>WorkerGroup</td>
+                      <td>
+                        {run.workerGroup ? <code>{run.workerGroup}</code> : '-'}
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td>WorkerId</td>
-                    <td>
-                      {run.workerId ? <code>{run.workerId}</code> : '-'}
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>WorkerId</td>
+                      <td>
+                        {run.workerId ? <code>{run.workerId}</code> : '-'}
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td>TakenUntil</td>
-                    <td>
-                      {run.takenUntil ? <format.DateView date={run.takenUntil} /> : '-'}
-                    </td>
-                  </tr>
+                    <tr>
+                      <td>TakenUntil</td>
+                      <td>
+                        {run.takenUntil ? <format.DateView date={run.takenUntil} /> : '-'}
+                      </td>
+                    </tr>
                   </tbody>
                 </Table>
               </Tab.Pane>
@@ -269,9 +269,7 @@ RunInfo.propTypes = {
 
 const taskclusterOpts = {
   // Need updated clients for Queue
-  clients: {
-    queue: taskcluster.Queue,
-  },
+  clients: { queue: taskcluster.Queue },
   // Reload when status.taskId changes or run.runId
   reloadOnProps: ['status.taskId', 'run.runId'],
   reloadOnLogin: true,

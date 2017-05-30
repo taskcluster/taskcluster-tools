@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import Layout from '../lib/Layout';
-import {hterm, lib} from 'hterm-umd';
+import React, { Component } from 'react';
+import { hterm, lib } from 'hterm-umd';
 import url from 'url';
 import qs from 'querystring';
-import {DockerExecClient} from 'docker-exec-websocket-server';
+import { DockerExecClient } from 'docker-exec-websocket-server';
+import Layout from '../lib/Layout';
 import './interactive.less';
 
 class Interactive extends Component {
@@ -36,9 +36,9 @@ class Interactive extends Component {
               'if [ -z `which "$SHELL"` ]; then export SHELL="/.taskclusterutils/busybox sh"; fi;',
               'SPAWN="$SHELL";',
               'if [ "$SHELL" = "bash" ]; then SPAWN="bash -li"; fi;',
-              'exec $SPAWN;',
-            ].join(''),
-          ],
+              'exec $SPAWN;'
+            ].join('')
+          ]
         });
 
         io.onVTKeystroke = io.sendString = d => {

@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {Button, Glyphicon, Modal} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../utils';
+import React, { Component } from 'react';
+import { Button, Glyphicon, Modal } from 'react-bootstrap';
+import { TaskClusterEnhance } from '../utils';
 
 /** Button with an associated confirm dialog */
 class ConfirmAction extends Component {
@@ -22,7 +22,7 @@ class ConfirmAction extends Component {
       resultLoaded: false,
       resultError: null,
       result: null
-    }
+    };
   }
 
   componentWillMount() {
@@ -33,7 +33,7 @@ class ConfirmAction extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -96,7 +96,7 @@ class ConfirmAction extends Component {
   }
 
   openDialog() {
-    this.setState({showDialog: true});
+    this.setState({ showDialog: true });
   }
 
   closeDialog() {
@@ -110,10 +110,10 @@ class ConfirmAction extends Component {
       result: (async () => {
         const result = await this.props.action();
 
-        this.setState({executing: false});
+        this.setState({ executing: false });
 
         return result;
-      })(),
+      })()
     });
   }
 }
@@ -132,7 +132,7 @@ ConfirmAction.propTypes = {
   action: React.PropTypes.func.isRequired
 };
 
-ConfirmAction.defaultProps = {disabled: false};
+ConfirmAction.defaultProps = { disabled: false };
 
 const taskclusterOpts = {
   name: ConfirmAction.name

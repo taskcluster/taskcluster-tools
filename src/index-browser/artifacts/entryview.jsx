@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {TaskClusterEnhance} from '../../lib/utils';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../../lib/utils';
 import ArtifactList from '../../lib/ui/artifactlist';
 
 class ArtifactView extends Component {
@@ -34,7 +34,7 @@ class ArtifactView extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -47,18 +47,16 @@ class ArtifactView extends Component {
       return;
     }
 
-    const promisedState = {artifacts: this.props.clients.queue.listLatestArtifacts(this.props.taskId)};
-
-    this.props.loadState(promisedState);
+    this.props.loadState({ artifacts: this.props.clients.queue.listLatestArtifacts(this.props.taskId) });
   }
 
   render() {
     return this.props.renderWaitFor('artifacts') || (
-        <ArtifactList
-          taskId={this.props.taskId}
-          indexNamespace={this.props.indexNamespace}
-          artifacts={this.state.artifacts ? this.state.artifacts.artifacts : []} />
-      );
+      <ArtifactList
+        taskId={this.props.taskId}
+        indexNamespace={this.props.indexNamespace}
+        artifacts={this.state.artifacts ? this.state.artifacts.artifacts : []} />
+    );
   }
 }
 
@@ -68,9 +66,7 @@ ArtifactView.propTypes = {
 };
 
 const artifactViewTaskclusterOpts = {
-  clients: {
-    queue: taskcluster.Queue
-  },
+  clients: { queue: taskcluster.Queue },
   // Reload when props.taskId changes, ignore credentials changes
   reloadOnProps: ['taskId', 'indexNamespace'],
   reloadOnLogin: false,
@@ -110,7 +106,7 @@ class EntryView extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -124,8 +120,8 @@ class EntryView extends Component {
     }
 
     const promisedState = this.props.namespace === '' ?
-      {task: null, taskError: null, taskLoaded: true} :
-      {task: this.props.clients.index.findTask(this.props.namespace)};
+      { task: null, taskError: null, taskLoaded: true } :
+      { task: this.props.clients.index.findTask(this.props.namespace) };
 
     this.props.loadState(promisedState);
   }
@@ -183,12 +179,10 @@ class EntryView extends Component {
   }
 }
 
-EntryView.propTypes = {namespace: React.PropTypes.string.isRequired};
+EntryView.propTypes = { namespace: React.PropTypes.string.isRequired };
 
 const entryViewTaskclusterOpts = {
-  clients: {
-    index: taskcluster.Index
-  },
+  clients: { index: taskcluster.Index },
   // Reload when props.namespace changes, ignore credentials changes
   reloadOnProps: ['namespace'],
   reloadOnLogin: false,

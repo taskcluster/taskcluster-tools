@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {Table, Nav, NavItem} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Table, Nav, NavItem } from 'react-bootstrap';
 import path from 'path';
-import {TaskClusterEnhance} from '../lib/utils';
-import taskcluster from 'taskcluster-client';
 import * as _ from 'lodash';
+import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../lib/utils';
 import * as format from '../lib/format';
 import WorkerTypeEditor from './workertypeeditor';
 
@@ -132,7 +132,7 @@ class WorkerTypeResources extends Component {
     return (
       <a href={`${URL}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{instanceId}</code>
-        <i className="fa fa-external-link" style={{paddingLeft: 5}} />
+        <i className="fa fa-external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
   }
@@ -150,7 +150,7 @@ class WorkerTypeResources extends Component {
     return (
       <a href={`${URL}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{spotReqId}</code>{!visibleToEC2 ? ' (Internally tracked)' : ''}
-        <i className="fa fa-external-link" style={{paddingLeft: 5}} />
+        <i className="fa fa-external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
   }
@@ -161,33 +161,33 @@ class WorkerTypeResources extends Component {
     return (
       <a href={`${URL}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{imageId}</code>
-        <i className="fa fa-external-link" style={{paddingLeft: 5}} />
+        <i className="fa fa-external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
   }
 
   runningCapacity() {
-    const {instanceTypes} = this.props.workerType;
+    const { instanceTypes } = this.props.workerType;
     const instances = this.props.awsState.instances
       .filter(x => x.state === 'running')
-      .map(instance => _.find(instanceTypes, {instanceType: instance.type}));
+      .map(instance => _.find(instanceTypes, { instanceType: instance.type }));
 
     return _.sumBy(instances, 'capacity');
   }
 
   pendingCapacity() {
-    const {instanceTypes} = this.props.workerType;
+    const { instanceTypes } = this.props.workerType;
     const instances = this.props.awsState.instances
       .filter(x => x.state === 'pending')
-      .map(instance => _.find(instanceTypes, {instanceType: instance.type}));
+      .map(instance => _.find(instanceTypes, { instanceType: instance.type }));
 
     return _.sumBy(instances, 'capacity');
   }
 
   spotReqCapacity() {
-    const {instanceTypes} = this.props.workerType;
+    const { instanceTypes } = this.props.workerType;
     const instances = this.props.awsState.requests
-      .map(spotReq => _.find(instanceTypes, {instanceType: spotReq.type}));
+      .map(spotReq => _.find(instanceTypes, { instanceType: spotReq.type }));
 
     return _.sumBy(instances, 'capacity');
   }
@@ -197,15 +197,11 @@ WorkerTypeResources.propTypes = {
   workerType: React.PropTypes.object.isRequired,
   awsState: React.PropTypes.shape({
     instances: React.PropTypes.arrayOf(React.PropTypes.object),
-    requests: React.PropTypes.arrayOf(React.PropTypes.object),
+    requests: React.PropTypes.arrayOf(React.PropTypes.object)
   }).isRequired
 };
 
 class WorkerTypeStatus extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     // Find availability zones
     const availabilityZones = _.union(
@@ -282,7 +278,7 @@ WorkerTypeStatus.propTypes = {
   awsState: React.PropTypes
     .shape({
       instances: React.PropTypes.arrayOf(React.PropTypes.object),
-      requests: React.PropTypes.arrayOf(React.PropTypes.object),
+      requests: React.PropTypes.arrayOf(React.PropTypes.object)
     })
     .isRequired
 };
@@ -293,7 +289,7 @@ class WorkerTypeView extends Component {
 
     this.state = {
       currentTab: this.props.match.params.currentTab || '',
-      pendingTasks: {pendingTasks: 0},
+      pendingTasks: { pendingTasks: 0 },
       pendingTasksLoaded: false,
       pendingTasksError: null,
       workerType: {},
@@ -326,7 +322,7 @@ class WorkerTypeView extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -340,7 +336,8 @@ class WorkerTypeView extends Component {
     }
 
     const self = this;
-    const promisedState = {
+
+    this.props.loadState({
       pendingTasks: this.props.clients.queue.pendingTasks(this.props.provisionerId, this.props.workerType),
       workerType: this.props.clients.awsProvisioner.workerType(this.props.workerType),
       awsState: this.props.clients.awsProvisioner
@@ -350,9 +347,7 @@ class WorkerTypeView extends Component {
 
           return res;
         })
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
   render() {
@@ -364,7 +359,7 @@ class WorkerTypeView extends Component {
           <NavItem eventKey="edit" key="edit">Edit Definition</NavItem>
           <NavItem eventKey="resources" key="resources">EC2 Resources</NavItem>
         </Nav>
-        <div className="tab-content" style={{minHeight: 400}}>
+        <div className="tab-content" style={{ minHeight: 400 }}>
           <div className="tab-pane active">
             {this.renderCurrentTab()}
           </div>
@@ -375,7 +370,7 @@ class WorkerTypeView extends Component {
 
   setCurrentTab(tab) {
     // Update state
-    this.setState({currentTab: tab});
+    this.setState({ currentTab: tab });
     this.props.history.push(path.join('/aws-provisioner', this.props.match.params.workerType, tab));
   }
 
@@ -435,7 +430,7 @@ const taskclusterOpts = {
   clientOpts: {
     awsProvisioner: {
       baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-    },
+    }
   },
   reloadOnProps: [
     'workerType',

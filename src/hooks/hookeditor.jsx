@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import _ from 'lodash';
-import {Button, Glyphicon, ButtonToolbar, Alert} from 'react-bootstrap';
-import ConfirmAction from '../lib/ui/confirmaction';
+import { Button, Glyphicon, ButtonToolbar, Alert } from 'react-bootstrap';
 import CodeMirror from 'react-code-mirror';
-import * as format from '../lib/format';
 import taskcluster from 'taskcluster-client';
-import {TaskClusterEnhance} from '../lib/utils';
 // Load javascript mode for CodeMirror
 import 'codemirror/mode/javascript/javascript';
+import ConfirmAction from '../lib/ui/confirmaction';
+import * as format from '../lib/format';
+import { TaskClusterEnhance } from '../lib/utils';
 import '../lib/codemirror/json-lint';
 import './hookeditor.less';
 
@@ -17,7 +17,7 @@ const initialHook = {
     name: '',
     description: '',
     owner: '',
-    emailOnError: true,
+    emailOnError: true
   },
   schedule: [],
   expires: '3 months',
@@ -28,22 +28,22 @@ const initialHook = {
     payload: {
       image: 'ubuntu:14.04',
       command: ['/bin/bash', '-c', 'echo "hello World"'],
-      maxRunTime: 60 * 10,
+      maxRunTime: 60 * 10
     },
     metadata: {
       name: 'Hook Task',
       description: 'Task Description',
       owner: 'name@example.com',
-      source: 'https://tools.taskcluster.net/hooks/',
-    },
-  },
+      source: 'https://tools.taskcluster.net/hooks/'
+    }
+  }
 };
 
 // some of the API functions return hook descriptions containing hookId
 // and hookGroupId, but the create and update methods do not take these
 // properties.  This function strips the properties on input.
 const stripHookIds = hook => {
-  const strippedHook = {...hook};
+  const strippedHook = { ...hook };
 
   delete strippedHook.hookId;
   delete strippedHook.hookGroupId;
@@ -55,7 +55,7 @@ class HookStatusDisplay extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {hookStatus: null};
+    this.state = { hookStatus: null };
 
     this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
   }
@@ -72,7 +72,7 @@ class HookStatusDisplay extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -348,7 +348,7 @@ class HookEditor extends Component {
                 See <a href="https://www.npmjs.com/package/cron-parser" target="_blank" rel="noopener noreferrer">
                 cron-parser</a> for format information. Times are in UTC.
               </p>
-              <ul style={{paddingLeft: 20}}>
+              <ul style={{ paddingLeft: 20 }}>
                 {
                   this.state.schedule.map((sched, index) => (
                     <li key={index}>
@@ -475,34 +475,34 @@ class HookEditor extends Component {
   }
 
   onHookGroupIdChange(e) {
-    this.setState({hookGroupId: e.target.value});
+    this.setState({ hookGroupId: e.target.value });
   }
 
   onHookIdChange(e) {
-    this.setState({hookId: e.target.value});
+    this.setState({ hookId: e.target.value });
   }
 
   onNameChange(e) {
-    this.setState({name: e.target.value});
+    this.setState({ name: e.target.value });
   }
 
   onDescriptionChange(e) {
-    this.setState({description: e.target.value});
+    this.setState({ description: e.target.value });
   }
 
   onOwnerChange(e) {
-    this.setState({owner: e.target.value});
+    this.setState({ owner: e.target.value });
   }
 
   onEmailOnErrorChange() {
-    this.setState({emailOnError: !this.state.emailOnError});
+    this.setState({ emailOnError: !this.state.emailOnError });
   }
 
   removeScheduleItem(index) {
     const schedule = [...this.state.schedule];
     schedule.splice(index, 1);
 
-    this.setState({schedule});
+    this.setState({ schedule });
   }
 
   onNewScheduleItem() {
@@ -512,26 +512,26 @@ class HookEditor extends Component {
       const schedule = _.cloneDeep(this.state.schedule);
 
       schedule.push(sch);
-      this.setState({schedule});
+      this.setState({ schedule });
     }
 
     findDOMNode(this.newSchInstance).value = '';
   }
 
   onScheduleTextChange(e) {
-    this.setState({scheduleText: e.target.value});
+    this.setState({ scheduleText: e.target.value });
   }
 
   onExpiresChange(e) {
-    this.setState({expires: e.target.value});
+    this.setState({ expires: e.target.value });
   }
 
   onDeadlineChange(e) {
-    this.setState({deadline: e.target.value});
+    this.setState({ deadline: e.target.value });
   }
 
   onTaskChange(e) {
-    this.setState({task: e.target.value});
+    this.setState({ task: e.target.value });
   }
 
   getHookDefinition() {
@@ -540,12 +540,12 @@ class HookEditor extends Component {
         name: this.state.name,
         description: this.state.description,
         owner: this.state.owner,
-        emailOnError: this.state.emailOnError,
+        emailOnError: this.state.emailOnError
       },
       schedule: this.state.schedule,
       expires: this.state.expires,
       deadline: this.state.deadline,
-      task: JSON.parse(this.state.task),
+      task: JSON.parse(this.state.task)
     };
   }
 
@@ -581,7 +581,7 @@ class HookEditView extends Component {
       hookStatus: null,
       hook: null,
       editing: true,
-      error: null,
+      error: null
     };
 
     this.load = this.load.bind(this);
@@ -607,7 +607,7 @@ class HookEditView extends Component {
     document.removeEventListener('taskcluster-reload', this.load, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -627,13 +627,11 @@ class HookEditView extends Component {
 
     // Create a new hook if we don't have the hookGroupId and hookId
     if (!this.props.currentHookId || !this.props.currentHookGroupId) {
-      const promisedState = {
+      return this.props.loadState({
         hook: null,
         editing: true,
-        error: null,
-      };
-
-      return this.props.loadState(promisedState);
+        error: null
+      });
     }
 
     const hookStatus = this.props.clients.hooks
@@ -642,14 +640,12 @@ class HookEditView extends Component {
       .hook(this.props.currentHookGroupId, this.props.currentHookId)
       .then(stripHookIds);
 
-    const promisedState = {
+    this.props.loadState({
       hook,
       hookStatus,
       editing: false,
-      error: null,
-    };
-
-    this.props.loadState(promisedState);
+      error: null
+    });
   }
 
   render() {
@@ -708,26 +704,26 @@ class HookEditView extends Component {
   }
 
   startEditing() {
-    this.setState({editing: true});
+    this.setState({ editing: true });
   }
 
   triggerHook() {
-    this.setState({hookStatus: null});
+    this.setState({ hookStatus: null });
 
     // Payloads are ignored, so we send empty data over
     this.props.clients.hooks
       .triggerHook(this.props.currentHookGroupId, this.props.currentHookId, {})
       .then(this.refreshHookStatus)
-      .catch(error => this.setState({error}));
+      .catch(error => this.setState({ error }));
   }
 
   refreshHookStatus() {
-    this.setState({hookStatus: null});
+    this.setState({ hookStatus: null });
 
     return this.props.clients.hooks
       .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId)
       .then(stat => {
-        this.setState({hookStatus: stat});
+        this.setState({ hookStatus: stat });
       });
   }
 
@@ -741,7 +737,7 @@ class HookEditView extends Component {
         this.props.refreshHookList();
       })
       .catch(err => {
-        this.setState({error: err});
+        this.setState({ error: err });
       });
   }
 
@@ -755,7 +751,7 @@ class HookEditView extends Component {
         error: null
       });
     } catch (err) {
-      this.setState({error: err});
+      this.setState({ error: err });
     }
   }
 
@@ -767,9 +763,7 @@ class HookEditView extends Component {
 
   /** Reset error state from operation*/
   dismissError() {
-    this.setState({
-      error: null
-    });
+    this.setState({ error: null });
   }
 }
 
@@ -777,13 +771,11 @@ HookEditView.propTypes = {
   currentHookId: React.PropTypes.string,
   currentHookGroupId: React.PropTypes.string,
   refreshHookList: React.PropTypes.func.isRequired,
-  selectHook: React.PropTypes.func.isRequired,
+  selectHook: React.PropTypes.func.isRequired
 };
 
 const hookEditViewTaskclusterOpts = {
-  clients: {
-    hooks: taskcluster.Hooks,
-  },
+  clients: { hooks: taskcluster.Hooks },
   reloadOnProps: ['currentHookId', 'currentHookGroupId'],
   name: HookEditView.name
 };

@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {OverlayTrigger, Tooltip, NavItem, Glyphicon} from 'react-bootstrap';
-import {buildLoginURL} from '../auth';
+import React, { Component } from 'react';
+import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
+import { buildLoginURL } from '../auth';
 
 export default class DevelopmentMenuItem extends Component {
   signIn() {

@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {Nav, NavItem, NavDropdown, MenuItem} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import _ from 'lodash';
 import path from 'path';
 import taskcluster from 'taskcluster-client';
-import {TaskClusterEnhance} from '../utils';
+import { TaskClusterEnhance } from '../utils';
 import TaskInfo from './taskinfo';
 import RunInfo from './runinfo';
 import ConfirmActionMenuItem from './ConfirmActionMenuItem';
@@ -19,7 +19,7 @@ class TaskView extends Component {
     this.state = {
       task: null,
       taskLoaded: false,
-      taskError: null,
+      taskError: null
     };
 
     this.scheduleTask = this.scheduleTask.bind(this);
@@ -46,7 +46,7 @@ class TaskView extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -67,9 +67,7 @@ class TaskView extends Component {
       return;
     }
 
-    const promisedState = {task: this.props.clients.queue.task(this.props.status.taskId)};
-
-    this.props.loadState(promisedState);
+    this.props.loadState({ task: this.props.clients.queue.task(this.props.status.taskId) });
   }
 
   // Render tabs and current tab
@@ -81,10 +79,10 @@ class TaskView extends Component {
     }
 
     const isResolved = [
-        'completed',
-        'failed',
-        'exception',
-      ].indexOf(this.props.status.state) !== -1;
+      'completed',
+      'failed',
+      'exception'
+    ].indexOf(this.props.status.state) !== -1;
 
     return (
       <div className="task-view">
@@ -119,7 +117,7 @@ class TaskView extends Component {
               workerType={this.state.task.workerType} />
           </NavDropdown>
           <NavDropdown eventKey="runs" title="Runs" key="runs" id="task-view-runs">
-            {this.props.status.runs.map(({runId}) => (
+            {this.props.status.runs.map(({ runId }) => (
               <MenuItem eventKey={`${runId}`} key={`${runId}`}>
                 Run {runId}
               </MenuItem>
@@ -156,11 +154,13 @@ class TaskView extends Component {
     }
 
     // return a RunInfo
-    return <RunInfo
-      {...this.props}
-      ref={instance => { this.runInfoInstance = instance; }}
-      run={run}
-      activeTabOnInit={this.props.match.params.section} />;
+    return (
+      <RunInfo
+        {...this.props}
+        ref={instance => { this.runInfoInstance = instance; }}
+        run={run}
+        activeTabOnInit={this.props.match.params.section} />
+    );
   }
 
   isNumber(term) {
@@ -169,7 +169,7 @@ class TaskView extends Component {
 
   // Set currentTab
   setCurrentTab(tab) {
-    const {taskId, run} = this.props.match.params;
+    const { taskId, run } = this.props.match.params;
     const directory = this.props.match.url.split('/').filter(p => p.length)[0];
     let section = '';
 
@@ -199,13 +199,11 @@ TaskView.defaultProps = {
   initialTab: ''
 };
 
-TaskView.propTypes = {status: React.PropTypes.object.isRequired};
+TaskView.propTypes = { status: React.PropTypes.object.isRequired };
 
 const taskclusterOpts = {
   // Need updated clients for Queue
-  clients: {
-    queue: taskcluster.Queue,
-  },
+  clients: { queue: taskcluster.Queue },
   // Reload when props.status.taskId changes, ignore credential changes
   reloadOnProps: ['status.taskId'],
   reloadOnLogin: false,

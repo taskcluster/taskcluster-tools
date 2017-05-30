@@ -1,13 +1,13 @@
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
-import TaskView from '../lib/ui/taskview';
-import {TaskClusterEnhance, CreateWebListener, CreateWatchState} from '../lib/utils';
-import {findDOMNode} from 'react-dom';
+import { findDOMNode } from 'react-dom';
 import path from 'path';
 import Helmet from 'react-helmet';
-import {Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button}
+import { Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button }
   from 'react-bootstrap';
+import { TaskClusterEnhance, CreateWebListener, CreateWatchState } from '../lib/utils';
+import TaskView from '../lib/ui/taskview';
 import PreviousTasks from '../lib/ui/previoustasks';
 
 const VALID_INPUT = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
@@ -65,12 +65,10 @@ class TaskInspector extends React.Component {
       return;
     }
 
-    const promisedState = {status: this.props.clients.queue.status(taskId).then(_.property('status'))};
-
-    this.props.loadState(promisedState);
+    this.props.loadState({ status: this.props.clients.queue.status(taskId).then(_.property('status')) });
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -78,13 +76,13 @@ class TaskInspector extends React.Component {
     this.setState(detail.state);
   }
 
-  onWatchReload({detail}) {
+  onWatchReload({ detail }) {
     detail.map(functionName => this[functionName]());
   }
 
-  onListenerMessage({detail}) {
+  onListenerMessage({ detail }) {
     // Update status structure
-    this.setState({status: detail.payload.status});
+    this.setState({ status: detail.payload.status });
 
     // If the message origins from the artifact create exchange, we should
     // notify our children
@@ -109,7 +107,7 @@ class TaskInspector extends React.Component {
     }
 
     // Construct the routing key pattern
-    const routingKey = {taskId};
+    const routingKey = { taskId };
 
     // Return all interesting bindings
     return [
@@ -134,7 +132,7 @@ class TaskInspector extends React.Component {
 
   /** When taskId changes, we should update the input */
   updateTaskIdInput() {
-    this.setState({taskIdInput: this.props.match.params.taskId});
+    this.setState({ taskIdInput: this.props.match.params.taskId });
   }
 
   render() {
@@ -143,7 +141,7 @@ class TaskInspector extends React.Component {
     const invalidInput = !VALID_INPUT.test(taskIdInput);
 
     return (
-      <div style={{marginBottom: 40}}>
+      <div style={{ marginBottom: 40 }}>
         <Helmet title={this.getTitle()} />
         <h4>My Component TaskInspector</h4>
         <p>
@@ -175,7 +173,7 @@ class TaskInspector extends React.Component {
             </Form>
           </Col>
 
-          <Col sm={4} style={{marginTop: '25px'}}>
+          <Col sm={4} style={{ marginTop: '25px' }}>
             <PreviousTasks objectId={taskId} objectType="taskId" />
           </Col>
         </Row>
@@ -185,7 +183,7 @@ class TaskInspector extends React.Component {
             {
               taskId && this.props.renderWaitFor('status') || (this.state.status && (
                 <TaskView
-                  ref={instance => {this.taskViewInstance = instance}}
+                  ref={instance => { this.taskViewInstance = instance; }}
                   status={this.state.status}
                   {...this.props} />
               ))
@@ -193,20 +191,20 @@ class TaskInspector extends React.Component {
           </Col>
         </Row>
       </div>
-    )
+    );
   }
 
   /** Update taskIdInput to reflect input */
   handleTaskIdInputChange() {
-    this.setState({taskIdInput: findDOMNode(this.refs.taskId).value.trim()});
+    this.setState({ taskIdInput: findDOMNode(this.refs.taskId).value.trim() });
   }
 
   /** Handle form submission */
   handleSubmit(e) {
     e.preventDefault();
 
-    this.setState({taskId: this.state.taskIdInput});
-    this.props.history.push(path.join('/', 'task-inspector', this.state.taskIdInput));
+    this.setState({ taskId: this.state.taskIdInput });
+    this.props.history.push(path.join('/task-inspector', this.state.taskIdInput));
   }
 }
 
@@ -230,9 +228,7 @@ const webListenerOpts = {
 
 // Called handler when match.params.taskId changes
 const watchStateOpts = {
-  onKeys: {
-    updateTaskIdInput: ['taskId']
-  }
+  onKeys: { updateTaskIdInput: ['taskId'] }
 };
 
 export default TaskClusterEnhance(CreateWatchState(CreateWebListener(TaskInspector, webListenerOpts), watchStateOpts), taskclusterOpts);

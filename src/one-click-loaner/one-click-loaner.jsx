@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
-import {FormGroup, FormControl, ControlLabel, InputGroup, Button} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import { FormGroup, FormControl, ControlLabel, InputGroup, Button } from 'react-bootstrap';
 import path from 'path';
-import {TaskClusterEnhance, CreateWatchState} from '../lib/utils';
 import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance, CreateWatchState } from '../lib/utils';
 import LoanerButton from '../lib/ui/loaner-button';
 
 const VALID_INPUT = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
@@ -48,7 +48,7 @@ class OneClickLoaner extends Component {
     this.props.watchState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -56,7 +56,7 @@ class OneClickLoaner extends Component {
     this.setState(detail.state);
   }
 
-  onWatchReload({detail}) {
+  onWatchReload({ detail }) {
     detail.map(functionName => this[functionName]());
   }
 
@@ -68,20 +68,16 @@ class OneClickLoaner extends Component {
 
     // Skip loading empty-strings
     if (this.state.taskId === '') {
-      const promisedState = {task: null};
-
-      return this.props.loadState(promisedState);
+      return this.props.loadState({ task: null });
     }
 
     // Reload task definition
-    const promisedState = {task: this.props.clients.queue.task(this.state.taskId)};
-
-    this.props.loadState(promisedState);
+    this.props.loadState({ task: this.props.clients.queue.task(this.state.taskId) });
   }
 
   /** When taskId changed we should update the input */
   updateTaskIdInput() {
-    this.setState({taskIdInput: this.state.taskId});
+    this.setState({ taskIdInput: this.state.taskId });
   }
 
   // Render a task-inspector
@@ -136,25 +132,23 @@ class OneClickLoaner extends Component {
     if (!invalidInput) {
       this.setState({
         taskIdInput,
-        taskId: taskIdInput,
+        taskId: taskIdInput
       });
     } else {
-      this.setState({taskIdInput});
+      this.setState({ taskIdInput });
     }
   }
 
   /** Handle form submission */
   handleSubmit(e) {
     e.preventDefault();
-    this.setState({taskId: this.state.taskIdInput});
+    this.setState({ taskId: this.state.taskIdInput });
     this.props.history.push(path.join('/one-click-loaner', this.state.taskIdInput));
   }
 }
 
 const taskclusterOpts = {
-  clients: {
-    queue: taskcluster.Queue,
-  },
+  clients: { queue: taskcluster.Queue },
   // Reload when state.taskId changes, ignore credential changes
   reloadOnKeys: ['taskId'],
   reloadOnLogin: false,
@@ -162,9 +156,7 @@ const taskclusterOpts = {
 };
 
 const watchStateOpts = {
-  onKeys: {
-    updateTaskIdInput: ['taskId'],
-  }
+  onKeys: { updateTaskIdInput: ['taskId'] }
 };
 
 export default TaskClusterEnhance(CreateWatchState(OneClickLoaner, watchStateOpts), taskclusterOpts);

@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import {Row, Col, Form, FormGroup, FormControl, Glyphicon, Button} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col, Form, FormGroup, FormControl, Glyphicon, Button } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
-import {TaskClusterEnhance} from '../utils';
+import { TaskClusterEnhance } from '../utils';
 
 /** Render a terminal and a dropdown menu to select logs from */
 class LogView extends Component {
@@ -13,7 +13,7 @@ class LogView extends Component {
         log.name === 'public/logs/live.log'
       ) || this.props.logs[0];
 
-    this.state = {name: entry ? entry.name : ''};
+    this.state = { name: entry ? entry.name : '' };
 
     this.refreshLog = this.refreshLog.bind(this);
     this.handleLogChanged = this.handleLogChanged.bind(this);
@@ -41,7 +41,7 @@ class LogView extends Component {
       <Row>
         <Col sm={12}>
           <Form inline={true}>
-            <FormGroup style={{marginRight: 10}}>
+            <FormGroup style={{ marginRight: 10 }}>
               <FormControl
                 componentClass="select"
                 value={this.state.name}
@@ -52,7 +52,7 @@ class LogView extends Component {
               </FormControl>
             </FormGroup>
 
-            <Button bsSize="sm" onClick={this.refreshLog} style={{marginRight: 10}}>
+            <Button bsSize="sm" onClick={this.refreshLog} style={{ marginRight: 10 }}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
             <a href={src} target="_blank" rel="noopener noreferrer" className="btn btn-default btn-sm">
@@ -61,7 +61,7 @@ class LogView extends Component {
           </Form>
         </Col>
 
-        <Col sm={12} style={{marginTop: 20}}>
+        <Col sm={12} style={{ marginTop: 20 }}>
           <iframe
             ref="logFrame"
             height="500"
@@ -74,7 +74,7 @@ class LogView extends Component {
   }
 
   handleLogChanged(e) {
-    this.setState({name: e.target.value});
+    this.setState({ name: e.target.value });
   }
 }
 
@@ -83,15 +83,13 @@ LogView.propTypes = {
   taskId: React.PropTypes.string.isRequired,
   runId: React.PropTypes.oneOfType([
     React.PropTypes.string,
-    React.PropTypes.number,
+    React.PropTypes.number
   ]).isRequired
 };
 
 const taskclusterOpts = {
   // Need updated clients for Queue
-  clients: {
-    queue: taskcluster.Queue,
-  },
+  clients: { queue: taskcluster.Queue },
   name: LogView.name
 };
 

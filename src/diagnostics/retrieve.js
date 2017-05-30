@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import assert from 'assert';
-import {Parser} from 'xml2js';
+import { Parser } from 'xml2js';
 import querystring from 'querystring';
 import $ from 'jquery';
 
@@ -24,7 +24,7 @@ const requestGet = url => new Promise(resolve => $.ajax({
   url,
   dataType: 'text',
   type: 'GET',
-  success: resolve,
+  success: resolve
 }));
 
 const getLatestLog = async (env, logType) => {
@@ -32,7 +32,7 @@ const getLatestLog = async (env, logType) => {
   assert(env === 'development' || env === 'production',
     'env should be one of { production, development }');
 
-  const logUrl = `${BASE_URL}?${querystring.stringify({prefix: `${env}/${logType}`})}`;
+  const logUrl = `${BASE_URL}?${querystring.stringify({ prefix: `${env}/${logType}` })}`;
 
   try {
     // Get the logs from the s3 bucket
@@ -52,9 +52,9 @@ const getLatestLog = async (env, logType) => {
       .value();
     const log = await requestGet(`${BASE_URL}/${key}`);
 
-    return {testId, testDate, log};
+    return { testId, testDate, log };
   } catch (err) {
-    return {err};
+    return { err };
   }
 };
 
@@ -91,4 +91,4 @@ const parseResult = jsonResult => {
   return result;
 };
 
-export default {getLatestLog, parseResult};
+export default { getLatestLog, parseResult };

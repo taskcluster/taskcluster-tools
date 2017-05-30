@@ -1,7 +1,7 @@
 import React from 'react';
+import { Route } from 'react-router-dom';
 import HookManager from './hookmanager';
 import Layout from '../lib/Layout';
-import {Route} from 'react-router-dom';
 
 const Hooks = () => (
   <Layout>

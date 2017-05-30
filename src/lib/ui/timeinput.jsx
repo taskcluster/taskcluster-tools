@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {Glyphicon} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Glyphicon } from 'react-bootstrap';
 import moment from 'moment';
 import classNames from 'classnames';
 
@@ -8,13 +8,13 @@ class TimeInput extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {valid: true};
+    this.state = { valid: true };
 
     this.onChange = this.onChange.bind(this);
   }
 
   render() {
-    const {format, value, className} = this.props;
+    const { format, value, className } = this.props;
     const formatted = value.format(format);
     const inputClass = classNames('input-group', this.state.valid ? 'has-success' : 'has-error');
 
@@ -37,7 +37,7 @@ class TimeInput extends Component {
     const parsed = moment(value);
     const valid = parsed.format(this.props.format) === value;
 
-    this.setState({valid});
+    this.setState({ valid });
 
     if (valid) {
       this.props.onChange(parsed);

@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
-import ConfirmActionMenuItem from './ConfirmActionMenuItem';
-import {TaskClusterEnhance} from '../utils';
 import slugid from 'slugid';
 import _ from 'lodash';
+import ConfirmActionMenuItem from './ConfirmActionMenuItem';
+import { TaskClusterEnhance } from '../utils';
 
 class RetriggerMenuItem extends Component {
   constructor(props) {
@@ -55,7 +55,7 @@ class RetriggerMenuItem extends Component {
   }
 }
 
-RetriggerMenuItem.defaultProps = {disabled: false};
+RetriggerMenuItem.defaultProps = { disabled: false };
 
 RetriggerMenuItem.propTypes = {
   taskId: React.PropTypes.string.isRequired,
@@ -65,9 +65,7 @@ RetriggerMenuItem.propTypes = {
 
 const taskclusterOpts = {
   // Need updated clients for Queue
-  clients: {
-    queue: taskcluster.Queue,
-  },
+  clients: { queue: taskcluster.Queue },
   name: RetriggerMenuItem.name
 };
 

@@ -1,15 +1,15 @@
-import React, {Component} from 'react';
-import {Row, Col} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import * as auth from '../lib/auth';
-import {TaskClusterEnhance} from '../lib/utils';
+import { TaskClusterEnhance } from '../lib/utils';
 import * as format from '../lib/format';
 
 export default class CredentialsManager extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {credentials: auth.loadCredentials()};
+    this.state = { credentials: auth.loadCredentials() };
 
     this.handleCredentialsChanged = this.handleCredentialsChanged.bind(this);
   }
@@ -26,7 +26,7 @@ export default class CredentialsManager extends Component {
   }
 
   handleCredentialsChanged() {
-    this.setState({credentials: auth.loadCredentials()});
+    this.setState({ credentials: auth.loadCredentials() });
   }
 
   /** Listen for credentials-changed events */
@@ -66,7 +66,7 @@ class CredentialView extends Component {
     document.removeEventListener('taskcluster-reload', this.load, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -84,8 +84,8 @@ class CredentialView extends Component {
     }
 
     const promisedState = this.props.credentials ?
-      {info: taskcluster.credentialInformation(this.props.credentials)} :
-      {info: null, infoLoaded: true};
+      { info: taskcluster.credentialInformation(this.props.credentials) } :
+      { info: null, infoLoaded: true };
 
     this.props.loadState(promisedState);
   }
@@ -97,14 +97,14 @@ class CredentialView extends Component {
     return this.props.renderWaitFor('info') || (() => {
       if (!info) {
         return (
-          <div style={{marginTop: 20}}>
+          <div style={{ marginTop: 20 }}>
             <p>No credentials loaded. Please sign in.</p>
           </div>
         );
       }
 
       return (
-        <div style={{marginTop: 20}}>
+        <div style={{ marginTop: 20 }}>
           <table className="table">
             <tbody>
               <tr>
@@ -159,7 +159,7 @@ class CredentialView extends Component {
                 <td>
                   {
                     info.scopes.length ? (
-                      <div style={{lineHeight: 1.8}}>
+                      <div style={{ lineHeight: 1.8 }}>
                         {info.scopes.map((scope, key) => <div key={key}><code>{scope}</code></div>)}
                       </div>
                     ) :
@@ -175,7 +175,7 @@ class CredentialView extends Component {
   }
 
   showToken() {
-    this.setState({showToken: true});
+    this.setState({ showToken: true });
   }
 }
 

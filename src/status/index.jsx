@@ -1,5 +1,5 @@
 import React from 'react';
-import {TaskClusterDashboard} from './status';
+import { TaskClusterDashboard } from './status';
 import Layout from '../lib/Layout';
 
 const Status = () => (

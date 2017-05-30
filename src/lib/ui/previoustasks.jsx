@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {ListGroup, ListGroupItem, Panel} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../../lib/utils';
+import React, { Component } from 'react';
+import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
+import { TaskClusterEnhance } from '../../lib/utils';
 import './previoustasks.less';
 
 class PreviousTasks extends Component {
@@ -36,7 +36,7 @@ class PreviousTasks extends Component {
     this.load();
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -49,13 +49,11 @@ class PreviousTasks extends Component {
       return;
     }
 
-    const promisedState = {
+    this.props.loadState({
       previousObjectIds: this.getPreviousObjectIds(this.props.objectType, this.props.objectId),
       objectId: this.props.objectId,
-      objectType: this.props.objectType,
-    };
-
-    this.props.loadState(promisedState);
+      objectType: this.props.objectType
+    });
   }
 
   getPreviousObjectIds(type, newId) {

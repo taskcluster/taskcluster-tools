@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import path from 'path';
-import {Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../../lib/utils';
-import taskcluster from 'taskcluster-client';
-import * as format from '../../lib/format';
+import { Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table } from 'react-bootstrap';
 import _ from 'lodash';
+import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../../lib/utils';
+import * as format from '../../lib/format';
 import RoleEditor from '../roles/roleeditor';
 import ClientEditor from '../clients/clienteditor';
 import './scopeinspector.less';
@@ -14,7 +14,7 @@ class ScopeInspector extends Component {
   constructor(props) {
     super(props);
 
-    const {params} = this.props.match;
+    const { params } = this.props.match;
     const selectedScope = params.selectedScope ? decodeURIComponent(params.selectedScope) : '';
     const selectedEntity= params.selectedEntity ? decodeURIComponent(params.selectedEntity) : '';
 
@@ -52,7 +52,7 @@ class ScopeInspector extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -72,12 +72,10 @@ class ScopeInspector extends Component {
     // - clientsLoaded
     // - clientsError
     // - clients
-    const promisedState = {
+    this.props.loadState({
       roles: this.props.clients.auth.listRoles(),
       clients: this.props.clients.auth.listClients()
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
   /** Render user-interface */
@@ -106,7 +104,7 @@ class ScopeInspector extends Component {
   }
 
   renderSelectedEntity() {
-    const {selectedEntity} = this.state;
+    const { selectedEntity } = this.state;
 
     if (selectedEntity === '') {
       return;
@@ -145,7 +143,7 @@ class ScopeInspector extends Component {
   }
 
   clearSelectedEntity() {
-    this.setState({selectedEntity: ''}, this.updatePath);
+    this.setState({ selectedEntity: '' }, this.updatePath);
   }
 
   renderSelectedScope() {
@@ -212,15 +210,15 @@ class ScopeInspector extends Component {
                   pullRight={true}
                   id="match">
                   <MenuItem key="1" onClick={() => this.setEntitySearchMode('Exact')}>
-                    <Glyphicon glyph="ok" style={mode === 'Exact' ? {} : {visibility: 'hidden'}} /> Exact
+                    <Glyphicon glyph="ok" style={mode === 'Exact' ? {} : { visibility: 'hidden' }} /> Exact
                   </MenuItem>
                   <MenuItem key="2" onClick={() => this.setEntitySearchMode('Has Scope')}>
-                    <Glyphicon glyph="ok" style={mode === 'Has Scope' ? {} : {visibility: 'hidden'}} /> Has Scope
+                    <Glyphicon glyph="ok" style={mode === 'Has Scope' ? {} : { visibility: 'hidden' }} /> Has Scope
                   </MenuItem>
                   <MenuItem key="3" onClick={() => this.setEntitySearchMode('Has Sub-Scope')}>
                     <Glyphicon
                       glyph="ok"
-                      style={mode === 'Has Sub-Scope' ? {} : {visibility: 'hidden'}} /> Has Sub-Scope
+                      style={mode === 'Has Sub-Scope' ? {} : { visibility: 'hidden' }} /> Has Sub-Scope
                   </MenuItem>
                 </DropdownButton>
               </InputGroup>
@@ -261,27 +259,25 @@ class ScopeInspector extends Component {
   }
 
   selectEntity(value) {
-    this.setState({selectedEntity: value}, this.updatePath);
+    this.setState({ selectedEntity: value }, this.updatePath);
   }
 
   selectedScopeChanged() {
-    this.setState({
-      selectedScope: findDOMNode(this.refs.selectedScope).value,
-    });
+    this.setState({ selectedScope: findDOMNode(this.refs.selectedScope).value });
   }
 
   setEntitySearchMode(mode) {
-    this.setState({entitySearchMode: mode});
+    this.setState({ entitySearchMode: mode });
   }
 
   clearSelectedScope() {
-    this.setState({selectedScope: ''}, this.updatePath);
+    this.setState({ selectedScope: '' }, this.updatePath);
   }
 
   renderScopes() {
     const scopes = _.uniq(_.flattenDeep([
       this.state.roles.map(role => role.expandedScopes),
-      this.state.clients.map(client => client.expandedScopes),
+      this.state.clients.map(client => client.expandedScopes)
     ]))
     .sort()
     .filter(scope => _.includes(scope, this.state.scopeSearchTerm));
@@ -289,7 +285,7 @@ class ScopeInspector extends Component {
     return (
       <Row>
         <Col md={12}>
-          <InputGroup style={{marginBottom: 20}}>
+          <InputGroup style={{ marginBottom: 20 }}>
             <InputGroup.Addon><Glyphicon glyph="search" /></InputGroup.Addon>
             <FormControl
               type="text"
@@ -318,15 +314,11 @@ class ScopeInspector extends Component {
   }
 
   scopeSearchTermChanged() {
-    this.setState({
-      scopeSearchTerm: findDOMNode(this.refs.scopeSearchTerm).value,
-    });
+    this.setState({ scopeSearchTerm: findDOMNode(this.refs.scopeSearchTerm).value });
   }
 
   clearScopeSearchTerm() {
-    this.setState({
-      scopeSearchTerm: '',
-    });
+    this.setState({ scopeSearchTerm: '' });
   }
 
   /** Render row with scope */
@@ -344,14 +336,12 @@ class ScopeInspector extends Component {
   }
 
   selectScope(scope) {
-    this.setState({selectedScope: scope}, this.updatePath);
+    this.setState({ selectedScope: scope }, this.updatePath);
   }
 }
 
 const taskclusterOpts = {
-  clients: {
-    auth: taskcluster.Auth
-  },
+  clients: { auth: taskcluster.Auth },
   name: ScopeInspector.name
 };
 

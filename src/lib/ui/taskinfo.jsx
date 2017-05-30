@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {Button, Table, Label} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Button, Table, Label } from 'react-bootstrap';
+import _ from 'lodash';
+import path from 'path';
 import ConfirmAction from './confirmaction';
 import LoanerButton from './loaner-button';
-import _ from 'lodash';
-import {Markdown, DateView, Code} from '../format';
-import path from 'path';
+import { Markdown, DateView, Code } from '../format';
 import './taskinfo.less';
 
 /** Displays information about a task in a tab page */
@@ -12,25 +12,25 @@ class TaskInfo extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {showRunLocallyScript: false};
+    this.state = { showRunLocallyScript: false };
 
     this.editTask = this.editTask.bind(this);
     this.handleRunLocally = this.handleRunLocally.bind(this);
   }
 
   handleRunLocally() {
-    this.setState({showRunLocallyScript: !this.state.showRunLocallyScript});
+    this.setState({ showRunLocallyScript: !this.state.showRunLocallyScript });
   }
 
   render() {
-    const {status, task} = this.props;
+    const { status, task } = this.props;
     const taskStateLabel = {
       unscheduled: 'default',
       pending: 'info',
       running: 'primary',
       completed: 'success',
       failed: 'danger',
-      exception: 'warning',
+      exception: 'warning'
     };
 
     return (
@@ -275,7 +275,7 @@ class TaskInfo extends Component {
     const newTask = {
       // filled in by task creator on load
       created: null,
-      deadline: null,
+      deadline: null
     };
     // copy fields from the parent task, intentionally excluding some
     // fields which might cause confusion if left unchanged
@@ -287,7 +287,7 @@ class TaskInfo extends Component {
       'created',
       'deadline',
       'dependencies',
-      'requires',
+      'requires'
     ];
 
     _.keys(this.props.task).forEach(key => {
@@ -451,7 +451,7 @@ class TaskInfo extends Component {
             '\r': '\\r',
             '\t': '\\t',
             '\v': '\\v',
-            '\b': '\\b',
+            '\b': '\\b'
           })[c]);
 
           return `'${replaced}'`;

@@ -1,6 +1,5 @@
-import React, {Component} from 'react';
-import {Button, ButtonToolbar, Glyphicon, Row, Col} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../lib/utils';
+import React, { Component } from 'react';
+import { Button, ButtonToolbar, Glyphicon, Row, Col } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import CodeMirror from 'react-code-mirror';
 import createDebugger from 'debug';
@@ -8,6 +7,7 @@ import _ from 'lodash';
 import slugid from 'slugid';
 import yaml from 'js-yaml';
 import 'codemirror/mode/yaml/yaml';
+import { TaskClusterEnhance } from '../lib/utils';
 import '../lib/codemirror/yaml-lint';
 import './taskcreator.less';
 
@@ -34,7 +34,7 @@ class TaskCreator extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -62,7 +62,7 @@ class TaskCreator extends Component {
     return _.defaults(this.parameterizeTask(task), {
       createdTaskIdLoaded: false,
       createdTaskIdError: undefined,
-      createdTaskId: null,
+      createdTaskId: null
     });
   }
 
@@ -80,7 +80,7 @@ class TaskCreator extends Component {
       deadline.setMinutes(deadline.getMinutes() + 60);
       data.created = new Date().toJSON();
       data.deadline = deadline.toJSON();
-      task = yaml.safeDump(data, {noCompatMode: true, noRefs: true}) + '\n';
+      task = yaml.safeDump(data, { noCompatMode: true, noRefs: true }) + '\n';
     } catch (err) {
       debug('Failed to parameterize task, err: %s, %j', err, err, err.stack);
       invalidTask = true;
@@ -89,7 +89,7 @@ class TaskCreator extends Component {
     // Set task, and serialize to string after parameterization
     return {
       task,
-      invalidTask,
+      invalidTask
     };
   }
 
@@ -103,7 +103,7 @@ class TaskCreator extends Component {
         window.location = link;
 
         return (
-          <Row style={{marginBottom: 40}}>
+          <Row style={{ marginBottom: 40 }}>
             <Col sm={12}>
               <a href={link}>
                 See&nbsp;
@@ -143,7 +143,7 @@ class TaskCreator extends Component {
           lineNumbers={true}
           mode="yaml"
           textAreaClassName="form-control"
-          textAreaStyle={{minHeight: '20em'}}
+          textAreaStyle={{ minHeight: '20em' }}
           value={this.state.task}
           onChange={this.handleTaskChange}
           indentWithTabs={false}
@@ -180,7 +180,7 @@ class TaskCreator extends Component {
 
     this.setState({
       invalidTask,
-      task: e.target.value,
+      task: e.target.value
     });
   }
 
@@ -206,7 +206,7 @@ class TaskCreator extends Component {
       });
 
     // Load state from promise (see TaskClusterEnhance)
-    this.props.loadState({createdTaskId: taskCreated});
+    this.props.loadState({ createdTaskId: taskCreated });
   }
 
   /** Reset timestamps in the task **/

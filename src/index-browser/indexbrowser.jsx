@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
-import {Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl} from 'react-bootstrap';
-import {TaskClusterEnhance, CreateWatchState} from '../lib/utils';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import { Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
-import './indexbrowser.less';
 import path from 'path';
+import { TaskClusterEnhance, CreateWatchState } from '../lib/utils';
+import './indexbrowser.less';
 
 /** Generic Index Browser with a custom entryView */
 class IndexBrowser extends Component {
@@ -18,12 +18,12 @@ class IndexBrowser extends Component {
       namespaceToken: null, // namespace continuationToken
       tasksToken: null, // tasks continuationToken
       current: namespace, // selected task
-      namespaces: {namespaces: []},
+      namespaces: { namespaces: [] },
       namespacesLoaded: true,
       namespacesError: null,
-      tasks: {tasks: []},
+      tasks: { tasks: [] },
       tasksLoaded: true,
-      tasksError: null,
+      tasksError: null
     };
 
     this.loadNamespaceInput = this.loadNamespaceInput.bind(this);
@@ -58,7 +58,7 @@ class IndexBrowser extends Component {
     this.props.watchState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -66,7 +66,7 @@ class IndexBrowser extends Component {
     this.setState(detail.state);
   }
 
-  onWatchReload({detail}) {
+  onWatchReload({ detail }) {
     detail.map(functionName => this[functionName]());
   }
 
@@ -75,16 +75,14 @@ class IndexBrowser extends Component {
       return;
     }
 
-    const promisedState = {
+    this.props.loadState({
       namespaces: this.props.clients.index.listNamespaces(this.state.namespace, {
-        continuationToken: this.state.namespaceToken || undefined,
+        continuationToken: this.state.namespaceToken || undefined
       }),
       tasks: this.props.clients.index.listTasks(this.state.namespace, {
-        continuationToken: this.state.tasksToken || undefined,
+        continuationToken: this.state.tasksToken || undefined
       })
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
   render() {
@@ -218,28 +216,22 @@ class IndexBrowser extends Component {
 
   /** Load next tasks */
   nextTasks() {
-    this.setState({
-      tasksToken: this.state.tasks.continuationToken,
-    });
+    this.setState({ tasksToken: this.state.tasks.continuationToken });
   }
 
   /** Load next namespaces */
   nextNamespaces() {
-    this.setState({
-      namespaceToken: this.state.namespaces.continuationToken,
-    });
+    this.setState({ namespaceToken: this.state.namespaces.continuationToken });
   }
 
   /** Update namespace input field */
   updateNamespaceInput() {
-    this.setState({namespaceInput: this.state.namespace});
+    this.setState({ namespaceInput: this.state.namespace });
   }
 
   /** Handle changes in namespace input field */
   handleNamespaceInputChange() {
-    this.setState({
-      namespaceInput: findDOMNode(this.refs.namespace).value,
-    });
+    this.setState({ namespaceInput: findDOMNode(this.refs.namespace).value });
   }
 
   setHistory(ns) {
@@ -254,7 +246,7 @@ class IndexBrowser extends Component {
       namespace: ns,
       current: ns,
       tasksToken: null,
-      namespaceToken: null,
+      namespaceToken: null
     });
 
     this.setHistory(ns);
@@ -262,9 +254,7 @@ class IndexBrowser extends Component {
 
   /** Set current tasks */
   setCurrent(ns) {
-    this.setState({
-      current: ns,
-    });
+    this.setState({ current: ns });
 
     this.setHistory(ns);
   }
@@ -281,27 +271,21 @@ class IndexBrowser extends Component {
   clearContinuationTokens() {
     this.setState({
       tasksToken: null,
-      namespaceToken: null,
+      namespaceToken: null
     });
   }
 
   clearNamespaceToken() {
-    this.setState({
-      namespaceToken: null,
-    });
+    this.setState({ namespaceToken: null });
   }
 
   clearTasksToken() {
-    this.setState({
-      tasksToken: null,
-    });
+    this.setState({ tasksToken: null });
   }
 }
 
 const taskclusterOpts = {
-  clients: {
-    index: taskcluster.Index,
-  },
+  clients: { index: taskcluster.Index },
   // Reload when state.namespace changes, ignore credentials changes
   reloadOnKeys: ['namespace', 'namespaceToken', 'tasksToken'],
   reloadOnLogin: false,
@@ -315,6 +299,6 @@ const watchStateOpts = {
   }
 };
 
-IndexBrowser.propTypes = {entryView: React.PropTypes.func.isRequired};
+IndexBrowser.propTypes = { entryView: React.PropTypes.func.isRequired };
 
 export default TaskClusterEnhance(CreateWatchState(IndexBrowser, watchStateOpts), taskclusterOpts);

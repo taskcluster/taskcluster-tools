@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import ConfirmActionMenuItem from './ConfirmActionMenuItem';
+import React, { Component } from 'react';
 import _ from 'lodash';
 import taskcluster from 'taskcluster-client';
-import {TaskClusterEnhance} from '../utils';
+import ConfirmActionMenuItem from './ConfirmActionMenuItem';
+import { TaskClusterEnhance } from '../utils';
 
 class PurgeCacheMenuItem extends Component {
   constructor(props) {
@@ -60,12 +60,12 @@ class PurgeCacheMenuItem extends Component {
       caches = caches.filter(i => i !== e.target.value);
     }
 
-    this.setState({selected: caches});
+    this.setState({ selected: caches });
   }
 
   purge() {
     const promises = this.state.selected.map(cacheName => this.props.clients.purgeCache
-      .purgeCache(this.props.provisionerId, this.props.workerType, {cacheName}));
+      .purgeCache(this.props.provisionerId, this.props.workerType, { cacheName }));
 
     return Promise.all(promises);
   }
@@ -78,9 +78,7 @@ PurgeCacheMenuItem.propTypes = {
 };
 
 const taskclusterOpts = {
-  clients: {
-    purgeCache: taskcluster.PurgeCache,
-  },
+  clients: { purgeCache: taskcluster.PurgeCache },
   name: PurgeCacheMenuItem.name
 };
 

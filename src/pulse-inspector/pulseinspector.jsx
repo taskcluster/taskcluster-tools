@@ -1,14 +1,14 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import {
   Row, Col, ButtonToolbar, Button, Glyphicon, Table, Alert,
-  FormGroup, FormControl, ControlLabel,
+  FormGroup, FormControl, ControlLabel
 } from 'react-bootstrap';
 import qs from 'qs';
-import {CreateWebListener} from '../lib/utils';
-import _ from 'lodash';
 import JSONInspector from 'react-json-inspector';
 import slugid from 'slugid';
+import _ from 'lodash';
+import { CreateWebListener } from '../lib/utils';
 import './pulseinspector.less';
 
 /**
@@ -99,7 +99,7 @@ class PulseInspector extends Component {
       messages: [], // List of messages received
       expandedMessage: null, // _idForInspector of current message
       listening: false, // State of listening, set by WebListenerMixin
-      listeningError: null, // Listening error set by WebListenerMixin
+      listeningError: null // Listening error set by WebListenerMixin
     };
 
     this.bindings = this.bindings.bind(this);
@@ -189,7 +189,7 @@ class PulseInspector extends Component {
 
   /** Clear all bindings */
   clearBindings() {
-    this.setState({bindings: [], doListen: false});
+    this.setState({ bindings: [], doListen: false });
     this.props.history.push(this.props.location.pathname);
   }
 
@@ -265,20 +265,20 @@ class PulseInspector extends Component {
   addBinding() {
     const binding = {
       exchange: findDOMNode(this.refs.exchange).value,
-      routingKeyPattern: findDOMNode(this.refs.routingKeyPattern).value,
+      routingKeyPattern: findDOMNode(this.refs.routingKeyPattern).value
     };
     const newBindings = this.state.bindings.concat([binding]);
 
-    this.setState({bindings: this.state.bindings.concat([binding])});
+    this.setState({ bindings: this.state.bindings.concat([binding]) });
     this.props.history.push(`${this.props.location.pathname}?${qs.stringify(newBindings)}`);
   }
 
   dontListen() {
-    this.setState({doListen: false});
+    this.setState({ doListen: false });
   }
 
   doListen() {
-    this.setState({doListen: true});
+    this.setState({ doListen: true });
   }
 
   /** return bindings for WebListenerMixin */
@@ -287,11 +287,11 @@ class PulseInspector extends Component {
   }
 
   /** Handle message from WebListener, sent by TaskClusterMixing */
-  onListenerMessage({detail}) {
-    this.setState({messages: [{
+  onListenerMessage({ detail }) {
+    this.setState({ messages: [{
       ...detail,
-      _idForInspector: slugid.nice(),
-    }].concat(this.state.messages)});
+      _idForInspector: slugid.nice()
+    }].concat(this.state.messages) });
   }
 
   /** Render table of messages */
@@ -301,10 +301,10 @@ class PulseInspector extends Component {
     return (
       <Table condensed={true} hover={true}>
         <thead>
-        <tr>
-          <th>Exchange</th>
-          <th>Routing Key</th>
-        </tr>
+          <tr>
+            <th>Exchange</th>
+            <th>Routing Key</th>
+          </tr>
         </thead>
         <tbody>
           {this.state.messages.map(message => {
@@ -326,7 +326,7 @@ class PulseInspector extends Component {
 
   /** Set expended message, note we rely on object reference comparison here */
   expandMessage(idForInspector) {
-    this.setState({expandedMessage: idForInspector});
+    this.setState({ expandedMessage: idForInspector });
   }
 
   /** Render a listening error */
@@ -340,19 +340,16 @@ class PulseInspector extends Component {
 
   /** Dismiss a listening error, basically reset error state */
   dismissListeningError() {
-    this.setState({listeningError: null});
+    this.setState({ listeningError: null });
 
     if (!this.props.listening) {
-      this.setState({doListen: false});
+      this.setState({ doListen: false });
     }
   }
 }
 
-PulseInspector.defaultProps = {hashIndex: 0};
+PulseInspector.defaultProps = { hashIndex: 0 };
 
-// Listen for messages, reload bindings() when state.taskId changes
-const webListenerOpts = {
-  reloadOnKeys: ['bindings', 'doListen']
-};
+const webListenerOpts = { reloadOnKeys: ['bindings', 'doListen'] };
 
 export default CreateWebListener(PulseInspector, webListenerOpts);

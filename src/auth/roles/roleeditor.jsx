@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import {
-  Alert, ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl,
+  Alert, ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl
 } from 'react-bootstrap';
-import taskcluster from 'taskcluster-client';
-import {TaskClusterEnhance} from '../../lib/utils';
-import * as format from '../../lib/format';
 import _ from 'lodash';
+import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../../lib/utils';
+import * as format from '../../lib/format';
 import ConfirmAction from '../../lib/ui/confirmaction';
 import ScopeEditor from '../../lib/ui/scopeeditor';
 import './roleeditor.less';
@@ -56,7 +56,7 @@ class RoleEditor extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -72,29 +72,25 @@ class RoleEditor extends Component {
 
     // If there is no currentRoleId, we're creating a new role
     if (this.props.currentRoleId === '') {
-      const promisedState = {
+      return this.props.loadState({
         role: {
           roleId: '',
           scopes: [],
-          description: '',
+          description: ''
         },
         editing: true,
         working: false,
         error: null
-      };
-
-      return this.props.loadState(promisedState);
+      });
     }
 
     // Load currentRoleId
-    const promisedState = {
+    this.props.loadState({
       role: this.props.clients.auth.role(this.props.currentRoleId),
       editing: false,
       working: false,
       error: null
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
   render() {
@@ -123,8 +119,8 @@ class RoleEditor extends Component {
     try {
       return (
         <div className="role-editor">
-          <h4 style={{marginTop: 0}}>{title}</h4>
-          <hr style={{marginBottom: 10}} />
+          <h4 style={{ marginTop: 0 }}>{title}</h4>
+          <hr style={{ marginBottom: 10 }} />
           <div className="form-horizontal">
             {
               isCreating ? (
@@ -158,7 +154,7 @@ class RoleEditor extends Component {
               </div>
             </div>
             {
-              _.map({created: 'Created', lastModified: 'Last Modified'}, (label, prop) => {
+              _.map({ created: 'Created', lastModified: 'Last Modified' }, (label, prop) => {
                 if (!this.state.role[prop]) {
                   return;
                 }
@@ -310,30 +306,30 @@ class RoleEditor extends Component {
 
     role.scopes = scopes;
 
-    this.setState({role});
+    this.setState({ role });
   }
 
   /** Start editing */
   startEditing() {
-    this.setState({editing: true});
+    this.setState({ editing: true });
   }
 
   /** Create new role */
   async createRole() {
-    this.setState({working: true});
+    this.setState({ working: true });
 
     try {
       const roleId = this.state.role.roleId;
       const role = await this.props.clients.auth.createRole(roleId, {
         description: this.state.role.description,
-        scopes: this.state.role.scopes,
+        scopes: this.state.role.scopes
       });
 
       this.setState({
         role,
         editing: false,
         working: false,
-        error: null,
+        error: null
       });
 
       this.props.reloadRoleId(roleId);
@@ -354,7 +350,7 @@ class RoleEditor extends Component {
       role: this.props.clients.auth
         .updateRole(roleId, {
           description: this.state.role.description,
-          scopes: this.state.role.scopes,
+          scopes: this.state.role.scopes
         })
         .then(role => {
           this.props.reloadRoleId(roleId);
@@ -375,14 +371,14 @@ class RoleEditor extends Component {
   dismissError() {
     this.setState({
       working: false,
-      error: null,
+      error: null
     });
   }
 }
 
 RoleEditor.propTypes = {
   // Method to reload a role in the parent
-  reloadRoleId: React.PropTypes.func.isRequired,
+  reloadRoleId: React.PropTypes.func.isRequired
 };
 
 RoleEditor.defaultProps = {
@@ -391,9 +387,7 @@ RoleEditor.defaultProps = {
 };
 
 const taskclusterOpts = {
-  clients: {
-    auth: taskcluster.Auth,
-  },
+  clients: { auth: taskcluster.Auth },
   reloadOnProps: ['currentRoleId'],
   name: RoleEditor.name
 };

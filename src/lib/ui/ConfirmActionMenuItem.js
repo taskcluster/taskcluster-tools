@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {Button, Glyphicon, Modal} from 'react-bootstrap';
-import {TaskClusterEnhance} from '../utils';
+import React, { Component } from 'react';
+import { Button, Glyphicon, Modal } from 'react-bootstrap';
+import { TaskClusterEnhance } from '../utils';
 
 /** Button with an associated confirm dialog */
 class ConfirmActionMenuItem extends Component {
@@ -22,7 +22,7 @@ class ConfirmActionMenuItem extends Component {
       resultLoaded: false,
       resultError: null,
       result: null
-    }
+    };
   }
 
   componentWillMount() {
@@ -33,7 +33,7 @@ class ConfirmActionMenuItem extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -96,7 +96,7 @@ class ConfirmActionMenuItem extends Component {
   }
 
   openDialog() {
-    this.setState({showDialog: true});
+    this.setState({ showDialog: true });
   }
 
   closeDialog() {
@@ -110,10 +110,10 @@ class ConfirmActionMenuItem extends Component {
       result: (async () => {
         const result = await this.props.action();
 
-        this.setState({executing: false});
+        this.setState({ executing: false });
 
         return result;
-      })(),
+      })()
     });
   }
 }
@@ -132,11 +132,9 @@ ConfirmActionMenuItem.propTypes = {
   action: React.PropTypes.func.isRequired
 };
 
-ConfirmActionMenuItem.defaultProps = {disabled: false};
+ConfirmActionMenuItem.defaultProps = { disabled: false };
 
-const taskclusterOpts = {
-  name: ConfirmActionMenuItem.name
-};
+const taskclusterOpts = { name: ConfirmActionMenuItem.name };
 
 // TaskClusterEnhance is used so we can use loadState to execute the action asynchronously
 export default TaskClusterEnhance(ConfirmActionMenuItem, taskclusterOpts);

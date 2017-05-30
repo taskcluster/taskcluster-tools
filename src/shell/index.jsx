@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import Layout from '../lib/Layout';
-import {hterm, lib} from 'hterm-umd';
+import React, { Component } from 'react';
+import { hterm, lib } from 'hterm-umd';
 import url from 'url';
 import qs from 'querystring';
-import {DockerExecClient} from 'docker-exec-websocket-server';
-import './shell.less';
+import { DockerExecClient } from 'docker-exec-websocket-server';
 import wsshell from 'ws-shell';
+import Layout from '../lib/Layout';
+import './shell.less';
 
 class Shell extends Component {
   constructor(props) {
@@ -61,9 +61,9 @@ class Shell extends Component {
               'SPAWN="$SHELL";',
               'if [ "$SHELL" = "bash" ]; then SPAWN="bash -li"; fi;',
               'if [ -f "/bin/taskcluster-interactive-shell" ]; then SPAWN="/bin/taskcluster-interactive-shell"; fi;',
-              'exec $SPAWN;',
-            ].join(''),
-          ],
+              'exec $SPAWN;'
+            ].join('')
+          ]
         };
 
         // Create a shell client, with interface similar to child_process

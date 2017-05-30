@@ -11,14 +11,14 @@ const initialTask = {
   payload: {
     image: 'ubuntu:13.10',
     command: ['/bin/bash', '-c', 'echo "hello World"'],
-    maxRunTime: 60 * 10,
+    maxRunTime: 60 * 10
   },
   metadata: {
     name: 'Example Task',
     description: 'Markdown description of **what** this task does',
     owner: 'name@example.com',
-    source: 'https://tools.taskcluster.net/task-creator/',
-  },
+    source: 'https://tools.taskcluster.net/task-creator/'
+  }
 };
 
 const TaskCreatorView = () => (

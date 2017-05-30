@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {Alert} from 'react-bootstrap';
-import {TaskClusterEnhance, CreateWebListener} from '../../lib/utils';
-import * as format from '../../lib/format';
+import React, { Component } from 'react';
+import { Alert } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
 import createDebugger from 'debug';
+import { TaskClusterEnhance, CreateWebListener } from '../../lib/utils';
+import * as format from '../../lib/format';
 import './connect.less';
 
 const debug = createDebugger('tools:one-click-loaner');
@@ -14,7 +14,7 @@ const taskStateLabel = {
   running: 'label label-primary',
   completed: 'label label-success',
   failed: 'label label-danger',
-  exception: 'label label-warning',
+  exception: 'label label-warning'
 };
 
 class Connect extends Component {
@@ -30,7 +30,7 @@ class Connect extends Component {
       displayUrl: null,
       taskLoaded: true,
       taskError: null,
-      task: null,
+      task: null
     };
 
     this.openShell = this.openShell.bind(this);
@@ -58,7 +58,7 @@ class Connect extends Component {
     document.removeEventListener('listener-listening', this.listening, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -79,9 +79,7 @@ class Connect extends Component {
 
     // Skip loading empty-strings
     if (this.state.taskId === '') {
-      const promisedState = {status: null};
-
-      return this.props.loadState(promisedState);
+      return this.props.loadState({ status: null });
     }
 
     this.props.clients.queue
@@ -96,7 +94,7 @@ class Connect extends Component {
       status: this.props.clients.queue
         .status(this.state.taskId)
         .then(_.property('status')),
-      task: this.props.clients.queue.task(this.state.taskId),
+      task: this.props.clients.queue.task(this.state.taskId)
     };
 
     this.props.loadState(promisedState);
@@ -109,7 +107,7 @@ class Connect extends Component {
     }
 
     // Construct the routing key pattern
-    const routingKey = {taskId: this.state.taskId};
+    const routingKey = { taskId: this.state.taskId };
 
     // Return all interesting bindings
     return [
@@ -131,9 +129,9 @@ class Connect extends Component {
       });
   }
 
-  onListenerMessage({detail}) {
+  onListenerMessage({ detail }) {
     // Update status structure
-    this.setState({status: detail.payload.status});
+    this.setState({ status: detail.payload.status });
 
     // If the message origins from the artifact create exchange,
     // we should look for the shell.html artifact :)
@@ -153,8 +151,8 @@ class Connect extends Component {
         shellUrl: [
           this.props.clients.queue.getLatestArtifact,
           this.state.taskId,
-          name,
-        ],
+          name
+        ]
       });
 
       if (notify) {
@@ -167,8 +165,8 @@ class Connect extends Component {
         displayUrl: [
           this.props.clients.queue.getLatestArtifact,
           this.state.taskId,
-          name,
-        ],
+          name
+        ]
       });
 
       if (notify) {
@@ -258,42 +256,42 @@ class Connect extends Component {
 
   renderStatus() {
     return this.props.renderWaitFor('status') || (this.state.status ? (
-        <div>
-          <dl className="dl-horizontal">
-            <dt>taskId</dt>
-            <dd>
-              <code><a href={`/task-inspector/${this.state.taskId}`}>{this.state.taskId}</a></code>
-            </dd>
-            <dt>Status</dt>
-            <dd>
+      <div>
+        <dl className="dl-horizontal">
+          <dt>taskId</dt>
+          <dd>
+            <code><a href={`/task-inspector/${this.state.taskId}`}>{this.state.taskId}</a></code>
+          </dd>
+          <dt>Status</dt>
+          <dd>
             <span className={taskStateLabel[this.state.status.state]}>
               {this.state.status.state}
             </span>
-            </dd>
-            {
-              this.state.task ? (
-                <div>
-                  <dt>Name</dt>
-                  <dd>
-                    <format.Markdown>
-                      {this.state.task.metadata.name}
-                    </format.Markdown>
-                  </dd>
-                  <dt>Description</dt>
-                  <dd>
-                    <format.Markdown>
-                      {this.state.task.metadata.description}
-                    </format.Markdown>
-                  </dd>
-                </div>
-              ) :
-              null
-            }
-          </dl>
-        </div>
-      ) :
+          </dd>
+          {
+            this.state.task ? (
+              <div>
+                <dt>Name</dt>
+                <dd>
+                  <format.Markdown>
+                    {this.state.task.metadata.name}
+                  </format.Markdown>
+                </dd>
+                <dt>Description</dt>
+                <dd>
+                  <format.Markdown>
+                    {this.state.task.metadata.description}
+                  </format.Markdown>
+                </dd>
+              </div>
+            ) :
+            null
+          }
+        </dl>
+      </div>
+    ) :
       null);
-  }
+}
 
   openShell() {
     const url = this.props.clients.queue.buildSignedUrl(...this.state.shellUrl);
@@ -330,7 +328,7 @@ class Connect extends Component {
       const notification = new window.Notification('TaskCluster - Loaner Ready!', {
         icon: '/one-click-loaner/connect/terminal.png',
         body: `The one-click-loaner task: ${this.state.taskId} that you have been waiting for is
-          now ready. Connect now, if don't connect quickly the task will terminate.`,
+          now ready. Connect now, if don't connect quickly the task will terminate.`
       });
 
       // Close notification after 30s (browser may close it sooner)
@@ -347,7 +345,7 @@ const taskclusterOpts = {
   // Need updated clients for Queue and QueueEvents
   clients: {
     queue: taskcluster.Queue,
-    queueEvents: taskcluster.QueueEvents,
+    queueEvents: taskcluster.QueueEvents
   },
   // Reload when state.taskId changes, ignore credential changes
   reloadOnKeys: ['taskId'],

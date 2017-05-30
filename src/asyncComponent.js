@@ -21,7 +21,7 @@ export default (loader, collection) => (
 
     render() {
       if (this.state.Component) {
-        return <this.state.Component { ...this.props } { ...collection } />;
+        return <this.state.Component {...this.props} {...collection} />;
       }
 
       return null;

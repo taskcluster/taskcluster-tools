@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {Row, Col, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import path from 'path';
-import RoleEditor from './roleeditor';
-import {TaskClusterEnhance} from '../../lib/utils';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
+import RoleEditor from './roleeditor';
+import { TaskClusterEnhance } from '../../lib/utils';
 
 import './rolemanager.less';
 
@@ -21,7 +21,7 @@ class RoleManager extends Component {
       rolesLoaded: false,
       rolesError: undefined,
       roles: undefined,
-      selectedRoleId,   // '' means "add new role"
+      selectedRoleId   // '' means "add new role"
     };
 
     this.reloadRoleId = this.reloadRoleId.bind(this);
@@ -40,7 +40,7 @@ class RoleManager extends Component {
     document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -58,17 +58,13 @@ class RoleManager extends Component {
     // - rolesLoaded
     // - rolesError
     // - roles
-    const promisedState = {
-      roles: this.props.clients.auth.listRoles(),
-    };
-
-    this.props.loadState(promisedState);
+    this.props.loadState({ roles: this.props.clients.auth.listRoles() });
   }
 
   /** Render user-interface */
   render() {
     return (
-      <Row style={{marginTop: 10}}>
+      <Row style={{ marginTop: 10 }}>
         <Col md={5}>
           {this.renderRolesTable()}
           <ButtonToolbar>
@@ -96,17 +92,17 @@ class RoleManager extends Component {
   /** Render table of all roles */
   renderRolesTable() {
     return this.props.renderWaitFor('roles') || (this.state.roles && (
-        <Table condensed={true} hover={true} className="role-manager-role-table">
-          <thead>
+      <Table condensed={true} hover={true} className="role-manager-role-table">
+        <thead>
           <tr>
             <th>RoleId</th>
           </tr>
-          </thead>
-          <tbody>
+        </thead>
+        <tbody>
           {this.state.roles.map(this.renderRoleRow)}
-          </tbody>
-        </Table>
-      ));
+        </tbody>
+      </Table>
+    ));
   }
 
   /** Render row with role */
@@ -143,19 +139,17 @@ class RoleManager extends Component {
     }
 
     roles.sort((a, b) => a.roleId > b.roleId);
-    this.setState({roles, selectedRoleId});
+    this.setState({ roles, selectedRoleId });
   }
 
   selectRoleId(roleId) {
     this.props.history.push(path.join('/auth/roles', encodeURIComponent(roleId)));
-    this.setState({selectedRoleId: roleId});
+    this.setState({ selectedRoleId: roleId });
   }
 }
 
 const taskclusterOpts = {
-  clients: {
-    auth: taskcluster.Auth,
-  },
+  clients: { auth: taskcluster.Auth },
   name: RoleManager.name
 };
 

@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import {TaskClusterEnhance} from '../lib/utils';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
-import * as format from '../lib/format';
 import JSONInspector from 'react-json-inspector';
+import { TaskClusterEnhance } from '../lib/utils';
+import * as format from '../lib/format';
 import './entryview.less';
 
 class EntryView extends Component {
@@ -36,7 +36,7 @@ class EntryView extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -49,15 +49,13 @@ class EntryView extends Component {
       return;
     }
 
-    const promisedState = this.props.namespace === '' ?
-      {
-        task: null,
-        taskError: null,
-        taskLoaded: true,
-      } :
-      {
-        task: this.props.clients.index.findTask(this.props.namespace),
-      };
+    const promisedState = this.props.namespace === '' ? {
+      task: null,
+      taskError: null,
+      taskLoaded: true
+    } : {
+      task: this.props.clients.index.findTask(this.props.namespace)
+    };
 
     this.props.loadState(promisedState);
   }
@@ -115,15 +113,13 @@ class EntryView extends Component {
 }
 
 const taskclusterOpts = {
-  clients: {
-    index: taskcluster.Index,
-  },
+  clients: { index: taskcluster.Index },
   // Reload when props.namespace changes, ignore credentials changes
   reloadOnProps: ['namespace'],
   reloadOnLogin: false,
   name: EntryView.name
 };
 
-EntryView.propTypes = {namespace: React.PropTypes.string.isRequired};
+EntryView.propTypes = { namespace: React.PropTypes.string.isRequired };
 
 export default TaskClusterEnhance(EntryView, taskclusterOpts);

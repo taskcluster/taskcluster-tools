@@ -1,6 +1,6 @@
 import React from 'react';
 import markdown from 'markdown-it';
-import {OverlayTrigger, Tooltip} from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import moment from 'moment';
 import hljs from 'highlight.js';
 import slugid from 'slugid';
@@ -17,7 +17,7 @@ export const Icon = React.createClass({
     rotate: React.PropTypes.oneOf(['90', '180', '270']),
     flip: React.PropTypes.oneOf(['horizontal', 'vertical']),
     fixedWidth: React.PropTypes.bool,
-    spin: React.PropTypes.bool,
+    spin: React.PropTypes.bool
   },
 
   render() {
@@ -53,21 +53,21 @@ export const Icon = React.createClass({
     }
 
     return <span {...props} className={classNames} />;
-  },
+  }
 });
 
 /** Render Markdown and handle all the particularities */
 export const Markdown = React.createClass({
   propTypes: {
-    children: React.PropTypes.string,
+    children: React.PropTypes.string
   },
 
   /** Render Markdown */
   render() {
     const html = markdown().render(this.props.children || '');
 
-    return <span className="markdown-view" dangerouslySetInnerHTML={{__html: html}} />;
-  },
+    return <span className="markdown-view" dangerouslySetInnerHTML={{ __html: html }} />;
+  }
 });
 
 /** Display a date object with optional since property */
@@ -76,23 +76,23 @@ export const DateView = React.createClass({
   propTypes: {
     date: React.PropTypes.oneOfType([
       React.PropTypes.instanceOf(Date),
-      React.PropTypes.string,
+      React.PropTypes.string
     ]).isRequired,
     since: React.PropTypes.oneOfType([
       React.PropTypes.instanceOf(Date),
-      React.PropTypes.string,
+      React.PropTypes.string
     ]),
     placement: React.PropTypes.oneOf([
-      'left', 'top', 'right', 'bottom',
+      'left', 'top', 'right', 'bottom'
     ]),
-    format: React.PropTypes.string,
+    format: React.PropTypes.string
   },
 
   /** default properties */
   getDefaultProps() {
     return {
       format: 'Do of MMMM YYYY, H:mm:ss',
-      placement: 'top',
+      placement: 'top'
     };
   },
 
@@ -118,7 +118,7 @@ export const DateView = React.createClass({
         {moment(this.props.date).format(this.props.format)}
       </Tooltip>
     );
-  },
+  }
 });
 
 export const Code = React.createClass({
@@ -133,7 +133,7 @@ export const Code = React.createClass({
       if (!hljs.getLanguage(language)) {
         return new Error(`Language '${language}' not supported by highlight.js`);
       }
-    },
+    }
     /* eslint-enable consistent-return */
   },
 
@@ -142,28 +142,28 @@ export const Code = React.createClass({
 
     return (
       <pre className={`language-${this.props.language}`}>
-        <code dangerouslySetInnerHTML={{__html: code.value}} />
+        <code dangerouslySetInnerHTML={{ __html: code.value }} />
       </pre>
     );
-  },
+  }
 });
 
 export const Collapse = React.createClass({
   propTypes: {
     title: React.PropTypes.node.isRequired,
     children: React.PropTypes.node.isRequired,
-    initialExpanded: React.PropTypes.bool,
+    initialExpanded: React.PropTypes.bool
   },
 
   getDefaultProps() {
     return {
-      initialExpanded: false,
+      initialExpanded: false
     };
   },
 
   getInitialState() {
     return {
-      expanded: this.props.initialExpanded,
+      expanded: this.props.initialExpanded
     };
   },
 
@@ -177,6 +177,6 @@ export const Collapse = React.createClass({
   },
 
   toggle() {
-    this.setState({expanded: !this.state.expanded});
-  },
+    this.setState({ expanded: !this.state.expanded });
+  }
 });

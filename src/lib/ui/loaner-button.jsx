@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
-import ConfirmAction from './confirmaction';
-import {TaskClusterEnhance} from '../utils';
 import slugid from 'slugid';
 import path from 'path';
 import _ from 'lodash';
-import {Button} from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import ConfirmAction from './confirmaction';
+import { TaskClusterEnhance } from '../utils';
 
 class LoanerButton extends Component {
   constructor(props) {
@@ -130,7 +130,7 @@ class LoanerButton extends Component {
   }
 }
 
-LoanerButton.defaultProps = {disabled: false};
+LoanerButton.defaultProps = { disabled: false };
 
 LoanerButton.propTypes = {
   taskId: React.PropTypes.string.isRequired,
@@ -142,9 +142,7 @@ LoanerButton.propTypes = {
 
 const taskclusterOpts = {
   // Need updated clients for Queue
-  clients: {
-    queue: taskcluster.Queue,
-  },
+  clients: { queue: taskcluster.Queue },
   name: LoanerButton.name
 };
 

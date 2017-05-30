@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {OverlayTrigger, ProgressBar, Tooltip, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { OverlayTrigger, ProgressBar, Tooltip, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import path from 'path';
-import {TaskClusterEnhance} from '../lib/utils';
-import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
+import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../lib/utils';
 import WorkerTypeView from './workertypeview';
 import WorkerTypeEditor from './workertypeeditor';
 import './aws-provisioner.less';
@@ -13,7 +13,7 @@ class WorkerTypeRow extends Component {
     super(props);
 
     this.state = {
-      pendingTasks: {pendingTasks: 0},
+      pendingTasks: { pendingTasks: 0 },
       pendingTasksLoaded: false,
       pendingTasksError: null
     };
@@ -39,7 +39,7 @@ class WorkerTypeRow extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -52,14 +52,12 @@ class WorkerTypeRow extends Component {
       return;
     }
 
-    const promisedState = {
+    this.props.loadState({
       pendingTasks: this.props.clients.queue.pendingTasks(
         this.props.provisionerId,
         this.props.workerType.workerType
       )
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
   render() {
@@ -67,7 +65,7 @@ class WorkerTypeRow extends Component {
       <tr
         onClick={this.props.onClick}
         className={this.props.selected ? 'active' : null}
-        style={{cursor: 'pointer'}}>
+        style={{ cursor: 'pointer' }}>
         <td><code>{this.props.workerType.workerType}</code></td>
         <td>
           <OverlayTrigger placement="left" overlay={this.tooltip()}>
@@ -166,9 +164,7 @@ const workerTypeRowTaskclusterOpts = {
     awsProvisioner: taskcluster.AwsProvisioner
   },
   clientOpts: {
-    awsProvisioner: {
-      baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-    },
+    awsProvisioner: { baseUrl: 'https://aws-provisioner.taskcluster.net/v1' }
   },
   reloadOnProps: [
     'provisionerId',
@@ -219,7 +215,7 @@ const defaultWorkerType = {
       scopes: [],
       userData: {},
       launchSpec: {
-        ImageId: 'ami-xx',
+        ImageId: 'ami-xx'
       }
     }
   ],
@@ -267,7 +263,7 @@ class WorkerTypeTable extends Component {
     this.props.taskclusterState(this.state, this.props);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -280,16 +276,14 @@ class WorkerTypeTable extends Component {
       return;
     }
 
-    const promisedState = {
+    this.props.loadState({
       workerTypeSummaries: this.props.clients.awsProvisioner.listWorkerTypeSummaries()
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
 
   setSelected(workerType) {
-    this.setState({selected: workerType});
+    this.setState({ selected: workerType });
     this.props.history.push(path.join('/aws-provisioner', workerType, this.props.match.params.currentTab || ''));
   }
 
@@ -306,7 +300,7 @@ class WorkerTypeTable extends Component {
             bsStyle="primary"
             bsSize="sm"
             onClick={this.setSelected.bind(this, 'create:worker-type')}
-            style={{marginTop: -10, padding: '3px 12px'}}>
+            style={{ marginTop: -10, padding: '3px 12px' }}>
             <Glyphicon glyph="plus" /> Create WorkerType
           </Button>
         </ButtonToolbar>
@@ -316,7 +310,7 @@ class WorkerTypeTable extends Component {
   }
 
   renderTypeInput() {
-    const setWorkerType = e => this.setState({workerTypeContains: e.target.value});
+    const setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
     const enterWorkerType = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
@@ -347,7 +341,7 @@ class WorkerTypeTable extends Component {
       <div>
         <h4>Worker Types</h4>
         {this.renderTypeInput()}
-        <Table style={{marginTop: 20}}>
+        <Table style={{ marginTop: 20 }}>
           <thead>
             <tr>
               <th className="col-xs-2">WorkerType</th>
@@ -376,12 +370,12 @@ class WorkerTypeTable extends Component {
   }
 
   renderWorkerTypeView() {
-    if (!_.find(this.state.workerTypeSummaries, {workerType: this.state.selected})) {
+    if (!_.find(this.state.workerTypeSummaries, { workerType: this.state.selected })) {
       return;
     }
 
     return (
-      <div style={{marginBottom: 40}}>
+      <div style={{ marginBottom: 40 }}>
         <h4>Worker Type: <code>{this.state.selected}</code></h4>
         <hr />
         <WorkerTypeView
@@ -390,7 +384,7 @@ class WorkerTypeTable extends Component {
           provisionerId={this.props.provisionerId}
           workerType={this.state.selected}
           reload={this.load}
-          updateSummary={this.updateSummary}  />
+          updateSummary={this.updateSummary} />
       </div>
     );
   }
@@ -399,16 +393,16 @@ class WorkerTypeTable extends Component {
     // work around https://github.com/taskcluster/aws-provisioner/pull/70
     const workerTypeSummaries = this.state.workerTypeSummaries
       .map(wt => wt.workerType === workerType ?
-        _.assign({workerType}, summary) :
+        _.assign({ workerType }, summary) :
         wt
       );
 
-    this.setState({workerTypeSummaries});
+    this.setState({ workerTypeSummaries });
   }
 
   renderWorkerTypeCreator() {
     return (
-      <div style={{marginBottom: 50}}>
+      <div style={{ marginBottom: 50 }}>
         <hr />
         <h2>Create New WorkerType</h2>
         <WorkerTypeEditor
@@ -426,18 +420,16 @@ class WorkerTypeTable extends Component {
 }
 
 const WorkerTypeTableTaskclusterOpts = {
-  clients: {
-    awsProvisioner: taskcluster.AwsProvisioner
-  },
+  clients: { awsProvisioner: taskcluster.AwsProvisioner },
   clientOpts: {
     awsProvisioner: {
       baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-    },
+    }
   },
   reloadOnProps: ['provisionerId'],
   name: WorkerTypeTable.name
 };
 
-WorkerTypeTable.propTypes = {provisionerId: React.PropTypes.string.isRequired};
+WorkerTypeTable.propTypes = { provisionerId: React.PropTypes.string.isRequired };
 
 export default TaskClusterEnhance(WorkerTypeTable, WorkerTypeTableTaskclusterOpts);

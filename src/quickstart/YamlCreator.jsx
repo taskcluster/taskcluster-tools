@@ -10,14 +10,14 @@ import {
   Checkbox,
   ButtonToolbar,
   Button,
-  Glyphicon,
+  Glyphicon
 } from 'react-bootstrap';
-import './yamlcreator.less';
 import CodeMirror from 'react-code-mirror';
 import 'codemirror/mode/yaml/yaml';
-import '../lib/codemirror/yaml-lint';
+import { Github } from 'taskcluster-client';
 import yaml from 'js-yaml';
-import {Github} from 'taskcluster-client';
+import './yamlcreator.less';
+import '../lib/codemirror/yaml-lint';
 
 const initialYaml = {
   version: 0,
@@ -25,7 +25,7 @@ const initialYaml = {
     name: '',
     description: '',
     owner: '{{ event.head.user.email }}',
-    source: '{{ event.head.repo.url }}',
+    source: '{{ event.head.repo.url }}'
   },
   tasks: [
     {
@@ -34,29 +34,29 @@ const initialYaml = {
       extra: {
         github: {
           env: true,
-          events: [],
-        },
+          events: []
+        }
       },
       payload: {
         maxRunTime: 3600,
         image: 'node',
-        command: [],
+        command: []
       },
       metadata: {
         name: '',
         description: '',
         owner: '{{ event.head.user.email }}',
-        source: '{{ event.head.repo.url }}',
-      },
-    },
-  ],
+        source: '{{ event.head.repo.url }}'
+      }
+    }
+  ]
 };
 
 const baseCmd = [
   'git clone {{event.head.repo.url}} repo',
   'cd repo',
   'git config advice.detachedHead false',
-  'git checkout {{event.head.sha}}',
+  'git checkout {{event.head.sha}}'
 ];
 
 function cmdDirectory(type, organization, repository) {
@@ -69,8 +69,8 @@ function cmdDirectory(type, organization, repository) {
       '-c',
       baseCmd.concat([
         'npm install .',
-        'npm test',
-      ]).join(' && '),
+        'npm test'
+      ]).join(' && ')
     ],
     python: [
       '/bin/bash',
@@ -78,8 +78,8 @@ function cmdDirectory(type, organization, repository) {
       '-c',
       baseCmd.concat([
         'pip install tox',
-        'tox',
-      ]).join(' && '),
+        'tox'
+      ]).join(' && ')
     ],
     'jimmycuadra/rust': [
       '/bin/bash',
@@ -87,8 +87,8 @@ function cmdDirectory(type, organization, repository) {
       '-c',
       baseCmd.concat([
         'rustc --test unit_test.rs',
-        './unit_test',
-      ]).join(' && '),
+        './unit_test'
+      ]).join(' && ')
     ],
     golang: [
       '/bin/bash',
@@ -102,9 +102,9 @@ function cmdDirectory(type, organization, repository) {
         'git config advice.detachedHead false',
         'git checkout {{ event.head.sha }}',
         'go install',
-        'go test ./...',
-      ]).join(' && '),
-    ],
+        'go test ./...'
+      ]).join(' && ')
+    ]
   };
   return cmds[type];
 }
@@ -134,7 +134,7 @@ export default class YamlCreator extends React.Component {
       resetActive: false,
       owner: '',
       repo: '',
-      installedState: null,
+      installedState: null
     };
   }
 
@@ -363,7 +363,7 @@ export default class YamlCreator extends React.Component {
   saveTextInput(event) {
     this.setState({
       [event.target.name]: event.target.value,
-      resetActive: true,
+      resetActive: true
     });
   }
 
@@ -376,7 +376,7 @@ export default class YamlCreator extends React.Component {
     this.setState({
       events: [...events],
       [event.target.id]: !this.state[event.target.id],
-      resetActive: true,
+      resetActive: true
     });
   }
 
@@ -386,7 +386,7 @@ export default class YamlCreator extends React.Component {
       image: event.target.value,
       currentCmd,
       resetActive: true,
-      commands: this.state.displayCmds ? currentCmd : [],
+      commands: this.state.displayCmds ? currentCmd : []
     });
   }
 
@@ -396,7 +396,7 @@ export default class YamlCreator extends React.Component {
       currentCmd: this.state.commands,
       commands: event.target.value === 'standard' ?
         this.state.commands :
-        [],
+        []
     });
   }
 
@@ -414,7 +414,7 @@ export default class YamlCreator extends React.Component {
       pullRequestSynchronized: false,
       pullRequestReopened: false,
       pushMade: false,
-      releaseMade: false,
+      releaseMade: false
     });
   }
 
@@ -424,7 +424,7 @@ export default class YamlCreator extends React.Component {
       metadata: {
         ...initialYaml.metadata,
         name: this.state.rootName,
-        description: this.state.rootDescription,
+        description: this.state.rootDescription
       },
       tasks: [{
         ...initialYaml.tasks[0],
@@ -432,20 +432,20 @@ export default class YamlCreator extends React.Component {
           metadata: {
             ...initialYaml.tasks[0].metadata,
             name: this.state.taskName,
-            description: this.state.taskDescription,
+            description: this.state.taskDescription
           },
           extra: {
             github: {
-              events: [...this.state.events],
-            },
+              events: [...this.state.events]
+            }
           },
           payload: {
             ...initialYaml.tasks[0].payload,
             command: this.state.commands,
-            image: this.state.image,
-          },
-        },
-      }],
+            image: this.state.image
+          }
+        }
+      }]
     });
 
     return (
@@ -456,7 +456,7 @@ export default class YamlCreator extends React.Component {
           lineNumbers={true}
           mode="yaml"
           textAreaClassName="form-control"
-          textAreaStyle={{minHeight: '20em'}}
+          textAreaStyle={{ minHeight: '20em' }}
           value={newYaml}
           indentWithTabs={false}
           tabSize={2}
@@ -469,11 +469,11 @@ export default class YamlCreator extends React.Component {
 
   async installedStatus() {
     if (this.state.owner && this.state.repo) {
-      this.setState({installedState: 'loading'});
+      this.setState({ installedState: 'loading' });
       const result = await githubClient.isInstalledFor(this.state.owner, this.state.repo);
-      this.setState({installedState: result.installed ? 'success' : 'error'});
+      this.setState({ installedState: result.installed ? 'success' : 'error' });
     } else {
-      this.setState({installedState: null});
+      this.setState({ installedState: null });
     }
   }
 

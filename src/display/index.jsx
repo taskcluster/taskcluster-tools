@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import $ from 'jquery';
 import URL from 'url';
 import qs from 'querystring';
-import {Grid, Row, Col, ListGroup, ListGroupItem, Button, Glyphicon} from 'react-bootstrap';
+import { Grid, Row, Col, ListGroup, ListGroupItem, Button, Glyphicon } from 'react-bootstrap';
 import * as format from '../lib/format';
-import {TaskClusterEnhance, CreateWatchState} from '../lib/utils';
+import { TaskClusterEnhance, CreateWatchState } from '../lib/utils';
 import Layout from '../lib/Layout';
 import './include/util.js';
 import './app.less';
@@ -34,6 +34,11 @@ class Display extends Component {
   }
 
   componentWillUnmount() {
+    if (this.rfb) {
+      this.rfb.disconnect();
+      this.rfb = null;
+    }
+
     document.removeEventListener('watch-reload', this.onWatchReload, false);
   }
 
@@ -45,13 +50,13 @@ class Display extends Component {
     this.props.watchState(this.state, this.props);
   }
 
-  onWatchReload({detail}) {
+  onWatchReload({ detail }) {
     detail.map(functionName => this[functionName]());
   }
 
   render() {
     return (
-      <div style={{textAlign: 'center'}}>
+      <div style={{ textAlign: 'center' }}>
         <canvas ref={instance => { this.displayInstance = instance; }}>Canvas not supported!</canvas>
       </div>
     );
@@ -82,7 +87,7 @@ class Display extends Component {
         onBell: this.onBell,
         onDesktopName: this.onDesktopName,
         connectTimeout: 5,
-        disconnectTimeout: 5,
+        disconnectTimeout: 5
       });
     } catch (err) {
       this.onUpdateState(null, 'fatal', null, `Unable to create RFB client, error: ${err}`);
@@ -90,7 +95,7 @@ class Display extends Component {
     }
 
     // Get port
-    let {port} = opts;
+    let { port } = opts;
 
     if (!port) {
       if (opts.protocol === 'wss:') {
@@ -109,13 +114,6 @@ class Display extends Component {
 
     // Connect to the frame buffer
     this.rfb.connect(opts.hostname, parseInt(port), '', pathWithSlash);
-  }
-
-  componentWillUnmount() {
-    if (this.rfb) {
-      this.rfb.disconnect();
-      this.rfb = null;
-    }
   }
 
   onDesktopName(/* rfb, name */) {
@@ -160,7 +158,6 @@ const watchStateOpts = {
 
 const DisplayEnhanced = CreateWatchState(Display, watchStateOpts);
 
-
 class DisplayList extends Component {
   constructor(props) {
     super(props);
@@ -181,7 +178,7 @@ class DisplayList extends Component {
       Util.load_scripts([
         'webutil.js', 'base64.js', 'websock.js', 'des.js',
         'keysymdef.js', 'keyboard.js', 'input.js', 'display.js',
-        'inflator.js', 'rfb.js', 'keysym.js',
+        'inflator.js', 'rfb.js', 'keysym.js'
       ]);
       // Once loaded return RFB from window object
       window.onscriptsload = () => accept(window.RFB);
@@ -203,7 +200,7 @@ class DisplayList extends Component {
     document.removeEventListener('taskcluster-reload', this.load, false);
   }
 
-  onTaskClusterUpdate({detail}) {
+  onTaskClusterUpdate({ detail }) {
     if (detail.name !== this.constructor.name) {
       return;
     }
@@ -220,13 +217,11 @@ class DisplayList extends Component {
       return;
     }
 
-    const promisedState = {
+    this.props.loadState({
       displays: $.getJSON(this.props.displaysUrl),
       display: null,
       RFB: this.RFBLoaded
-    };
-
-    this.props.loadState(promisedState);
+    });
   }
 
   render() {
@@ -234,53 +229,53 @@ class DisplayList extends Component {
       const display = encodeURIComponent(this.state.display);
 
       return this.props.renderWaitFor('RFB') || (
-          <DisplayEnhanced
-            RFB={this.state.RFB}
-            socketUrl={`${this.props.socketUrl}?display=${display}`}
-            shared={this.props.shared === 'true'} />
-        );
+        <DisplayEnhanced
+          RFB={this.state.RFB}
+          socketUrl={`${this.props.socketUrl}?display=${display}`}
+          shared={this.props.shared === 'true'} />
+      );
     }
 
     return this.props.renderWaitFor('displays') || (
-        <Grid>
-          <Row>
-            <Col md={6} mdOffset={3}>
-              <h2>List of Displays</h2>
-              <i>
-                Pick a display to initiate a VNC session with a display server from the container.
-              </i>
-              <br /><br />
-              <ListGroup>
-                {
-                  this.state.displays && this.state.displays.map((d, index) => (
-                    <ListGroupItem
-                      style={{cursor: 'pointer'}}
-                      key={index}
-                      onClick={() => this.setDisplay(d.display)}>
-                      <Row>
-                        <Col md={2}>
-                          <format.Icon name="television" size="4x" />
-                        </Col>
-                        <Col md={10}>
-                          <h4>Display <code>{d.display}</code></h4>
-                          Resolution {d.width} &times; {d.height}
-                        </Col>
-                      </Row>
-                    </ListGroupItem>
-                  ))
-                }
-              </ListGroup>
-              <Button bsStyle="success" onClick={this.load}>
-                <Glyphicon glyph="refresh" /> Refresh
-              </Button>
-            </Col>
-          </Row>
-        </Grid>
-      );
+      <Grid>
+        <Row>
+          <Col md={6} mdOffset={3}>
+            <h2>List of Displays</h2>
+            <i>
+              Pick a display to initiate a VNC session with a display server from the container.
+            </i>
+            <br /><br />
+            <ListGroup>
+              {
+                this.state.displays && this.state.displays.map((d, index) => (
+                  <ListGroupItem
+                    style={{ cursor: 'pointer' }}
+                    key={index}
+                    onClick={() => this.setDisplay(d.display)}>
+                    <Row>
+                      <Col md={2}>
+                        <format.Icon name="television" size="4x" />
+                      </Col>
+                      <Col md={10}>
+                        <h4>Display <code>{d.display}</code></h4>
+                        Resolution {d.width} &times; {d.height}
+                      </Col>
+                    </Row>
+                  </ListGroupItem>
+                ))
+              }
+            </ListGroup>
+            <Button bsStyle="success" onClick={this.load}>
+              <Glyphicon glyph="refresh" /> Refresh
+            </Button>
+          </Col>
+        </Row>
+      </Grid>
+    );
   }
 
   setDisplay(display) {
-    this.setState({display});
+    this.setState({ display });
   }
 }
 
