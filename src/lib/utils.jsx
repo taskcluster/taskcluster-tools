@@ -58,15 +58,21 @@ const hasChanged = (paths, obj1, obj2) => {
  *
  * This component will dispatch the event
  * `taskcluster-reload` when:
- *  - `componentDidMount` triggers
- *  - A key in reloadOnKeys changes
+ *  - A key in `reloadOnKeys`/`reloadOnProps` changes
  *  - Credentials change given `reloadOnLogin` option is set to true
  *
  *  `taskcluster-update` when:
  *  - state changes i.e., when key is resolved/rejects
  *
+ * To use the feature of `reloadOnKeys` and `reloadOnProps`, implementors should call
+ * `taskclusterState(keys, props)` whenever a component receives new props/keys. Example:
+ *
+ * componentDidUpdate(prevProps, prevState) {
+ *   this.props.taskclusterState(this.state, this.props);
+ * }
+ *
  * Implementors can call `loadState({key: promise})` with a mapping from key to promise.
- * example: this.props.loadState({key: promise})
+ * Example: this.props.loadState({key: promise})
  *
  * When a promise is successful state will be set as follows:
  * {
@@ -89,6 +95,11 @@ const hasChanged = (paths, obj1, obj2) => {
  *   key:         undefined
  * }
  *
+ * Required option properties:
+ *  - name: name of wrapped component
+ *
+ * You can call `getWrappedInstance()` to have a reference to the wrapped instance of
+ * this HOC.
  */
 export const TaskClusterEnhance = (Component, opts) => (
   class extends React.Component {
@@ -135,8 +146,6 @@ export const TaskClusterEnhance = (Component, opts) => (
       this._createClients(auth.loadCredentials());
       // Listen for changes to credentials
       window.addEventListener('credentials-changed', this.handleCredentialsChanged, false);
-      // Initial load
-      // this.reload();
     }
 
     /** Reload if props/keys change */
@@ -356,23 +365,44 @@ export const TaskClusterEnhance = (Component, opts) => (
 /**
  * Logic for listening to Pulse exchanges using WebListener
  *
- * To use this component you must implement the method
- * `this.bindings()` which returns a list of bindings to bind to.
- *
  * This component dispatches 2 type of events
  *  - `listener-message` when a message arrives
  *  - `listener-listening` when listener starts listening
  *
- * Implementors can call `startListening(bindings)` to set the bindings. In addition,
- * you can repeatedly invoke the latter to listen to additional bindings.
- * Calling `stopListening()` will clear all bindings and stop listening.
- * But if you  are implementing `this.bindings()` you should beware
+ * To use this component you must implement the method
+ * `this.bindings()` which returns a list of bindings to bind to.
+ *
+ * options:
+ * {
+ *   reloadOnProps:     [], // Properties to reload bindings on
+ *   reloadOnKeys:      []  // State keys to reload bindings on
+ * }
+ *
+ * To use the feature of `reloadOnKeys` and `reloadOnProps`, implementors should call
+ * `listenerState(keys, props)` whenever a component receives new props/keys. Example:
+ *
+ * componentDidUpdate(prevProps, prevState) {
+ *   this.props.listenerState(this.state, this.props);
+ * }
+ *
+ * If `this.bindings()` is implemented it'll be called after mount and we will
+ * bind to the bindings returned. In addition whenever a property or state key
+ * specified in `reloadOnProps` and `reloadOnKeys`, respectively, is changed
+ * bindings will be reconfigured based on `this.bindings()`, assuming it's
+ * implemented.
+ *
+ * You can call `startListening(bindings)` repeatedly to listen to additional
+ * bindings. Calling `stopListening()` will clear all bindings and stop
+ * listening. But if you  are implementing `this.bindings()` you should beware
  * that it'll will overwrite `startListening(bindings)`.
  *
  * This component adds the state property `listening` to state as follows:
  * {
  *    listening:    true || false || null // null when connecting
  * }
+ *
+ * You can call `getWrappedInstance()` to have a reference to the wrapped instance of
+ * this HOC.
  */
 export const CreateWebListener = (Component, opts) => (
   class extends React.Component {
@@ -428,7 +458,7 @@ export const CreateWebListener = (Component, opts) => (
     }
 
     listenerState(keys, props) {
-      // No need to check state if this.child.bindings() isn't implemented
+      // No need to check state if this.wrappedInstance.bindings() isn't implemented
       if (!this.componentBindings instanceof Function) {
         return;
       }
@@ -588,12 +618,14 @@ export const CreateWebListener = (Component, opts) => (
  * Watch for state changes.
  *
  * This component will dispatch the event `watch-reload` when:
- *  - handlers in the wrapped component need to be triggered
+ *  - elements in `onProps`/`onKeys` change in the wrapped component
  *
- * Implementors can call `watchStateProps(props)` to send props to analyze.
- * This function is meant to be invoked after every props change.
- * example: this.props.watchStateProps(this.props)
+ * To use the feature of `onProps` and `onKeys`, implementors should call
+ * `watchState(keys, props)` whenever a component receives new props/keys. Example:
  *
+ * componentDidUpdate(prevProps, prevState) {
+ *   this.props.watchState(this.state, this.props);
+ * }
  *
  * options:
  * {
@@ -605,9 +637,12 @@ export const CreateWebListener = (Component, opts) => (
  *   }
  * }
  *
- * In the example above, `this.handler()` of the wrapped component will be called if, `props.match.params.k1.k2` or
- * `props.match.params.k3` is modified. And similarly if `this.props.prop1.prop2` or
+ * In the example above, the event `watch-reload` will be dispatched if, `state.k1.k2` or
+ * `state.k3` is modified. And similarly if `this.props.prop1.prop2` or
  * `this.props.prop3` is changed.
+ *
+ * You can call `getWrappedInstance()` to have a reference to the wrapped instance of
+ * this HOC.
  *
  * Be careful with this component and watch out for infinite loops. Never modify
  * a state property that triggers a method in a handler.
