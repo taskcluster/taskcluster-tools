@@ -82,9 +82,8 @@ const LoanerButton = React.createClass({
   parameterizeTask() {
     const task = _.cloneDeep(this.props.task);
 
-    // Strip taskGroupId and schedulerId
+    // Strip taskGroupId
     delete task.taskGroupId;
-    delete task.schedulerId;
 
     // Strip routes
     delete task.routes;
