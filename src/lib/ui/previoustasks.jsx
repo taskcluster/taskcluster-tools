@@ -21,6 +21,8 @@ class PreviousTasks extends Component {
   componentWillMount() {
     document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
     document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+
+    this.load();
   }
 
   componentWillUnmount() {

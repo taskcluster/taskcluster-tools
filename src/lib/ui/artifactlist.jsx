@@ -26,7 +26,6 @@ const MIMETYPE_ICONS = [
       'application/vnd.ms-cab-compressed',
       'application/vnd.android.package-archive',
       'application/x-gtar'
-
     ]
   }, {
     icon: 'file-word-o',
@@ -110,6 +109,8 @@ class ArtifactList extends Component {
 
   componentWillMount() {
     document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
   }
 
   componentWillUnmount() {
