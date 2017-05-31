@@ -149,8 +149,8 @@ class ClientEditor extends Component {
       </Tooltip>
     );
 
-    if (this.props.renderWaitFor('client') || !this.state.client) {
-      return this.props.renderSpinner();
+    if (!this.state.client) {
+      return this.props.renderWaitFor('client') || this.props.renderSpinner();
     }
 
     return (

@@ -112,8 +112,8 @@ class RoleEditor extends Component {
       title = isEditing ? 'Edit Role' : 'View Role';
     }
 
-    if (this.props.renderWaitFor('role') || !this.state.role) {
-      return this.props.renderSpinner();
+    if (!this.state.role) {
+      return this.props.renderWaitFor('role') ||  this.props.renderSpinner();
     }
 
     try {

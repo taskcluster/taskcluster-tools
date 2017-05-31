@@ -673,7 +673,7 @@ class HookEditView extends Component {
     }
 
     if (!this.state.hookLoaded) {
-      return this.props.renderSpinner();
+      return this.props.renderWaitFor('hook') || this.props.renderSpinner();
     }
 
     const isCreating = !this.props.currentHookId || !this.props.currentHookGroupId;
