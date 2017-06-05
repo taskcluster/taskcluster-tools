@@ -95,6 +95,11 @@ const TaskInfo = React.createClass({
             </tr>
 
             <tr>
+              <td>Priority</td>
+              <td><code>{task.priority}</code></td>
+            </tr>
+
+            <tr>
               <td>Provisioner</td>
               <td><code>{task.provisionerId}</code></td>
             </tr>
