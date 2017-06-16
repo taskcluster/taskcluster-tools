@@ -1,5 +1,5 @@
 import React from 'react';
-import {Col} from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 
 export default class Service extends React.Component {
   constructor(props) {

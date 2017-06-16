@@ -1,39 +1,19 @@
-import React from 'react';
-import {findDOMNode} from 'react-dom';
-import {Alert, Button, ButtonToolbar, Glyphicon} from 'react-bootstrap';
-import * as utils from '../lib/utils';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
+import _ from 'lodash';
+import moment from 'moment';
+import {TaskClusterEnhance} from '../lib/utils';
 import * as format from '../lib/format';
 import ConfirmAction from '../lib/ui/confirmaction';
 import TimeInput from '../lib/ui/timeinput';
-import _ from 'lodash';
-import moment from 'moment';
 
-const SecretEditor = React.createClass({
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        secrets: taskcluster.Secrets,
-      },
-      reloadOnProps: ['currentSecretId'],
-    }),
-  ],
+class SecretEditor extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    // Method to reload a client in the parent
-    reloadSecrets: React.PropTypes.func.isRequired,
-  },
-
-  getDefaultProps() {
-    return {
-      // '' implies. "Create Secret"
-      currentSecretId: '',
-    };
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       // Loading secret or loaded secret
       secretLoaded: false,
       secretError: null,
@@ -43,36 +23,72 @@ const SecretEditor = React.createClass({
       // Operation details, if currently doing anything
       working: false,
       error: null,
-      showSecret: false,
+      showSecret: false
     };
-  },
 
-  /** Load initial state */
-  load() {
-    // If there is no currentSecretId, we're creating a new secret
-    if (this.props.currentSecretId === '') {
-      return {
-        secretId: '',
-        secret: {
-          secret: {},
-          expires: taskcluster.fromNow('1 day'),
-        },
-        editing: true,
-        working: false,
-        error: null,
-      };
+    this.onExpiresChange = this.onExpiresChange.bind(this);
+    this.startEditing = this.startEditing.bind(this);
+    this.openSecret = this.openSecret.bind(this);
+    this.saveSecret = this.saveSecret.bind(this);
+    this.deleteSecret = this.deleteSecret.bind(this);
+    this.showError = this.showError.bind(this);
+    this.dismissError = this.dismissError.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
     }
 
-    // Load currentSecretId
-    return {
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    // A component may have nested components. `data.detail.name` will identify
+    // which component (possibly nested) needs to load.
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    // If there is currentSecretId, we load it. Otherwise we create a new secret
+    const promisedState = this.props.currentSecretId === '' ? {
+      secretId: '',
+      secret: {
+        secret: {},
+        expires: taskcluster.fromNow('1 day')
+      },
+      editing: true,
+      working: false,
+      error: null
+    } : {
       secretId: this.props.currentSecretId,
-      secret: this.secrets.get(this.props.currentSecretId),
+      secret: this.props.clients.secrets.get(this.props.currentSecretId),
       editing: false,
       working: false,
       error: null,
-      showSecret: false,
+      showSecret: false
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   render() {
     try {
@@ -90,7 +106,7 @@ const SecretEditor = React.createClass({
       }
 
       if (!this.state.secretLoaded) {
-        return this.renderWaitFor('secret');
+        return this.props.renderWaitFor('secret') || null;
       }
 
       const isEditing = this.state.editing;
@@ -171,7 +187,7 @@ const SecretEditor = React.createClass({
 
                     return (
                       <Button onClick={this.openSecret} bsStyle="warning">
-                        <format.Icon name="user-secret" style={{padding: '.15em'}} /> Show secret
+                        <format.Icon name="user-secret" style={{ padding: '.15em' }} /> Show secret
                       </Button>
                     );
                   }
@@ -215,22 +231,22 @@ const SecretEditor = React.createClass({
     } catch (e) {
       return <span>Error while rendering - see devtools for details</span>;
     }
-  },
+  }
 
   onExpiresChange(date) {
     const state = _.cloneDeep(this.state);
 
     state.secret.expires = date.toDate().toJSON();
     this.setState(state);
-  },
+  }
 
   startEditing() {
-    this.setState({editing: true});
-  },
+    this.setState({ editing: true });
+  }
 
   openSecret() {
-    this.setState({showSecret: true});
-  },
+    this.setState({ showSecret: true });
+  }
 
   async saveSecret() {
     let secretId = this.props.currentSecretId;
@@ -256,8 +272,8 @@ const SecretEditor = React.createClass({
 
     const expires = this.state.secret.expires;
 
-    this.secrets
-      .set(secretId, {secret, expires})
+    this.props.clients.secrets
+      .set(secretId, { secret, expires })
       .then(() => {
         const newSecret = _.cloneDeep(this.state.secret);
 
@@ -267,37 +283,54 @@ const SecretEditor = React.createClass({
         this.setState({
           secretId,
           editing: false,
-          secret: newSecret,
+          secret: newSecret
         });
 
         if (shouldReload) {
           this.props.reloadSecrets();
+          this.props.selectSecretId(secretId);
         }
       })
       .catch(this.showError);
-  },
+  }
 
   async deleteSecret() {
-    await this.secrets
+    await this.props.clients.secrets
       .remove(this.props.currentSecretId)
       .then(() => this.props.reloadSecrets())
       .catch(this.showError);
-  },
+  }
 
   showError(err) {
     this.setState({
       error: err,
       // clear the value, just to be safe
-      value: null,
+      value: null
     });
-  },
+  }
 
   dismissError() {
     this.setState({
       secretError: null,
-      error: null,
+      error: null
     });
-  },
-});
+  }
+}
 
-export default SecretEditor;
+SecretEditor.propTypes = {
+  // Method to reload a client in the parent
+  reloadSecrets: React.PropTypes.func.isRequired
+};
+
+// '' implies. "Create Secret"
+SecretEditor.defaultProps = {
+  currentSecretId: ''
+};
+
+const taskclusterOpts = {
+  clients: { secrets: taskcluster.Secrets },
+  reloadOnProps: ['currentSecretId'],
+  name: SecretEditor.name
+};
+
+export default TaskClusterEnhance(SecretEditor, taskclusterOpts);

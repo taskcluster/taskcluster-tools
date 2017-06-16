@@ -1,66 +1,89 @@
-import React from 'react';
-import {findDOMNode} from 'react-dom';
-import {Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl} from 'react-bootstrap';
-import * as utils from '../lib/utils';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import { Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl } from 'react-bootstrap';
 import taskcluster from 'taskcluster-client';
-import './indexbrowser.less';
 import path from 'path';
+import { TaskClusterEnhance, CreateWatchState } from '../lib/utils';
+import './indexbrowser.less';
 
 /** Generic Index Browser with a custom entryView */
-export default React.createClass({
-  displayName: 'IndexBrowser',
-
-  mixins: [
-    // Calls load()
-    utils.createTaskClusterMixin({
-      clients: {
-        index: taskcluster.Index,
-      },
-      // Reload when state.namespace changes, ignore credentials changes
-      reloadOnKeys: ['namespace', 'namespaceToken', 'tasksToken'],
-      reloadOnLogin: false,
-    }),
-    // Called handler when state.namespace changes
-    utils.createWatchStateMixin({
-      onKeys: {
-        updateNamespaceInput: ['namespace', 'current'],
-        clearContinuationTokens: ['namespace'],
-      },
-    })
-  ],
-
-  propTypes: {
-    entryView: React.PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
+class IndexBrowser extends Component {
+  constructor(props) {
+    super(props);
     const namespace = this.props.match.params.ns || '';
 
-    return {
+    this.state = {
       namespace,
       namespaceInput: '',
       namespaceToken: null, // namespace continuationToken
       tasksToken: null, // tasks continuationToken
       current: namespace, // selected task
-      namespaces: {namespaces: []},
+      namespaces: { namespaces: [] },
       namespacesLoaded: true,
       namespacesError: null,
-      tasks: {tasks: []},
+      tasks: { tasks: [] },
       tasksLoaded: true,
-      tasksError: null,
+      tasksError: null
     };
-  },
 
-  load() {
-    return {
-      namespaces: this.index.listNamespaces(this.state.namespace, {
-        continuationToken: this.state.namespaceToken || undefined,
+    this.loadNamespaceInput = this.loadNamespaceInput.bind(this);
+    this.handleNamespaceInputChange = this.handleNamespaceInputChange.bind(this);
+    this.nextTasks = this.nextTasks.bind(this);
+    this.clearNamespaceToken = this.clearNamespaceToken.bind(this);
+    this.clearContinuationTokens = this.clearContinuationTokens.bind(this);
+    this.updateNamespaceInput = this.updateNamespaceInput.bind(this);
+    this.nextNamespaces = this.nextNamespaces.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+    this.onWatchReload = this.onWatchReload.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+    document.addEventListener('watch-reload', this.onWatchReload, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+    document.removeEventListener('watch-reload', this.onWatchReload, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+    this.props.watchState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  onWatchReload({ detail }) {
+    detail.map(functionName => this[functionName]());
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.props.loadState({
+      namespaces: this.props.clients.index.listNamespaces(this.state.namespace, {
+        continuationToken: this.state.namespaceToken || undefined
       }),
-      tasks: this.index.listTasks(this.state.namespace, {
-        continuationToken: this.state.tasksToken || undefined,
-      }),
-    };
-  },
+      tasks: this.props.clients.index.listTasks(this.state.namespace, {
+        continuationToken: this.state.tasksToken || undefined
+      })
+    });
+  }
 
   render() {
     return (
@@ -83,15 +106,15 @@ export default React.createClass({
               </div>
             </FormGroup>
           </form>
-          {this.state.namespace && (this.renderWaitFor('tasks') || this.renderTasks())}
-          {this.renderWaitFor('namespaces') || this.renderNamespaces()}
+          {this.state.namespace && (this.props.renderWaitFor('tasks') || this.renderTasks())}
+          {this.props.renderWaitFor('namespaces') || this.renderNamespaces()}
         </Col>
         <Col md={6}>
-          <this.props.entryView namespace={this.state.current} />
+          <this.props.entryView {...this.props} namespace={this.state.current} />
         </Col>
       </Row>
     );
-  },
+  }
 
   /** Render bread crumbs for navigation */
   renderBreadcrumbs() {
@@ -121,7 +144,7 @@ export default React.createClass({
         }
       </ol>
     );
-  },
+  }
 
   /** Render list of namespaces */
   renderNamespaces() {
@@ -129,7 +152,7 @@ export default React.createClass({
       <div>
         <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
-            {this.state.namespaces.namespaces.map((ns, index) => (
+            {this.state.namespaces && this.state.namespaces.namespaces.map((ns, index) => (
               <tr key={index}>
                 <td onClick={this.browse.bind(this, ns.namespace)}>
                   {ns.name}
@@ -146,7 +169,7 @@ export default React.createClass({
           ) : null
         }
         {
-          this.state.namespaces.continuationToken ? (
+          this.state.namespaces && this.state.namespaces.continuationToken ? (
             <Button bsStyle="primary" onClick={this.nextNamespaces} className="pull-right">
               More namespaces <Glyphicon glyph="arrow-right" />
             </Button>
@@ -154,7 +177,7 @@ export default React.createClass({
         }
       </div>
     );
-  },
+  }
 
   /** Render list of tasks */
   renderTasks() {
@@ -162,7 +185,7 @@ export default React.createClass({
       <div>
         <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
-            {this.state.tasks.tasks.map((task, index) => {
+            {this.state.tasks && this.state.tasks.tasks.map((task, index) => {
               const isCurrent = (this.state.current === task.namespace);
 
               return (
@@ -182,46 +205,40 @@ export default React.createClass({
             <Glyphicon glyph="arrow-left" /> Back to start
           </Button>
         )}
-        {this.state.tasks.continuationToken && (
+        {this.state.tasks && this.state.tasks.continuationToken && (
           <Button bsStyle="primary" onClick={this.nextTasks} className="pull-right">
             More tasks <Glyphicon glyph="arrow-right" />
           </Button>
         )}
       </div>
     );
-  },
+  }
 
   /** Load next tasks */
   nextTasks() {
-    this.setState({
-      tasksToken: this.state.tasks.continuationToken,
-    });
-  },
+    this.setState({ tasksToken: this.state.tasks.continuationToken });
+  }
 
   /** Load next namespaces */
   nextNamespaces() {
-    this.setState({
-      namespaceToken: this.state.namespaces.continuationToken,
-    });
-  },
+    this.setState({ namespaceToken: this.state.namespaces.continuationToken });
+  }
 
   /** Update namespace input field */
   updateNamespaceInput() {
-    this.setState({namespaceInput: this.state.namespace});
-  },
+    this.setState({ namespaceInput: this.state.namespace });
+  }
 
   /** Handle changes in namespace input field */
   handleNamespaceInputChange() {
-    this.setState({
-      namespaceInput: findDOMNode(this.refs.namespace).value,
-    });
-  },
+    this.setState({ namespaceInput: findDOMNode(this.refs.namespace).value });
+  }
 
   setHistory(ns) {
     const isIndexedArtifact = this.props.match.url.includes('/index/artifacts');
 
-    this.props.history.push(path.join('/', 'index', isIndexedArtifact ? 'artifacts' : '', ns));
-  },
+    this.props.history.push(path.join('/index', isIndexedArtifact ? 'artifacts' : '', ns));
+  }
 
   /** Browse a namespace */
   browse(ns) {
@@ -229,20 +246,18 @@ export default React.createClass({
       namespace: ns,
       current: ns,
       tasksToken: null,
-      namespaceToken: null,
+      namespaceToken: null
     });
 
     this.setHistory(ns);
-  },
+  }
 
   /** Set current tasks */
   setCurrent(ns) {
-    this.setState({
-      current: ns,
-    });
+    this.setState({ current: ns });
 
     this.setHistory(ns);
-  },
+  }
 
   /** Load from namespace input field */
   loadNamespaceInput(e) {
@@ -251,24 +266,39 @@ export default React.createClass({
     }
 
     this.browse(this.state.namespaceInput);
-  },
+  }
 
   clearContinuationTokens() {
     this.setState({
       tasksToken: null,
-      namespaceToken: null,
+      namespaceToken: null
     });
-  },
+  }
 
   clearNamespaceToken() {
-    this.setState({
-      namespaceToken: null,
-    });
-  },
+    this.setState({ namespaceToken: null });
+  }
 
   clearTasksToken() {
-    this.setState({
-      tasksToken: null,
-    });
-  },
-});
+    this.setState({ tasksToken: null });
+  }
+}
+
+const taskclusterOpts = {
+  clients: { index: taskcluster.Index },
+  // Reload when state.namespace changes, ignore credentials changes
+  reloadOnKeys: ['namespace', 'namespaceToken', 'tasksToken'],
+  reloadOnLogin: false,
+  name: IndexBrowser.name
+};
+
+const watchStateOpts = {
+  onKeys: {
+    updateNamespaceInput: ['namespace', 'current'],
+    clearContinuationTokens: ['namespace']
+  }
+};
+
+IndexBrowser.propTypes = { entryView: React.PropTypes.func.isRequired };
+
+export default TaskClusterEnhance(CreateWatchState(IndexBrowser, watchStateOpts), taskclusterOpts);

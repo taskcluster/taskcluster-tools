@@ -1,34 +1,24 @@
-import React from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import path from 'path';
-import {Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table} from 'react-bootstrap';
-import * as utils from '../../lib/utils';
-import taskcluster from 'taskcluster-client';
-import * as format from '../../lib/format';
+import { Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table } from 'react-bootstrap';
 import _ from 'lodash';
+import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../../lib/utils';
+import * as format from '../../lib/format';
 import RoleEditor from '../roles/roleeditor';
 import ClientEditor from '../clients/clienteditor';
 import './scopeinspector.less';
 
-export default React.createClass({
-  displayName: 'ScopeInspector',
+class ScopeInspector extends Component {
+  constructor(props) {
+    super(props);
 
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        auth: taskcluster.Auth,
-      },
-    })
-  ],
-
-  /** Create an initial state */
-  getInitialState() {
-    const {params} = this.props.match;
+    const { params } = this.props.match;
     const selectedScope = params.selectedScope ? decodeURIComponent(params.selectedScope) : '';
     const selectedEntity= params.selectedEntity ? decodeURIComponent(params.selectedEntity) : '';
 
-    return {
+    this.state = {
       rolesLoaded: false,
       rolesError: null,
       roles: null,
@@ -38,12 +28,43 @@ export default React.createClass({
       selectedScope,
       selectedEntity,
       scopeSearchTerm: '',
-      entitySearchMode: 'Has Scope',
+      entitySearchMode: 'Has Scope'
     };
-  },
 
-  /** Load state from auth (using TaskClusterMixin) */
-  load() {
+    this.updatePath = this.updatePath.bind(this);
+    this.clearSelectedEntity = this.clearSelectedEntity.bind(this);
+    this.clearSelectedScope = this.clearSelectedScope.bind(this);
+    this.selectedScopeChanged = this.selectedScopeChanged.bind(this);
+    this.scopeSearchTermChanged = this.scopeSearchTermChanged.bind(this);
+    this.clearScopeSearchTerm = this.clearScopeSearchTerm.bind(this);
+    this.renderScopeRow = this.renderScopeRow.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     // Creates state properties:
     // - rolesLoaded
     // - rolesError
@@ -51,33 +72,39 @@ export default React.createClass({
     // - clientsLoaded
     // - clientsError
     // - clients
-    return {
-      roles: this.auth.listRoles(),
-      clients: this.auth.listClients(),
-    };
-  },
+    this.props.loadState({
+      roles: this.props.clients.auth.listRoles(),
+      clients: this.props.clients.auth.listClients()
+    });
+  }
 
   /** Render user-interface */
   render() {
+    if (!this.state.roles || !this.state.clients) {
+      return (
+        this.props.renderWaitFor('roles') ||
+        this.props.renderWaitFor('clients') ||
+        this.props.renderSpinner()
+      );
+    }
+
     return (
-      this.renderWaitFor('roles') ||
-      this.renderWaitFor('clients') ||
       this.renderSelectedEntity() ||
       this.renderSelectedScope() ||
       this.renderScopes()
     );
-  },
+  }
 
-  updatePath(replace = false) {
+  updatePath() {
     const selectedScope = this.state.selectedScope ? encodeURIComponent(this.state.selectedScope) : '';
     const selectedEntity = this.state.selectedEntity ? encodeURIComponent(this.state.selectedEntity) : '';
-    const url = path.join('/', 'auth', 'scopes', selectedScope, selectedEntity);
+    const url = path.join('/auth/scopes', selectedScope, selectedEntity);
 
-    return replace ? this.props.history.replace(url) : this.props.history.push(url);
-  },
+    this.props.history.replace(url);
+  }
 
   renderSelectedEntity() {
-    const {selectedEntity} = this.state;
+    const { selectedEntity } = this.state;
 
     if (selectedEntity === '') {
       return;
@@ -103,21 +130,21 @@ export default React.createClass({
             _.startsWith(this.state.selectedEntity, 'role:') ? (
               <RoleEditor
                 currentRoleId={this.state.selectedEntity.slice('role:'.length)}
-                reloadRoleId={this.reload} />
+                reloadRoleId={this.load} />
             ) : (
               <ClientEditor
                 currentClientId={this.state.selectedEntity.slice('client:'.length)}
-                reloadClientId={this.reload} />
+                reloadClientId={this.load} />
             )
           }
         </Col>
       </Row>
     );
-  },
+  }
 
   clearSelectedEntity() {
-    this.setState({selectedEntity: ''}, this.updatePath);
-  },
+    this.setState({ selectedEntity: '' }, this.updatePath);
+  }
 
   renderSelectedScope() {
     if (this.state.selectedScope === '') {
@@ -183,15 +210,15 @@ export default React.createClass({
                   pullRight={true}
                   id="match">
                   <MenuItem key="1" onClick={() => this.setEntitySearchMode('Exact')}>
-                    <Glyphicon glyph="ok" style={mode === 'Exact' ? {} : {visibility: 'hidden'}} /> Exact
+                    <Glyphicon glyph="ok" style={mode === 'Exact' ? {} : { visibility: 'hidden' }} /> Exact
                   </MenuItem>
                   <MenuItem key="2" onClick={() => this.setEntitySearchMode('Has Scope')}>
-                    <Glyphicon glyph="ok" style={mode === 'Has Scope' ? {} : {visibility: 'hidden'}} /> Has Scope
+                    <Glyphicon glyph="ok" style={mode === 'Has Scope' ? {} : { visibility: 'hidden' }} /> Has Scope
                   </MenuItem>
                   <MenuItem key="3" onClick={() => this.setEntitySearchMode('Has Sub-Scope')}>
                     <Glyphicon
                       glyph="ok"
-                      style={mode === 'Has Sub-Scope' ? {} : {visibility: 'hidden'}} /> Has Sub-Scope
+                      style={mode === 'Has Sub-Scope' ? {} : { visibility: 'hidden' }} /> Has Sub-Scope
                   </MenuItem>
                 </DropdownButton>
               </InputGroup>
@@ -229,30 +256,28 @@ export default React.createClass({
         </Col>
       </Row>
     );
-  },
+  }
 
   selectEntity(value) {
-    this.setState({selectedEntity: value}, this.updatePath);
-  },
+    this.setState({ selectedEntity: value }, this.updatePath);
+  }
 
   selectedScopeChanged() {
-    this.setState({
-      selectedScope: findDOMNode(this.refs.selectedScope).value,
-    });
-  },
+    this.setState({ selectedScope: findDOMNode(this.refs.selectedScope).value });
+  }
 
   setEntitySearchMode(mode) {
-    this.setState({entitySearchMode: mode});
-  },
+    this.setState({ entitySearchMode: mode });
+  }
 
   clearSelectedScope() {
-    this.setState({selectedScope: ''}, () => this.updatePath(true));
-  },
+    this.setState({ selectedScope: '' }, this.updatePath);
+  }
 
   renderScopes() {
     const scopes = _.uniq(_.flattenDeep([
       this.state.roles.map(role => role.expandedScopes),
-      this.state.clients.map(client => client.expandedScopes),
+      this.state.clients.map(client => client.expandedScopes)
     ]))
     .sort()
     .filter(scope => _.includes(scope, this.state.scopeSearchTerm));
@@ -260,7 +285,7 @@ export default React.createClass({
     return (
       <Row>
         <Col md={12}>
-          <InputGroup style={{marginBottom: 20}}>
+          <InputGroup style={{ marginBottom: 20 }}>
             <InputGroup.Addon><Glyphicon glyph="search" /></InputGroup.Addon>
             <FormControl
               type="text"
@@ -286,19 +311,15 @@ export default React.createClass({
         </Col>
       </Row>
     );
-  },
+  }
 
   scopeSearchTermChanged() {
-    this.setState({
-      scopeSearchTerm: findDOMNode(this.refs.scopeSearchTerm).value,
-    });
-  },
+    this.setState({ scopeSearchTerm: findDOMNode(this.refs.scopeSearchTerm).value });
+  }
 
   clearScopeSearchTerm() {
-    this.setState({
-      scopeSearchTerm: '',
-    });
-  },
+    this.setState({ scopeSearchTerm: '' });
+  }
 
   /** Render row with scope */
   renderScopeRow(scope, index) {
@@ -312,9 +333,16 @@ export default React.createClass({
         <td><code>{scope}</code></td>
       </tr>
     );
-  },
+  }
 
   selectScope(scope) {
-    this.setState({selectedScope: scope}, this.updatePath);
-  },
-});
+    this.setState({ selectedScope: scope }, this.updatePath);
+  }
+}
+
+const taskclusterOpts = {
+  clients: { auth: taskcluster.Auth },
+  name: ScopeInspector.name
+};
+
+export default TaskClusterEnhance(ScopeInspector, taskclusterOpts);

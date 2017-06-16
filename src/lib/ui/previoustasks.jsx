@@ -1,19 +1,62 @@
-import React from 'react';
-import {ListGroup, ListGroupItem, Panel} from 'react-bootstrap';
-import * as utils from '../../lib/utils';
+import React, { Component } from 'react';
+import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
+import { TaskClusterEnhance } from '../../lib/utils';
 import './previoustasks.less';
 
-export default React.createClass({
-  displayName: 'PreviousTasks',
+class PreviousTasks extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    // Calls load() initially and on reload()
-    utils.createTaskClusterMixin({
-      // Reload when props.status.taskId changes, ignore credential changes
-      reloadOnProps: ['objectId', 'objectType'],
-      reloadOnLogin: false,
-    }),
-  ],
+    this.state = {
+      previousObjectIds: [],
+      objectId: '',
+      objectType: ''
+    };
+
+    this.load = this.load.bind(this);
+    this.onTaskClusterReload = this.onTaskClusterReload.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-reload', this.onTaskClusterReload, false);
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterReload() {
+    this.load();
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.props.loadState({
+      previousObjectIds: this.getPreviousObjectIds(this.props.objectType, this.props.objectId),
+      objectId: this.props.objectId,
+      objectType: this.props.objectType
+    });
+  }
 
   getPreviousObjectIds(type, newId) {
     let ids = [];
@@ -46,29 +89,14 @@ export default React.createClass({
     }
 
     return ids;
-  },
-
-  load() {
-    return {
-      previousObjectIds: this.getPreviousObjectIds(this.props.objectType, this.props.objectId),
-      objectId: this.props.objectId,
-      objectType: this.props.objectType,
-    };
-  },
-
-  getInitialState() {
-    return {
-      previousObjectIds: [],
-      objectId: '',
-      objectType: '',
-    };
-  },
+  }
 
   render() {
     const objectIds = this.state.previousObjectIds || [];
     const rows = objectIds
       .map(objectId => {
-        const link = `#${objectId}`;
+        const link = `${objectId}`;
+
         return <ListGroupItem key={objectId} href={link}>{objectId}</ListGroupItem>;
       })
       // show most recent first
@@ -100,5 +128,14 @@ export default React.createClass({
         </ListGroup>
       </Panel>
     );
-  },
-});
+  }
+}
+
+const taskclusterOpts = {
+  // Reload when props.status.taskId changes, ignore credential changes
+  reloadOnProps: ['objectId', 'objectType'],
+  reloadOnLogin: false,
+  name: PreviousTasks.name
+};
+
+export default TaskClusterEnhance(PreviousTasks, taskclusterOpts);

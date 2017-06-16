@@ -1,22 +1,21 @@
-import React from 'react';
-import {Table, Nav, NavItem} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Table, Nav, NavItem } from 'react-bootstrap';
 import path from 'path';
-import * as utils from '../lib/utils';
-import taskcluster from 'taskcluster-client';
 import * as _ from 'lodash';
+import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../lib/utils';
 import * as format from '../lib/format';
 import WorkerTypeEditor from './workertypeeditor';
 
 const URL = 'https://console.aws.amazon.com/ec2/v2/home';
 
-const WorkerTypeResources = React.createClass({
-  propTypes: {
-    workerType: React.PropTypes.object.isRequired,
-    awsState: React.PropTypes.shape({
-      instances: React.PropTypes.arrayOf(React.PropTypes.object),
-      requests: React.PropTypes.arrayOf(React.PropTypes.object),
-    }).isRequired,
-  },
+class WorkerTypeResources extends Component {
+  constructor(props) {
+    super(props);
+
+    this.renderInstanceRow = this.renderInstanceRow.bind(this);
+    this.renderSpotRow = this.renderSpotRow.bind(this);
+  }
 
   render() {
     return (
@@ -85,7 +84,7 @@ const WorkerTypeResources = React.createClass({
         </Table>
       </span>
     );
-  },
+  }
 
   renderInstanceRow(instance, index) {
     return (
@@ -104,7 +103,7 @@ const WorkerTypeResources = React.createClass({
         </td>
       </tr>
     );
-  },
+  }
 
   renderSpotRow(spotReq, index) {
     return (
@@ -125,7 +124,7 @@ const WorkerTypeResources = React.createClass({
         </td>
       </tr>
     );
-  },
+  }
 
   renderInstanceIdLink(instanceId, region) {
     const qs = `?region=${region}#Instances:instanceId=${instanceId};sort=Name`;
@@ -133,10 +132,10 @@ const WorkerTypeResources = React.createClass({
     return (
       <a href={`${URL}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{instanceId}</code>
-        <i className="fa fa-external-link" style={{paddingLeft: 5}} />
+        <i className="fa fa-external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
-  },
+  }
 
   renderSpotRequestLink(spotReqId, region, visibleToEC2) {
     const qs = `?region=${region}#SpotInstances:spotInstanceRequestId=${spotReqId};sort=requestId`;
@@ -151,10 +150,10 @@ const WorkerTypeResources = React.createClass({
     return (
       <a href={`${URL}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{spotReqId}</code>{!visibleToEC2 ? ' (Internally tracked)' : ''}
-        <i className="fa fa-external-link" style={{paddingLeft: 5}} />
+        <i className="fa fa-external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
-  },
+  }
 
   renderImageIdLink(imageId, region) {
     const qs = `?region=${region}#Images:visibility=owned-by-me;imageId=${imageId};sort=name`;
@@ -162,49 +161,47 @@ const WorkerTypeResources = React.createClass({
     return (
       <a href={`${URL}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{imageId}</code>
-        <i className="fa fa-external-link" style={{paddingLeft: 5}} />
+        <i className="fa fa-external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
-  },
+  }
 
   runningCapacity() {
-    const {instanceTypes} = this.props.workerType;
+    const { instanceTypes } = this.props.workerType;
     const instances = this.props.awsState.instances
       .filter(x => x.state === 'running')
-      .map(instance => _.find(instanceTypes, {instanceType: instance.type}));
+      .map(instance => _.find(instanceTypes, { instanceType: instance.type }));
 
     return _.sumBy(instances, 'capacity');
-  },
+  }
 
   pendingCapacity() {
-    const {instanceTypes} = this.props.workerType;
+    const { instanceTypes } = this.props.workerType;
     const instances = this.props.awsState.instances
       .filter(x => x.state === 'pending')
-      .map(instance => _.find(instanceTypes, {instanceType: instance.type}));
+      .map(instance => _.find(instanceTypes, { instanceType: instance.type }));
 
     return _.sumBy(instances, 'capacity');
-  },
+  }
 
   spotReqCapacity() {
-    const {instanceTypes} = this.props.workerType;
+    const { instanceTypes } = this.props.workerType;
     const instances = this.props.awsState.requests
-      .map(spotReq => _.find(instanceTypes, {instanceType: spotReq.type}));
+      .map(spotReq => _.find(instanceTypes, { instanceType: spotReq.type }));
 
     return _.sumBy(instances, 'capacity');
-  },
-});
+  }
+}
 
-const WorkerTypeStatus = React.createClass({
-  propTypes: {
-    workerType: React.PropTypes.object.isRequired,
-    awsState: React.PropTypes
-      .shape({
-        instances: React.PropTypes.arrayOf(React.PropTypes.object),
-        requests: React.PropTypes.arrayOf(React.PropTypes.object),
-      })
-      .isRequired,
-  },
+WorkerTypeResources.propTypes = {
+  workerType: React.PropTypes.object.isRequired,
+  awsState: React.PropTypes.shape({
+    instances: React.PropTypes.arrayOf(React.PropTypes.object),
+    requests: React.PropTypes.arrayOf(React.PropTypes.object)
+  }).isRequired
+};
 
+class WorkerTypeStatus extends Component {
   render() {
     // Find availability zones
     const availabilityZones = _.union(
@@ -233,7 +230,7 @@ const WorkerTypeStatus = React.createClass({
         </tbody>
       </Table>
     );
-  },
+  }
 
   renderRow(instTypeDef, availabilityZone) {
     // Find number of running, pending and spotRequests
@@ -273,43 +270,26 @@ const WorkerTypeStatus = React.createClass({
         </td>
       </tr>
     );
-  },
-});
+  }
+}
 
-const WorkerTypeView = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        queue: taskcluster.Queue,
-        awsProvisioner: taskcluster.AwsProvisioner,
-      },
-      clientOpts: {
-        awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
-        },
-      },
-      reloadOnProps: [
-        'workerType',
-        'provisionerId',
-      ],
-    }),
-    //
+WorkerTypeStatus.propTypes = {
+  workerType: React.PropTypes.object.isRequired,
+  awsState: React.PropTypes
+    .shape({
+      instances: React.PropTypes.arrayOf(React.PropTypes.object),
+      requests: React.PropTypes.arrayOf(React.PropTypes.object)
+    })
+    .isRequired
+};
 
-  ],
+class WorkerTypeView extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    provisionerId: React.PropTypes.string.isRequired,
-    workerType: React.PropTypes.string.isRequired,
-    // Reload list of workerTypes
-    reload: React.PropTypes.func.isRequired,
-    // update the summary for this workerType
-    updateSummary: React.PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       currentTab: this.props.match.params.currentTab || '',
-      pendingTasks: {pendingTasks: 0},
+      pendingTasks: { pendingTasks: 0 },
       pendingTasksLoaded: false,
       pendingTasksError: null,
       workerType: {},
@@ -317,27 +297,61 @@ const WorkerTypeView = React.createClass({
       workerTypeError: null,
       awsState: {},
       awsStateLoaded: false,
-      awsStateError: null,
+      awsStateError: null
     };
-  },
 
-  load() {
+    this.setCurrentTab = this.setCurrentTab.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     const self = this;
 
-    return {
-      pendingTasks: this.queue.pendingTasks(this.props.provisionerId, this.props.workerType),
-      workerType: this.awsProvisioner.workerType(this.props.workerType),
-      awsState: this.awsProvisioner
+    this.props.loadState({
+      pendingTasks: this.props.clients.queue.pendingTasks(this.props.provisionerId, this.props.workerType),
+      workerType: this.props.clients.awsProvisioner.workerType(this.props.workerType),
+      awsState: this.props.clients.awsProvisioner
         .state(this.props.workerType)
         .then(res => {
           self.props.updateSummary(self.props.workerType, res.summary);
+
           return res;
-        }),
-    };
-  },
+        })
+    });
+  }
 
   render() {
-    return this.renderWaitFor('workerType') || this.renderWaitFor('pendingTasks') || (
+    return this.props.renderWaitFor('workerType') || this.props.renderWaitFor('pendingTasks') || (
       <div>
         <Nav bsStyle="tabs" activeKey={`${this.state.currentTab}`} onSelect={this.setCurrentTab}>
           <NavItem eventKey="" key="">Status</NavItem>
@@ -345,20 +359,20 @@ const WorkerTypeView = React.createClass({
           <NavItem eventKey="edit" key="edit">Edit Definition</NavItem>
           <NavItem eventKey="resources" key="resources">EC2 Resources</NavItem>
         </Nav>
-        <div className="tab-content" style={{minHeight: 400}}>
+        <div className="tab-content" style={{ minHeight: 400 }}>
           <div className="tab-pane active">
             {this.renderCurrentTab()}
           </div>
         </div>
       </div>
     );
-  },
+  }
 
   setCurrentTab(tab) {
     // Update state
-    this.setState({currentTab: tab});
+    this.setState({ currentTab: tab });
     this.props.history.push(path.join('/aws-provisioner', this.props.match.params.workerType, tab));
-  },
+  }
 
   renderCurrentTab() {
     if (this.state.currentTab === 'view') {
@@ -371,19 +385,19 @@ const WorkerTypeView = React.createClass({
           updated={this.props.reload} />
       );
     } else if (this.state.currentTab === 'resources') {
-      return this.renderWaitFor('awsState') || (
+      return this.props.renderWaitFor('awsState') || (
         <WorkerTypeResources
           workerType={this.state.workerType}
           awsState={this.state.awsState} />
       );
     }
 
-    return this.renderWaitFor('awsState') || (
+    return this.props.renderWaitFor('awsState') || (
       <WorkerTypeStatus
         workerType={this.state.workerType}
         awsState={this.state.awsState} />
     );
-  },
+  }
 
   renderDefinition() {
     const def = _.cloneDeep(this.state.workerType);
@@ -396,7 +410,33 @@ const WorkerTypeView = React.createClass({
         </format.Code>
       </div>
     );
-  },
-});
+  }
+}
 
-export default WorkerTypeView;
+WorkerTypeView.propTypes = {
+  provisionerId: React.PropTypes.string.isRequired,
+  workerType: React.PropTypes.string.isRequired,
+  // Reload list of workerTypes
+  reload: React.PropTypes.func.isRequired,
+  // update the summary for this workerType
+  updateSummary: React.PropTypes.func.isRequired
+};
+
+const taskclusterOpts = {
+  clients: {
+    queue: taskcluster.Queue,
+    awsProvisioner: taskcluster.AwsProvisioner
+  },
+  clientOpts: {
+    awsProvisioner: {
+      baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
+    }
+  },
+  reloadOnProps: [
+    'workerType',
+    'provisionerId'
+  ],
+  name: WorkerTypeView.name
+};
+
+export default TaskClusterEnhance(WorkerTypeView, taskclusterOpts);

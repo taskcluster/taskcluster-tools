@@ -1,80 +1,130 @@
-import React from 'react';
-import * as utils from '../../lib/utils';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../../lib/utils';
 import ArtifactList from '../../lib/ui/artifactlist';
 
-const ArtifactView = React.createClass({
-  mixins: [
-    // Calls load()
-    utils.createTaskClusterMixin({
-      clients: {
-        queue: taskcluster.Queue,
-      },
-      // Reload when props.taskId changes, ignore credentials changes
-      reloadOnProps: ['taskId', 'indexNamespace'],
-      reloadOnLogin: false,
-    }),
-  ],
+class ArtifactView extends Component {
+  constructor(props) {
+    super(props);
 
-  getInitialState() {
-    return {
+    this.state = {
       artifacts: null,
       artifactsLoaded: false,
-      artifactsError: null,
+      artifactsError: null
     };
-  },
 
-  propTypes: {
-    taskId: React.PropTypes.string.isRequired,
-    indexNamespace: React.PropTypes.string.isRequired,
-  },
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
 
-  load() {
-    return {
-      artifacts: this.queue.listLatestArtifacts(this.props.taskId),
-    };
-  },
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.props.loadState({ artifacts: this.props.clients.queue.listLatestArtifacts(this.props.taskId) });
+  }
 
   render() {
-    return this.renderWaitFor('artifacts') || (
+    return this.props.renderWaitFor('artifacts') || (
       <ArtifactList
         taskId={this.props.taskId}
         indexNamespace={this.props.indexNamespace}
-        artifacts={this.state.artifacts.artifacts} />
+        artifacts={this.state.artifacts ? this.state.artifacts.artifacts : []} />
     );
-  },
-});
+  }
+}
 
-const EntryView = React.createClass({
-  mixins: [
-    // Calls load()
-    utils.createTaskClusterMixin({
-      clients: {
-        index: taskcluster.Index,
-      },
-      // Reload when props.namespace changes, ignore credentials changes
-      reloadOnProps: ['namespace'],
-      reloadOnLogin: false,
-    }),
-  ],
+ArtifactView.propTypes = {
+  taskId: React.PropTypes.string.isRequired,
+  indexNamespace: React.PropTypes.string.isRequired
+};
 
-  propTypes: {
-    namespace: React.PropTypes.string.isRequired,
-  },
+const artifactViewTaskclusterOpts = {
+  clients: { queue: taskcluster.Queue },
+  // Reload when props.taskId changes, ignore credentials changes
+  reloadOnProps: ['taskId', 'indexNamespace'],
+  reloadOnLogin: false,
+  name: ArtifactView.name
+};
 
-  getInitialState() {
-    return {
+const ArtifactViewEnhanced = TaskClusterEnhance(ArtifactView, artifactViewTaskclusterOpts);
+
+class EntryView extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       task: null,
       taskError: null,
-      taskLoaded: false,
+      taskLoaded: false
     };
-  },
 
-  load() {
-    return this.props.namespace === '' ?
-      {task: null, taskError: null, taskLoaded: true} :
-      {task: this.index.findTask(this.props.namespace)};
-  },
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    const promisedState = this.props.namespace === '' ?
+      { task: null, taskError: null, taskLoaded: true } :
+      { task: this.props.clients.index.findTask(this.props.namespace) };
+
+    this.props.loadState(promisedState);
+  }
 
   render() {
     return (
@@ -89,18 +139,18 @@ const EntryView = React.createClass({
               No task is indexed under <code>{this.props.namespace}</code>.
             </div>
           ) :
-          this.renderWaitFor('task') || this.renderTask()
+          this.props.renderWaitFor('task') || this.renderTask()
         }
       </div>
     );
-  },
+  }
 
   renderTask() {
     if (!this.state.task) {
       return;
     }
 
-    const inspectLink = `https://tools.taskcluster.net/task-inspector/#${this.state.task.taskId}/`;
+    const inspectLink = `https://tools.taskcluster.net/task-inspector/${this.state.task.taskId}/`;
 
     return (
       <div>
@@ -114,7 +164,7 @@ const EntryView = React.createClass({
         <dl className="dl-horizontal">
           <dt>Latest Artifacts</dt>
           <dd>
-            <ArtifactView taskId={this.state.task.taskId} indexNamespace={this.state.task.namespace} />
+            <ArtifactViewEnhanced taskId={this.state.task.taskId} indexNamespace={this.state.task.namespace} />
             <br />
             <div className="alert alert-info" role="alert">
               <strong>Latest Artifacts</strong>&nbsp;
@@ -126,7 +176,17 @@ const EntryView = React.createClass({
         </dl>
       </div>
     );
-  },
-});
+  }
+}
 
-export default EntryView;
+EntryView.propTypes = { namespace: React.PropTypes.string.isRequired };
+
+const entryViewTaskclusterOpts = {
+  clients: { index: taskcluster.Index },
+  // Reload when props.namespace changes, ignore credentials changes
+  reloadOnProps: ['namespace'],
+  reloadOnLogin: false,
+  name: EntryView.name
+};
+
+export default TaskClusterEnhance(EntryView, entryViewTaskclusterOpts);

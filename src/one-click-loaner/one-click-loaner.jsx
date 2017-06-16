@@ -1,61 +1,84 @@
-import React from 'react';
-import {findDOMNode} from 'react-dom';
-import {FormGroup, FormControl, ControlLabel, InputGroup, Button} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
+import { FormGroup, FormControl, ControlLabel, InputGroup, Button } from 'react-bootstrap';
 import path from 'path';
-import * as utils from '../lib/utils';
 import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance, CreateWatchState } from '../lib/utils';
 import LoanerButton from '../lib/ui/loaner-button';
 
 const VALID_INPUT = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
 
-export default React.createClass({
-  displayName: 'OneClickLoaner',
+class OneClickLoaner extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    // Calls load() initially and on reload()
-    utils.createTaskClusterMixin({
-      clients: {
-        queue: taskcluster.Queue,
-      },
-      // Reload when state.taskId changes, ignore credential changes
-      reloadOnKeys: ['taskId'],
-      reloadOnLogin: false,
-    }),
-    // Called handler when state.taskId changes
-    utils.createWatchStateMixin({
-      onKeys: {
-        updateTaskIdInput: ['taskId'],
-      },
-    })
-  ],
-
-  getInitialState() {
-    return {
+    this.state = {
       taskId: this.props.match.params.taskId || '',
       taskLoaded: true,
       taskError: null,
       task: null,
-      taskIdInput: this.props.match.params.taskId || '',
+      taskIdInput: this.props.match.params.taskId || ''
     };
-  },
+
+    this.updateTaskIdInput = this.updateTaskIdInput.bind(this);
+    this.handleTaskIdInputChange = this.handleTaskIdInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+    this.onWatchReload = this.onWatchReload.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+    document.addEventListener('watch-reload', this.onWatchReload, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+    document.removeEventListener('watch-reload', this.onWatchReload, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+    this.props.watchState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  onWatchReload({ detail }) {
+    detail.map(functionName => this[functionName]());
+  }
 
   /** Return promised state for TaskClusterMixin */
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     // Skip loading empty-strings
     if (this.state.taskId === '') {
-      return {task: null};
+      return this.props.loadState({ task: null });
     }
 
     // Reload task definition
-    return {
-      task: this.queue.task(this.state.taskId),
-    };
-  },
+    this.props.loadState({ task: this.props.clients.queue.task(this.state.taskId) });
+  }
 
   /** When taskId changed we should update the input */
   updateTaskIdInput() {
-    this.setState({taskIdInput: this.state.taskId});
-  },
+    this.setState({ taskIdInput: this.state.taskId });
+  }
 
   // Render a task-inspector
   render() {
@@ -87,19 +110,19 @@ export default React.createClass({
         <br /><br />
         {!invalidInput && (
           <div className="text-center">
-            {this.renderWaitFor('task') || (this.state.task && (
+            {this.props.renderWaitFor('task') || (this.state.task && (
               <LoanerButton
+                {...this.props}
                 buttonStyle="primary"
                 buttonSize="large"
                 taskId={this.state.taskId}
-                task={this.state.task}
-                {...this.props} />
+                task={this.state.task} />
             ))}
           </div>
         )}
       </div>
     );
-  },
+  }
 
   /** Update TaskIdInput to reflect input */
   handleTaskIdInputChange() {
@@ -109,17 +132,31 @@ export default React.createClass({
     if (!invalidInput) {
       this.setState({
         taskIdInput,
-        taskId: taskIdInput,
+        taskId: taskIdInput
       });
     } else {
-      this.setState({taskIdInput});
+      this.setState({ taskIdInput });
     }
-  },
+  }
 
   /** Handle form submission */
   handleSubmit(e) {
     e.preventDefault();
-    this.setState({taskId: this.state.taskIdInput});
+    this.setState({ taskId: this.state.taskIdInput });
     this.props.history.push(path.join('/one-click-loaner', this.state.taskIdInput));
-  },
-});
+  }
+}
+
+const taskclusterOpts = {
+  clients: { queue: taskcluster.Queue },
+  // Reload when state.taskId changes, ignore credential changes
+  reloadOnKeys: ['taskId'],
+  reloadOnLogin: false,
+  name: OneClickLoaner.name
+};
+
+const watchStateOpts = {
+  onKeys: { updateTaskIdInput: ['taskId'] }
+};
+
+export default TaskClusterEnhance(CreateWatchState(OneClickLoaner, watchStateOpts), taskclusterOpts);

@@ -1,6 +1,6 @@
-import React from 'react';
-import * as utils from '../utils';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../utils';
 import * as auth from '../auth';
 
 // Matching patterns for finding an icon from a mimetype, most specific
@@ -8,7 +8,7 @@ import * as auth from '../auth';
 const MIMETYPE_ICONS = [
   {
     icon: 'file-pdf-o',
-    matches: ['application/pdf', 'application/postscript'],
+    matches: ['application/pdf', 'application/postscript']
   }, {
     icon: 'file-archive-o',
     matches: [
@@ -25,18 +25,17 @@ const MIMETYPE_ICONS = [
       'application/x-apple-diskimage',
       'application/vnd.ms-cab-compressed',
       'application/vnd.android.package-archive',
-      'application/x-gtar',
-
-    ],
+      'application/x-gtar'
+    ]
   }, {
     icon: 'file-word-o',
-    matches: ['text/rtf', 'text/html'],
+    matches: ['text/rtf', 'text/html']
   }, {
     icon: 'file-excel-o',
-    matches: ['text/csv'],
+    matches: ['text/csv']
   }, {
     icon: 'file-powerpoint-o',
-    matches: [],
+    matches: []
   }, {
     icon: 'file-code-o',
     matches: [
@@ -46,33 +45,33 @@ const MIMETYPE_ICONS = [
       'text/css',
       'text/javascript',
       'text/xml',
-      'application/ecmascript',
-    ],
+      'application/ecmascript'
+    ]
   }, {
     icon: 'file-video-o',
-    matches: [/^video\//],
+    matches: [/^video\//]
   }, {
     icon: 'file-image-o',
-    matches: [/^image\//],
+    matches: [/^image\//]
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//],
+    matches: [/^text\//]
   }, {
     icon: 'file-audio-o',
-    matches: [/^audio\//],
+    matches: [/^audio\//]
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//],
+    matches: [/^text\//]
   }, {
     icon: 'file-text-o',
-    matches: [/^text\//],
+    matches: [/^text\//]
   }, {
     icon: 'file-archive-o',
-    matches: [/compressed/, /tar/, /zip/],
+    matches: [/compressed/, /tar/, /zip/]
   }, {
     icon: 'file-o',
-    matches: [/.*/],
-  },
+    matches: [/.*/]
+  }
 ];
 
 /** Get icon from mimetype */
@@ -96,42 +95,39 @@ const getIconFromMime = contentType => {
 };
 
 /** Displays a list of artifacts */
-export default React.createClass({
-  displayName: 'ArtifactList',
+class ArtifactList extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue
-      clients: {
-        queue: taskcluster.Queue,
-      },
-      // Reload when taskId changes or runId
-      reloadOnProps: ['taskId', 'runId', 'indexNamespace', 'artifacts'],
-      reloadOnLogin: true,
-    }),
-  ],
-
-  // Validate properties
-  propTypes: {
-    artifacts: React.PropTypes.array.isRequired,
-    taskId: React.PropTypes.string.isRequired,
-    // If not provided, latestArtifact is used
-    runId: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
-    ]),
-  },
-
-  /** Get initial state */
-  getInitialState() {
-    return {
+    this.state = {
       // list of artifacts with url built
-      artifacts: [],
+      artifacts: this.props.artifacts || []
     };
-  },
+
+    this.load = this.load.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
 
   /** Build the right url for artifacts */
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     // Build the Urls where so that they'll be updated, if when people login
     // with credentials
     const artifacts = this.props.artifacts.map(artifact => {
@@ -160,15 +156,15 @@ export default React.createClass({
         // If we have credentials we create a signed URL; note that signed URLs always point to the
         // task directly, as they are not useful for users copy/pasting
         if (this.props.runId != null) {
-          url = this.queue.buildSignedUrl(
-            this.queue.getArtifact,
+          url = this.props.clients.queue.buildSignedUrl(
+            this.props.clients.queue.getArtifact,
             this.props.taskId,
             this.props.runId,
             artifact.name
           );
         } else {
-          url = this.queue.buildSignedUrl(
-            this.queue.getLatestArtifact,
+          url = this.props.clients.queue.buildSignedUrl(
+            this.props.clients.queue.getLatestArtifact,
             this.props.taskId,
             artifact.name
           );
@@ -185,23 +181,44 @@ export default React.createClass({
       return {
         url,
         icon,
-        name: artifact.name,
+        name: artifact.name
       };
     });
 
-    this.setState({artifacts});
-  },
+    this.setState({ artifacts });
+  }
 
   render() {
     return (
-      <div style={{fontSize: 14}}>
+      <div style={{ fontSize: 14 }}>
         {this.state.artifacts.map((artifact, key) => (
-          <div key={key} style={{marginBottom: 8}}>
-            <i className={`fa fa-${artifact.icon}`} style={{marginRight: 5}} />
+          <div key={key} style={{ marginBottom: 8 }}>
+            <i className={`fa fa-${artifact.icon}`} style={{ marginRight: 5 }} />
             <a href={artifact.url} target="_blank" rel="noopener noreferrer">{artifact.name}</a>
           </div>
         ))}
       </div>
     );
-  },
-});
+  }
+}
+
+ArtifactList.propTypes = {
+  artifacts: React.PropTypes.array.isRequired,
+  taskId: React.PropTypes.string.isRequired,
+  // If not provided, latestArtifact is used
+  runId: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.number
+  ])
+};
+
+const taskclusterOpts = {
+  // Need updated clients for Queue
+  clients: { queue: taskcluster.Queue },
+  // Reload when taskId changes or runId
+  reloadOnProps: ['taskId', 'runId', 'indexNamespace', 'artifacts'],
+  reloadOnLogin: true,
+  name: ArtifactList.name
+};
+
+export default TaskClusterEnhance(ArtifactList, taskclusterOpts);

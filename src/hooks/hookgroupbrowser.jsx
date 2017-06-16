@@ -1,49 +1,55 @@
-import React from 'react';
-import * as utils from '../lib/utils';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
-import * as format from '../lib/format';
 import TreeView from 'react-treeview';
+import { TaskClusterEnhance } from '../lib/utils';
+import * as format from '../lib/format';
 
-const HookBrowser = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        hooks: taskcluster.Hooks,
-      },
-    }),
-  ],
+class HookBrowser extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    group: React.PropTypes.string.isRequired,
-    currentHookGroupId: React.PropTypes.string,
-    currentHookId: React.PropTypes.string,
-    selectHook: React.PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       hooks: null,
       hooksLoading: false,
       hooksLoaded: false,
-      hooksError: null,
+      hooksError: null
     };
-  },
+
+    this.handleClick = this.handleClick.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
 
   render() {
     // forward clicks on the label on to the TreeView's handleClick (undocumented..)
-    const label = <code onClick={() => this.refs.tv.handleClick()}>{this.props.group}</code>;
+    const label = <code onClick={() => this.tvInstance.handleClick()}>{this.props.group}</code>;
 
     if (!this.state.hooksLoaded || this.state.hooksError) {
       return (
         <TreeView
           key={this.props.group}
           nodeLabel={label}
-          ref="tv"
+          ref={instance => { this.tvInstance = instance; }}
           defaultCollapsed={true}
           onClick={this.handleClick}>
           {
             this.state.hooksError ?
-              this.renderError(this.state.hooksError) : (
+              this.props.renderError(this.state.hooksError) : (
                 <format.Icon name="spinner" spin={true} />
               )
           }
@@ -55,7 +61,7 @@ const HookBrowser = React.createClass({
       <TreeView
         key={this.props.group}
         nodeLabel={label}
-        ref="tv"
+        ref={instance => { this.tvInstance = instance; }}
         defaultCollapsed={false}
         onClick={this.handleClick}>
         {
@@ -76,52 +82,75 @@ const HookBrowser = React.createClass({
         }
       </TreeView>
     );
-  },
+  }
 
   handleClick() {
     if (!this.state.hooksLoading) {
-      this.setState({hooksLoading: true});
-      this.loadState({
-        hooks: this.hooks.listHooks(this.props.group),
+      this.setState({ hooksLoading: true });
+      this.props.loadState({
+        hooks: this.props.clients.hooks.listHooks(this.props.group)
       });
     }
-  },
-});
+  }
+}
 
-const HookGroupBrowser = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        hooks: taskcluster.Hooks,
-      },
-    }),
-  ],
+HookBrowser.propTypes = {
+  group: React.PropTypes.string.isRequired,
+  currentHookGroupId: React.PropTypes.string,
+  currentHookId: React.PropTypes.string,
+  selectHook: React.PropTypes.func.isRequired
+};
 
-  propTypes: {
-    currentHookGroupId: React.PropTypes.string,
-    currentHookId: React.PropTypes.string,
-    selectHook: React.PropTypes.func.isRequired,
-  },
+const hookBrowserTaskclusterOpts = {
+  clients: { hooks: taskcluster.Hooks },
+  name: HookBrowser.name
+};
 
-  getInitialState() {
-    return {
+const HookBrowserEnhanced = TaskClusterEnhance(HookBrowser, hookBrowserTaskclusterOpts);
+
+class HookGroupBrowser extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       groups: null,
       groupsLoaded: false,
-      groupsError: null,
+      groupsError: null
     };
-  },
 
-  load() {
-    return {
-      groups: this.hooks.listHookGroups(),
-    };
-  },
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.props.loadState({ groups: this.props.clients.hooks.listHookGroups() });
+  }
 
   render() {
-    const waitFor = this.renderWaitFor('groups');
-
-    if (waitFor) {
-      return waitFor;
+    if (!this.state.groupsLoaded) {
+      return this.props.renderSpinner();
     }
 
     try {
@@ -130,7 +159,7 @@ const HookGroupBrowser = React.createClass({
           {
             this.state.groups.groups
               .map(group => (
-                <HookBrowser
+                <HookBrowserEnhanced
                   key={group}
                   group={group}
                   selectHook={this.props.selectHook}
@@ -143,7 +172,18 @@ const HookGroupBrowser = React.createClass({
     } catch (e) {
       // TODO: Handle error
     }
-  },
-});
+  }
+}
 
-export default HookGroupBrowser;
+HookGroupBrowser.propTypes = {
+  currentHookGroupId: React.PropTypes.string,
+  currentHookId: React.PropTypes.string,
+  selectHook: React.PropTypes.func.isRequired
+};
+
+const hookGroupBrowserTaskclusterOpts = {
+  clients: { hooks: taskcluster.Hooks },
+  name: HookGroupBrowser.name
+};
+
+export default TaskClusterEnhance(HookGroupBrowser, hookGroupBrowserTaskclusterOpts);

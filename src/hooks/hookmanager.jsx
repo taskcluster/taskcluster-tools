@@ -1,35 +1,28 @@
-import React from 'react';
-import {Row, Col, ButtonToolbar, Button, Glyphicon} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import path from 'path';
+import taskcluster from 'taskcluster-client';
 import HookGroupBrowser from './hookgroupbrowser';
 import HookEditView from './hookeditor';
-import * as utils from '../lib/utils';
-import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../lib/utils';
 import './hookmanager.less';
 
-export default React.createClass({
-  displayName: 'HookManager',
+class HookManager extends Component {
+  constructor(props) {
+    super(props);
 
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        hooks: taskcluster.Hooks,
-      },
-    })
-  ],
-
-  /** Create an initial state */
-  getInitialState() {
-    return {
+    this.state = {
       currentHookGroupId: this.props.match.params.hookGroupId,
-      currentHookId: this.props.match.params.hookId,
+      currentHookId: this.props.match.params.hookId
     };
-  },
+
+    this.refreshHookList = this.refreshHookList.bind(this);
+    this.selectHook = this.selectHook.bind(this);
+  }
 
   /** Render the main layout of the hooks manager page */
   render() {
-    const {hookId, hookGroupId} = this.props.match.params;
+    const { hookId, hookGroupId } = this.props.match.params;
     const creating = !hookGroupId && !hookId;
 
     return (
@@ -38,7 +31,7 @@ export default React.createClass({
           <h4>Hooks</h4>
           <hr />
           <HookGroupBrowser
-            ref="hookgroupbrowser"
+            ref={instance => { this.hookGroupBrowserInstance = instance; }}
             currentHookGroupId={hookGroupId}
             currentHookId={hookId}
             selectHook={this.selectHook} />
@@ -57,21 +50,28 @@ export default React.createClass({
         </Col>
         <Col md={8}>
           <HookEditView
+            {...this.props}
             currentHookId={hookId}
             currentHookGroupId={hookGroupId}
             refreshHookList={this.refreshHookList}
-            selectHook={this.selectHook}
-            {...this.props} />
+            selectHook={this.selectHook} />
         </Col>
       </Row>
     );
-  },
+  }
 
   refreshHookList() {
-    this.refs.hookgroupbrowser.reload();
-  },
+    this.hookGroupBrowserInstance.getWrappedInstance().load();
+  }
 
   selectHook(hookGroupId, hookId) {
     this.props.history.push(path.join('/hooks', hookGroupId ? hookGroupId : '', hookId ? hookId : ''));
-  },
-});
+  }
+}
+
+const taskclusterOpts = {
+  clients: { hooks: taskcluster.Hooks },
+  name: HookManager.name
+};
+
+export default TaskClusterEnhance(HookManager, taskclusterOpts);

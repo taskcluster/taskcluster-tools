@@ -5,17 +5,50 @@
   "engines": {
     "node": ">=6.0.0"
   },
-  "config": {
-    "presets": [
-      "neutrino-preset-react",
-      "tools-preset"
-    ],
-    "neutrino": {
+  "neutrino": {
+    "use": ["tools-preset"],
+    "config": {
       "entry": {
         "vendor": [
           "react",
+          "ansi-regex",
+          "ansi_up",
+          "assume",
+          "bootstrap",
+          "change-case",
+          "classnames",
+          "codemirror",
+          "concat-stream",
+          "debug",
+          "docker-exec-websocket-server",
+          "durable-json-lint",
+          "exorcist",
+          "highlight.js",
+          "hterm-umd",
+          "jquery",
+          "js-yaml",
+          "less-loader",
+          "lodash",
+          "markdown-it",
+          "moment",
+          "redux",
+          "react-helmet",
+          "redux-thunk",
+          "react-bootstrap",
+          "react-code-mirror",
+          "react-datepicker",
           "react-dom",
-          "react-router-dom"
+          "react-router-dom",
+          "react-helmet",
+          "react-json-inspector",
+          "react-redux",
+          "react-tabs",
+          "react-tooltip",
+          "react-treeview",
+          "taskcluster-client",
+          "www-authenticate",
+          "xml2js",
+          "qs"
         ]
       }
     }
@@ -32,6 +65,7 @@
     "ansi_up": "^1.3.0",
     "assume": "^1.4.1",
     "bootstrap": "^3.3.7",
+    "bufferutil": "^3.0.0",
     "change-case": "^3.0.0",
     "classnames": "^2.2.5",
     "codemirror": "^5.22.0",
@@ -45,10 +79,11 @@
     "hterm-umd": "^1.0.1",
     "jquery": "^3.1.0",
     "js-yaml": "^3.7.0",
-    "less-loader": "^2.2.3",
+    "less-loader": "^4.0.3",
     "lodash": "^4.15.0",
     "markdown-it": "^7.0.1",
     "moment": "^2.15.0",
+    "qs": "^6.4.0",
     "react": "^15.3.1",
     "react-bootstrap": "0.30.5",
     "react-code-mirror": "^3.1.0",
@@ -68,22 +103,24 @@
     "slugid": "^1.1.0",
     "taskcluster-client": "^2.0.0",
     "term.js": "0.0.7",
+    "utf-8-validate": "^3.0.1",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
     "xml2js": "0.4.17"
   },
   "devDependencies": {
-    "babel-polyfill": "^6.13.0",
-    "copy-webpack-plugin": "^3.0.1",
+    "babel-polyfill": "^6.23.0",
+    "copy-webpack-plugin": "^4.0.1",
     "html-webpack-plugin": "^2.28.0",
     "less": "^2.7.1",
     "lodash.clonedeep": "^4.5.0",
-    "neutrino": "4.2.1",
-    "neutrino-preset-react": "4.2.2",
-    "neutrino-preset-taskcluster-web": "^2.0.0",
+    "neutrino": "^5.8.0",
+    "neutrino-preset-react": "^5.8.0",
+    "neutrino-middleware-env": "^5.8.0",
+    "neutrino-preset-mozilla-rpweb": "^3.0.1",
     "s3-deploy": "0.6.1",
     "shebang-loader": "0.0.1",
-    "webpack": "^2.3.2",
-    "webpack-dev-server": "^1.15.2"
+    "webpack": "^2.5.1",
+    "webpack-dev-server": "^2.4.5"
   }
 }

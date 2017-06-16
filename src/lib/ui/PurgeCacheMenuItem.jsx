@@ -1,32 +1,21 @@
-import React from 'react';
-import ConfirmActionMenuItem from './ConfirmActionMenuItem';
+import React, { Component } from 'react';
 import _ from 'lodash';
 import taskcluster from 'taskcluster-client';
-import * as utils from '../utils';
+import ConfirmActionMenuItem from './ConfirmActionMenuItem';
+import { TaskClusterEnhance } from '../utils';
 
-export default React.createClass({
-  displayName: 'PurgeCacheMenuItem',
+class PurgeCacheMenuItem extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        purgeCache: taskcluster.PurgeCache,
-      },
-    }),
-  ],
-
-  propTypes: {
-    provisionerId: React.PropTypes.string.isRequired,
-    workerType: React.PropTypes.string.isRequired,
-    caches: React.PropTypes.array,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       purged: null,
-      selected: this.props.caches || [],
+      selected: this.props.caches || []
     };
-  },
+
+    this.update = this.update.bind(this);
+    this.purge = this.purge.bind(this);
+  }
 
   render() {
     return (
@@ -60,7 +49,7 @@ export default React.createClass({
         </div>
       </ConfirmActionMenuItem>
     );
-  },
+  }
 
   update(e) {
     let caches = _.clone(this.state.selected);
@@ -71,12 +60,26 @@ export default React.createClass({
       caches = caches.filter(i => i !== e.target.value);
     }
 
-    this.setState({selected: caches});
-  },
+    this.setState({ selected: caches });
+  }
+
   purge() {
-    const promises = this.state.selected.map(cacheName => this.purgeCache
-      .purgeCache(this.props.provisionerId, this.props.workerType, {cacheName}));
+    const promises = this.state.selected.map(cacheName => this.props.clients.purgeCache
+      .purgeCache(this.props.provisionerId, this.props.workerType, { cacheName }));
 
     return Promise.all(promises);
-  },
-});
+  }
+}
+
+PurgeCacheMenuItem.propTypes = {
+  provisionerId: React.PropTypes.string.isRequired,
+  workerType: React.PropTypes.string.isRequired,
+  caches: React.PropTypes.array
+};
+
+const taskclusterOpts = {
+  clients: { purgeCache: taskcluster.PurgeCache },
+  name: PurgeCacheMenuItem.name
+};
+
+export default TaskClusterEnhance(PurgeCacheMenuItem, taskclusterOpts);

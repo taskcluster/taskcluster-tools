@@ -1,45 +1,25 @@
-import React from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import taskcluster from 'taskcluster-client';
 import moment from 'moment';
-import * as utils from '../../lib/utils';
-import * as format from '../../lib/format';
 import _ from 'lodash';
+import {
+  Alert, OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar
+} from 'react-bootstrap';
+import { TaskClusterEnhance } from '../../lib/utils';
+import * as format from '../../lib/format';
 import ConfirmAction from '../../lib/ui/confirmaction';
 import ScopeEditor from '../../lib/ui/scopeeditor';
 import TimeInput from '../../lib/ui/timeinput';
 import * as auth from '../../lib/auth';
-import {
-  Alert, OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar,
-} from 'react-bootstrap';
 import './clienteditor.less';
 
 /** Create client editor/viewer (same thing) */
-const ClientEditor = React.createClass({
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        auth: taskcluster.Auth,
-      },
-      reloadOnProps: ['currentClientId'],
-    }),
-  ],
+class ClientEditor extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    // Method to reload a client in the parent
-    reloadClientId: React.PropTypes.func.isRequired,
-  },
-
-  getDefaultProps() {
-    return {
-      // '' implies. "Create Client"
-      currentClientId: '',
-    };
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       // Loading client or loaded client
       clientLoaded: false,
       clientError: null,
@@ -49,30 +29,75 @@ const ClientEditor = React.createClass({
       // Operation details, if currently doing anything
       working: false,
       error: null,
-      showModal: true,
+      showModal: true
     };
-  },
+
+    this.dismissError = this.dismissError.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.resetAccessToken = this.resetAccessToken.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
+    this.onExpiresChange = this.onExpiresChange.bind(this);
+    this.onDOEChange = this.onDOEChange.bind(this);
+    this.scopesUpdated = this.scopesUpdated.bind(this);
+    this.startEditing = this.startEditing.bind(this);
+    this.saveClient = this.saveClient.bind(this);
+    this.deleteClient = this.deleteClient.bind(this);
+    this.enableClient = this.enableClient.bind(this);
+    this.disableClient = this.disableClient.bind(this);
+    this.createClient = this.createClient.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
 
   /** Load initial state */
-  load() {
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
     // If there is no currentClientId, we're creating a new client
     if (this.props.currentClientId === '') {
       const creds = auth.loadCredentials();
       const clientId = creds ? `${creds.clientId}/` : '';
 
-      return {
+      return this.props.loadState({
         client: {
           clientId,
           expires: new Date(3017, 1, 1),
           description: '',
           scopes: [],
-          expandedScopes: [],
+          expandedScopes: []
         },
         accessToken: null,
         editing: true,
         working: false,
-        error: null,
-      };
+        error: null
+      });
     }
 
     // Load currentClientId, but avoid doing so after creating a new client
@@ -80,20 +105,24 @@ const ClientEditor = React.createClass({
       this.setState({
         editing: false,
         working: false,
-        error: null,
+        error: null
       });
 
-      return {};
+      const promisedState = {};
+
+      return this.props.loadState(promisedState);
     }
 
-    return {
-      client: this.auth.client(this.props.currentClientId),
+    const promisedState = {
+      client: this.props.clients.auth.client(this.props.currentClientId),
       accessToken: null,
       editing: false,
       working: false,
-      error: null,
+      error: null
     };
-  },
+
+    this.props.loadState(promisedState);
+  }
 
   render() {
     // display errors from operations
@@ -120,10 +149,14 @@ const ClientEditor = React.createClass({
       </Tooltip>
     );
 
-    return this.renderWaitFor('client') || (
+    if (!this.state.client) {
+      return this.props.renderWaitFor('client') || this.props.renderSpinner();
+    }
+
+    return (
       <div className="client-editor">
-        <h4 style={{marginTop: 0}}>{title}</h4>
-        <hr style={{marginBottom: 10}} />
+        <h4 style={{ marginTop: 0 }}>{title}</h4>
+        <hr style={{ marginBottom: 10 }} />
         <div className="form-horizontal">
           {
             isCreating ? (
@@ -165,7 +198,7 @@ const ClientEditor = React.createClass({
                 </div>
               </div>
             ) :
-            null
+              null
           }
           {
             (isEditing && !isCreating) || this.state.accessToken !== null ? (
@@ -201,7 +234,7 @@ const ClientEditor = React.createClass({
                 })()}
               </div>
             ) :
-            null
+              null
           }
           <div className="form-group">
             <label className="control-label col-md-3">Description</label>
@@ -251,7 +284,7 @@ const ClientEditor = React.createClass({
               created: 'Created',
               lastModified: 'Last Modified',
               lastDateUsed: 'Last Date Used',
-              lastRotated: 'Last Rotated',
+              lastRotated: 'Last Rotated'
             }, (label, prop) => {
               if (!this.state.client[prop]) {
                 return;
@@ -290,7 +323,7 @@ const ClientEditor = React.createClass({
                 </div>
               </div>
             ) :
-            null
+              null
           }
           <hr />
           <div className="form-group">
@@ -320,12 +353,12 @@ const ClientEditor = React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
   /** Determine if clientId is valid */
   validClientId() {
     return /^[A-Za-z0-9@\/:._-]+$/.test(this.state.client.clientId || '');
-  },
+  }
 
   /** Render editing toolbar */
   renderEditingToolbar() {
@@ -368,7 +401,7 @@ const ClientEditor = React.createClass({
         }
       </ButtonToolbar>
     );
-  },
+  }
 
   /** Render creation toolbar */
   renderCreatingToolbar() {
@@ -382,7 +415,7 @@ const ClientEditor = React.createClass({
         </Button>
       </ButtonToolbar>
     );
-  },
+  }
 
   /** Render description editor */
   renderDescEditor() {
@@ -395,7 +428,7 @@ const ClientEditor = React.createClass({
         rows={8}
         placeholder="Description in markdown..." />
     );
-  },
+  }
 
   /** Render description */
   renderDesc() {
@@ -404,7 +437,7 @@ const ClientEditor = React.createClass({
         <format.Markdown>{this.state.client.description}</format.Markdown>
       </div>
     );
-  },
+  }
 
   /** Handle changes in the editor */
   onChange() {
@@ -417,71 +450,71 @@ const ClientEditor = React.createClass({
     }
 
     this.setState(state);
-  },
+  }
 
   scopesUpdated(scopes) {
     const client = _.cloneDeep(this.state.client);
 
     client.scopes = scopes;
-    this.setState({client});
-  },
+    this.setState({ client });
+  }
 
   /** When expires exchanges in the editor */
   onExpiresChange(date) {
     const client = _.cloneDeep(this.state.client);
 
     client.expires = date.toDate().toJSON();
-    this.setState({client});
-  },
+    this.setState({ client });
+  }
 
   onDOEChange() {
     const client = _.cloneDeep(this.state.client);
 
     client.deleteOnExpiration = !client.deleteOnExpiration;
-    this.setState({client});
-  },
+    this.setState({ client });
+  }
 
   /** Reset accessToken for current client */
   async resetAccessToken() {
     try {
-      const client = await this.auth.resetAccessToken(this.state.client.clientId);
+      const client = await this.props.clients.auth.resetAccessToken(this.state.client.clientId);
 
-      this.loadState({
+      this.props.loadState({
         client,
         accessToken: client.accessToken,
         editing: false,
-        working: false,
+        working: false
       });
     } catch (err) {
       this.setState({
         working: false,
         error: auth.loadCredentials() ?
           'You do not have sufficient permission to reset access tokens for this user.' :
-          'You must be logged in and have permission to reset access tokens for this user.',
+          'You must be logged in and have permission to reset access tokens for this user.'
       });
     }
-  },
+  }
 
   /** Close modal */
   closeDialog() {
-    this.setState({accessToken: null});
-  },
+    this.setState({ accessToken: null });
+  }
 
   /** Start editing */
   startEditing() {
-    this.setState({editing: true});
-  },
+    this.setState({ editing: true });
+  }
 
   /** Create new client */
   async createClient() {
-    this.setState({working: true});
+    this.setState({ working: true });
 
     try {
       const clientId = this.state.client.clientId;
-      const client = await this.auth.createClient(clientId, {
+      const client = await this.props.clients.auth.createClient(clientId, {
         description: this.state.client.description,
         expires: this.state.client.expires,
-        scopes: this.state.client.scopes,
+        scopes: this.state.client.scopes
       });
 
       this.setState({
@@ -489,67 +522,84 @@ const ClientEditor = React.createClass({
         accessToken: client.accessToken,
         editing: false,
         working: false,
-        error: null,
+        error: null
       });
 
       this.props.reloadClientId(clientId);
     } catch (err) {
       this.setState({
         working: false,
-        error: err,
+        error: err
       });
     }
-  },
+  }
 
   /** Save current client */
   saveClient() {
     const clientId = this.state.client.clientId;
 
-    this.loadState({
+    this.props.loadState({
       editing: false,
-      client: this.auth
+      client: this.props.clients.auth
         .updateClient(clientId, {
           description: this.state.client.description,
           expires: this.state.client.expires,
           scopes: this.state.client.scopes,
-          deleteOnExpiration: this.state.client.deleteOnExpiration,
+          deleteOnExpiration: this.state.client.deleteOnExpiration
         })
         .then(client => {
           this.props.reloadClientId(clientId);
+
           return client;
-        }),
+        })
     });
-  },
+  }
 
   /** Delete current client */
   async deleteClient() {
     const clientId = this.state.client.clientId;
 
-    await this.auth.deleteClient(clientId);
+    await this.props.clients.auth.deleteClient(clientId);
     await this.props.reloadClientId(clientId);
-  },
+  }
 
   async disableClient() {
     const clientId = this.state.client.clientId;
 
-    await this.auth.disableClient(clientId);
-    await this.reload();
-  },
+    await this.props.clients.auth.disableClient(clientId);
+    await this.load();
+  }
 
   async enableClient() {
     const clientId = this.state.client.clientId;
 
-    await this.auth.enableClient(clientId);
-    await this.reload();
-  },
+    await this.props.clients.auth.enableClient(clientId);
+    await this.load();
+  }
 
   /** Reset error state from operation*/
   dismissError() {
     this.setState({
       working: false,
-      error: null,
+      error: null
     });
-  },
-});
+  }
+}
 
-export default ClientEditor;
+ClientEditor.propTypes = {
+  // Method to reload a client in the parent
+  reloadClientId: React.PropTypes.func.isRequired
+};
+
+ClientEditor.defaultProps = {
+  // '' implies. "Create Client"
+  currentClientId: ''
+};
+
+const taskclusterOpts = {
+  clients: { auth: taskcluster.Auth },
+  reloadOnProps: ['currentClientId'],
+  name: ClientEditor.name
+};
+
+export default TaskClusterEnhance(ClientEditor, taskclusterOpts);

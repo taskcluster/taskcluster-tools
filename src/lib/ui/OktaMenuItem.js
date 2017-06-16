@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {OverlayTrigger, Tooltip, NavItem, Glyphicon} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
 
 export default class OktaMenuItem extends Component {
   // This authenticates to Okta by opening a new Window where Okta will do its thing,

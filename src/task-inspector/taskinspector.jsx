@@ -1,13 +1,13 @@
 import React from 'react';
 import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
-import TaskView from '../lib/ui/taskview';
-import {TaskClusterEnhance, CreateWebListener, CreateWatchState} from '../lib/utils';
-import {findDOMNode} from 'react-dom';
+import { findDOMNode } from 'react-dom';
 import path from 'path';
 import Helmet from 'react-helmet';
-import {Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button}
+import { Form, FormGroup, FormControl, ControlLabel, Row, Col, InputGroup, Button }
   from 'react-bootstrap';
+import { TaskClusterEnhance, CreateWebListener, CreateWatchState } from '../lib/utils';
+import TaskView from '../lib/ui/taskview';
 import PreviousTasks from '../lib/ui/previoustasks';
 
 const VALID_INPUT = /^[A-Za-z0-9_-]{8}[Q-T][A-Za-z0-9_-][CGKOSWaeimquy26-][A-Za-z0-9_-]{10}[AQgw]$/;
@@ -17,6 +17,7 @@ class TaskInspector extends React.Component {
     super(props);
 
     this.state = {
+      taskId: this.props.match.params.taskId || '',
       taskIdInput: '',
       statusLoaded: true,
       statusError: null,
@@ -27,67 +28,75 @@ class TaskInspector extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.bindings = this.bindings.bind(this);
     this.onListenerMessage = this.onListenerMessage.bind(this);
-    this.onTaskclusterReload = this.onTaskclusterReload.bind(this);
-    this.onWatchStateReload = this.onWatchStateReload.bind(this);
-    this.onTaskclusterUpdate = this.onTaskclusterUpdate.bind(this);
+    this.load = this.load.bind(this);
+    this.onWatchReload = this.onWatchReload.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
   }
 
   /** Setup required event listeners for HOC */
   componentWillMount() {
-    document.addEventListener('taskcluster-update', this.onTaskclusterUpdate, false);
-    document.addEventListener('taskcluster-reload', this.onTaskclusterReload, false);
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
     document.addEventListener('listener-message', this.onListenerMessage, false);
-    document.addEventListener('watch-reload', this.onWatchStateReload, false);
+    document.addEventListener('watch-reload', this.onWatchReload, false);
 
-    // Send props to CreateWatchState. Invoked to trigger on mount.
-    this.props.watchStateProps(this.props);
-  }
-
-  /** Use TaskClusterEnhance to load taskId */
-  load() {
-    const taskId = this.props.match.params.taskId || '';
-
-    const promisedState = {status: this.props.clients.queue.status(taskId).then(_.property('status'))};
-
-    this.props.loadState(promisedState);
-  }
-
-  /** Send new props to CreateWatchState */
-  componentDidUpdate(prevProps, prevState) {
-    // Send props to CreateWatchState
-    this.props.watchStateProps(this.props);
-  }
-
-  onTaskclusterReload() {
+    // Send props to CreateWatchState here in order to trigger on mount.
+    this.props.watchState(this.state, this.props);
     this.load();
   }
 
-  onTaskclusterUpdate({detail}) {
-    this.setState(detail);
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    // Send props and keys to each higher order component
+    this.props.watchState(this.state, this.props);
+    this.props.taskclusterState(this.state, this.props);
+    this.props.listenerState(this.state, this.props);
   }
 
-  onWatchStateReload({detail}) {
+  /** Use TaskClusterEnhance to load taskId */
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    const taskId = this.props.match.params.taskId;
+
+    if (!taskId) {
+      return;
+    }
+
+    this.props.loadState({ status: this.props.clients.queue.status(taskId).then(_.property('status')) });
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  onWatchReload({ detail }) {
     detail.map(functionName => this[functionName]());
   }
 
-  onListenerMessage({detail}) {
+  onListenerMessage({ detail }) {
     // Update status structure
-    this.setState({status: detail.payload.status});
+    this.setState({ status: detail.payload.status });
 
     // If the message origins from the artifact create exchange, we should
     // notify our children
-    if (detail.exchange === this.props.clients.queueEvents.artifactCreated().exchange && this.refs.taskView) {
-      this.refs.taskView.handleArtifactCreatedMessage(detail);
+    if (detail.exchange === this.props.clients.queueEvents.artifactCreated().exchange && this.taskViewInstance) {
+      this.taskViewInstance.getWrappedInstance().handleArtifactCreatedMessage(detail);
     }
   }
 
   componentWillUnmount() {
-    document.removeEventListener('taskcluster-update', this.onTaskclusterUpdate, false);
-    document.removeEventListener('taskcluster-reload', this.onTaskclusterReload, false);
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
     document.removeEventListener('listener-message', this.onListenerMessage, false);
-    document.removeEventListener('watch-reload', this.onWatchStateReload, false);
+    document.removeEventListener('watch-reload', this.onWatchReload, false);
   }
-
 
   bindings() {
     const taskId = this.props.match.params.taskId;
@@ -98,7 +107,7 @@ class TaskInspector extends React.Component {
     }
 
     // Construct the routing key pattern
-    const routingKey = {taskId};
+    const routingKey = { taskId };
 
     // Return all interesting bindings
     return [
@@ -108,14 +117,14 @@ class TaskInspector extends React.Component {
       this.props.clients.queueEvents.artifactCreated(routingKey),
       this.props.clients.queueEvents.taskCompleted(routingKey),
       this.props.clients.queueEvents.taskFailed(routingKey),
-      this.props.clients.queueEvents.taskException(routingKey),
+      this.props.clients.queueEvents.taskException(routingKey)
     ];
   }
 
 
   getTitle() {
-    if (this.refs.taskView && this.refs.taskView.state.task) {
-      return this.refs.taskView.state.task.metadata.name;
+    if (this.taskViewInstance && this.taskViewInstance.getWrappedInstance().state.task) {
+      return this.taskViewInstance.getWrappedInstance().state.task.metadata.name;
     }
 
     return 'Task Inspector';
@@ -123,7 +132,7 @@ class TaskInspector extends React.Component {
 
   /** When taskId changes, we should update the input */
   updateTaskIdInput() {
-    this.setState({taskIdInput: this.props.match.params.taskId});
+    this.setState({ taskIdInput: this.props.match.params.taskId });
   }
 
   render() {
@@ -132,7 +141,7 @@ class TaskInspector extends React.Component {
     const invalidInput = !VALID_INPUT.test(taskIdInput);
 
     return (
-      <div style={{marginBottom: 40}}>
+      <div style={{ marginBottom: 40 }}>
         <Helmet title={this.getTitle()} />
         <h4>My Component TaskInspector</h4>
         <p>
@@ -164,7 +173,7 @@ class TaskInspector extends React.Component {
             </Form>
           </Col>
 
-          <Col sm={4} style={{marginTop: '25px'}}>
+          <Col sm={4} style={{ marginTop: '25px' }}>
             <PreviousTasks objectId={taskId} objectType="taskId" />
           </Col>
         </Row>
@@ -174,7 +183,7 @@ class TaskInspector extends React.Component {
             {
               taskId && this.props.renderWaitFor('status') || (this.state.status && (
                 <TaskView
-                  ref="taskView"
+                  ref={instance => { this.taskViewInstance = instance; }}
                   status={this.state.status}
                   {...this.props} />
               ))
@@ -182,19 +191,20 @@ class TaskInspector extends React.Component {
           </Col>
         </Row>
       </div>
-    )
+    );
   }
 
   /** Update taskIdInput to reflect input */
   handleTaskIdInputChange() {
-    this.setState({taskIdInput: findDOMNode(this.refs.taskId).value.trim()});
+    this.setState({ taskIdInput: findDOMNode(this.refs.taskId).value.trim() });
   }
 
   /** Handle form submission */
   handleSubmit(e) {
     e.preventDefault();
 
-    this.props.history.push(path.join('/', 'task-inspector', this.state.taskIdInput));
+    this.setState({ taskId: this.state.taskIdInput });
+    this.props.history.push(path.join('/task-inspector', this.state.taskIdInput));
   }
 }
 
@@ -207,7 +217,8 @@ const taskclusterOpts = {
   },
   // Reload when props.match.params.taskId changes, ignore credential changes
   reloadOnKeys: ['taskId'],
-  reloadOnLogin: false
+  reloadOnLogin: false,
+  name: TaskInspector.name
 };
 
 // Listen for messages, reload bindings() when state.taskId changes
@@ -217,9 +228,7 @@ const webListenerOpts = {
 
 // Called handler when match.params.taskId changes
 const watchStateOpts = {
-  onKeys: {
-    updateTaskIdInput: ['taskId']
-  }
+  onKeys: { updateTaskIdInput: ['taskId'] }
 };
 
 export default TaskClusterEnhance(CreateWatchState(CreateWebListener(TaskInspector, webListenerOpts), watchStateOpts), taskclusterOpts);

@@ -1,69 +1,71 @@
-import React from 'react';
-import {OverlayTrigger, ProgressBar, Tooltip, ButtonToolbar, Button, Glyphicon, Table} from 'react-bootstrap';
+import React, { Component } from 'react';
+import { OverlayTrigger, ProgressBar, Tooltip, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import path from 'path';
-import * as utils from '../lib/utils';
-import taskcluster from 'taskcluster-client';
 import _ from 'lodash';
+import taskcluster from 'taskcluster-client';
+import { TaskClusterEnhance } from '../lib/utils';
 import WorkerTypeView from './workertypeview';
 import WorkerTypeEditor from './workertypeeditor';
 import './aws-provisioner.less';
 
-const WorkerTypeRow = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        queue: taskcluster.Queue,
-        awsProvisioner: taskcluster.AwsProvisioner,
-      },
-      clientOpts: {
-        awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
-        },
-      },
-      reloadOnProps: [
-        'provisionerId',
-        'workerType',
-      ],
-    }),
-  ],
+class WorkerTypeRow extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    provisionerId: React.PropTypes.string.isRequired,
-    workerType: React.PropTypes.shape({
-      workerType: React.PropTypes.string.isRequired,
-      minCapacity: React.PropTypes.number.isRequired,
-      maxCapacity: React.PropTypes.number.isRequired,
-      requestedCapacity: React.PropTypes.number.isRequired,
-      pendingCapacity: React.PropTypes.number.isRequired,
-      runningCapacity: React.PropTypes.number.isRequired,
-    }).isRequired,
-    selected: React.PropTypes.bool.isRequired,
-    onClick: React.PropTypes.func.isRequired,
-  },
-
-  getInitialState() {
-    return {
-      pendingTasks: {pendingTasks: 0},
+    this.state = {
+      pendingTasks: { pendingTasks: 0 },
       pendingTasksLoaded: false,
-      pendingTasksError: null,
+      pendingTasksError: null
     };
-  },
 
-  load() {
-    return {
-      pendingTasks: this.queue.pendingTasks(
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+
+    this.count = 1;
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.props.loadState({
+      pendingTasks: this.props.clients.queue.pendingTasks(
         this.props.provisionerId,
         this.props.workerType.workerType
-      ),
-    };
-  },
+      )
+    });
+  }
 
   render() {
     return (
       <tr
         onClick={this.props.onClick}
         className={this.props.selected ? 'active' : null}
-        style={{cursor: 'pointer'}}>
+        style={{ cursor: 'pointer' }}>
         <td><code>{this.props.workerType.workerType}</code></td>
         <td>
           <OverlayTrigger placement="left" overlay={this.tooltip()}>
@@ -73,7 +75,7 @@ const WorkerTypeRow = React.createClass({
         <td>{this.state.pendingTasksLoaded ? this.state.pendingTasks.pendingTasks : '...'}</td>
       </tr>
     );
-  },
+  }
 
   renderCapacityBar() {
     const progress = this.doMath();
@@ -98,7 +100,7 @@ const WorkerTypeRow = React.createClass({
     }
 
     return <ProgressBar>{progressBars}</ProgressBar>;
-  },
+  }
 
   /* Return an object which has the fuzzed percentages to use for creating
    * progress bars and the unfuzzed capacities.  If we have a state with 0%, we
@@ -139,9 +141,9 @@ const WorkerTypeRow = React.createClass({
       s: spotPer * 100,
       rc: runningCap,
       pc: pendingCap,
-      sc: spotReqCap,
+      sc: spotReqCap
     };
-  },
+  }
 
   tooltip() {
     return (
@@ -153,8 +155,39 @@ const WorkerTypeRow = React.createClass({
         handle {this.props.workerType.requestedCapacity || '0'} tasks in parallel.
       </Tooltip>
     );
+  }
+}
+
+const workerTypeRowTaskclusterOpts = {
+  clients: {
+    queue: taskcluster.Queue,
+    awsProvisioner: taskcluster.AwsProvisioner
   },
-});
+  clientOpts: {
+    awsProvisioner: { baseUrl: 'https://aws-provisioner.taskcluster.net/v1' }
+  },
+  reloadOnProps: [
+    'provisionerId',
+    'workerType'
+  ],
+  name: WorkerTypeRow.name
+};
+
+WorkerTypeRow.propTypes = {
+  provisionerId: React.PropTypes.string.isRequired,
+  workerType: React.PropTypes.shape({
+    workerType: React.PropTypes.string.isRequired,
+    minCapacity: React.PropTypes.number.isRequired,
+    maxCapacity: React.PropTypes.number.isRequired,
+    requestedCapacity: React.PropTypes.number.isRequired,
+    pendingCapacity: React.PropTypes.number.isRequired,
+    runningCapacity: React.PropTypes.number.isRequired
+  }).isRequired,
+  selected: React.PropTypes.bool.isRequired,
+  onClick: React.PropTypes.func.isRequired
+};
+
+const WorkerTypeRowEnhanced = TaskClusterEnhance(WorkerTypeRow, workerTypeRowTaskclusterOpts);
 
 const defaultWorkerType = {
   minCapacity: 0,
@@ -172,8 +205,8 @@ const defaultWorkerType = {
       secrets: {},
       scopes: [],
       userData: {},
-      launchSpec: {},
-    },
+      launchSpec: {}
+    }
   ],
   regions: [
     {
@@ -182,62 +215,77 @@ const defaultWorkerType = {
       scopes: [],
       userData: {},
       launchSpec: {
-        ImageId: 'ami-xx',
-      },
-    },
+        ImageId: 'ami-xx'
+      }
+    }
   ],
   userData: {},
   launchSpec: {},
   secrets: {},
-  scopes: [],
+  scopes: []
 };
 
 /** Table of workerTypes */
-export default React.createClass({
-  displayName: 'WorkerTypeTable',
+class WorkerTypeTable extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        awsProvisioner: taskcluster.AwsProvisioner,
-      },
-      clientOpts: {
-        awsProvisioner: {
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1',
-        },
-      },
-      reloadOnProps: [
-        'provisionerId',
-      ]
-    })
-  ],
-
-  propTypes: {
-    provisionerId: React.PropTypes.string.isRequired,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       // selected workerType identifier (string)
       // or 'create:worker-type' to indicate creation of workerType
       selected: this.props.match.params.workerType || '',
       workerTypeSummaries: [],
       workerTypeSummariesLoaded: false,
       workerTypeSummariesError: null,
-      workerTypeContains: '',
+      workerTypeContains: ''
     };
-  },
 
-  load() {
-    return {
-      workerTypeSummaries: this.awsProvisioner.listWorkerTypeSummaries(),
-    };
-  },
+    this.updateSummary = this.updateSummary.bind(this);
+    this.workerTypeCreated = this.workerTypeCreated.bind(this);
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
+
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  /** Update values for reloadOnProps and reloadOnKeys */
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.setState(detail.state);
+  }
+
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    this.props.loadState({
+      workerTypeSummaries: this.props.clients.awsProvisioner.listWorkerTypeSummaries()
+    });
+  }
+
 
   setSelected(workerType) {
-    this.setState({selected: workerType});
+    this.setState({ selected: workerType });
     this.props.history.push(path.join('/aws-provisioner', workerType, this.props.match.params.currentTab || ''));
-  },
+  }
 
   render() {
     return (
@@ -252,17 +300,17 @@ export default React.createClass({
             bsStyle="primary"
             bsSize="sm"
             onClick={this.setSelected.bind(this, 'create:worker-type')}
-            style={{marginTop: -10, padding: '3px 12px'}}>
+            style={{ marginTop: -10, padding: '3px 12px' }}>
             <Glyphicon glyph="plus" /> Create WorkerType
           </Button>
         </ButtonToolbar>
-        <span>{this.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()}</span>
+        <span>{this.props.renderWaitFor('workerTypeSummaries') || this.renderWorkerTypeTable()}</span>
       </div>
     );
-  },
+  }
 
   renderTypeInput() {
-    const setWorkerType = e => this.setState({workerTypeContains: e.target.value});
+    const setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
     const enterWorkerType = e => {
       if (e.keyCode === 13) {
         e.preventDefault();
@@ -286,14 +334,14 @@ export default React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
   renderWorkerTypeTable() {
     return (
       <div>
         <h4>Worker Types</h4>
         {this.renderTypeInput()}
-        <Table style={{marginTop: 20}}>
+        <Table style={{ marginTop: 20 }}>
           <thead>
             <tr>
               <th className="col-xs-2">WorkerType</th>
@@ -303,10 +351,10 @@ export default React.createClass({
           </thead>
           <tbody>
             {
-              this.state.workerTypeSummaries
+              this.state.workerTypeSummaries && this.state.workerTypeSummaries
                 .filter(workerType => workerType.workerType.includes(this.state.workerTypeContains))
                 .map(workerType => (
-                  <WorkerTypeRow
+                  <WorkerTypeRowEnhanced
                     key={workerType.workerType}
                     provisionerId={this.props.provisionerId}
                     workerType={workerType}
@@ -319,41 +367,42 @@ export default React.createClass({
         </Table>
       </div>
     );
-  },
+  }
 
   renderWorkerTypeView() {
-    if (!_.find(this.state.workerTypeSummaries, {workerType: this.state.selected})) {
+    if (!_.find(this.state.workerTypeSummaries, { workerType: this.state.selected })) {
       return;
     }
 
     return (
-      <div style={{marginBottom: 40}}>
+      <div style={{ marginBottom: 40 }}>
         <h4>Worker Type: <code>{this.state.selected}</code></h4>
         <hr />
         <WorkerTypeView
+          history={this.props.history}
+          match={this.props.match}
           provisionerId={this.props.provisionerId}
           workerType={this.state.selected}
-          reload={this.reload}
-          updateSummary={this.updateSummary}
-          {...this.props} />
+          reload={this.load}
+          updateSummary={this.updateSummary} />
       </div>
     );
-  },
+  }
 
   updateSummary(workerType, summary) {
     // work around https://github.com/taskcluster/aws-provisioner/pull/70
     const workerTypeSummaries = this.state.workerTypeSummaries
       .map(wt => wt.workerType === workerType ?
-        _.assign({workerType}, summary) :
+        _.assign({ workerType }, summary) :
         wt
       );
 
-    this.setState({workerTypeSummaries});
-  },
+    this.setState({ workerTypeSummaries });
+  }
 
   renderWorkerTypeCreator() {
     return (
-      <div style={{marginBottom: 50}}>
+      <div style={{ marginBottom: 50 }}>
         <hr />
         <h2>Create New WorkerType</h2>
         <WorkerTypeEditor
@@ -361,10 +410,26 @@ export default React.createClass({
           updated={this.workerTypeCreated} />
       </div>
     );
-  },
+  }
 
   async workerTypeCreated(workerType) {
-    await this.reload();
+    await this.load();
+
     this.setSelected(workerType);
+  }
+}
+
+const WorkerTypeTableTaskclusterOpts = {
+  clients: { awsProvisioner: taskcluster.AwsProvisioner },
+  clientOpts: {
+    awsProvisioner: {
+      baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
+    }
   },
-});
+  reloadOnProps: ['provisionerId'],
+  name: WorkerTypeTable.name
+};
+
+WorkerTypeTable.propTypes = { provisionerId: React.PropTypes.string.isRequired };
+
+export default TaskClusterEnhance(WorkerTypeTable, WorkerTypeTableTaskclusterOpts);

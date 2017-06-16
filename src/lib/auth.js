@@ -10,9 +10,9 @@ export const saveCredentials = creds => {
     delete localStorage.credentials;
 
     // Notify interested parties that credentials have changed
-    window.dispatchEvent(new window.CustomEvent('credentials-changed', {detail: null}));
+    window.dispatchEvent(new window.CustomEvent('credentials-changed', { detail: null }));
   } else {
-    const credentials = {...creds};
+    const credentials = { ...creds };
 
     // Parse certificate, if present
     if (typeof credentials.certificate === 'string') {
@@ -24,7 +24,7 @@ export const saveCredentials = creds => {
 
     // Notify interested parties that credentials have changed
     window.dispatchEvent(new window.CustomEvent('credentials-changed', {
-      detail: credentials,
+      detail: credentials
     }));
   }
 };
@@ -45,6 +45,7 @@ export const loadCredentials = () => {
 
     if (creds.certificate && creds.certificate.expiry < Date.now()) {
       saveCredentials(null); // clear credentials
+
       return null;
     }
 
@@ -59,6 +60,7 @@ export const loadCredentials = () => {
     return creds;
   } catch (err) {
     debug('Failed to parse credentials, err: %s', err, err.stack);
+
     return null;
   }
 };
@@ -66,6 +68,7 @@ export const loadCredentials = () => {
 /** Check if we have credentials */
 export const hasCredentials = () => {
   const credentials = loadCredentials();
+
   return credentials != null;
 };
 
@@ -86,7 +89,7 @@ window.addEventListener('storage', e => {
 
     // Notify interested parties that credentials have changed
     window.dispatchEvent(new window.CustomEvent('credentials-changed', {
-      detail: credentials,
+      detail: credentials
     }));
   }
 }, false);
@@ -96,7 +99,7 @@ export const buildLoginURL = () => {
   const target = url.format({
     protocol: window.location.protocol,
     host: window.location.host,
-    pathname: '/login/',
+    pathname: '/login/'
   });
 
   return url.format({
@@ -105,7 +108,7 @@ export const buildLoginURL = () => {
     query: {
       target,
       description: `TaskCluster Tools offers various way to create and inspect both tasks,
-        and task-graphs.`,
-    },
+        and task-graphs.`
+    }
   });
 };

@@ -1,38 +1,21 @@
-import React from 'react';
+import React, { Component } from 'react';
 import taskcluster from 'taskcluster-client';
-import ConfirmActionMenuItem from './ConfirmActionMenuItem';
-import * as utils from '../utils';
 import slugid from 'slugid';
 import _ from 'lodash';
+import ConfirmActionMenuItem from './ConfirmActionMenuItem';
+import { TaskClusterEnhance } from '../utils';
 
-export default React.createClass({
-  displayName: 'RetriggerMenuItem',
+class RetriggerMenuItem extends Component {
+  constructor(props) {
+    super(props);
 
-  mixins: [
-    utils.createTaskClusterMixin({
-      // Need updated clients for Queue
-      clients: {
-        queue: taskcluster.Queue,
-      },
-    }),
-  ],
-
-  propTypes: {
-    taskId: React.PropTypes.string.isRequired,
-    task: React.PropTypes.object.isRequired,
-    disabled: React.PropTypes.bool,
-  },
-
-  getDefaultProps() {
-    return {
-      disabled: false,
-    };
-  },
+    this.createTask = this.createTask.bind(this);
+  }
 
   valid() {
     // Simple sanity check
     return !!(this.props.task && this.props.task.payload);
-  },
+  }
 
   render() {
     return (
@@ -52,7 +35,7 @@ export default React.createClass({
         Note: this may not work with all tasks.
       </ConfirmActionMenuItem>
     );
-  },
+  }
 
   async createTask() {
     const taskId = slugid.nice();
@@ -67,7 +50,23 @@ export default React.createClass({
     task.dependencies = task.dependencies.filter(requiredTask => requiredTask !== taskId);
     task.retries = 0;
 
-    await this.queue.createTask(taskId, task);
+    await this.props.clients.queue.createTask(taskId, task);
     window.location = `/task-inspector/${taskId}`;
-  },
-});
+  }
+}
+
+RetriggerMenuItem.defaultProps = { disabled: false };
+
+RetriggerMenuItem.propTypes = {
+  taskId: React.PropTypes.string.isRequired,
+  task: React.PropTypes.object.isRequired,
+  disabled: React.PropTypes.bool
+};
+
+const taskclusterOpts = {
+  // Need updated clients for Queue
+  clients: { queue: taskcluster.Queue },
+  name: RetriggerMenuItem.name
+};
+
+export default TaskClusterEnhance(RetriggerMenuItem, taskclusterOpts);

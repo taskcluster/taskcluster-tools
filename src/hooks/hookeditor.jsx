@@ -1,14 +1,14 @@
-import React from 'react';
-import {findDOMNode} from 'react-dom';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import _ from 'lodash';
-import {Button, Glyphicon, ButtonToolbar, Alert} from 'react-bootstrap';
-import ConfirmAction from '../lib/ui/confirmaction';
+import { Button, Glyphicon, ButtonToolbar, Alert } from 'react-bootstrap';
 import CodeMirror from 'react-code-mirror';
-import * as format from '../lib/format';
 import taskcluster from 'taskcluster-client';
-import * as utils from '../lib/utils';
 // Load javascript mode for CodeMirror
 import 'codemirror/mode/javascript/javascript';
+import ConfirmAction from '../lib/ui/confirmaction';
+import * as format from '../lib/format';
+import { TaskClusterEnhance } from '../lib/utils';
 import '../lib/codemirror/json-lint';
 import './hookeditor.less';
 
@@ -17,7 +17,7 @@ const initialHook = {
     name: '',
     description: '',
     owner: '',
-    emailOnError: true,
+    emailOnError: true
   },
   schedule: [],
   expires: '3 months',
@@ -28,22 +28,22 @@ const initialHook = {
     payload: {
       image: 'ubuntu:14.04',
       command: ['/bin/bash', '-c', 'echo "hello World"'],
-      maxRunTime: 60 * 10,
+      maxRunTime: 60 * 10
     },
     metadata: {
       name: 'Hook Task',
       description: 'Task Description',
       owner: 'name@example.com',
-      source: 'https://tools.taskcluster.net/hooks/',
-    },
-  },
+      source: 'https://tools.taskcluster.net/hooks/'
+    }
+  }
 };
 
 // some of the API functions return hook descriptions containing hookId
 // and hookGroupId, but the create and update methods do not take these
 // properties.  This function strips the properties on input.
 const stripHookIds = hook => {
-  const strippedHook = {...hook};
+  const strippedHook = { ...hook };
 
   delete strippedHook.hookId;
   delete strippedHook.hookGroupId;
@@ -51,42 +51,42 @@ const stripHookIds = hook => {
   return strippedHook;
 };
 
-const HookStatusDisplay = React.createClass({
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        hooks: taskcluster.Hooks,
-      }
-    }),
-  ],
+class HookStatusDisplay extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    currentHookId: React.PropTypes.string.isRequired,
-    currentHookGroupId: React.PropTypes.string.isRequired,
-  },
+    this.state = { hookStatus: null };
 
-  getInitialState() {
-    return {
-      hookStatus: null
-    };
-  },
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+  }
 
-  /** Load initial state */
-  load() {
-    return {
-      hookStatus: this.hooks
-        .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId),
-    };
-  },
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
 
-  render() {
-    const waitFor = this.renderWaitFor('hookStatus');
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+  }
 
-    if (waitFor) {
-      return waitFor;
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
     }
 
-    const stat = this.state.hookStatus;
+    this.setState(detail.state);
+  }
+
+  render() {
+    const stat = this.props.hookStatus;
+
+    if (!stat) {
+      return this.props.renderSpinner();
+    }
+
     let lastTime;
     let lastResult;
 
@@ -100,7 +100,7 @@ const HookStatusDisplay = React.createClass({
         lastResult = <pre>{JSON.stringify(stat.lastFire.error, null, 2)}</pre>;
       } else {
         const taskId = stat.lastFire.taskId;
-        const href = `/task-inspector/#${taskId}`;
+        const href = `/task-inspector/${taskId}`;
 
         lastResult = <span>Created task <a href={href}>{taskId}</a></span>;
       }
@@ -117,7 +117,7 @@ const HookStatusDisplay = React.createClass({
         <dt>Last Fired</dt>
         <dd>
           {lastTime}
-          <Button className="btn-xs" onClick={this.reload}>
+          <Button className="btn-xs" onClick={this.props.refreshHookStatus}>
             <Glyphicon glyph="refresh" />
           </Button>
         </dd>
@@ -127,98 +127,109 @@ const HookStatusDisplay = React.createClass({
         <dd>{when}</dd>
       </dl>
     );
+  }
+}
+
+const hookStatusDisplayTaskclusterOpts = {
+  clients: {
+    hooks: taskcluster.Hooks
   },
-});
+  reloadOnProps: ['currentHookId', 'currentHookGroupId', 'hookStatus'],
+  name: HookStatusDisplay.name
+};
 
-const HookDisplay = React.createClass({
-  propTypes: {
-    currentHookId: React.PropTypes.string.isRequired,
-    currentHookGroupId: React.PropTypes.string.isRequired,
-    hook: React.PropTypes.object.isRequired,
-    startEditing: React.PropTypes.func.isRequired,
-  },
+HookStatusDisplay.propTypes = {
+  currentHookId: React.PropTypes.string.isRequired,
+  currentHookGroupId: React.PropTypes.string.isRequired,
+  hookStatus: React.PropTypes.object,
+  refreshHookStatus: React.PropTypes.func.isRequired
+};
 
-  render() {
-    const hook = this.props.hook;
+const HookStatusDisplayEnhanced = TaskClusterEnhance(HookStatusDisplay, hookStatusDisplayTaskclusterOpts);
 
-    return (
-      <div>
-        <dl className="dl-horizontal">
-          <dt>HookGroupId</dt>
-          <dd><code>{this.props.currentHookGroupId}</code></dd>
-          <dt>HookId</dt>
-          <dd><code>{this.props.currentHookId}</code></dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Name</dt>
-          <dd>{hook.metadata.name}</dd>
-          <dt>Description</dt>
-          <dd><format.Markdown>{hook.metadata.description}</format.Markdown></dd>
-          <dt>Owner</dt>
-          <dd>{hook.metadata.owner}</dd>
-          <dt>Email On Error?</dt>
-          <dd>{JSON.stringify(hook.metadata.emailOnError)}</dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Schedule</dt>
-          <dd>
-            {
-              !hook.schedule.length ? (
-                <span>(no schedule)</span>
-              ) : (
-                <ul className="hookSchedule">
-                  {hook.schedule.map((schedule, key) => <li key={key}>{schedule}</li>)}
-                </ul>
-              )
-            }
-          </dd>
-        </dl>
-        <dl className="dl-horizontal">
-          <dt>Task Expires</dt>
-          <dd>{hook.expires} after creation</dd>
-          <dt>Task Deadline</dt>
-          <dd>{hook.deadline} after creation</dd>
-        </dl>
-        <HookStatusDisplay
-          currentHookGroupId={this.props.currentHookGroupId}
-          currentHookId={this.props.currentHookId} />
-        <dl className="dl-horizontal">
-          <dt>Task Definition</dt>
-          <dd />
-        </dl>
-        <format.Code language="json">
-          {JSON.stringify(hook.task, null, 2)}
-        </format.Code>
-        <ButtonToolbar>
-          <Button bsStyle="success" onClick={this.props.startEditing}>
-            <Glyphicon glyph="pencil" /> Edit Hook
-          </Button>
-          <Button bsStyle="success" onClick={this.props.triggerHook}>
-            <Glyphicon glyph="repeat" /> Trigger Hook
-          </Button>
-        </ButtonToolbar>
-      </div>
-    );
-  },
-});
+const HookDisplay = (props) => {
+  const hook = props.hook;
 
-const HookEditor = React.createClass({
-  propTypes: {
-    currentHookId: React.PropTypes.string,
-    currentHookGroupId: React.PropTypes.string,
-    hook: React.PropTypes.object,
-    isCreating: React.PropTypes.bool,
-    createHook: React.PropTypes.func.isRequired,
-    updateHook: React.PropTypes.func.isRequired,
-    deleteHook: React.PropTypes.func.isRequired,
-  },
+  return (
+    <div>
+      <dl className="dl-horizontal">
+        <dt>HookGroupId</dt>
+        <dd><code>{props.currentHookGroupId}</code></dd>
+        <dt>HookId</dt>
+        <dd><code>{props.currentHookId}</code></dd>
+      </dl>
+      <dl className="dl-horizontal">
+        <dt>Name</dt>
+        <dd>{hook.metadata.name}</dd>
+        <dt>Description</dt>
+        <dd><format.Markdown>{hook.metadata.description}</format.Markdown></dd>
+        <dt>Owner</dt>
+        <dd>{hook.metadata.owner}</dd>
+        <dt>Email On Error?</dt>
+        <dd>{JSON.stringify(hook.metadata.emailOnError)}</dd>
+      </dl>
+      <dl className="dl-horizontal">
+        <dt>Schedule</dt>
+        <dd>
+          {
+            !hook.schedule.length ? (
+              <span>(no schedule)</span>
+            ) : (
+              <ul className="hookSchedule">
+                {hook.schedule.map((schedule, key) => <li key={key}>{schedule}</li>)}
+              </ul>
+            )
+          }
+        </dd>
+      </dl>
+      <dl className="dl-horizontal">
+        <dt>Task Expires</dt>
+        <dd>{hook.expires} after creation</dd>
+        <dt>Task Deadline</dt>
+        <dd>{hook.deadline} after creation</dd>
+      </dl>
+      <HookStatusDisplayEnhanced
+        currentHookGroupId={props.currentHookGroupId}
+        currentHookId={props.currentHookId}
+        hookStatus={props.hookStatus}
+        refreshHookStatus={props.refreshHookStatus} />
+      <dl className="dl-horizontal">
+        <dt>Task Definition</dt>
+        <dd />
+      </dl>
+      <format.Code language="json">
+        {JSON.stringify(hook.task, null, 2)}
+      </format.Code>
+      <ButtonToolbar>
+        <Button bsStyle="success" onClick={props.startEditing}>
+          <Glyphicon glyph="pencil" /> Edit Hook
+        </Button>
+        <Button bsStyle="success" onClick={props.triggerHook}>
+          <Glyphicon glyph="repeat" /> Trigger Hook
+        </Button>
+      </ButtonToolbar>
+    </div>
+  );
+};
 
-  getInitialState() {
+HookDisplay.propTypes = {
+  currentHookId: React.PropTypes.string.isRequired,
+  currentHookGroupId: React.PropTypes.string.isRequired,
+  hook: React.PropTypes.object.isRequired,
+  startEditing: React.PropTypes.func.isRequired
+};
+
+class HookEditor extends Component {
+  constructor(props) {
+    super(props);
+
     const hook = this.props.isCreating ?
       initialHook :
       this.props.hook;
 
-    return {
+    this.state = {
+      hookGroupId: this.props.currentHookGroupId,
+      hookId: this.props.currentHookId,
       name: hook.metadata.name,
       description: hook.metadata.description,
       owner: hook.metadata.owner,
@@ -228,7 +239,20 @@ const HookEditor = React.createClass({
       deadline: hook.deadline,
       task: JSON.stringify(hook.task, null, 2)
     };
-  },
+
+    this.onNameChange = this.onNameChange.bind(this);
+    this.onDescriptionChange = this.onDescriptionChange.bind(this);
+    this.onOwnerChange = this.onOwnerChange.bind(this);
+    this.onEmailOnErrorChange = this.onEmailOnErrorChange.bind(this);
+    this.onNewScheduleItem = this.onNewScheduleItem.bind(this);
+    this.onExpiresChange = this.onExpiresChange.bind(this);
+    this.onDeadlineChange = this.onDeadlineChange.bind(this);
+    this.onTaskChange = this.onTaskChange.bind(this);
+    this.createHook = this.createHook.bind(this);
+    this.updateHook = this.updateHook.bind(this);
+    this.onHookGroupIdChange = this.onHookGroupIdChange.bind(this);
+    this.onHookIdChange = this.onHookIdChange.bind(this);
+  }
 
   render() {
     const isCreating = this.props.isCreating;
@@ -244,6 +268,7 @@ const HookEditor = React.createClass({
                   <input
                     type="text"
                     className="form-control"
+                    onChange={this.onHookGroupIdChange}
                     placeholder="hookGroupId" />
                 ) : (
                   <div className="form-control-static">
@@ -261,6 +286,7 @@ const HookEditor = React.createClass({
                   <input
                     type="text"
                     className="form-control"
+                    onChange={this.onHookIdChange}
                     placeholder="hookId" />
                 ) : (
                   <div className="form-control-static">
@@ -311,7 +337,7 @@ const HookEditor = React.createClass({
                 checked={this.state.emailOnError}
                 onChange={this.onEmailOnErrorChange} />
               <span className="text-info">
-                Email the owner when an error occurs while creating a task.
+                Email the owner when an error occurs while creating a task. Note: to be notifed of tasks that fail once created, use <a href="https://docs.taskcluster.net/reference/core/taskcluster-notify" target="_blank" rel="noopener noreferrer">notify routes</a>.
               </span>
             </div>
           </div>
@@ -322,7 +348,7 @@ const HookEditor = React.createClass({
                 See <a href="https://www.npmjs.com/package/cron-parser" target="_blank" rel="noopener noreferrer">
                 cron-parser</a> for format information. Times are in UTC.
               </p>
-              <ul style={{paddingLeft: 20}}>
+              <ul style={{ paddingLeft: 20 }}>
                 {
                   this.state.schedule.map((sched, index) => (
                     <li key={index}>
@@ -343,7 +369,7 @@ const HookEditor = React.createClass({
                   type="text"
                   className="form-control"
                   placeholder="* * * * * *"
-                  ref="newSch" />
+                  ref={instance => { this.newSchInstance = instance; }} />
                 <span className="input-group-btn">
                   <button
                     className="btn btn-success"
@@ -400,7 +426,7 @@ const HookEditor = React.createClass({
     } catch (e) {
       // TODO: Handle error
     }
-  },
+  }
 
   renderButtonBar() {
     if (this.props.isCreating) {
@@ -429,13 +455,11 @@ const HookEditor = React.createClass({
         </ConfirmAction>
       </ButtonToolbar>
     );
-  },
+  }
 
   validHook() {
-    const isValid = ['name', 'description', 'owner', 'deadline']
-      .every(s => this.state[s]) &&
-      this.props.currentHookId &&
-      this.props.currentHookGroupId;
+    const isValid = ['hookGroupId', 'hookId', 'name', 'description', 'owner', 'deadline']
+      .every(s => this.state[s]);
 
     if (!isValid) {
       return false;
@@ -448,59 +472,67 @@ const HookEditor = React.createClass({
     } catch (err) {
       return false;
     }
-  },
+  }
+
+  onHookGroupIdChange(e) {
+    this.setState({ hookGroupId: e.target.value });
+  }
+
+  onHookIdChange(e) {
+    this.setState({ hookId: e.target.value });
+  }
 
   onNameChange(e) {
-    this.setState({name: e.target.value});
-  },
+    this.setState({ name: e.target.value });
+  }
 
   onDescriptionChange(e) {
-    this.setState({description: e.target.value});
-  },
+    this.setState({ description: e.target.value });
+  }
 
   onOwnerChange(e) {
-    this.setState({owner: e.target.value});
-  },
+    this.setState({ owner: e.target.value });
+  }
 
   onEmailOnErrorChange() {
-    this.setState({emailOnError: !this.state.emailOnError});
-  },
+    this.setState({ emailOnError: !this.state.emailOnError });
+  }
 
   removeScheduleItem(index) {
     const schedule = [...this.state.schedule];
     schedule.splice(index, 1);
 
-    this.setState({schedule});
-  },
+    this.setState({ schedule });
+  }
 
   onNewScheduleItem() {
-    const sch = findDOMNode(this.refs.newSch).value;
+    const sch = findDOMNode(this.newSchInstance).value;
 
     if (sch !== '') {
       const schedule = _.cloneDeep(this.state.schedule);
 
       schedule.push(sch);
-      this.setState({schedule});
+      this.setState({ schedule });
     }
 
-    findDOMNode(this.refs.newSch).value = '';
-  },
+    findDOMNode(this.newSchInstance).value = '';
+  }
 
   onScheduleTextChange(e) {
-    this.setState({scheduleText: e.target.value});
-  },
+    this.setState({ scheduleText: e.target.value });
+  }
 
   onExpiresChange(e) {
-    this.setState({expires: e.target.value});
-  },
+    this.setState({ expires: e.target.value });
+  }
 
   onDeadlineChange(e) {
-    this.setState({deadline: e.target.value});
-  },
+    this.setState({ deadline: e.target.value });
+  }
 
   onTaskChange(e) {
-    this.setState({task: e.target.value});
-  },
+    this.setState({ task: e.target.value });
+  }
 
   getHookDefinition() {
     return {
@@ -508,79 +540,113 @@ const HookEditor = React.createClass({
         name: this.state.name,
         description: this.state.description,
         owner: this.state.owner,
-        emailOnError: this.state.emailOnError,
+        emailOnError: this.state.emailOnError
       },
       schedule: this.state.schedule,
       expires: this.state.expires,
       deadline: this.state.deadline,
-      task: JSON.parse(this.state.task),
+      task: JSON.parse(this.state.task)
     };
-  },
+  }
 
   createHook() {
     // TODO: reflect these into state with onChange hooks
-    this.props.createHook(this.props.currentHookGroupId, this.props.currentHookId, this.getHookDefinition());
-  },
+    this.props.createHook(this.state.hookGroupId, this.state.hookId, this.getHookDefinition());
+  }
 
   updateHook() {
     this.props.updateHook(this.getHookDefinition());
-  },
-});
+  }
+}
+
+HookEditor.propTypes = {
+  currentHookId: React.PropTypes.string,
+  currentHookGroupId: React.PropTypes.string,
+  hook: React.PropTypes.object,
+  isCreating: React.PropTypes.bool,
+  createHook: React.PropTypes.func.isRequired,
+  updateHook: React.PropTypes.func.isRequired,
+  deleteHook: React.PropTypes.func.isRequired
+};
 
 /** Create hook editor/viewer (same thing) */
-const HookEditView = React.createClass({
-  /** Initialize mixins */
-  mixins: [
-    utils.createTaskClusterMixin({
-      clients: {
-        hooks: taskcluster.Hooks,
-      },
-      reloadOnProps: ['currentHookId', 'currentHookGroupId'],
-    }),
-  ],
+class HookEditView extends Component {
+  constructor(props) {
+    super(props);
 
-  propTypes: {
-    currentHookId: React.PropTypes.string,
-    currentHookGroupId: React.PropTypes.string,
-    refreshHookList: React.PropTypes.func.isRequired,
-    selectHook: React.PropTypes.func.isRequired,
-    triggerHook: React.PropTypes.func,
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       // Currently loaded hook
       hookLoaded: false,
       hookError: null,
+      hookStatus: null,
       hook: null,
       editing: true,
-      error: null,
+      error: null
     };
-  },
 
-  /** Load initial state */
-  load() {
-    const {hookId, hookGroupId} = this.props.match.params;
+    this.load = this.load.bind(this);
+    this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+    this.startEditing = this.startEditing.bind(this);
+    this.triggerHook = this.triggerHook.bind(this);
+    this.createHook = this.createHook.bind(this);
+    this.updateHook = this.updateHook.bind(this);
+    this.deleteHook = this.deleteHook.bind(this);
+    this.dismissError = this.dismissError.bind(this);
+    this.refreshHookStatus = this.refreshHookStatus.bind(this);
+  }
 
-    // Create a new hook if we don't have the hookGroupId and hookId
-    if (!hookId || !hookGroupId) {
-      return {
-        hook: null,
-        editing: true,
-        error: null,
-      };
+  componentWillMount() {
+    document.addEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.addEventListener('taskcluster-reload', this.load, false);
+
+    this.load();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('taskcluster-update', this.onTaskClusterUpdate, false);
+    document.removeEventListener('taskcluster-reload', this.load, false);
+  }
+
+  onTaskClusterUpdate({ detail }) {
+    if (detail.name !== this.constructor.name) {
+      return;
     }
 
-    const hook = this.hooks
-      .hook(hookGroupId, hookId)
+    this.setState(detail.state);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.taskclusterState(this.state, this.props);
+  }
+
+  /** Load initial state */
+  load(data) {
+    if (typeof data === 'object' && data.detail.name && data.detail.name !== this.constructor.name) {
+      return;
+    }
+
+    // Create a new hook if we don't have the hookGroupId and hookId
+    if (!this.props.currentHookId || !this.props.currentHookGroupId) {
+      return this.props.loadState({
+        hook: null,
+        editing: true,
+        error: null
+      });
+    }
+
+    const hookStatus = this.props.clients.hooks
+      .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId);
+    const hook = this.props.clients.hooks
+      .hook(this.props.currentHookGroupId, this.props.currentHookId)
       .then(stripHookIds);
 
-    return {
+    this.props.loadState({
       hook,
+      hookStatus,
       editing: false,
-      error: null,
-    };
-  },
+      error: null
+    });
+  }
 
   render() {
     // React calls render before it's loaded the initial state, at which
@@ -600,21 +666,24 @@ const HookEditView = React.createClass({
       );
     }
 
-    const waitFor = this.renderWaitFor('hook');
+    const waitFor = this.props.renderWaitFor('hook');
 
     if (waitFor) {
       return waitFor;
     }
 
-    const {hookId, hookGroupId} = this.props.match.params;
-    const isCreating = !hookId || !hookGroupId;
+    if (!this.state.hookLoaded) {
+      return this.props.renderWaitFor('hook') || this.props.renderSpinner();
+    }
+
+    const isCreating = !this.props.currentHookId || !this.props.currentHookGroupId;
 
     if (this.state.editing) {
       return (
         <HookEditor
           hook={this.state.hook}
-          currentHookId={hookId || ''}
-          currentHookGroupId={hookGroupId || ''}
+          currentHookId={this.props.currentHookId || ''}
+          currentHookGroupId={this.props.currentHookGroupId || ''}
           isCreating={isCreating}
           createHook={this.createHook}
           updateHook={this.updateHook}
@@ -625,64 +694,90 @@ const HookEditView = React.createClass({
     return (
       <HookDisplay
         hook={this.state.hook}
-        currentHookId={hookId || ''}
-        currentHookGroupId={hookGroupId || ''}
+        hookStatus={this.state.hookStatus}
+        currentHookId={this.props.currentHookId || ''}
+        currentHookGroupId={this.props.currentHookGroupId || ''}
         startEditing={this.startEditing}
-        triggerHook={this.triggerHook} />
+        triggerHook={this.triggerHook}
+        refreshHookStatus={this.refreshHookStatus} />
     );
-  },
+  }
 
   startEditing() {
-    this.setState({editing: true});
-  },
+    this.setState({ editing: true });
+  }
 
   triggerHook() {
+    this.setState({ hookStatus: null });
+
     // Payloads are ignored, so we send empty data over
-    this.hooks
-      .triggerHook(this.props.match.params.hookGroupId, this.props.match.params.hookId, {})
-      .catch(error => this.setState({error}));
-  },
+    this.props.clients.hooks
+      .triggerHook(this.props.currentHookGroupId, this.props.currentHookId, {})
+      .then(this.refreshHookStatus)
+      .catch(error => this.setState({ error }));
+  }
+
+  refreshHookStatus() {
+    this.setState({ hookStatus: null });
+
+    return this.props.clients.hooks
+      .getHookStatus(this.props.currentHookGroupId, this.props.currentHookId)
+      .then(stat => {
+        this.setState({ hookStatus: stat });
+      });
+  }
 
   createHook(hookGroupId, hookId, hook) {
     // add hookId and hookGroupId to the hook, since they are required
     // by the schema
-    this.hooks
+    this.props.clients.hooks
       .createHook(hookGroupId, hookId, hook)
       .then(hook => {
         this.props.selectHook(hook.hookGroupId, hook.hookId);
         this.props.refreshHookList();
       })
       .catch(err => {
-        this.setState({error: err});
+        this.setState({ error: err });
       });
-  },
+  }
 
   async updateHook(hook) {
     try {
-      await this.hooks.updateHook(this.props.match.params.hookGroupId, this.props.match.params.hookId, hook);
+      await this.props.clients.hooks.updateHook(this.props.currentHookGroupId, this.props.currentHookId, hook);
 
       this.setState({
         hook: stripHookIds(hook),
         editing: false,
-        error: null,
+        error: null
       });
     } catch (err) {
-      this.setState({error: err});
+      this.setState({ error: err });
     }
-  },
+  }
 
   async deleteHook() {
-    await this.hooks.removeHook(this.props.match.params.hookGroupId, this.props.match.params.hookId);
+    await this.props.clients.hooks.removeHook(this.props.currentHookGroupId, this.props.currentHookId);
     this.props.selectHook();
     this.props.refreshHookList();
-  },
+  }
 
   /** Reset error state from operation*/
   dismissError() {
-    this.setState({
-      error: null,
-    });
-  },
-});
+    this.setState({ error: null });
+  }
+}
 
-export default HookEditView;
+HookEditView.propTypes = {
+  currentHookId: React.PropTypes.string,
+  currentHookGroupId: React.PropTypes.string,
+  refreshHookList: React.PropTypes.func.isRequired,
+  selectHook: React.PropTypes.func.isRequired
+};
+
+const hookEditViewTaskclusterOpts = {
+  clients: { hooks: taskcluster.Hooks },
+  reloadOnProps: ['currentHookId', 'currentHookGroupId'],
+  name: HookEditView.name
+};
+
+export default TaskClusterEnhance(HookEditView, hookEditViewTaskclusterOpts);
