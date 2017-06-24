@@ -2,6 +2,7 @@ import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import equal from 'deep-equal';
 import { credentialInformation } from 'taskcluster-client';
+import HelmetTitle from '../../components/HelmetTitle';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
@@ -144,12 +145,15 @@ export default class CredentialsManager extends React.PureComponent {
 
   render() {
     return (
-      <Row>
-        <Col sm={12}>
-          <h4>TaskCluster Credentials</h4>
-          {this.renderCredentials()}
-        </Col>
-      </Row>
+      <div>
+        <HelmetTitle title="Credentials Manager" />
+        <Row>
+          <Col sm={12}>
+            <h4>TaskCluster Credentials</h4>
+            {this.renderCredentials()}
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

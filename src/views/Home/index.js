@@ -1,10 +1,10 @@
 import React from 'react';
-import { Helmet, title } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { Col, Row } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import chunk from 'lodash.chunk';
 import Markdown from '../../components/Markdown';
+import HelmetTitle from '../../components/HelmetTitle';
 import links from '../../links';
 import { header, hero, logo, entries, entry, description } from './styles.css';
 
@@ -16,9 +16,7 @@ export default class Home extends React.PureComponent {
   render() {
     return (
       <div className={entries}>
-        <Helmet>
-          <title>{'TaskCluster'}</title>
-        </Helmet>
+        <HelmetTitle title="Home" />
         <Row className={hero}>
           <Col md={8} mdOffset={2} sm={10} smOffset={1}>
             <div className={header}>

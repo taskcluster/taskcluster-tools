@@ -1,6 +1,5 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import { Helmet, title } from 'react-helmet';
 import { Button, ButtonToolbar, Glyphicon, Col } from 'react-bootstrap';
 import { safeLoad, safeDump } from 'js-yaml';
 import merge from 'deepmerge';
@@ -8,6 +7,7 @@ import { nice } from 'slugid';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import CodeEditor from '../../components/CodeEditor';
+import HelmetTitle from '../../components/HelmetTitle';
 
 const localStorageKey = 'tasks:create';
 const defaultTask = {
@@ -154,9 +154,7 @@ export default class TaskCreator extends React.PureComponent {
 
     return (
       <Col sm={12}>
-        <Helmet>
-          <title>{'Task Creator | TaskCluster'}</title>
-        </Helmet>
+        <HelmetTitle title="Task Creator" />
         <h4>Task Creator</h4>
         <p>
           Write and submit a task to TaskCluster. For details on what you can write, refer to the&nbsp;

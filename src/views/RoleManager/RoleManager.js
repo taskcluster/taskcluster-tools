@@ -3,6 +3,7 @@ import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstr
 import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
+import HelmetTitle from '../../components/HelmetTitle';
 
 export default class RoleManager extends React.PureComponent {
   constructor(props) {
@@ -72,6 +73,7 @@ export default class RoleManager extends React.PureComponent {
   render() {
     return (
       <Row style={{ marginTop: 10 }}>
+        <HelmetTitle title="Role Manager" />
         <Col md={5}>
           {this.renderRolesTable()}
           <ButtonToolbar>

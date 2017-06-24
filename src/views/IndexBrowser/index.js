@@ -1,6 +1,7 @@
 import React from 'react';
 import Clients from '../../components/Clients';
 import IndexBrowser from '../../components/IndexBrowser';
+import HelmetTitle from '../../components/HelmetTitle';
 import EntryView from './EntryView';
 
 const View = ({ match, credentials, history }) => (
@@ -9,14 +10,17 @@ const View = ({ match, credentials, history }) => (
       const { namespace = '', namespaceTaskId } = match.params;
 
       return (
-        <IndexBrowser
-          urlRoot="/index"
-          history={history}
-          index={index}
-          namespace={namespace}
-          namespaceTaskId={namespaceTaskId}>
-          <EntryView index={index} namespace={namespace} namespaceTaskId={namespaceTaskId} />
-        </IndexBrowser>
+        <div>
+          <HelmetTitle title="Index Browser" />
+          <IndexBrowser
+            urlRoot="/index"
+            history={history}
+            index={index}
+            namespace={namespace}
+            namespaceTaskId={namespaceTaskId}>
+            <EntryView index={index} namespace={namespace} namespaceTaskId={namespaceTaskId} />
+          </IndexBrowser>
+        </div>
       );
     }}
   </Clients>

@@ -4,6 +4,7 @@ import {
 } from 'react-bootstrap';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
+import HelmetTitle from '../../components/HelmetTitle';
 
 export default class CachePurgeInspector extends React.PureComponent {
   constructor(props) {
@@ -171,6 +172,7 @@ export default class CachePurgeInspector extends React.PureComponent {
   render() {
     return (
       <Row>
+        <HelmetTitle title="Cache Purge Inspector" />
         <Col md={12}>
           <h4>Cache Purge Inspector</h4>
           <p>

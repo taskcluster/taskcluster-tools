@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ClientEditor from '../../components/ClientEditor';
+import HelmetTitle from '../../components/HelmetTitle';
 
 export default class ClientManager extends Component {
   constructor(props) {
@@ -107,6 +108,7 @@ export default class ClientManager extends Component {
   render() {
     return (
       <Row style={{ marginTop: 10 }}>
+        <HelmetTitle title="Client Manager" />
         <Col md={5}>
           {this.renderPrefixInput()}
           {this.renderClientsTable()}

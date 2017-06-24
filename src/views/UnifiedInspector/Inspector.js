@@ -3,7 +3,6 @@ import { Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { Helmet, title } from 'react-helmet';
 import { WebListener } from 'taskcluster-client';
 import { isNil } from 'ramda';
 import PropsRoute from '../../components/PropsRoute';
@@ -13,6 +12,7 @@ import ActionsMenu from './ActionsMenu';
 import RunsMenu from './RunsMenu';
 import LogsMenu from './LogsMenu';
 import ArtifactList from '../../components/ArtifactList';
+import HelmetTitle from '../../components/HelmetTitle';
 import { loadable } from '../../utils';
 import iconUrl from '../../taskcluster.png';
 
@@ -448,11 +448,7 @@ export default class Inspector extends React.PureComponent {
 
     return (
       <div>
-        <Helmet>
-          <title>
-            {`${task ? task.metadata.name : 'Task Inspector'} | TaskCluster`}
-          </title>
-        </Helmet>
+        <HelmetTitle title={`${task ? task.metadata.name : 'Task Inspector'}`} />
         <h4>Task &amp; Group Inspector</h4>
         <p>
           Given a task group ID or task ID, inspect task groups, monitor progress, view dependencies and states, and

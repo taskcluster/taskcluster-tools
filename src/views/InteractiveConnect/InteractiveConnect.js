@@ -6,6 +6,7 @@ import { WebListener } from 'taskcluster-client';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
+import HelmetTitle from '../../components/HelmetTitle';
 import { labels } from '../../utils';
 import iconUrl from './terminal.png';
 import { connectLinkButton, connectLinkText } from './styles.css';
@@ -306,6 +307,7 @@ export default class InteractiveConnect extends React.PureComponent {
   render() {
     return (
       <div>
+        <HelmetTitle title="Interactive Connect" />
         <h4>Connect to Interactive Task</h4>
         <hr />
         {this.renderTask()}

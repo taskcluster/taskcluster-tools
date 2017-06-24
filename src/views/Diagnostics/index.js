@@ -1,5 +1,6 @@
 import React from 'react';
 import { Grid, Row, Button } from 'react-bootstrap';
+import HelmetTitle from '../../components/HelmetTitle';
 import Service from './Service';
 import RawLog from './RawLog';
 import retrieve from './retrieve';
@@ -42,15 +43,18 @@ export default class Diagnostics extends React.Component {
 
   render() {
     return (
-      <Grid fluid={true}>
-        <h4>Date: {this.state.testDate}</h4>
-        <h4>TestId: {this.state.testId}</h4>
-        <Row>
-          {Object.entries(this.state.jsonLog).map(([key, value]) => <Service key={key} title={key} test={value} />)}
-        </Row>
-        <Button onClick={this.toggleShow} bsStyle="primary" bsSize="small">Show Log</Button>
-        {this.state.showRawLog && <RawLog text={this.state.rawLog} />}
-      </Grid>
+      <div>
+        <HelmetTitle title="Diagnostics" />
+        <Grid fluid={true}>
+          <h4>Date: {this.state.testDate}</h4>
+          <h4>TestId: {this.state.testId}</h4>
+          <Row>
+            {Object.entries(this.state.jsonLog).map(([key, value]) => <Service key={key} title={key} test={value} />)}
+          </Row>
+          <Button onClick={this.toggleShow} bsStyle="primary" bsSize="small">Show Log</Button>
+          {this.state.showRawLog && <RawLog text={this.state.rawLog} />}
+        </Grid>
+      </div>
     );
   }
 }
