@@ -1,0 +1,36 @@
+/* the tree node's style */
+:global .tree-view {
+  overflow-y: hidden;
+}
+
+:global .tree-view_item:hover {
+  cursor: pointer;
+  /* immediate child of .tree-view, for styling convenience */
+}
+
+/* style for the children nodes container */
+:global .tree-view_children {
+  margin-left: 30px;
+}
+
+:global .tree-view_children-collapsed {
+  height: 0;
+}
+
+:global .tree-view_arrow {
+  cursor: pointer;
+  margin-right: 6px;
+  display: inline-block;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* rotate the triangle to close it */
+:global .tree-view_arrow-collapsed {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}

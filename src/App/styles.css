@@ -1,0 +1,15 @@
+@import 'https://fonts.googleapis.com/css?family=Lato:400,700|Montserrat:400,700';
+
+:global(body) {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+:global(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) {
+  font-family: 'Montserrat', sans-serif;
+}
+
+:global(pre) {
+  font-size: 12px;
+}
