@@ -242,55 +242,53 @@ export default class PulseInspector extends React.PureComponent {
 
   render() {
     return (
-      <div>
+      <Row>
         <HelmetTitle title="Pulse Inspector" />
-        <Row>
-          <Col md={12}>
-            <h4>Pulse Inspector</h4>
-            <p>
-              This tool lets you listen to Pulse messages from any exchange and
-              routing key. When messages are received you can inspect the
-              messages. This is useful for debugging and development when
-              consuming from undocumented exchanges. A list of Pulse exchanges is
-              maintained on the project Wiki, see&nbsp;
-              <a href="https://wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges">
-                wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
-              </a>. Notice that all exchanges from TaskCluster is formally
-              documented on <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
-            </p>
-            <hr />
-            {this.renderForm()}
-            {this.props.listeningError ? this.renderListeningError() : null}
-            <hr />
-            <ButtonToolbar className="pull-right">
-              <Button
-                bsSize="sm"
-                bsStyle="danger"
-                onClick={this.clearBindings}
-                disabled={!this.state.bindings.length}>
-                <Glyphicon glyph="trash" /> Clear Bindings
-              </Button>
-            </ButtonToolbar>
-            <h5>Bindings</h5>
-            {this.renderBindings()}
-            <hr />
-            <ButtonToolbar className="pull-right">
-              <Button
-                bsSize="sm"
-                bsStyle="success"
-                href={this.state.downloadLink}
-                download="pulse-messages.json"
-                disabled={this.state.messages.length === 0}>
-                <Glyphicon glyph="download-alt" /> Download Messages
-              </Button>
-            </ButtonToolbar>
-            <h5>Messages</h5>
-            {this.renderMessages()}
-            <br />
-            <br />
-          </Col>
-        </Row>
-      </div>
+        <Col md={12}>
+          <h4>Pulse Inspector</h4>
+          <p>
+            This tool lets you listen to Pulse messages from any exchange and
+            routing key. When messages are received you can inspect the
+            messages. This is useful for debugging and development when
+            consuming from undocumented exchanges. A list of Pulse exchanges is
+            maintained on the project Wiki, see&nbsp;
+            <a href="https://wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges">
+              wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
+            </a>. Notice that all exchanges from TaskCluster is formally
+            documented on <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
+          </p>
+          <hr />
+          {this.renderForm()}
+          {this.props.listeningError ? this.renderListeningError() : null}
+          <hr />
+          <ButtonToolbar className="pull-right">
+            <Button
+              bsSize="sm"
+              bsStyle="danger"
+              onClick={this.clearBindings}
+              disabled={!this.state.bindings.length}>
+              <Glyphicon glyph="trash" /> Clear Bindings
+            </Button>
+          </ButtonToolbar>
+          <h5>Bindings</h5>
+          {this.renderBindings()}
+          <hr />
+          <ButtonToolbar className="pull-right">
+            <Button
+              bsSize="sm"
+              bsStyle="success"
+              href={this.state.downloadLink}
+              download="pulse-messages.json"
+              disabled={this.state.messages.length === 0}>
+              <Glyphicon glyph="download-alt" /> Download Messages
+            </Button>
+          </ButtonToolbar>
+          <h5>Messages</h5>
+          {this.renderMessages()}
+          <br />
+          <br />
+        </Col>
+      </Row>
     );
   }
 }

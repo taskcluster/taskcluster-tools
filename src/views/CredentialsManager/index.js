@@ -145,15 +145,13 @@ export default class CredentialsManager extends React.PureComponent {
 
   render() {
     return (
-      <div>
+      <Row>
         <HelmetTitle title="Credentials Manager" />
-        <Row>
-          <Col sm={12}>
-            <h4>TaskCluster Credentials</h4>
-            {this.renderCredentials()}
-          </Col>
-        </Row>
-      </div>
+        <Col sm={12}>
+          <h4>TaskCluster Credentials</h4>
+          {this.renderCredentials()}
+        </Col>
+      </Row>
     );
   }
 }
