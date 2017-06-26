@@ -272,6 +272,25 @@ export default class Inspector extends React.PureComponent {
     }
   };
 
+  handleHighlight = (range) => {
+    if (this.highlightRange && this.highlightRange.equals(range)) {
+      return;
+    }
+
+    const first = range.first();
+    const last = range.last();
+
+    if (!first) {
+      this.props.history.replace({ hash: '' });
+    } else if (first === last) {
+      this.props.history.replace({ hash: `#L${first}` });
+    } else {
+      this.props.history.replace({ hash: `#L${first}-${last}` });
+    }
+
+    this.highlightRange = range;
+  };
+
   getLocalHistory(key) {
     return JSON.parse(localStorage.getItem(key) || '[]');
   }
@@ -388,12 +407,12 @@ export default class Inspector extends React.PureComponent {
             <LogsMenu
               logs={logs}
               taskGroupId={taskGroupId}
-              taskId={taskId}
+              taskId={trackedTaskId}
               runId={runNumber}
               active={subSectionId === 'logs'} />
             <ArtifactList
               queue={queue}
-              taskId={taskId}
+              taskId={trackedTaskId}
               artifacts={artifacts}
               runId={runNumber}
               menu={true} />
@@ -409,7 +428,9 @@ export default class Inspector extends React.PureComponent {
               taskId={taskId}
               runId={runId}
               status={status}
-              log={selectedLog} />
+              log={selectedLog}
+              highlight={this.props.highlight}
+              onHighlight={this.handleHighlight} />
             <PropsRoute path={PATHS.RUN_DETAILS} component={RunDetails} run={status ? status.runs[runId] : null} />
             <PropsRoute path={PATHS.TASK_DETAILS} component={TaskDetails} status={status} task={task} />
             <PropsRoute path={PATHS.TASK_LIST} component={GroupDetails} taskGroupId={taskGroupId} tasks={tasks} />

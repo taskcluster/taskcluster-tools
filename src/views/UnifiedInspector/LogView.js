@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { string, object, number } from 'prop-types';
+import { arrayOf, oneOfType, string, object, number, func } from 'prop-types';
 import { LazyLog, LazyStream, ScrollFollow } from 'react-lazylog';
 import { isNil } from 'ramda';
 
@@ -15,7 +15,9 @@ export default class LogView extends React.PureComponent {
     taskId: string,
     runId: number,
     status: object,
-    log: object
+    log: object,
+    highlight: oneOfType([arrayOf(number), number]),
+    onHighlight: func
   };
 
   constructor(props) {
@@ -80,7 +82,13 @@ export default class LogView extends React.PureComponent {
 
         <ScrollFollow startFollowing={follow}>
           {({ follow }) => (
-            <LazyViewer url={url} height={600} follow={follow} onScroll={this.handleScroll} />
+            <LazyViewer
+              url={url}
+              height={600}
+              follow={follow}
+              highlight={this.props.highlight}
+              onHighlight={this.props.onHighlight}
+              onScroll={this.handleScroll} />
           )}
         </ScrollFollow>
       </div>

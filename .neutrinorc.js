@@ -22,6 +22,16 @@ Object
 module.exports = {
   use: [
     ['neutrino-preset-mozilla-rpweb', {
+      eslint: {
+        rules: {
+          'consistent-return': 'off',
+          'no-unused-expressions': 'off',
+          'no-shadow': 'off',
+          'no-return-assign': 'off',
+          'babel/new-cap': 'off',
+          'no-mixed-operators': 'off'
+        }
+      },
       react: {
         hot: false,
         devServer: {
@@ -52,23 +62,6 @@ module.exports = {
     }],
     ['neutrino-middleware-env', Object.keys(envs)],
     (neutrino) => {
-      neutrino.config
-        .plugin('minify')
-        .set('args', [{ mangle: false }]);
-
-      neutrino.config.module
-        .rule('lint')
-        .use('eslint').tap(options => merge(options, {
-          rules: {
-            'consistent-return': 'off',
-            'no-unused-expressions': 'off',
-            'no-shadow': 'off',
-            'no-return-assign': 'off',
-            'babel/new-cap': 'off',
-            'no-mixed-operators': 'off'
-          }
-        }));
-
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
@@ -91,7 +84,8 @@ module.exports = {
           .use('css')
             .options({ modules: true });
 
-      // The JSONStream module's main file has a Node.js shebang, which Webpack doesn't like loading as JS
+      // The JSONStream module's main file has a Node.js shebang
+      // which Webpack doesn't like loading as JS
       neutrino.config.module
         .rule('shebang')
           .test(/JSONStream/)
@@ -99,7 +93,7 @@ module.exports = {
             .loader('shebang-loader');
 
       neutrino.config
-        .externals(Object.assign(neutrino.config.get('externals'), {
+        .externals(merge(neutrino.config.get('externals'), {
           bindings: 'bindings'
         }));
 
@@ -116,8 +110,6 @@ module.exports = {
         .merge([
           '@skidding/react-codemirror',
           'highlight.js',
-          'hterm-umd',
-          'jquery',
           'js-yaml',
           'markdown-it',
           'moment',
@@ -128,18 +120,16 @@ module.exports = {
           'react-datepicker',
           'react-dom',
           'react-helmet',
-          'react-json-inspector',
           'react-router-dom',
-          'react-tabs',
           'react-tooltip',
-          'react-treeview',
           'taskcluster-client'
         ]);
     }
   ],
   env: {
     NODE_ENV: {
-      development: ({ config }) => config.devtool('eval')
+      development: ({ config }) => config.devtool('eval'),
+      production: ({ config }) => config.plugin('minify').set('args', [{ mangle: false }])
     }
   }
 };
