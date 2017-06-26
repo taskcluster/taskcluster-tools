@@ -16,11 +16,11 @@ import ArtifactList from '../../components/ArtifactList';
 import { loadable } from '../../utils';
 import iconUrl from '../../taskcluster.png';
 
-const GroupProgress = loadable(() => import('./GroupProgress'));
-const GroupDetails = loadable(() => import('./GroupDetails'));
-const TaskDetails = loadable(() => import('./TaskDetails'));
-const RunDetails = loadable(() => import('./RunDetails'));
-const LogView = loadable(() => import('./LogView'));
+const GroupProgress = loadable(() => import(/* webpackChunkName: 'GroupProgress' */ './GroupProgress'));
+const GroupDetails = loadable(() => import(/* webpackChunkName: 'GroupDetails' */ './GroupDetails'));
+const TaskDetails = loadable(() => import(/* webpackChunkName: 'TaskDetails' */ './TaskDetails'));
+const RunDetails = loadable(() => import(/* webpackChunkName: 'RunDetails' */ './RunDetails'));
+const LogView = loadable(() => import(/* webpackChunkName: 'LogView' */ './LogView'));
 const taskGroupItemKey = 'inspector-items-taskGroupId';
 const taskItemKey = 'inspector-items-taskId';
 const notifyKey = 'inspector-notify';

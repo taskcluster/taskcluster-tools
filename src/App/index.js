@@ -10,27 +10,27 @@ import './styles.css';
 import iconUrl from '../taskcluster.png';
 
 const expirationTimeout = 5 * 60 * 1000; // time before expiration at which we warn
-const Home = loadable(() => import('../views/Home'));
-const TaskCreator = loadable(() => import('../views/TaskCreator'));
-const TaskRedirect = loadable(() => import('../views/TaskRedirect'));
-const UnifiedInspector = loadable(() => import('../views/UnifiedInspector'));
-const QuickStart = loadable(() => import('../views/QuickStart'));
-const AwsProvisioner = loadable(() => import('../views/AwsProvisioner'));
-const ClientManager = loadable(() => import('../views/ClientManager'));
-const RoleManager = loadable(() => import('../views/RoleManager'));
-const ScopeInspector = loadable(() => import('../views/ScopeInspector'));
-const PulseInspector = loadable(() => import('../views/PulseInspector'));
-const CachePurgeInspector = loadable(() => import('../views/CachePurgeInspector'));
-const IndexedArtifactBrowser = loadable(() => import('../views/IndexedArtifactBrowser'));
-const IndexBrowser = loadable(() => import('../views/IndexBrowser'));
-const HooksManager = loadable(() => import('../views/HooksManager'));
-const SecretsManager = loadable(() => import('../views/SecretsManager'));
-const Status = loadable(() => import('../views/Status'));
-const Diagnostics = loadable(() => import('../views/Diagnostics'));
-const CredentialsManager = loadable(() => import('../views/CredentialsManager'));
-const Displays = loadable(() => import('../views/Displays'));
-const Shell = loadable(() => import('../views/Shell'));
-const InteractiveConnect = loadable(() => import('../views/InteractiveConnect'));
+const Home = loadable(() => import(/* webpackChunkName: 'Home' */ '../views/Home'));
+const TaskCreator = loadable(() => import(/* webpackChunkName: 'TaskCreator' */ '../views/TaskCreator'));
+const TaskRedirect = loadable(() => import(/* webpackChunkName: 'TaskRedirect' */ '../views/TaskRedirect'));
+const UnifiedInspector = loadable(() => import(/* webpackChunkName: 'UnifiedInspector' */ '../views/UnifiedInspector'));
+const QuickStart = loadable(() => import(/* webpackChunkName: 'QuickStart' */ '../views/QuickStart'));
+const AwsProvisioner = loadable(() => import(/* webpackChunkName: 'AwsProvisioner' */ '../views/AwsProvisioner'));
+const ClientManager = loadable(() => import(/* webpackChunkName: 'ClientManager' */ '../views/ClientManager'));
+const RoleManager = loadable(() => import(/* webpackChunkName: 'RoleManager' */ '../views/RoleManager'));
+const ScopeInspector = loadable(() => import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector'));
+const PulseInspector = loadable(() => import(/* webpackChunkName: 'PulseInspector' */ '../views/PulseInspector'));
+const CachePurgeInspector = loadable(() => import(/* webpackChunkName: 'CachePurgeInspector' */ '../views/CachePurgeInspector'));
+const IndexedArtifactBrowser = loadable(() => import(/* webpackChunkName: 'IndexedArtifactBrowser' */ '../views/IndexedArtifactBrowser'));
+const IndexBrowser = loadable(() => import(/* webpackChunkName: 'IndexBrowser' */ '../views/IndexBrowser'));
+const HooksManager = loadable(() => import(/* webpackChunkName: 'HooksManager' */ '../views/HooksManager'));
+const SecretsManager = loadable(() => import(/* webpackChunkName: 'SecretsManager' */ '../views/SecretsManager'));
+const Status = loadable(() => import(/* webpackChunkName: 'Status' */ '../views/Status'));
+const Diagnostics = loadable(() => import(/* webpackChunkName: 'Diagnostics' */ '../views/Diagnostics'));
+const CredentialsManager = loadable(() => import(/* webpackChunkName: 'CredentialsManager' */ '../views/CredentialsManager'));
+const Displays = loadable(() => import(/* webpackChunkName: 'Displays' */ '../views/Displays'));
+const Shell = loadable(() => import(/* webpackChunkName: 'Shell' */ '../views/Shell'));
+const InteractiveConnect = loadable(() => import(/* webpackChunkName: 'InteractiveConnect' */ '../views/InteractiveConnect'));
 
 export default class App extends React.Component {
   constructor(props) {
