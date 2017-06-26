@@ -1,4 +1,5 @@
 const env = require('neutrino-middleware-env');
+const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
 
 const envs = {
@@ -27,13 +28,6 @@ module.exports = {
           port: 9000,
           historyApiFallback: { disableDotRule: true }
         },
-        // babel: {
-        //   env: {
-        //     production: {
-        //       presets: [require.resolve('babel-preset-babili')]
-        //     }
-        //   }
-        // },
         html: {
           title: 'TaskCluster Tools',
           googleAnalytics: {
@@ -58,8 +52,22 @@ module.exports = {
     }],
     ['neutrino-middleware-env', Object.keys(envs)],
     (neutrino) => {
-      neutrino.config.module.rules.delete('lint');
-      neutrino.config.plugins.delete('minify');
+      neutrino.config
+        .plugin('minify')
+        .set('args', [{ mangle: false }]);
+
+      neutrino.config.module
+        .rule('lint')
+        .use('eslint').tap(options => merge(options, {
+          rules: {
+            'consistent-return': 'off',
+            'no-unused-expressions': 'off',
+            'no-shadow': 'off',
+            'no-return-assign': 'off',
+            'babel/new-cap': 'off',
+            'no-mixed-operators': 'off'
+          }
+        }));
 
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
@@ -107,10 +115,6 @@ module.exports = {
         .entry('vendor')
         .merge([
           '@skidding/react-codemirror',
-          'change-case',
-          'classnames',
-          'concat-stream',
-          'exorcist',
           'highlight.js',
           'hterm-umd',
           'jquery',
@@ -129,9 +133,7 @@ module.exports = {
           'react-tabs',
           'react-tooltip',
           'react-treeview',
-          'taskcluster-client',
-          'www-authenticate',
-          'xml2js'
+          'taskcluster-client'
         ]);
     }
   ],

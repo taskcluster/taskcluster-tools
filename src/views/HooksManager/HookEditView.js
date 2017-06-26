@@ -5,15 +5,6 @@ import { Alert } from 'react-bootstrap';
 import Spinner from '../../components/Spinner';
 import HookEditor from './HookEditor';
 import HookDisplay from './HookDisplay';
-// import CodeMirror from 'react-code-mirror';
-// import taskcluster from 'taskcluster-client';
-// Load javascript mode for CodeMirror
-// import 'codemirror/mode/javascript/javascript';
-// import ConfirmAction from '../lib/ui/confirmaction';
-// import * as format from '../lib/format';
-// import { TaskClusterEnhance } from '../lib/utils';
-// import '../lib/codemirror/json-lint';
-// import './hookeditor.less';
 
 export default class HookEditView extends React.PureComponent {
   static propTypes = {
@@ -107,9 +98,9 @@ export default class HookEditView extends React.PureComponent {
     // add hookId and hookGroupId to the hook, since they are required by the schema
 
     try {
-      const hook = await this.props.hooks.createHook(hookGroupId, hookId, hook);
+      const createdHook = await this.props.hooks.createHook(hookGroupId, hookId, hook);
 
-      this.props.selectHook(hook.hookGroupId, hook.hookId);
+      this.props.selectHook(createdHook.hookGroupId, createdHook.hookId);
     } catch (err) {
       this.setState({
         error: err

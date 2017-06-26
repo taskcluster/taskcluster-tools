@@ -58,21 +58,19 @@ export default class WorkerTypeStatus extends React.Component {
       ...this.props.awsState.requests.map(({ zone }) => zone)
     ])];
 
-    console.log(availabilityZones, this.props.awsState.instances, this.props.awsState.requests);
-
     return (
       <Table>
         <thead>
-        <tr>
-          <th>Instance Type</th>
-          <th>Availability Zone</th>
-          <th>Running Capacity</th>
-          <th>Pending Capacity</th>
-          <th>Requested Spot Capacity</th>
-        </tr>
+          <tr>
+            <th>Instance Type</th>
+            <th>Availability Zone</th>
+            <th>Running Capacity</th>
+            <th>Pending Capacity</th>
+            <th>Requested Spot Capacity</th>
+          </tr>
         </thead>
         <tbody>
-        {this.props.workerType.instanceTypes
+          {this.props.workerType.instanceTypes
           .reduce((reduction, typeDef) => reduction
             .concat(availabilityZones.map(zone => this.renderRow(typeDef, zone))), [])}
         </tbody>

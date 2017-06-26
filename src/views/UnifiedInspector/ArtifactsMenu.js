@@ -1,10 +1,10 @@
 import React from 'react';
-import { array, bool } from 'prop-types';
+import { array } from 'prop-types';
 import { NavDropdown, MenuItem, NavItem } from 'react-bootstrap';
 
 export default class ArtifactsMenu extends React.PureComponent {
   static propTypes = {
-    artifacts: array,
+    artifacts: array
   };
 
   render() {

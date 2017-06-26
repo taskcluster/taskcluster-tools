@@ -46,7 +46,7 @@ export default class HookDisplay extends React.PureComponent {
                     ))}
                   </ul>
                 ) :
-                <span>(no schedule)</span>
+                  <span>(no schedule)</span>
             }
           </dd>
         </dl>

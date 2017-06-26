@@ -18,13 +18,13 @@ export default [
     title: 'GitHub Quick-Start',
     link: '/quickstart',
     icon: 'github',
-    description: `Create a \`.taskcluster.yml\` configuration file and plug TaskCluster into your repository.`
+    description: 'Create a `.taskcluster.yml` configuration file and plug TaskCluster into your repository.'
   },
   {
     title: 'AWS Provisioner',
     link: '/aws-provisioner',
     icon: 'server',
-    description: `Manage worker types known to the AWS Provisioner and check on the status of AWS nodes.`
+    description: 'Manage worker types known to the AWS Provisioner and check on the status of AWS nodes.'
   },
   {
     title: 'Client Manager',
@@ -90,7 +90,7 @@ export default [
     title: 'Documentation',
     link: 'https://docs.taskcluster.net',
     icon: 'book',
-    description: `Visit the documentation site with documentation for all TaskCluster APIs and Pulse exchanges.`
+    description: 'Visit the documentation site with documentation for all TaskCluster APIs and Pulse exchanges.'
   },
   {
     title: 'GitHub Repository',
@@ -110,7 +110,7 @@ export default [
     title: 'Status',
     link: '/status',
     icon: 'cogs',
-    description: `Display the status of Taskcluster services and underlying services TaskCluster depends on.`
+    description: 'Display the status of Taskcluster services and underlying services TaskCluster depends on.'
   },
   {
     title: 'Diagnostics',

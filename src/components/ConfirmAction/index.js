@@ -11,7 +11,7 @@ export default class ConfirmAction extends React.PureComponent {
       executing: false,
       resultLoaded: false,
       resultError: null,
-      result: null,
+      result: null
     };
 
     this.openDialog = this.openDialog.bind(this);
@@ -95,7 +95,7 @@ export default class ConfirmAction extends React.PureComponent {
       </Wrapper>
     );
   }
-};
+}
 
 ConfirmAction.propTypes = {
   buttonSize: string,

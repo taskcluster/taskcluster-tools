@@ -47,7 +47,7 @@ export default class IndexBrowser extends React.PureComponent {
         namespaceInput: namespace,
         namespaces: null,
         tasks: null
-      })
+      });
     }
   }
 
@@ -55,7 +55,7 @@ export default class IndexBrowser extends React.PureComponent {
 
   nextNamespaces = () => this.setState({ namespaceToken: this.state.namespaces.continuationToken });
 
-  handleNamespaceInputChange = (e) => this.setState({ namespaceInput: e.target.value });
+  handleNamespaceInputChange = e => this.setState({ namespaceInput: e.target.value });
 
   clearNamespaceToken = () => this.setState({ namespaceToken: null });
 
@@ -76,12 +76,12 @@ export default class IndexBrowser extends React.PureComponent {
           <Link to={urlRoot}>root</Link>
         </li>
         {
-          parents.map((name, index) => {
+          parents.map((parent, index) => {
             const path = parents.slice(0, index + 1).join('.');
 
             return (
               <li key={`index-breadcrumb-${index}`}>
-                <Link to={`${urlRoot}/${path}`}>{name}</Link>
+                <Link to={`${urlRoot}/${path}`}>{parent}</Link>
               </li>
             );
           })
@@ -102,12 +102,12 @@ export default class IndexBrowser extends React.PureComponent {
       <div>
         <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
-          {this.state.namespaces && this.state.namespaces.namespaces.map(({ namespace, name }, index) => (
-            <tr key={`index-namespace-${index}`}>
-              <td style={tableStyle}>
-                <Link to={`${this.props.urlRoot}/${namespace}`}>{name}</Link>
-              </td>
-            </tr>
+            {this.state.namespaces && this.state.namespaces.namespaces.map(({ namespace, name }, index) => (
+              <tr key={`index-namespace-${index}`}>
+                <td style={tableStyle}>
+                  <Link to={`${this.props.urlRoot}/${namespace}`}>{name}</Link>
+                </td>
+              </tr>
           ))}
           </tbody>
         </Table>
@@ -146,21 +146,21 @@ export default class IndexBrowser extends React.PureComponent {
       <div>
         <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
-          {this.state.tasks && this.state.tasks.tasks.map((task, index) => {
-            const isCurrent = namespace === task.namespace;
-            const taskNamespace = task.namespace.split('.');
-            const namespaceTaskId = taskNamespace.pop();
+            {this.state.tasks && this.state.tasks.tasks.map((task, index) => {
+              const isCurrent = namespace === task.namespace;
+              const taskNamespace = task.namespace.split('.');
+              const namespaceTaskId = taskNamespace.pop();
 
-            return (
-              <tr key={`index-task-${index}`}>
-                <td className={isCurrent ? 'info' : null} style={tableStyle}>
-                  <Link to={`${urlRoot}/${taskNamespace.join('.')}/${namespaceTaskId}`}>
-                    {namespaceTaskId}
-                  </Link>
-                </td>
-              </tr>
-            );
-          })}
+              return (
+                <tr key={`index-task-${index}`}>
+                  <td className={isCurrent ? 'info' : null} style={tableStyle}>
+                    <Link to={`${urlRoot}/${taskNamespace.join('.')}/${namespaceTaskId}`}>
+                      {namespaceTaskId}
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
         {this.state.tasksToken && (

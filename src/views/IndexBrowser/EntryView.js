@@ -11,7 +11,7 @@ export default class EntryView extends React.PureComponent {
     namespaceTaskId: string,
     index: object.isRequired
   };
-  
+
   constructor(props) {
     super(props);
 

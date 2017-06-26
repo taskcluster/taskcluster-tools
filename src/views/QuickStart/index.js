@@ -1,9 +1,9 @@
 import React from 'react';
-import { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Checkbox, ButtonToolbar, Button, Glyphicon }
+import { Row, Col, Form, FormGroup, FormControl, ControlLabel, Checkbox, ButtonToolbar, Button, Glyphicon }
   from 'react-bootstrap';
-import CodeEditor from '../../components/CodeEditor';
 import { safeDump } from 'js-yaml';
 import { Github } from 'taskcluster-client';
+import CodeEditor from '../../components/CodeEditor';
 import { info } from './styles.css';
 
 const initialYaml = {
@@ -107,7 +107,7 @@ export default class YamlCreator extends React.Component {
       resetActive: false,
       owner: '',
       repo: '',
-      installedState: null,
+      installedState: null
     };
   }
 
@@ -115,7 +115,7 @@ export default class YamlCreator extends React.Component {
   saveTextInput(event) {
     this.setState({
       [event.target.name]: event.target.value,
-      resetActive: true,
+      resetActive: true
     });
   }
 
@@ -175,7 +175,7 @@ export default class YamlCreator extends React.Component {
       metadata: {
         ...initialYaml.metadata,
         name: this.state.rootName,
-        description: this.state.rootDescription,
+        description: this.state.rootDescription
       },
       tasks: [{
         ...initialYaml.tasks[0],
@@ -183,20 +183,20 @@ export default class YamlCreator extends React.Component {
           metadata: {
             ...initialYaml.tasks[0].metadata,
             name: this.state.taskName,
-            description: this.state.taskDescription,
+            description: this.state.taskDescription
           },
           extra: {
             github: {
-              events: [...this.state.events],
-            },
+              events: [...this.state.events]
+            }
           },
           payload: {
             ...initialYaml.tasks[0].payload,
             command: this.state.commands,
-            image: this.state.image,
-          },
-        },
-      }],
+            image: this.state.image
+          }
+        }
+      }]
     });
 
     return (
@@ -235,7 +235,7 @@ export default class YamlCreator extends React.Component {
     return this.state.installedState === 'success' ?
       (
         <p className="text-success">
-          You're all set!
+          You are all set!
         </p>
       ) :
       (
@@ -256,7 +256,7 @@ export default class YamlCreator extends React.Component {
               This tool lets you easily generate a simple generic <code>.taskcluster.yml</code> file,
               which should live in the root of your repository. It defines
               tasks that you want TaskCluster to run for you. The tasks will run when certain
-              GitHub events happen — you will choose the events you're interested in while
+              GitHub events happen. You will choose the events you are interested in while
               creating the file.
             </p>
             <hr />
@@ -429,7 +429,7 @@ export default class YamlCreator extends React.Component {
               <ControlLabel>Commands: </ControlLabel>
               <FormControl componentClass="select" placeholder="Pick one..." onChange={e => this.handleCommandsSelection(e)}>
                 <option value="standard">Clone repo and run my tests</option>
-                <option value="custom">I'll define them myself</option>
+                <option value="custom">I will define them myself</option>
               </FormControl>
             </FormGroup>
           </Col>

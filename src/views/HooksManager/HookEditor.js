@@ -74,7 +74,7 @@ export default class HookEditor extends React.PureComponent {
     }
   }
 
-  handleNewScheduleChange = (e) => this.setState({ newScheduleValue: e.target.value });
+  handleNewScheduleChange = e => this.setState({ newScheduleValue: e.target.value });
 
   validHook = () => {
     const isValid = (
@@ -99,23 +99,23 @@ export default class HookEditor extends React.PureComponent {
     }
   };
 
-  onHookGroupIdChange = (e) => this.setState({
+  onHookGroupIdChange = e => this.setState({
     hook: assocPath(['hookGroupId'], e.target.value, this.state.hook)
   });
 
-  onHookIdChange = (e) => this.setState({
+  onHookIdChange = e => this.setState({
     hook: assocPath(['hookId'], e.target.value, this.state.hook)
   });
 
-  onNameChange = (e) => this.setState({
+  onNameChange = e => this.setState({
     hook: assocPath(['metadata', 'name'], e.target.value, this.state.hook)
   });
 
-  onDescriptionChange = (e) => this.setState({
+  onDescriptionChange = e => this.setState({
     hook: assocPath(['metadata', 'description'], e.target.value, this.state.hook)
   });
 
-  onOwnerChange = (e) => this.setState({
+  onOwnerChange = e => this.setState({
     hook: assocPath(['metadata', 'owner'], e.target.value, this.state.hook)
   });
 
@@ -142,19 +142,19 @@ export default class HookEditor extends React.PureComponent {
     }
   };
 
-  onScheduleTextChange = (e) => this.setState({
+  onScheduleTextChange = e => this.setState({
     hook: assocPath(['scheduleText'], e.target.value, this.state.hook)
   });
 
-  onExpiresChange = (e) => this.setState({
+  onExpiresChange = e => this.setState({
     hook: assocPath(['expires'], e.target.value, this.state.hook)
   });
 
-  onDeadlineChange = (e) => this.setState({
+  onDeadlineChange = e => this.setState({
     hook: assocPath(['deadline'], e.target.value, this.state.hook)
   });
 
-  onTaskChange = (e) => this.setState({
+  onTaskChange = e => this.setState({
     hook: assocPath(['task'], JSON.parse(e.target.value), this.state.hook)
   });
 

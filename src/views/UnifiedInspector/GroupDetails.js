@@ -22,7 +22,7 @@ export default class GroupDetails extends React.PureComponent {
     };
   }
 
-  handleSelect = (filterStatus) => this.setState({ filterStatus });
+  handleSelect = filterStatus => this.setState({ filterStatus });
 
   getTasksToRender() {
     const { tasks } = this.props;
@@ -107,7 +107,7 @@ export default class GroupDetails extends React.PureComponent {
           </tbody>
         </Table>
       </div>
-    )
+    );
 
     // <Table id="task-list-table" condensed={true} hover={true}>
     //   <thead>

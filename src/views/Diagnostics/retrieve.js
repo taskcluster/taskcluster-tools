@@ -9,15 +9,9 @@ import $ from 'jquery';
 
 const parser = new Parser();
 const BASE_URL = 'https://taskcluster-diagnostic-logs.s3.amazonaws.com';
-// const BUCKET_NAME = 'taskcluster-diagnostic-logs';
-// const REGION = 'us-west-2';
 
 const parsePromise = xml => new Promise((resolve, reject) =>
-  parser.parseString(xml, (err, res) => err ?
-    reject(err) :
-    resolve(res)
-  )
-);
+  parser.parseString(xml, (err, res) => (err ? reject(err) : resolve(res))));
 
 const requestGet = url => new Promise(resolve => $.ajax({
   url,
@@ -52,12 +46,12 @@ const getLatestLog = async (env, logType) => {
   }
 };
 
-const parseResult = jsonResult => {
+const parseResult = (jsonResult) => {
   const component = str => str.split('/')[0];
   const test = str => str.split('/').slice(1);
   const result = {};
 
-  jsonResult.pass.forEach(res => {
+  jsonResult.pass.forEach((res) => {
     const comp = component(res);
     const testResult = test(res);
 
@@ -70,7 +64,7 @@ const parseResult = jsonResult => {
     result[comp].pass.push(testResult);
   });
 
-  jsonResult.fail.forEach(res => {
+  jsonResult.fail.forEach((res) => {
     const comp = component(res);
     const testResult = test(res);
 

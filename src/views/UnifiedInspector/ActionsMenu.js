@@ -57,7 +57,7 @@ export default class ActionsMenu extends React.PureComponent {
     this.setState({ selectedCaches });
   };
 
-  getCachesFromTask = (task) => Object.keys(pathOr({}, ['payload', 'cache'], task));
+  getCachesFromTask = task => Object.keys(pathOr({}, ['payload', 'cache'], task));
 
   isValidTask() {
     if (!this.props.task) {
@@ -119,7 +119,7 @@ export default class ActionsMenu extends React.PureComponent {
     const { selectedCaches } = this.state;
     const promises = [];
 
-    selectedCaches.forEach(cacheName => {
+    selectedCaches.forEach((cacheName) => {
       promises.push(purgeCache.purgeCache(task.provisionerId, task.workerType, { cacheName }));
     });
 
@@ -205,7 +205,7 @@ export default class ActionsMenu extends React.PureComponent {
       <span>
         Are you sure that you wish to edit this task?<br />
         Note that the edited task will not be linked to other tasks nor have the same <code>task.routes</code> as
-        other tasks, so this is not a way to "fix" a failing task in a larger task group.
+        other tasks, so this is not a way to fix a failing task in a larger task group.
         Note that you may also not have the scopes required to create the resulting task.
       </span>
     );
@@ -246,16 +246,15 @@ export default class ActionsMenu extends React.PureComponent {
   }
 
   render() {
-    const { taskId, queue, purgeCache, status, task, onRetrigger, onEdit, onCreateInteractive, onEditInteractive } = this.props;
-    const { caches } = this.state;
+    const { taskId } = this.props;
 
     if (!taskId) {
       return <NavItem disabled>Actions</NavItem>;
     }
 
-    const isResolved = status ?
-      ['completed', 'failed', 'exception'].includes(status.state) :
-      false;
+    const { caches } = this.state;
+    const { queue, purgeCache, status, task, onRetrigger, onEdit, onCreateInteractive, onEditInteractive } = this.props;
+    const isResolved = status ? ['completed', 'failed', 'exception'].includes(status.state) : false;
 
     return (
       <NavDropdown title="Actions" id="task-view-actions">

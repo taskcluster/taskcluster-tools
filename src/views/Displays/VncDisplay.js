@@ -1,6 +1,6 @@
 import React from 'react';
 import { string, bool } from 'prop-types';
-import { VncDisplay as VNC } from 'react-vnc-display';
+import { VncDisplay as Vnc } from 'react-vnc-display';
 
 export default class VncDisplay extends React.PureComponent {
   static propTypes = {
@@ -16,12 +16,12 @@ export default class VncDisplay extends React.PureComponent {
 
   // This shouldn't be necessary, so we just have this sketchy implementation
   // eslint-disable-next-line no-alert
-  onPasswordRequired = (rfb) => rfb.sendPassword(prompt('VNC server wants a password:'));
+  onPasswordRequired = rfb => rfb.sendPassword(prompt('VNC server wants a password:'));
 
   render() {
     return (
       <div style={{ textAlign: 'center' }}>
-        <VNC
+        <Vnc
           url={this.props.url}
           view_only={this.props.viewOnly}
           shared={this.props.shared} />

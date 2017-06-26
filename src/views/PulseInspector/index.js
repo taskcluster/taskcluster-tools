@@ -7,7 +7,6 @@ import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
 import MessageRow from './MessageRow';
-// import './pulseinspector.less';
 
 export default class PulseInspector extends React.PureComponent {
   static defaultProps = {
@@ -63,7 +62,7 @@ export default class PulseInspector extends React.PureComponent {
       Object.values(query.bindings) :
       [];
   }
-  
+
   createListener(bindings) {
     if (this.listener) {
       this.listener.close();
@@ -75,12 +74,13 @@ export default class PulseInspector extends React.PureComponent {
     }
 
     try {
-      const listener = this.listener = new WebListener();
+      const listener = new WebListener();
 
       bindings.map(binding => listener.bind(binding));
 
       listener.on('message', this.handleListenerMessage);
 
+      this.listener = listener;
       return listener;
     } catch (err) {
       this.setState({ listeningError: err });
@@ -104,9 +104,9 @@ export default class PulseInspector extends React.PureComponent {
     this.props.history.replace('/pulse-inspector');
   };
 
-  updateExchangeValue = (e) => this.setState({ exchangeValue: e.target.value });
+  updateExchangeValue = e => this.setState({ exchangeValue: e.target.value });
 
-  updateRoutingKeyPatternValue = (e) => this.setState({ routingKeyPatternValue: e.target.value });
+  updateRoutingKeyPatternValue = e => this.setState({ routingKeyPatternValue: e.target.value });
 
   addBinding = () => {
     const { exchangeValue, routingKeyPatternValue } = this.state;
@@ -129,7 +129,7 @@ export default class PulseInspector extends React.PureComponent {
   };
 
   /** Set expanded message, note we rely on object reference comparison here */
-  expandMessage = (idForInspector) => this.setState({ expandedMessage: idForInspector });
+  expandMessage = idForInspector => this.setState({ expandedMessage: idForInspector });
 
   dismissListeningError = () => this.setState({ listeningError: null });
 
@@ -216,24 +216,24 @@ export default class PulseInspector extends React.PureComponent {
     return (
       <Table condensed={true} hover={true}>
         <thead>
-        <tr>
-          <th>Exchange</th>
-          <th>Routing Key</th>
-        </tr>
+          <tr>
+            <th>Exchange</th>
+            <th>Routing Key</th>
+          </tr>
         </thead>
         <tbody>
-        {this.state.messages.map(message => {
-          const msgId = message._idForInspector;
-          const expanded = msgId === expandedMsgId;
+          {this.state.messages.map((message) => {
+            const msgId = message._idForInspector; // eslint-disable-line no-underscore-dangle
+            const expanded = msgId === expandedMsgId;
 
-          return (
-            <MessageRow
-              key={msgId}
-              expanded={expanded}
-              message={message}
-              onClick={() => this.expandMessage(msgId)} />
-          );
-        })}
+            return (
+              <MessageRow
+                key={msgId}
+                expanded={expanded}
+                message={message}
+                onClick={() => this.expandMessage(msgId)} />
+            );
+          })}
         </tbody>
       </Table>
     );

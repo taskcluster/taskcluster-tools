@@ -19,7 +19,7 @@ export default class LogsMenu extends React.PureComponent {
     if (!taskGroupId || !taskId || isNil(runId) || !logs || !logs.length) {
       return <NavItem disabled>No logs</NavItem>;
     }
-    //subSectionId === 'logs'
+    // subSectionId === 'logs'
     return (
       <NavDropdown title="Logs" active={active} id="logs-dropdown">
         {logs.map((log, index) => (

@@ -1,8 +1,6 @@
 import React from 'react';
 import { string, shape, number, bool, func } from 'prop-types';
 import { OverlayTrigger, ProgressBar, Tooltip } from 'react-bootstrap';
-import Error from '../../components/Error';
-import Spinner from '../../components/Spinner';
 
 export default class WorkerTypeRow extends React.Component {
   static propTypes = {
@@ -18,7 +16,7 @@ export default class WorkerTypeRow extends React.Component {
     selected: bool.isRequired,
     onClick: func.isRequired
   };
-  
+
   constructor(props) {
     super(props);
 

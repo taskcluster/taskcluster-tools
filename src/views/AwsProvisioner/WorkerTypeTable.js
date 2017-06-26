@@ -87,10 +87,10 @@ export default class WorkerTypeTable extends React.PureComponent {
     }
   }
 
-  setSelected = (workerType) => this.props.history
+  setSelected = workerType => this.props.history
     .replace(`/aws-provisioner/${workerType}/${this.props.currentTab}`);
 
-  handleTabChange = (tab) => this.props.history.replace(`/aws-provisioner/${this.props.workerType}/${tab}`);
+  handleTabChange = tab => this.props.history.replace(`/aws-provisioner/${this.props.workerType}/${tab}`);
 
   workerTypeCreated = async (workerType) => {
     await this.loadWorkerTypeSummaries();
@@ -101,12 +101,12 @@ export default class WorkerTypeTable extends React.PureComponent {
   // work around https://github.com/taskcluster/aws-provisioner/pull/70
   updateSummary = (workerType, summary) => this.setState({
     workerTypeSummaries: this.state.workerTypeSummaries
-      .map(workerType => workerType.workerType === workerType ?
+      .map(workerType => (workerType.workerType === workerType ?
         Object.assign(summary, { workerType }) :
-        workerType)
+        workerType))
   });
 
-  setWorkerType = (e) => this.setState({ workerTypeContains: e.target.value });
+  setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
 
   enterWorkerType = (e) => {
     if (e.keyCode === 13) {
@@ -169,7 +169,7 @@ export default class WorkerTypeTable extends React.PureComponent {
 
   renderState() {
     if (this.state.error) {
-      return <Error error={error} />;
+      return <Error error={this.state.error} />;
     }
 
     if (!this.state.workerTypeSummaries) {
@@ -182,14 +182,14 @@ export default class WorkerTypeTable extends React.PureComponent {
         {this.renderTypeInput()}
         <Table style={{ marginTop: 20 }}>
           <thead>
-          <tr>
-            <th className="col-xs-2">WorkerType</th>
-            <th>Capacity</th>
-            <th className="col-xs-2">Pending Tasks</th>
-          </tr>
+            <tr>
+              <th className="col-xs-2">WorkerType</th>
+              <th>Capacity</th>
+              <th className="col-xs-2">Pending Tasks</th>
+            </tr>
           </thead>
           <tbody>
-          {
+            {
             this.state.workerTypeSummaries && this.state.workerTypeSummaries
               .filter(workerType => workerType.workerType.includes(this.state.workerTypeContains))
               .map(workerType => (

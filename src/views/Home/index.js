@@ -32,7 +32,7 @@ export default class Home extends React.PureComponent {
           <Col sm={12}>
             <p>
               A collection of tools for TaskCluster components and elements in the TaskCluster
-              ecosystem. Here you'll find tools to manage TaskCluster, as well as run, debug, inspect
+              ecosystem. Here you will find tools to manage TaskCluster, as well as run, debug, inspect
               and view tasks, task-graphs, and other TaskCluster related entities.
             </p>
           </Col>
@@ -61,6 +61,6 @@ export default class Home extends React.PureComponent {
           </Row>
         ))}
       </div>
-    )
+    );
   }
 }

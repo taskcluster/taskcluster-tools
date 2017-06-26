@@ -34,9 +34,9 @@ export default class SearchForm extends React.PureComponent {
     });
   }
 
-  handleTaskGroupIdInputChange = (e) => this.setState({ taskGroupIdInput: e.target.value.trim() });
+  handleTaskGroupIdInputChange = e => this.setState({ taskGroupIdInput: e.target.value.trim() });
 
-  handleTaskIdInputChange = (e) => this.setState({ taskIdInput: e.target.value.trim() });
+  handleTaskIdInputChange = e => this.setState({ taskIdInput: e.target.value.trim() });
 
   handleSubmit = (e) => {
     e.preventDefault();

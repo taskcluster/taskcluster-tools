@@ -1,4 +1,3 @@
-import React from 'react';
 import taskcluster from 'taskcluster-client';
 import { omit } from 'ramda';
 import merge from 'deepmerge';
@@ -50,13 +49,13 @@ export const MIMETYPE_ICONS = {
 
 // Matching patterns for finding an icon from a mimetype, most specific
 // mimetype are listed first as they are matched top down.
-export const getIconFromMime = contentType => {
+export const getIconFromMime = (contentType) => {
   const [icon = 'file-o'] = Object
     .entries(MIMETYPE_ICONS)
     .find(([, matches]) => matches
-      .some(pattern => pattern instanceof RegExp ?
+      .some(pattern => (pattern instanceof RegExp ?
         pattern.test(contentType) :
-        pattern === contentType));
+        pattern === contentType)));
 
   return icon;
 };
@@ -92,7 +91,7 @@ export const parameterizeTask = task => merge(omit([
     env: {
       TASKCLUSTER_INTERACTIVE: 'true'
     }
-  }),
+  })
 });
 
 export const labels = {
@@ -101,7 +100,7 @@ export const labels = {
   unscheduled: 'default',
   completed: 'success',
   failed: 'danger',
-  exception: 'warning',
+  exception: 'warning'
 };
 
 export const loadable = loader => Loadable({

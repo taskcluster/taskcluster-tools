@@ -1,5 +1,5 @@
 import React from 'react';
-import { object, func } from 'prop-types';
+import { object } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Table, Label } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
@@ -46,9 +46,9 @@ export default class TaskDetails extends React.PureComponent {
               <td>Source</td>
               <td>
                 <a href={metadata.source}>
-                    <span>
-                      {metadata.source.length > 90 ? `...${metadata.source.substr(8 - 90)}` : metadata.source}
-                    </span>
+                  <span>
+                    {metadata.source.length > 90 ? `...${metadata.source.substr(8 - 90)}` : metadata.source}
+                  </span>
                 </a>
               </td>
             </tr>

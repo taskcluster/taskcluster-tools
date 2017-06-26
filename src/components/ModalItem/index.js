@@ -1,5 +1,5 @@
 import React from 'react';
-import { any, bool, func, node, string } from 'prop-types';
+import { bool, func, node, string } from 'prop-types';
 import { MenuItem, Modal, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 

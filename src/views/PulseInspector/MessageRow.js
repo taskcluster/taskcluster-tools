@@ -17,6 +17,7 @@ export default class MessageRow extends React.PureComponent {
 
   shouldComponentUpdate(nextProps) {
     // Just compare the _idForInspector
+    // eslint-disable-next-line no-underscore-dangle
     if (this.props.message._idForInspector !== nextProps.message._idForInspector) {
       return true;
     }

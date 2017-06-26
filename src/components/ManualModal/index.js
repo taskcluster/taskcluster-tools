@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon } from 'react-bootstrap';
 
-const certificateIsValid = certificate => {
+const certificateIsValid = (certificate) => {
   if (certificate === '') {
     return true;
   }
@@ -28,7 +28,7 @@ class ManualModal extends React.PureComponent {
     const { onSubmit, onClose } = this.props;
     const { clientId, accessToken, certificate } = this.state;
     const isValid = clientId && accessToken && certificateIsValid(certificate);
-    const onClick = e => {
+    const onClick = (e) => {
       e.preventDefault();
       onClose && onClose({ clientId, accessToken, certificate });
     };
@@ -46,11 +46,10 @@ class ManualModal extends React.PureComponent {
               <FormControl
                 required={true}
                 className="top-element"
-                ref="clientId"
                 name="clientId"
                 type="text"
                 placeholder="clientId"
-                onChange={e => this.setState({ clientId: e.target.value}) } />
+                onChange={e => this.setState({ clientId: e.target.value })} />
             </FormGroup>
 
             <FormGroup controlId="accessToken">
@@ -58,7 +57,6 @@ class ManualModal extends React.PureComponent {
               <FormControl
                 required={true}
                 className="mid-element"
-                ref="accessToken"
                 name="accessToken"
                 type="password"
                 placeholder="accessToken"
@@ -70,7 +68,6 @@ class ManualModal extends React.PureComponent {
               <FormControl
                 componentClass="textarea"
                 className="bottom-element"
-                ref="certificate"
                 name="certificate"
                 rows={8}
                 placeholder="JSON certificate (if required)"

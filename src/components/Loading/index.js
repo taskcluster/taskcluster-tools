@@ -15,11 +15,11 @@ export default class Loading extends React.PureComponent {
     const { isLoading, timedOut, pastDelay, error } = this.props;
 
     if (isLoading) {
-      return timedOut ?
-        <div>timeout</div> :
-        pastDelay ?
-          <Spinner /> :
-          null;
+      if (timedOut) {
+        return <div>A timeout occurred while loading the associated component.</div>;
+      }
+
+      return pastDelay ? <Spinner /> : null;
     }
 
     if (error) {

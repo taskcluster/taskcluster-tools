@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { string, func, object } from 'prop-types';
 import TreeView from 'react-treeview';
+import 'react-treeview/react-treeview.css';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 
@@ -12,7 +13,7 @@ export default class HookBrowser extends Component {
     selectHook: func.isRequired,
     hooks: object.isRequired
   };
-  
+
   constructor(props) {
     super(props);
 
@@ -48,7 +49,7 @@ export default class HookBrowser extends Component {
     }
   }
 
-  registerChild = (ref) => this.treeView = ref;
+  registerChild = ref => this.treeView = ref;
 
   handleLabelClick = () => this.treeView && this.treeView.handleClick();
 

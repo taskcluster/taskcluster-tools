@@ -44,7 +44,7 @@ export default class CodeEditor extends React.PureComponent {
         }} />
     );
   }
-};
+}
 
 CodeEditor.propTypes = {
   mode: string

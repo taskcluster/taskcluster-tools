@@ -78,14 +78,14 @@ export default class CredentialsManager extends React.PureComponent {
       <div style={{ marginTop: 20 }}>
         <table className="table">
           <tbody>
-          <tr>
-            <td>ClientId</td>
-            <td><code>{info.clientId}</code></td>
-          </tr>
+            <tr>
+              <td>ClientId</td>
+              <td><code>{info.clientId}</code></td>
+            </tr>
 
-          <tr>
-            <td>AccessToken</td>
-            {showToken && credentials ?
+            <tr>
+              <td>AccessToken</td>
+              {showToken && credentials ?
               (
                 <td>
                   <code>{credentials.accessToken}</code>
@@ -97,31 +97,31 @@ export default class CredentialsManager extends React.PureComponent {
                 </td>
               )
             }
-          </tr>
+            </tr>
 
-          <tr>
-            <td>Type</td>
-            <td>{info.type}</td>
-          </tr>
+            <tr>
+              <td>Type</td>
+              <td>{info.type}</td>
+            </tr>
 
-          {info.start && (
+            {info.start && (
             <tr>
               <td>Valid From</td>
               <td><DateView date={info.start} /></td>
             </tr>
           )}
 
-          {info.expiry && (
+            {info.expiry && (
             <tr>
               <td>Expires</td>
               <td><DateView date={info.expiry} /></td>
             </tr>
           )}
 
-          <tr>
-            <td>Scopes</td>
-            <td>
-              {
+            <tr>
+              <td>Scopes</td>
+              <td>
+                {
                 info.scopes.length ?
                   (
                     <div style={{ lineHeight: 1.8 }}>
@@ -134,8 +134,8 @@ export default class CredentialsManager extends React.PureComponent {
                   ) :
                   'none (or accessToken is invalid)'
               }
-            </td>
-          </tr>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

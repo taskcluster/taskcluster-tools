@@ -3,7 +3,7 @@ import { Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { Helmet, title, link } from 'react-helmet';
+import { Helmet, title } from 'react-helmet';
 import { WebListener } from 'taskcluster-client';
 import { isNil } from 'ramda';
 import PropsRoute from '../../components/PropsRoute';
@@ -75,7 +75,14 @@ export default class Inspector extends React.PureComponent {
     const { taskGroupId, taskId, runId } = nextProps;
 
     if (taskGroupId && taskGroupId !== this.props.taskGroupId) {
-      this.setState({ selectedTaskId: null, status: null, task: null, artifacts: null, selectedRun: null, tasks: null });
+      this.setState({
+        selectedTaskId: null,
+        status: null,
+        task: null,
+        artifacts: null,
+        selectedRun: null,
+        tasks: null
+      });
       this.loadTasks(nextProps);
     }
 
@@ -161,7 +168,7 @@ export default class Inspector extends React.PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = this.taskListener = new WebListener();
+    const listener = new WebListener();
     const routingKey = { taskId };
 
     ['taskDefined', 'taskPending', 'taskRunning', 'artifactCreated', 'taskCompleted', 'taskFailed', 'taskException']
@@ -169,6 +176,7 @@ export default class Inspector extends React.PureComponent {
 
     listener.on('message', this.handleTaskMessage);
     listener.resume();
+    this.taskListener = listener;
 
     return listener;
   }
@@ -302,14 +310,14 @@ export default class Inspector extends React.PureComponent {
     localStorage.setItem(localKey, JSON.stringify([...ids].slice(-5).reverse()));
   }
 
-  handleEdit = (task) => this.props.history.push({
+  handleEdit = task => this.props.history.push({
     pathname: '/tasks/create',
     state: { task }
   });
 
-  handleRetrigger = (taskId) => this.props.history.replace(`/groups/${this.props.taskGroupId}/tasks/${taskId}`);
+  handleRetrigger = taskId => this.props.history.replace(`/groups/${this.props.taskGroupId}/tasks/${taskId}`);
 
-  handleCreateInteractive = async (taskId) => this.props.history.push(`/tasks/${taskId}/connect`);
+  handleCreateInteractive = async taskId => this.props.history.push(`/tasks/${taskId}/connect`);
 
   getRunNumber(runId, selectedRun, runs) {
     if (!isNil(runId)) {
@@ -394,14 +402,21 @@ export default class Inspector extends React.PureComponent {
 
         <Row>
           <Switch>
-            <PropsRoute path={PATHS.LOG} component={LogView} queue={queue} taskId={taskId} runId={runId} status={status} log={selectedLog} />
+            <PropsRoute
+              path={PATHS.LOG}
+              component={LogView}
+              queue={queue}
+              taskId={taskId}
+              runId={runId}
+              status={status}
+              log={selectedLog} />
             <PropsRoute path={PATHS.RUN_DETAILS} component={RunDetails} run={status ? status.runs[runId] : null} />
             <PropsRoute path={PATHS.TASK_DETAILS} component={TaskDetails} status={status} task={task} />
             <PropsRoute path={PATHS.TASK_LIST} component={GroupDetails} taskGroupId={taskGroupId} tasks={tasks} />
           </Switch>
         </Row>
       </div>
-    )
+    );
   }
 
   render() {
@@ -420,7 +435,7 @@ export default class Inspector extends React.PureComponent {
         <h4>Task &amp; Group Inspector</h4>
         <p>
           Given a task group ID or task ID, inspect task groups, monitor progress, view dependencies and states, and
-          inspect individual tasks' state, runs, public and private artifacts, definition, and logs as they are
+          inspect individual tasks&rsquo; state, runs, public and private artifacts, definition, and logs as they are
           evaluated.
         </p>
         <hr />

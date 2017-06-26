@@ -3,7 +3,7 @@ import Clients from '../../components/Clients';
 import IndexBrowser from '../../components/IndexBrowser';
 import EntryView from './EntryView';
 
-export default ({ match, credentials, history }) => (
+const View = ({ match, credentials, history }) => (
   <Clients credentials={credentials} Index Queue>
     {({ index, queue }) => {
       const { namespace = '', namespaceTaskId } = match.params;
@@ -21,3 +21,5 @@ export default ({ match, credentials, history }) => (
     }}
   </Clients>
 );
+
+export default View;

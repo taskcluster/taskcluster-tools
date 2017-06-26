@@ -35,5 +35,5 @@ DateView.propTypes = {
 
 DateView.defaultProps = {
   format: 'Do of MMMM YYYY, H:mm:ss',
-  placement: 'top',
+  placement: 'top'
 };

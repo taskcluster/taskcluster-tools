@@ -37,7 +37,7 @@ export default class Navigation extends React.PureComponent {
     return {
       title: null,
       message: null
-    }
+    };
   }
 
   render() {
@@ -58,7 +58,7 @@ export default class Navigation extends React.PureComponent {
           </Navbar.Header>
           <Nav pullRight={true}>
             <NavDropdown key={1} title="Tools" id="tools">
-              {links.map(({ title, link, icon }) => link.startsWith('/') ?
+              {links.map(({ title, link, icon }) => (link.startsWith('/') ?
                 (
                   <LinkContainer to={link} key={`navigation-link-${link}`}>
                     <MenuItem>
@@ -71,7 +71,7 @@ export default class Navigation extends React.PureComponent {
                     <Icon name={icon} fixedWidth={true} /> {title}
                   </MenuItem>
                 )
-              )}
+              ))}
             </NavDropdown>
 
             <CredentialsMenu
@@ -95,7 +95,7 @@ export default class Navigation extends React.PureComponent {
           {showManualModal && (
             <ManualModal
               onClose={() => this.setState({ showManualModal: false })}
-              onSubmit={creds => {
+              onSubmit={(creds) => {
                 signInManually && signInManually(creds);
                 this.setState({ credentialsMenuExpanded: false, showManualModal: false });
               }} />

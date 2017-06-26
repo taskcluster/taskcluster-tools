@@ -86,13 +86,13 @@ export default class SecretEditor extends React.PureComponent {
     }
   }
 
-  onExpiresChange = (date) => this.setState({
+  onExpiresChange = date => this.setState({
     expires: date.toDate().toJSON()
   });
 
-  handleSecretNameChange = (e) => this.setState({ secretNameValue: e.target.value });
+  handleSecretNameChange = e => this.setState({ secretNameValue: e.target.value });
 
-  handleValueChange = (value) => this.setState({ secretValue: value });
+  handleValueChange = value => this.setState({ secretValue: value });
 
   startEditing = () => this.setState({ editing: true });
 
@@ -119,7 +119,6 @@ export default class SecretEditor extends React.PureComponent {
         this.setState({ error: null });
       }
     } catch (err) {
-      console.log(err);
       this.setState({ error: err });
     }
   };
@@ -148,7 +147,7 @@ export default class SecretEditor extends React.PureComponent {
           <Button onClick={this.openSecret} bsStyle="warning">
             <Icon name="user-secret" style={{ padding: '.15em' }} /> Show secret
           </Button>
-        )
+        );
     }
 
     return <em>none</em>;
@@ -200,7 +199,7 @@ export default class SecretEditor extends React.PureComponent {
                       {secretId}
                       {secretId.startsWith('garbage/') && (
                         <div className="alert alert-warning">
-                          This is a "garbage" secret and is visible to just about everybody.
+                          This is a &quot;garbage&quot; secret and is visible to just about everybody.
                           Do not put any real secrets here!
                         </div>
                       )}
@@ -221,7 +220,7 @@ export default class SecretEditor extends React.PureComponent {
                       onChange={this.onExpiresChange}
                       className="form-control" />
                   ) :
-                  <DateView date={expires} />
+                    <DateView date={expires} />
               }
             </div>
           </div>

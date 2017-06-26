@@ -78,6 +78,7 @@ export default class ClientEditor extends React.PureComponent {
         error: null
       });
     }
+
     try {
       this.setState({
         client: await props.auth.client(props.currentClientId),
@@ -96,7 +97,7 @@ export default class ClientEditor extends React.PureComponent {
 
   render() {
     if (this.state.error && !this.state.client) {
-      return(
+      return (
         <Alert bsStyle="danger" onDismiss={this.dismissError}>
           <strong>Error executing operation</strong> {this.state.error.toString()}
         </Alert>
@@ -115,7 +116,7 @@ export default class ClientEditor extends React.PureComponent {
     const clientId = creds ? `${creds.clientId}/` : '';
     const tooltip = (
       <Tooltip id="clientId">
-        You can create as many clients as you would like that begin with "{clientId}".
+        You can create as many clients as you would like that begin with &quot;{clientId}&quot;.
       </Tooltip>
     );
 
@@ -145,7 +146,6 @@ export default class ClientEditor extends React.PureComponent {
                   <div className="col-md-9">
                     <FormControl
                       type="text"
-                      ref="clientId"
                       placeholder="ClientId"
                       value={this.state.client.clientId}
                       onChange={this.onClientIdChange} />
@@ -255,27 +255,30 @@ export default class ClientEditor extends React.PureComponent {
             )
           }
           {
-            Object.entries({
-              created: 'Created',
-              lastModified: 'Last Modified',
-              lastDateUsed: 'Last Date Used',
-              lastRotated: 'Last Rotated'
-            }).map(([prop, label]) => {
-              if (!this.state.client[prop]) {
-                return;
-              }
+            Object
+              .entries({
+                created: 'Created',
+                lastModified: 'Last Modified',
+                lastDateUsed: 'Last Date Used',
+                lastRotated: 'Last Rotated'
+              })
+              .map(([prop, label]) => {
+                if (!this.state.client[prop]) {
+                  return null;
+                }
 
-              return (
-                <div className="form-group" key={prop}>
-                  <label className="control-label col-md-3">{label}</label>
-                  <div className="col-md-9">
-                    <div className="form-control-static">
-                      <DateView date={this.state.client[prop]} />
+                return (
+                  <div className="form-group" key={prop}>
+                    <label className="control-label col-md-3">{label}</label>
+                    <div className="col-md-9">
+                      <div className="form-control-static">
+                        <DateView date={this.state.client[prop]} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })
+              .filter(Boolean)
           }
           <div className="form-group">
             <label className="control-label col-md-3">Client Scopes</label>
@@ -331,7 +334,7 @@ export default class ClientEditor extends React.PureComponent {
   }
 
   /** Determine if clientId is valid */
-  validClientId = () => /^[A-Za-z0-9@\/:._-]+$/.test(this.state.client.clientId || '');
+  validClientId = () => /^[A-Za-z0-9@/:._-]+$/.test(this.state.client.clientId || '');
 
   /** Render editing toolbar */
   renderEditingToolbar() {
@@ -405,7 +408,6 @@ export default class ClientEditor extends React.PureComponent {
     return (
       <textarea
         className="form-control"
-        ref="description"
         value={this.state.client.description}
         onChange={this.onDescriptionChange}
         rows={8}
@@ -422,20 +424,20 @@ export default class ClientEditor extends React.PureComponent {
     );
   }
 
-  onDescriptionChange = (e) => this.setState({
+  onDescriptionChange = e => this.setState({
     client: assoc('description', e.target.value, this.state.client)
   });
 
-  onClientIdChange = (e) => this.setState({
+  onClientIdChange = e => this.setState({
     client: assoc('clientId', e.target.value, this.state.client)
   });
 
-  onScopesUpdated = (scopes) => this.setState({
+  onScopesUpdated = scopes => this.setState({
     client: assoc('scopes', scopes, this.state.client)
   });
 
   /** When expires exchanges in the editor */
-  onExpiresChange = (date) => this.setState({
+  onExpiresChange = date => this.setState({
     client: assoc('expires', date.toDate().toJSON(), this.state.client)
   });
 

@@ -4,6 +4,10 @@ import { camelCase } from 'change-case';
 import taskcluster from 'taskcluster-client';
 
 export default class Clients extends React.PureComponent {
+  static propTypes = {
+    children: func.isRequired
+  };
+
   constructor(props) {
     super(props);
     this.state = this.getClients(props);
@@ -20,8 +24,8 @@ export default class Clients extends React.PureComponent {
 
     return Object
       .entries(clients)
-      .reduce((clients, [key, value]) => ({
-        ...clients,
+      .reduce((reduction, [key, value]) => ({
+        ...reduction,
         [camelCase(key)]: value === true ?
           new taskcluster[key]({ credentials }) :
           new taskcluster[key]({ credentials, ...value })
@@ -31,8 +35,4 @@ export default class Clients extends React.PureComponent {
   render() {
     return this.props.children(this.state);
   }
-};
-
-Clients.propTypes = {
-  children: func.isRequired
-};
+}

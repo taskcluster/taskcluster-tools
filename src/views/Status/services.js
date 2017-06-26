@@ -1,4 +1,3 @@
-import React from 'react';
 import $ from 'jquery';
 import { parsers } from 'www-authenticate';
 
@@ -24,7 +23,7 @@ function makeRequest(options, allowHeaders = []) {
 function pollTaskclusterService(key, cb) {
   return $
     .getJSON(`https://api.uptimerobot.com/getMonitors?apiKey=${key}&format=json&noJsonCallback=1`)
-    .done(res => {
+    .done((res) => {
       const [monitor] = res.monitors.monitor;
 
       // 2 is 'up'
@@ -85,7 +84,7 @@ export const otherServices = [
     name: 'AWS',
     description: 'Amazon Elastic Compute Cloud (Oregon)',
     link: 'http://status.aws.amazon.com/',
-    poll: async cb => {
+    poll: async (cb) => {
       try {
         const data = await Promise.resolve(makeRequest({
           url: 'http://status.aws.amazon.com/rss/ec2-us-west-2.rss'
@@ -113,13 +112,13 @@ export const otherServices = [
 
     // Authentication procedure is described at
     // https://docs.docker.com/registry/spec/auth/token/
-    poll: async cb => {
-      let req;
+    poll: async (cb) => {
+      let request;
 
       try {
-        req = makeRequest({ url: 'https://index.docker.io/v2/' }, ['www-authenticate']);
+        request = makeRequest({ url: 'https://index.docker.io/v2/' }, ['www-authenticate']);
 
-        await Promise.resolve(req);
+        await Promise.resolve(request);
       } catch (err) {
         if (err.status !== 401) {
           cb('down');
@@ -128,7 +127,7 @@ export const otherServices = [
         }
 
         try {
-          const auth = new WebAuthentication(req.getResponseHeader('www-authenticate'));
+          const auth = new WebAuthentication(request.getResponseHeader('www-authenticate'));
           const data = await Promise.resolve(makeRequest({
             url: `${auth.parms.realm}?service=${auth.parms.service}`
           }));
@@ -154,7 +153,7 @@ export const otherServices = [
     name: 'Heroku',
     description: 'https://status.heroku.com/',
     link: 'https://status.heroku.com/',
-    poll: cb => {
+    poll: (cb) => {
       Promise.resolve(makeRequest({
         url: 'https://status.heroku.com/feed'
       }))

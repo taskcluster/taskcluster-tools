@@ -1,23 +1,17 @@
 import React from 'react';
 import { func, string, object } from 'prop-types';
 import { ButtonToolbar, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
 import clone from 'lodash.clonedeep';
 import { omit } from 'ramda';
 import CodeEditor from '../../components/CodeEditor';
 import ModalItem from '../../components/ModalItem';
-import Icon from 'react-fontawesome';
 
 /* eslint-disable no-param-reassign */
 /** Encode/decode UserData property of object */
-const encodeUserData = obj => {
+const encodeUserData = (obj) => {
   if (obj && obj.UserData) {
     obj.UserData = window.btoa(JSON.stringify(obj.UserData));
-  }
-};
-
-const decodeUserData = obj => {
-  if (obj && obj.UserData) {
-    obj.UserData = window.atob(JSON.parse(obj.UserData));
   }
 };
 
@@ -68,7 +62,7 @@ export default class WorkerTypeEditor extends React.PureComponent {
     }
   };
 
-  workerTypeChange = (value) => this.setState({ workerType: value });
+  workerTypeChange = value => this.setState({ workerType: value });
 
   workerTypeValidationState() {
     return /^[a-zA-Z0-9_-]{1,22}$/.test(this.state.workerType) ? 'success' : 'error';
@@ -123,7 +117,6 @@ export default class WorkerTypeEditor extends React.PureComponent {
               <div>
                 <FormControl
                   type="text"
-                  ref="workerType"
                   placeholder="workerType"
                   value={this.state.workerType}
                   onChange={this.workerTypeChange} />

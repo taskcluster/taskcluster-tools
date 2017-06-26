@@ -10,7 +10,7 @@ export default class TimeInput extends React.PureComponent {
     value: object.isRequired,
     onChange: func
   };
-  
+
   constructor(props) {
     super(props);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { object, shape, arrayOf, func, string } from 'prop-types';
+import { func, string } from 'prop-types';
 import { Nav, NavItem } from 'react-bootstrap';
 import clone from 'lodash.clonedeep';
 import Error from '../../components/Error';
@@ -47,7 +47,7 @@ export default class WorkerTypeView extends React.PureComponent {
         pendingTasks: await queue.pendingTasks(provisionerId, workerType),
         workerType: await awsProvisioner.workerType(workerType),
         awsState: await awsProvisioner.state(workerType)
-          .then(response => {
+          .then((response) => {
             updateSummary(workerType, response.summary);
             return response;
           })

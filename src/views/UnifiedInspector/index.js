@@ -2,7 +2,7 @@ import React from 'react';
 import Clients from '../../components/Clients';
 import Inspector from './Inspector';
 
-export default ({ credentials, match, history, location }) => (
+const View = ({ credentials, match, history }) => (
   <Clients credentials={credentials} Queue QueueEvents PurgeCache>
     {clients => (
       <Inspector
@@ -18,3 +18,5 @@ export default ({ credentials, match, history, location }) => (
     )}
   </Clients>
 );
+
+export default View;

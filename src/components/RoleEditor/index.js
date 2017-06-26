@@ -70,15 +70,15 @@ export default class RoleEditor extends React.PureComponent {
 
   validRoleId = () => (this.state.role.roleId || '').length > 0;
 
-  onRoleIdChange = (e) => this.setState({
+  onRoleIdChange = e => this.setState({
     role: assoc('roleId', e.target.value, this.state.role)
   });
 
-  onDescriptionChange = (e) => this.setState({
+  onDescriptionChange = e => this.setState({
     role: assoc('description', e.target.value, this.state.role)
   });
 
-  scopesUpdated = (scopes) => this.setState({
+  scopesUpdated = scopes => this.setState({
     role: assoc('scopes', scopes, this.state.role)
   });
 
@@ -216,7 +216,6 @@ export default class RoleEditor extends React.PureComponent {
                 <div className="col-md-9">
                   <FormControl
                     type="text"
-                    ref="roleId"
                     placeholder="RoleId"
                     value={this.state.role.roleId}
                     onChange={this.onRoleIdChange} />
@@ -241,22 +240,25 @@ export default class RoleEditor extends React.PureComponent {
             </div>
           </div>
           {
-            Object.entries({ created: 'Created', lastModified: 'Last Modified' }).map(([prop, label]) => {
-              if (!this.state.role[prop]) {
-                return;
-              }
+            Object
+              .entries({ created: 'Created', lastModified: 'Last Modified' })
+              .map(([prop, label]) => {
+                if (!this.state.role[prop]) {
+                  return null;
+                }
 
-              return (
-                <div className="form-group" key={prop}>
-                  <label className="control-label col-md-3">{label}</label>
-                  <div className="col-md-9">
-                    <div className="form-control-static">
-                      <DateView date={this.state.role[prop]} />
+                return (
+                  <div className="form-group" key={prop}>
+                    <label className="control-label col-md-3">{label}</label>
+                    <div className="col-md-9">
+                      <div className="form-control-static">
+                        <DateView date={this.state.role[prop]} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })
+              .filter(Boolean)
           }
           <div className="form-group">
             <label className="control-label col-md-3">Scopes</label>

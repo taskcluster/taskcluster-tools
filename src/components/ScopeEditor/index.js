@@ -1,6 +1,5 @@
 import React from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
-import { findDOMNode } from 'react-dom';
 import clone from 'lodash.clonedeep';
 import equal from 'deep-equal';
 
@@ -22,9 +21,9 @@ export default class ScopeEditor extends React.Component {
       !equal(this.props.scopes, this.getScopesFromTextarea());
 
     if (notEqual) {
-      findDOMNode(this.refs.scopeText).value = this.props.scopes.join('\n');
+      this.scopeText.value = this.props.scopes.join('\n');
     }
-  };
+  }
 
   onChange = () => {
     const newScopes = this.getScopesFromTextarea();
@@ -35,7 +34,7 @@ export default class ScopeEditor extends React.Component {
   };
 
   getScopesFromTextarea = () => {
-    const textarea = findDOMNode(this.refs.scopeText);
+    const textarea = this.scopeText;
 
     if (!textarea) {
       return this.props.scopes;
@@ -61,10 +60,10 @@ export default class ScopeEditor extends React.Component {
           rows={scopes.length + 1}
           defaultValue={scopes.join('\n')}
           onChange={this.onChange}
-          ref="scopeText" />
+          ref={ref => this.scopeText = ref} />
       </div>
     );
-  };
+  }
 
   /** Render a list of scopes */
   renderScopes() {
@@ -72,7 +71,7 @@ export default class ScopeEditor extends React.Component {
 
     return (
       <ul className="form-control-static" style={{ paddingLeft: 20 }}>
-        {scopes.map((scope, index) => <li key={`scope-editor-${scope}`}><code>{scope}</code></li>)}
+        {scopes.map(scope => <li key={`scope-editor-${scope}`}><code>{scope}</code></li>)}
       </ul>
     );
   }

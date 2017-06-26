@@ -32,7 +32,7 @@ const Displays = loadable(() => import('../views/Displays'));
 const Shell = loadable(() => import('../views/Shell'));
 const InteractiveConnect = loadable(() => import('../views/InteractiveConnect'));
 
-export class App extends React.Component {
+export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -107,7 +107,7 @@ export class App extends React.Component {
     };
   }
 
-  startExpirationTimer() {
+  startExpirationTimer = () => {
     this.stopExpirationTimer();
 
     const { credentials } = this.state;
@@ -130,20 +130,18 @@ export class App extends React.Component {
     this.setState({
       expirationTimer: setTimeout(() => this.setState({ credentialsExpiringSoon: true }), timeout)
     });
-  }
+  };
 
-  stopExpirationTimer() {
+  stopExpirationTimer = () => {
     if (this.state.expirationTimer) {
       clearTimeout(this.state.expirationTimer);
       this.setState({ expirationTimer: null });
     }
-  }
+  };
 
-  signOut() {
-    this.saveCredentials(null);
-  }
+  signOut = () => this.saveCredentials(null);
 
-  signInManually({ clientId, accessToken, certificate }) {
+  signInManually = ({ clientId, accessToken, certificate }) => {
     this.saveCredentials({
       clientId,
       accessToken,
@@ -164,7 +162,7 @@ export class App extends React.Component {
             component={Navigation}
             credentials={credentials}
             credentialsExpiringSoon={credentialsExpiringSoon}
-            signInManually={credentials => this.signInManually(credentials)}
+            signInManually={this.signInManually}
             loginUrl={getLoginUrl()}
             onSignOut={() => this.signOut()} />
 
