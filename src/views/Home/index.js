@@ -16,7 +16,7 @@ export default class Home extends React.PureComponent {
   render() {
     return (
       <div className={entries}>
-        <HelmetTitle title="Home" />
+        <HelmetTitle blank />
         <Row className={hero}>
           <Col md={8} mdOffset={2} sm={10} smOffset={1}>
             <div className={header}>
