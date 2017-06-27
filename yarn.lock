@@ -4173,7 +4173,7 @@ neutrino-middleware-image-loader@^6.1.1:
     svg-url-loader "^2.0.2"
     url-loader "^0.5.8"
 
-neutrino-middleware-loader-merge@^6.0.2, neutrino-middleware-loader-merge@^6.1.1:
+neutrino-middleware-loader-merge@^6.1.1:
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/neutrino-middleware-loader-merge/-/neutrino-middleware-loader-merge-6.1.1.tgz#d211671764658c3409ac46de2da1417bdf5acc24"
   dependencies:
@@ -4192,7 +4192,7 @@ neutrino-middleware-style-loader@^6.1.1:
     css-loader "^0.28.4"
     style-loader "^0.18.2"
 
-neutrino-preset-airbnb-base@^6.0.2:
+neutrino-preset-airbnb-base@^6.1.1:
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/neutrino-preset-airbnb-base/-/neutrino-preset-airbnb-base-6.1.1.tgz#126fa678d7d62705caba38b088bb85a6928b6c4d"
   dependencies:
@@ -4200,16 +4200,16 @@ neutrino-preset-airbnb-base@^6.0.2:
     eslint-config-airbnb-base "^11.2.0"
     neutrino-middleware-eslint "^6.1.0"
 
-neutrino-preset-mozilla-rpweb@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/neutrino-preset-mozilla-rpweb/-/neutrino-preset-mozilla-rpweb-4.1.1.tgz#5fa8fc2856231f42d922d61a231c95a2034bc47c"
+neutrino-preset-mozilla-rpweb@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/neutrino-preset-mozilla-rpweb/-/neutrino-preset-mozilla-rpweb-4.2.0.tgz#21bd8df473442be7bc08391770693367ad7fedc5"
   dependencies:
     eslint-plugin-react "^7.1.0"
-    neutrino-middleware-loader-merge "^6.0.2"
-    neutrino-preset-airbnb-base "^6.0.2"
-    neutrino-preset-react "^6.0.2"
+    neutrino-middleware-loader-merge "^6.1.1"
+    neutrino-preset-airbnb-base "^6.1.1"
+    neutrino-preset-react "^6.1.1"
 
-neutrino-preset-react@^6.0.2:
+neutrino-preset-react@^6.1.1:
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/neutrino-preset-react/-/neutrino-preset-react-6.1.1.tgz#90ce609bd3a755106a1ec982a3008fd84ff446b7"
   dependencies:

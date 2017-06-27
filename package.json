@@ -62,7 +62,7 @@
     "babel-preset-babili": "^0.1.4",
     "neutrino": "^6.1.1",
     "neutrino-middleware-env": "^6.1.1",
-    "neutrino-preset-mozilla-rpweb": "^4.1.1",
+    "neutrino-preset-mozilla-rpweb": "^4.2.0",
     "shebang-loader": "0.0.1"
   },
   "optionalDependencies": {
