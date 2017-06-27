@@ -1,9 +1,9 @@
 import React from 'react';
 import { Helmet, title } from 'react-helmet';
 
-const HelmetTitle = ({ title }) => (
+const HelmetTitle = props => (
   <Helmet>
-    <title>{`${title} | TaskCluster`}</title>
+    <title>{props.blank ? 'TaskCluster' : `${props.title} | TaskCluster`}</title>
   </Helmet>
 );
 

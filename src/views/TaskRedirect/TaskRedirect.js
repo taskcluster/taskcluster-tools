@@ -40,7 +40,7 @@ export default class TaskRedirect extends React.PureComponent {
   render() {
     return (
       <div>
-        <HelmetTitle title="Task Redirect" />
+        <HelmetTitle blank />
         {this.renderTaskRedirect()}
       </div>
     );
