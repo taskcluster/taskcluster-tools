@@ -3,6 +3,7 @@ import { string } from 'prop-types';
 import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
+import HelmetTitle from '../../components/HelmetTitle';
 import HookBrowser from './HookBrowser';
 import HookEditView from './HookEditView';
 import './styles.css';
@@ -94,6 +95,7 @@ export default class HooksManager extends React.PureComponent {
 
     return (
       <Row>
+        <HelmetTitle title="Hooks Manager" />
         <Col md={4}>
           <h4>Hooks Manager</h4>
           <hr />

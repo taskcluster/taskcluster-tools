@@ -6,6 +6,7 @@ import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
 import ClientEditor from '../../components/ClientEditor';
+import HelmetTitle from '../../components/HelmetTitle';
 
 const flatten = list => list.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
 
@@ -300,7 +301,7 @@ export default class ScopeInspector extends React.PureComponent {
     );
   }
 
-  render() {
+  renderInspector() {
     const { selectedEntity, selectedScope } = this.props;
     const { error, roles, clients } = this.state;
 
@@ -321,5 +322,14 @@ export default class ScopeInspector extends React.PureComponent {
     }
 
     return this.renderScopes();
+  }
+
+  render() {
+    return (
+      <div>
+        <HelmetTitle title="Scope Inspector" />
+        {this.renderInspector()}
+      </div>
+    );
   }
 }

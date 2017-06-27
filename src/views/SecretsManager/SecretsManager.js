@@ -3,6 +3,7 @@ import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstr
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
+import HelmetTitle from '../../components/HelmetTitle';
 import SecretEditor from './SecretEditor';
 
 export default class SecretsManager extends React.PureComponent {
@@ -85,6 +86,7 @@ export default class SecretsManager extends React.PureComponent {
 
     return (
       <Row>
+        <HelmetTitle title="Secrets Manager" />
         <Col md={5}>
           {this.renderSecretsTable()}
           <ButtonToolbar>

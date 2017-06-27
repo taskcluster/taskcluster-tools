@@ -7,6 +7,7 @@ import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
 import MessageRow from './MessageRow';
+import HelmetTitle from '../../components/HelmetTitle';
 
 export default class PulseInspector extends React.PureComponent {
   static defaultProps = {
@@ -242,6 +243,7 @@ export default class PulseInspector extends React.PureComponent {
   render() {
     return (
       <Row>
+        <HelmetTitle title="Pulse Inspector" />
         <Col md={12}>
           <h4>Pulse Inspector</h4>
           <p>

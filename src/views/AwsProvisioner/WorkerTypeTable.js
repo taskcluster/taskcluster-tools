@@ -6,6 +6,7 @@ import WorkerTypeEditor from './WorkerTypeEditor';
 import WorkerTypeRow from './WorkerTypeRow';
 import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
+import HelmetTitle from '../../components/HelmetTitle';
 import { workerTypes } from './styles.css';
 
 const defaultWorkerType = {
@@ -212,6 +213,7 @@ export default class WorkerTypeTable extends React.PureComponent {
   render() {
     return (
       <div className={workerTypes}>
+        <HelmetTitle title="AWS Provisioner" />
         {
           this.props.workerType === 'create:worker-type' ?
             this.renderWorkerTypeCreator() :

@@ -2,6 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
+import HelmetTitle from '../../components/HelmetTitle';
 
 export default class TaskRedirect extends React.PureComponent {
   constructor(props) {
@@ -22,7 +23,7 @@ export default class TaskRedirect extends React.PureComponent {
     }
   }
 
-  render() {
+  renderTaskRedirect() {
     const { taskGroupId, error } = this.state;
 
     if (error) {
@@ -34,5 +35,14 @@ export default class TaskRedirect extends React.PureComponent {
     }
 
     return <Redirect to={`/groups/${taskGroupId}/tasks/${this.props.taskId}`} />;
+  }
+
+  render() {
+    return (
+      <div>
+        <HelmetTitle blank />
+        {this.renderTaskRedirect()}
+      </div>
+    );
   }
 }

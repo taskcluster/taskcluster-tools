@@ -4,6 +4,7 @@ import { Row, Col, Form, FormGroup, FormControl, ControlLabel, Checkbox, ButtonT
 import { safeDump } from 'js-yaml';
 import { Github } from 'taskcluster-client';
 import CodeEditor from '../../components/CodeEditor';
+import HelmetTitle from '../../components/HelmetTitle';
 import { info } from './styles.css';
 
 const initialYaml = {
@@ -201,6 +202,7 @@ export default class YamlCreator extends React.Component {
 
     return (
       <div>
+        <HelmetTitle title="Quick Start" />
         <hr />
         <CodeEditor mode="yaml" value={newYaml} />
       </div>
