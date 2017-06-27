@@ -4200,9 +4200,9 @@ neutrino-preset-airbnb-base@^6.0.2:
     eslint-config-airbnb-base "^11.2.0"
     neutrino-middleware-eslint "^6.1.0"
 
-neutrino-preset-mozilla-rpweb@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/neutrino-preset-mozilla-rpweb/-/neutrino-preset-mozilla-rpweb-4.1.0.tgz#97e2ee9c040db44502d514b1d07f987bb6b882a5"
+neutrino-preset-mozilla-rpweb@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/neutrino-preset-mozilla-rpweb/-/neutrino-preset-mozilla-rpweb-4.1.1.tgz#5fa8fc2856231f42d922d61a231c95a2034bc47c"
   dependencies:
     eslint-plugin-react "^7.1.0"
     neutrino-middleware-loader-merge "^6.0.2"
@@ -5375,9 +5375,11 @@ react-tooltip@^3.1.8:
     classnames "^2.2.0"
     prop-types "^15.5.8"
 
-react-treeview@0.4.6:
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/react-treeview/-/react-treeview-0.4.6.tgz#c4e5d209ab6dc736c4e8c51410d37821c41ce061"
+react-treeview@^0.4.7:
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/react-treeview/-/react-treeview-0.4.7.tgz#f647e04f70496eb11fb0912c35187e80eb60d458"
+  dependencies:
+    prop-types "^15.5.8"
 
 react-virtualized@^9.8.0:
   version "9.8.0"

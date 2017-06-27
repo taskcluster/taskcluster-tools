@@ -50,7 +50,7 @@
     "react-router-dom": "^4.1.1",
     "react-tabs": "^1.1.0",
     "react-tooltip": "^3.1.8",
-    "react-treeview": "0.4.6",
+    "react-treeview": "^0.4.7",
     "react-vnc-display": "^1.1.0",
     "slugid": "^1.1.0",
     "taskcluster-client": "^2.0.0",
@@ -62,7 +62,7 @@
     "babel-preset-babili": "^0.1.4",
     "neutrino": "^6.1.1",
     "neutrino-middleware-env": "^6.1.1",
-    "neutrino-preset-mozilla-rpweb": "^4.1.0",
+    "neutrino-preset-mozilla-rpweb": "^4.1.1",
     "shebang-loader": "0.0.1"
   },
   "optionalDependencies": {
