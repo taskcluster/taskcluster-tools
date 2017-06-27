@@ -43,18 +43,16 @@ export default class Diagnostics extends React.Component {
 
   render() {
     return (
-      <div>
+      <Grid fluid={true}>
         <HelmetTitle title="Diagnostics" />
-        <Grid fluid={true}>
-          <h4>Date: {this.state.testDate}</h4>
-          <h4>TestId: {this.state.testId}</h4>
-          <Row>
-            {Object.entries(this.state.jsonLog).map(([key, value]) => <Service key={key} title={key} test={value} />)}
-          </Row>
-          <Button onClick={this.toggleShow} bsStyle="primary" bsSize="small">Show Log</Button>
-          {this.state.showRawLog && <RawLog text={this.state.rawLog} />}
-        </Grid>
-      </div>
+        <h4>Date: {this.state.testDate}</h4>
+        <h4>TestId: {this.state.testId}</h4>
+        <Row>
+          {Object.entries(this.state.jsonLog).map(([key, value]) => <Service key={key} title={key} test={value} />)}
+        </Row>
+        <Button onClick={this.toggleShow} bsStyle="primary" bsSize="small">Show Log</Button>
+        {this.state.showRawLog && <RawLog text={this.state.rawLog} />}
+      </Grid>
     );
   }
 }
