@@ -10,8 +10,8 @@
     "lint": "neutrino lint",
     "debug": "node --inspect ./node_modules/.bin/neutrino start",
     "build": "neutrino build",
-    "deploy": "yarn build && s3-deploy './build/**' --cwd './build/' --region us-west-2 --bucket taskcluster-tools --gzip --cache 0",
-    "test": "yarn build"
+    "test": "yarn build",
+    "install": "yarn build"
   },
   "repository": "taskcluster/taskcluster-tools",
   "dependencies": {
@@ -56,9 +56,7 @@
     "taskcluster-client": "^2.0.0",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
-    "xml2js": "0.4.17"
-  },
-  "devDependencies": {
+    "xml2js": "0.4.17",
     "babel-preset-babili": "^0.1.4",
     "neutrino": "^6.1.1",
     "neutrino-middleware-env": "^6.1.1",
