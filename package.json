@@ -10,7 +10,6 @@
     "lint": "neutrino lint",
     "debug": "node --inspect ./node_modules/.bin/neutrino start",
     "build": "neutrino build",
-    "deploy": "yarn build && s3-deploy './build/**' --cwd './build/' --region us-west-2 --bucket taskcluster-tools --gzip --cache 0",
     "test": "yarn build",
     "install": "yarn build"
   },
