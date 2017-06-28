@@ -38,7 +38,7 @@ export default class SecretEditor extends React.PureComponent {
     // this.showError = this.showError.bind(this);
     // this.dismissError = this.dismissError.bind(this);
     // this.load = this.load.bind(this);
-    // this.onTaskClusterUpdate = this.onTaskClusterUpdate.bind(this);
+    // this.onTaskclusterUpdate = this.onTaskclusterUpdate.bind(this);
   }
 
   componentWillMount() {

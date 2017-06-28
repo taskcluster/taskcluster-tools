@@ -11,14 +11,14 @@ export default [
     title: 'Task Creator',
     link: '/tasks/create',
     icon: 'pencil-square-o',
-    description: `Create and submit tasks to TaskCluster. Created tasks will be saved so you can come back and
+    description: `Create and submit tasks to Taskcluster. Created tasks will be saved so you can come back and
       experiment with variations.`
   },
   {
     title: 'GitHub Quick-Start',
     link: '/quickstart',
     icon: 'github',
-    description: 'Create a `.taskcluster.yml` configuration file and plug TaskCluster into your repository.'
+    description: 'Create a `.taskcluster.yml` configuration file and plug Taskcluster into your repository.'
   },
   {
     title: 'AWS Provisioner',
@@ -78,7 +78,7 @@ export default [
     title: 'Hooks Manager',
     link: '/hooks',
     icon: 'repeat',
-    description: 'Manage hooks: tasks that are created in response to events within TaskCluster.'
+    description: 'Manage hooks: tasks that are created in response to events within Taskcluster.'
   },
   {
     title: 'Secrets Manager',
@@ -90,7 +90,7 @@ export default [
     title: 'Documentation',
     link: 'https://docs.taskcluster.net',
     icon: 'book',
-    description: 'Visit the documentation site with documentation for all TaskCluster APIs and Pulse exchanges.'
+    description: 'Visit the documentation site with documentation for all Taskcluster APIs and Pulse exchanges.'
   },
   {
     title: 'GitHub Repository',
@@ -103,14 +103,14 @@ export default [
     title: 'Bugzilla Product',
     link: 'https://bugzilla.mozilla.org/buglist.cgi?product=Taskcluster&bug_status=__open__',
     icon: 'bug',
-    description: `Visit the TaskCluster Bugzilla product to view open bugs, participate in
-      discussions or report new bugs in TaskCluster.`
+    description: `Visit the Taskcluster Bugzilla product to view open bugs, participate in
+      discussions or report new bugs in Taskcluster.`
   },
   {
     title: 'Status',
     link: '/status',
     icon: 'cogs',
-    description: 'Display the status of Taskcluster services and underlying services TaskCluster depends on.'
+    description: 'Display the status of Taskcluster services and underlying services Taskcluster depends on.'
   },
   {
     title: 'Diagnostics',
