@@ -11,13 +11,13 @@ export default class Dashboard extends React.PureComponent {
         <HelmetTitle title="Status" />
         <Row>
           <ServiceGroup
-            name="TaskCluster Services"
+            name="Taskcluster Services"
             services={taskclusterServices}
-            description="TaskCluster services" />
+            description="Taskcluster services" />
           <ServiceGroup
             name="External Services"
             services={otherServices}
-            description="TaskCluster-dependent external services" />
+            description="Taskcluster-dependent external services" />
         </Row>
       </div>
     );

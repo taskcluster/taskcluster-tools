@@ -52,7 +52,7 @@ export default class Navigation extends React.PureComponent {
           <Navbar.Header>
             <Navbar.Brand>
               <Link to="/">
-                <img src={logoUrl} width="26" height="26" /> TaskCluster Tools
+                <img src={logoUrl} width="26" height="26" /> Taskcluster Tools
               </Link>
             </Navbar.Brand>
           </Navbar.Header>
