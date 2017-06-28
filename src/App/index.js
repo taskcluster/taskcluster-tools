@@ -152,6 +152,16 @@ export default class App extends React.Component {
   render() {
     const { credentials, credentialsExpiringSoon } = this.state;
 
+    const PreviousAPI = (props) => {
+      if (props.path === '/task-inspector') {
+        return <Redirect to={`/tasks/${props.location.hash.slice(1)}`} />
+      } else if (props.path === '/one-click-loaner') {
+        return props.location.hash ?
+          <Redirect to={`/tasks/${props.location.hash.slice(1)}/create/`} /> :
+          <Redirect to='/groups' />
+      }
+    };
+
     return (
       <BrowserRouter>
         <div>
@@ -168,12 +178,13 @@ export default class App extends React.Component {
 
           <Grid fluid id="container">
             <Switch>
+              <PropsRoute path="/task-inspector" component={PreviousAPI} />
               <Redirect from="/interactive" to="/shell" />
               <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
               <PropsRoute path="/" exact={true} component={Home} credentials={credentials} />
               <PropsRoute path="/tasks/create" component={TaskCreator} credentials={credentials} />
               <PropsRoute path="/tasks/:taskId/connect" component={InteractiveConnect} credentials={credentials} />
-              <PropsRoute path="/tasks/:taskId" component={TaskRedirect} credentials={credentials} />
+              <PropsRoute path="/tasks/:taskId?" component={TaskRedirect} credentials={credentials} />
               <PropsRoute
                 path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?"
                 component={UnifiedInspector}
