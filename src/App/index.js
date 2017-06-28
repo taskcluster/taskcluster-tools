@@ -8,6 +8,7 @@ import Login from '../views/Login';
 import { getLoginUrl, loadable } from '../utils';
 import './styles.css';
 import iconUrl from '../taskcluster.png';
+import LegacyAPI from './LegacyAPI';
 
 const expirationTimeout = 5 * 60 * 1000; // time before expiration at which we warn
 const Home = loadable(() => import(/* webpackChunkName: 'Home' */ '../views/Home'));
@@ -152,16 +153,6 @@ export default class App extends React.Component {
   render() {
     const { credentials, credentialsExpiringSoon } = this.state;
 
-    const PreviousAPI = (props) => {
-      if (props.path === '/task-inspector') {
-        return <Redirect to={`/tasks/${props.location.hash.slice(1)}`} />
-      } else if (props.path === '/one-click-loaner') {
-        return props.location.hash ?
-          <Redirect to={`/tasks/${props.location.hash.slice(1)}/create/`} /> :
-          <Redirect to='/groups' />
-      }
-    };
-
     return (
       <BrowserRouter>
         <div>
@@ -178,7 +169,8 @@ export default class App extends React.Component {
 
           <Grid fluid id="container">
             <Switch>
-              <PropsRoute path="/task-inspector" component={PreviousAPI} />
+              <PropsRoute path="/task-inspector" component={LegacyAPI} />
+              <PropsRoute path="/one-click-loaner" component={LegacyAPI} />
               <Redirect from="/interactive" to="/shell" />
               <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
               <PropsRoute path="/" exact={true} component={Home} credentials={credentials} />
