@@ -171,6 +171,8 @@ export default class App extends React.Component {
           <Grid fluid id="container">
             <Switch>
               <PropsRoute path="/task-inspector" component={LegacyRedirect} />
+              <PropsRoute path="/task-group-inspector" component={LegacyRedirect} />
+              <PropsRoute path="/push-inspector" component={LegacyRedirect} />
               <PropsRoute path="/one-click-loaner" component={LegacyRedirect} />
               <Redirect from="/interactive" to="/shell" />
               <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
