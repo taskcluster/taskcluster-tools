@@ -166,7 +166,7 @@ export default class App extends React.Component {
             credentialsExpiringSoon={credentialsExpiringSoon}
             signInManually={this.signInManually}
             loginUrl={getLoginUrl()}
-            onSignOut={() => this.signOut()} />
+            onSignOut={this.signOut} />
 
           <Grid fluid id="container">
             <Switch>
@@ -178,15 +178,9 @@ export default class App extends React.Component {
               <PropsRoute path="/tasks/create" component={TaskCreator} credentials={credentials} />
               <PropsRoute path="/tasks/:taskId/connect" component={InteractiveConnect} credentials={credentials} />
               <PropsRoute path="/tasks/:taskId?/:action?" component={TaskRedirect} credentials={credentials} />
-              <PropsRoute
-                path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?"
-                component={UnifiedInspector}
-                credentials={credentials} />
+              <PropsRoute path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?" component={UnifiedInspector} credentials={credentials} />
               <PropsRoute path="/quickstart" component={QuickStart} credentials={credentials} />
-              <PropsRoute
-                path="/aws-provisioner/:workerType?/:currentTab?"
-                component={AwsProvisioner}
-                credentials={credentials} />
+              <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} />
               <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} credentials={credentials} />
               <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} credentials={credentials} />
               <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} credentials={credentials} />
