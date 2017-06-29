@@ -129,8 +129,7 @@ module.exports = {
   ],
   env: {
     NODE_ENV: {
-      development: ({ config }) => config.devtool('eval'),
-      production: ({ config }) => config.plugin('minify').set('args', [{ mangle: false }])
+      development: ({ config }) => config.devtool('eval')
     }
   }
 };
