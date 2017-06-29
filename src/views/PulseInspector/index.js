@@ -88,9 +88,9 @@ export default class PulseInspector extends React.PureComponent {
     }
   }
 
-  handleListenerMessage = ({ detail }) => {
+  handleListenerMessage = (message) => {
     const messages = [
-      { ...detail, _idForInspector: nice() },
+      { ...message, _idForInspector: nice() },
       ...this.state.messages
     ];
     const params = btoa(JSON.stringify(messages.map(pick(['exchange', 'routingKey', 'payload'])), null, 2));

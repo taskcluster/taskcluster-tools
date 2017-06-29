@@ -28,9 +28,9 @@ export default class HookBrowser extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.group !== this.props.group) {
-      this.loadHooksList(nextProps);
-    }
+    // if (nextProps.group !== this.props.group) {
+    this.loadHooksList(nextProps);
+    // }
   }
 
   async loadHooksList({ hooks, group }) {

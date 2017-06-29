@@ -30,7 +30,7 @@ export default class MessageRow extends React.PureComponent {
 
   render() {
     const { message } = this.props;
-    const hasCustomRoutes = !!message.routes.length;
+    const hasCustomRoutes = !!(message.routes && message.routes.length);
 
     if (!this.props.expanded) {
       return (

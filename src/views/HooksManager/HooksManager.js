@@ -36,20 +36,22 @@ export default class HooksManager extends React.PureComponent {
     }
   }
 
-  loadGroups = async () => {
-    try {
-      const { groups } = await this.props.hooks.listHookGroups();
+  loadGroups = () => {
+    this.setState({ groups: [] }, async () => {
+      try {
+        const { groups } = await this.props.hooks.listHookGroups();
 
-      this.setState({
-        groups,
-        error: null
-      });
-    } catch (err) {
-      this.setState({
-        groups: null,
-        error: err
-      });
-    }
+        this.setState({
+          groups,
+          error: null
+        });
+      } catch (err) {
+        this.setState({
+          groups: null,
+          error: err
+        });
+      }
+    });
   };
 
   selectHook = (hookGroupId, hookId) => {
