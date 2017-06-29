@@ -36,6 +36,11 @@
   url('./montserrat-v10-latin-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
+:global(html, body) {
+  height: 100vh;
+  width: 100vw;
+}
+
 :global(body) {
   font-family: 'Lato', sans-serif;
   font-weight: 400;

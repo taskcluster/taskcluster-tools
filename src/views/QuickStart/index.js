@@ -113,14 +113,12 @@ export default class YamlCreator extends React.Component {
   }
 
 
-  saveTextInput(event) {
-    this.setState({
-      [event.target.name]: event.target.value,
-      resetActive: true
-    });
-  }
+  saveTextInput = e => this.setState({
+    [e.target.name]: e.target.value,
+    resetActive: true
+  });
 
-  handleEventsSelection(event) {
+  handleEventsSelection = (event) => {
     const events = new Set(this.state.events);
 
     events.has(event.target.name) ?
@@ -132,9 +130,9 @@ export default class YamlCreator extends React.Component {
       [event.target.id]: !this.state[event.target.id],
       resetActive: true
     });
-  }
+  };
 
-  handleImageSelection(event) {
+  handleImageSelection = (event) => {
     const currentCmd = cmdDirectory(event.target.value, this.state.owner, this.state.repo);
     this.setState({
       image: event.target.value,
@@ -142,33 +140,29 @@ export default class YamlCreator extends React.Component {
       resetActive: true,
       commands: this.state.displayCmds ? currentCmd : []
     });
-  }
+  };
 
-  handleCommandsSelection(event) {
-    this.setState({
-      displayCmds: event.target.value === 'standard',
-      currentCmd: this.state.commands,
-      commands: event.target.value === 'standard' ? this.state.commands : []
-    });
-  }
+  handleCommandsSelection = e => this.setState({
+    displayCmds: e.target.value === 'standard',
+    currentCmd: this.state.commands,
+    commands: e.target.value === 'standard' ? this.state.commands : []
+  });
 
-  resetAll() {
-    this.setState({
-      resetActive: false,
-      rootName: '',
-      rootDescription: '',
-      tasks: [],
-      events: new Set(),
-      taskName: '',
-      taskDescription: '',
-      pullRequestOpened: false,
-      pullRequestClosed: false,
-      pullRequestSynchronized: false,
-      pullRequestReopened: false,
-      pushMade: false,
-      releaseMade: false
-    });
-  }
+  resetAll = () => this.setState({
+    resetActive: false,
+    rootName: '',
+    rootDescription: '',
+    tasks: [],
+    events: new Set(),
+    taskName: '',
+    taskDescription: '',
+    pullRequestOpened: false,
+    pullRequestClosed: false,
+    pullRequestSynchronized: false,
+    pullRequestReopened: false,
+    pushMade: false,
+    releaseMade: false
+  });
 
   renderEditor() {
     const newYaml = safeDump({
@@ -209,7 +203,9 @@ export default class YamlCreator extends React.Component {
     );
   }
 
-  installedStatus() {
+  installedStatus = (e) => {
+    e.preventDefault();
+
     const { owner, repo } = this.state;
 
     if (!owner || !repo) {
@@ -217,11 +213,11 @@ export default class YamlCreator extends React.Component {
     }
 
     this.setState({ installedState: 'loading' }, async () => {
-      const { installed } = await githubClient.isInstalledFor(owner, repo);
+      const { installed } = await githubClient.repository(owner, repo);
 
       this.setState({ installedState: installed ? 'success' : 'error' });
     });
-  }
+  };
 
   renderInfoText() {
     const { installedState } = this.state;
@@ -263,24 +259,24 @@ export default class YamlCreator extends React.Component {
             </p>
             <hr />
             <h5>For organization members: Check if your repository already has Taskcluster</h5>
-            <Form componentClass="fieldset" inline>
+            <Form onSubmit={this.installedStatus} inline>
               <FormGroup validationState={this.state.installedState === 'loading' ? null : this.state.installedState}>
                 <FormControl
                   type="text"
                   name="owner"
                   placeholder="Enter organization name"
-                  onChange={e => this.saveTextInput(e)} />
+                  onChange={this.saveTextInput} />
                 <FormControl.Feedback />
                 {' '}/{' '}
                 <FormControl
                   type="text"
                   name="repo"
                   placeholder="Enter repository name"
-                  onChange={e => this.saveTextInput(e)} />
+                  onChange={this.saveTextInput} />
                 <FormControl.Feedback />
               </FormGroup>
               {' '}
-              <Button bsStyle="info" onClick={() => this.installedStatus()}>
+              <Button type="submit" bsStyle="info">
                 <Glyphicon glyph="question-sign" /> Check
               </Button>
               {this.renderInfoText()}
@@ -347,7 +343,7 @@ export default class YamlCreator extends React.Component {
                 placeholder="Name of the task"
                 name="taskName"
                 value={this.state.taskName}
-                onChange={e => this.saveTextInput(e)} />
+                onChange={this.saveTextInput} />
             </FormGroup>
             <FormGroup>
               <ControlLabel>Description:</ControlLabel>
@@ -356,7 +352,7 @@ export default class YamlCreator extends React.Component {
                 placeholder="Description of the task"
                 name="taskDescription"
                 value={this.state.taskDescription}
-                onChange={e => this.saveTextInput(e)} />
+                onChange={this.saveTextInput} />
             </FormGroup>
 
             <FormGroup id="checkboxGroup">
@@ -366,7 +362,7 @@ export default class YamlCreator extends React.Component {
                 id="pullRequestOpened"
                 className="data_checkboxes"
                 checked={this.state.pullRequestOpened}
-                onChange={e => this.handleEventsSelection(e)}>
+                onChange={this.handleEventsSelection}>
                 Pull request opened
               </Checkbox>
               <Checkbox
@@ -374,7 +370,7 @@ export default class YamlCreator extends React.Component {
                 id="pullRequestClosed"
                 className="data_checkboxes"
                 checked={this.state.pullRequestClosed}
-                onChange={e => this.handleEventsSelection(e)}>
+                onChange={this.handleEventsSelection}>
                 Pull request merged or closed
               </Checkbox>
               <Checkbox
@@ -382,7 +378,7 @@ export default class YamlCreator extends React.Component {
                 id="pullRequestSynchronized"
                 className="data_checkboxes"
                 checked={this.state.pullRequestSynchronized}
-                onChange={e => this.handleEventsSelection(e)}>
+                onChange={this.handleEventsSelection}>
                 New commit made in an opened pull request
               </Checkbox>
               <Checkbox
@@ -390,7 +386,7 @@ export default class YamlCreator extends React.Component {
                 id="pullRequestReopened"
                 className="data_checkboxes"
                 checked={this.state.pullRequestReopened}
-                onChange={e => this.handleEventsSelection(e)}>
+                onChange={this.handleEventsSelection}>
                 Pull request re-opened
               </Checkbox>
               <Checkbox
@@ -398,7 +394,7 @@ export default class YamlCreator extends React.Component {
                 id="pushMade"
                 className="data_checkboxes"
                 checked={this.state.pushMade}
-                onChange={e => this.handleEventsSelection(e)}>
+                onChange={this.handleEventsSelection}>
                 Push
               </Checkbox>
               <Checkbox
@@ -406,7 +402,7 @@ export default class YamlCreator extends React.Component {
                 id="releaseMade"
                 className="data_checkboxes"
                 checked={this.state.releaseMade}
-                onChange={e => this.handleEventsSelection(e)}>
+                onChange={this.handleEventsSelection}>
                 Release or tag created
               </Checkbox>
             </FormGroup>
@@ -419,7 +415,7 @@ export default class YamlCreator extends React.Component {
                 <Glyphicon glyph="info-sign" />&nbsp;
                 This will select a corresponding docker image.
               </p>
-              <FormControl componentClass="select" name="image" onChange={e => this.handleImageSelection(e)}>
+              <FormControl componentClass="select" name="image" onChange={this.handleImageSelection}>
                 <option value="node">Node.js</option>
                 <option value="python">Python</option>
                 <option value="jimmycuadra/rust">Rust</option>
@@ -429,7 +425,7 @@ export default class YamlCreator extends React.Component {
 
             <FormGroup>
               <ControlLabel>Commands: </ControlLabel>
-              <FormControl componentClass="select" placeholder="Pick one..." onChange={e => this.handleCommandsSelection(e)}>
+              <FormControl componentClass="select" placeholder="Pick one..." onChange={this.handleCommandsSelection}>
                 <option value="standard">Clone repo and run my tests</option>
                 <option value="custom">I will define them myself</option>
               </FormControl>
@@ -437,7 +433,7 @@ export default class YamlCreator extends React.Component {
           </Col>
           <Col md={7}>
             <ButtonToolbar>
-              <Button bsStyle="danger" disabled={!this.state.resetActive} onClick={() => this.resetAll()}>
+              <Button bsStyle="danger" disabled={!this.state.resetActive} onClick={this.resetAll}>
                 <Glyphicon glyph="repeat" /> Reset form and file
               </Button>
             </ButtonToolbar>

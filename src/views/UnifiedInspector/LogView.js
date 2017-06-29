@@ -77,7 +77,19 @@ export default class LogView extends React.PureComponent {
     });
   };
 
-  registerChild = ref => this.lazylog = findDOMNode(ref).children[0];
+  registerChild = (ref) => {
+    if (!ref) {
+      return;
+    }
+
+    const node = findDOMNode(ref);
+
+    if (!node) {
+      return;
+    }
+
+    this.lazylog = node.children[0];
+  };
 
   render() {
     const { queue, taskId, runId, status, log, highlight, onHighlight } = this.props;
@@ -115,7 +127,7 @@ export default class LogView extends React.PureComponent {
             <LazyViewer
               ref={this.registerChild}
               url={url}
-              height={isFullscreen ? document.documentElement.clientHeight : 850}
+              height={isFullscreen ? document.documentElement.clientHeight : 800}
               follow={follow}
               scrollToLine={!follow && highlight ? scrollToLine : null}
               scrollToAlignment="start"

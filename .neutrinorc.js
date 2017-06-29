@@ -39,18 +39,18 @@ module.exports = {
           historyApiFallback: { disableDotRule: true }
         },
         html: {
-          title: 'TaskCluster Tools',
+          title: 'Taskcluster Tools',
           mobile: true,
           meta: [
             {
               name: 'description',
-              content: `A collection of tools for TaskCluster components and elements in the TaskCluster ecosystem. Here
-                you'll find tools to manage TaskCluster as well as run, debug, inspect, and view tasks, task groups, and
-                other TaskCluster related entities.`
+              content: `A collection of tools for Taskcluster components and elements in the Taskcluster ecosystem. Here
+                you'll find tools to manage Taskcluster as well as run, debug, inspect, and view tasks, task groups, and
+                other Taskcluster related entities.`
             },
             {
               name: 'author',
-              content: 'Mozilla TaskCluster Team'
+              content: 'Mozilla Taskcluster Team'
             }
           ]
         }
