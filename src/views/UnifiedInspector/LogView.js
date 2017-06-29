@@ -1,9 +1,11 @@
 import React from 'react';
+import { findDOMNode } from 'react-dom';
 import { Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { arrayOf, oneOfType, string, object, number, func } from 'prop-types';
 import { LazyLog, LazyStream, ScrollFollow } from 'react-lazylog';
 import { isNil } from 'ramda';
+import fscreen from 'fscreen';
 
 const buttonStyle = {
   margin: '10px 0 10px 10px'
@@ -27,8 +29,18 @@ export default class LogView extends React.PureComponent {
 
     this.state = {
       streaming,
-      follow: streaming
+      follow: streaming,
+      isFullscreen: false,
+      fullscreenEnabled: fscreen.fullscreenEnabled
     };
+  }
+
+  componentWillMount() {
+    fscreen.addEventListener('fullscreenchange', this.handleFullscreenChange, false);
+  }
+
+  componentWillUnmount() {
+    fscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -37,7 +49,8 @@ export default class LogView extends React.PureComponent {
 
       this.setState({
         streaming,
-        follow: streaming
+        follow: streaming,
+        isFullscreen: false
       });
     }
   }
@@ -56,14 +69,25 @@ export default class LogView extends React.PureComponent {
     }
   };
 
+  handleFullscreen = () => this.lazylog && fscreen.requestFullscreen(this.lazylog);
+
+  handleFullscreenChange = () => {
+    this.setState({
+      isFullscreen: fscreen.fullscreenElement !== null
+    });
+  };
+
+  registerChild = ref => this.lazylog = findDOMNode(ref).children[0];
+
   render() {
-    const { queue, taskId, runId, status, log } = this.props;
-    const { streaming, follow } = this.state;
+    const { queue, taskId, runId, status, log, highlight, onHighlight } = this.props;
+    const { streaming, follow, fullscreenEnabled, isFullscreen } = this.state;
 
     if (!queue || !taskId || isNil(runId) || !status || !log) {
       return null;
     }
 
+    const scrollToLine = Array.isArray(highlight) ? highlight[0] : highlight;
     const url = queue.buildUrl(queue.getArtifact, taskId, runId, log.name);
     const LazyViewer = streaming ? LazyStream : LazyLog;
 
@@ -78,16 +102,25 @@ export default class LogView extends React.PureComponent {
           <Button href={url} target="_blank" rel="noopener noreferrer" bsSize="sm" style={buttonStyle}>
             <Icon name="external-link-square" />&nbsp;&nbsp;View raw log
           </Button>
+
+          {fullscreenEnabled && (
+            <Button onClick={this.handleFullscreen} bsSize="sm" style={buttonStyle}>
+              <Icon name="arrows-alt" />&nbsp;&nbsp;View fullscreen
+            </Button>
+          )}
         </div>
 
         <ScrollFollow startFollowing={follow}>
           {({ follow }) => (
             <LazyViewer
+              ref={this.registerChild}
               url={url}
-              height={600}
+              height={isFullscreen ? document.documentElement.clientHeight : 850}
               follow={follow}
-              highlight={this.props.highlight}
-              onHighlight={this.props.onHighlight}
+              scrollToLine={!follow && highlight ? scrollToLine : null}
+              scrollToAlignment="start"
+              highlight={highlight}
+              onHighlight={onHighlight}
               onScroll={this.handleScroll} />
           )}
         </ScrollFollow>

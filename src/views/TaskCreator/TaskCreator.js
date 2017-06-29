@@ -157,7 +157,7 @@ export default class TaskCreator extends React.PureComponent {
         <HelmetTitle title="Task Creator" />
         <h4>Task Creator</h4>
         <p>
-          Write and submit a task to TaskCluster. For details on what you can write, refer to the&nbsp;
+          Write and submit a task to Taskcluster. For details on what you can write, refer to the&nbsp;
           <a href="https://docs.taskcluster.net" target="_blank" rel="noopener noreferrer">documentation</a>.
           When you submit a task here, you will be taken to the Task Inspector. Your task will be saved so you can
           come back and experiment with variations.

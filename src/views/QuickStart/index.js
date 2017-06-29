@@ -257,12 +257,12 @@ export default class YamlCreator extends React.Component {
             <p>
               This tool lets you easily generate a simple generic <code>.taskcluster.yml</code> file,
               which should live in the root of your repository. It defines
-              tasks that you want TaskCluster to run for you. The tasks will run when certain
+              tasks that you want Taskcluster to run for you. The tasks will run when certain
               GitHub events happen. You will choose the events you are interested in while
               creating the file.
             </p>
             <hr />
-            <h5>For organization members: Check if your repository already has TaskCluster</h5>
+            <h5>For organization members: Check if your repository already has Taskcluster</h5>
             <Form componentClass="fieldset" inline>
               <FormGroup validationState={this.state.installedState === 'loading' ? null : this.state.installedState}>
                 <FormControl
@@ -286,7 +286,7 @@ export default class YamlCreator extends React.Component {
               {this.renderInfoText()}
             </Form>
             <hr />
-            <h5>For independent developers and organization owners: How to set up your repository with TaskCluster</h5>
+            <h5>For independent developers and organization owners: How to set up your repository with Taskcluster</h5>
             <ul>
               <li>
                 Fill out the form below. All
@@ -299,7 +299,7 @@ export default class YamlCreator extends React.Component {
               <li>
                 Make sure to install
                 the <a href="https://github.com/integration/taskcluster" target="_blank" rel="noopener noreferrer">
-                TaskCluster-GitHub integration</a>.
+                Taskcluster-GitHub integration</a>.
               </li>
             </ul>
             <p>

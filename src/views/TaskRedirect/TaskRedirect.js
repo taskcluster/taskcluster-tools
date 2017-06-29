@@ -9,12 +9,21 @@ export default class TaskRedirect extends React.PureComponent {
     super(props);
     this.state = {
       taskGroupId: null,
+      task: null,
       error: null
     };
   }
 
   async componentWillMount() {
+    const { taskId, queue } = this.props;
+
     try {
+      if (this.props.action === 'create') {
+        return this.setState({
+          task: await queue.task(taskId)
+        });
+      }
+
       const { status } = await this.props.queue.status(this.props.taskId);
 
       this.setState({ taskGroupId: status.taskGroupId });
@@ -24,14 +33,22 @@ export default class TaskRedirect extends React.PureComponent {
   }
 
   renderTaskRedirect() {
-    const { taskGroupId, error } = this.state;
+    const { taskGroupId, task, error } = this.state;
 
     if (error) {
       return <Error error={error} />;
     }
 
-    if (!taskGroupId) {
+    if (!taskGroupId && !task) {
       return <Spinner />;
+    }
+
+    if (task) {
+      return (<Redirect
+        to={{
+          pathname: '/tasks/create',
+          state: { task }
+        }} />);
     }
 
     return <Redirect to={`/groups/${taskGroupId}/tasks/${this.props.taskId}`} />;

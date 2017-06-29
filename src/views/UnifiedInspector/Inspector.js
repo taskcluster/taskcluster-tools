@@ -74,7 +74,7 @@ export default class Inspector extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     const { taskGroupId, taskId, runId } = nextProps;
 
-    if (taskGroupId && taskGroupId !== this.props.taskGroupId) {
+    if (taskGroupId !== this.props.taskGroupId) {
       this.setState({
         selectedTaskId: null,
         status: null,
@@ -83,10 +83,14 @@ export default class Inspector extends React.PureComponent {
         selectedRun: null,
         tasks: null
       });
-      this.loadTasks(nextProps);
     }
 
-    if (taskId && (taskId !== this.state.selectedTaskId || (this.props.taskId && taskId !== this.props.taskId))) {
+    if (taskGroupId) {
+      this.loadTasks(nextProps);
+    } else if (
+      taskId &&
+      (taskId !== this.state.selectedTaskId || (this.props.taskId && taskId !== this.props.taskId))
+    ) {
       this.loadTask(nextProps);
     } else if (runId && runId !== this.props.runId) {
       this.setState({ selectedRun: runId });
@@ -236,38 +240,36 @@ export default class Inspector extends React.PureComponent {
     this.setState({ artifacts });
   };
 
-  handleSearch = ({ taskGroupId, taskId }) => {
-    const { history } = this.props;
+  navigate = (taskGroupId, taskId) => {
+    if (!taskGroupId && taskId) {
+      history.push(`/tasks/${taskId}`);
+    } else if (taskGroupId && !taskId) {
+      history.push(`/groups/${taskGroupId}`);
+    } else if (!taskGroupId && !taskId) {
+      history.push('/groups');
+    } else {
+      history.push(`/groups/${taskGroupId}/tasks/${taskId}`);
+    }
+  };
 
+  handleSearch = ({ taskGroupId, taskId }) => {
     if (taskId === this.props.taskId && taskGroupId === this.props.taskGroupId) {
       // Return if nothing has changed
       return;
     }
 
     if (taskId !== this.props.taskId && taskGroupId !== this.props.taskGroupId) {
-      // If both have changed, load up the new task group and task
-      history.push(`/groups/${taskGroupId}/tasks/${taskId}`);
+      this.navigate(taskGroupId, taskId);
     } else if (taskGroupId !== this.props.taskGroupId) {
-      // If only the task group ID changed, load up new task group
-      history.push(`/groups/${taskGroupId}`);
+      this.navigate(taskGroupId);
     } else {
-      // Only the task ID has changed
       const { tasks } = this.state;
+      const task = tasks && tasks.find(task => task.status.taskId === taskId);
 
-      if (tasks) {
-        // If we have tasks...
-        const task = tasks.find(task => task.status.taskId === taskId);
-
-        if (task) {
-          // And if the requested task is part of the current group, switch to the loaded task
-          history.replace(`/tasks/${this.props.taskGroupId}/tasks/${taskId}`);
-        } else {
-          // Otherwise redirect to /tasks, which will lookup the right task group, and come back here
-          history.push(`/tasks/${taskId}`);
-        }
+      if (task) {
+        this.navigate(this.props.taskGroupId, taskId);
       } else {
-        // If there aren't any tasks, redirect to /tasks which will lookup the right task group, and come back here
-        history.push(`/tasks/${taskId}`);
+        this.navigate(null, taskId);
       }
     }
   };
@@ -334,7 +336,7 @@ export default class Inspector extends React.PureComponent {
     state: { task }
   });
 
-  handleRetrigger = taskId => this.props.history.replace(`/groups/${this.props.taskGroupId}/tasks/${taskId}`);
+  handleRetrigger = taskId => this.navigate(this.props.taskGroupId, taskId);
 
   handleCreateInteractive = async taskId => this.props.history.push(`/tasks/${taskId}/connect`);
 
@@ -359,7 +361,7 @@ export default class Inspector extends React.PureComponent {
       return;
     }
 
-    return new Notification('TaskCluster', {
+    return new Notification('Taskcluster', {
       icon: iconUrl,
       body: message
     });

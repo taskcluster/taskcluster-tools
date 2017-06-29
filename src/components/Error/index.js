@@ -40,6 +40,7 @@ export default class Error extends React.PureComponent {
 
             const index = error.message.indexOf('----');
 
+
             return index === -1 ? error.message : error.message.slice(0, index);
           })()}
         </Markdown>
