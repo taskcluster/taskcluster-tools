@@ -4,12 +4,14 @@ import IndexBrowser from '../../components/IndexBrowser';
 import HelmetTitle from '../../components/HelmetTitle';
 import EntryView from './EntryView';
 
-const View = ({ match, credentials, history }) => (
-  <Clients credentials={credentials} Index Queue>
-    {({ index, queue }) => {
-      const { namespace = '', namespaceTaskId } = match.params;
+const View = ({ match, credentials, history, location }) => {
+  const [ns, nsId] = location.hash.slice(1).split('/');
+  const namespace = match.params.namespace || ns || '';
+  const namespaceTaskId = match.params.namespaceTaskId || nsId;
 
-      return (
+  return (
+    <Clients credentials={credentials} Index Queue>
+      {({ index, queue }) => (
         <div>
           <HelmetTitle title="Indexed Artifact Browser" />
           <IndexBrowser
@@ -21,9 +23,9 @@ const View = ({ match, credentials, history }) => (
             <EntryView index={index} queue={queue} namespace={namespace} namespaceTaskId={namespaceTaskId} />
           </IndexBrowser>
         </div>
-      );
-    }}
-  </Clients>
-);
+      )}
+    </Clients>
+  );
+};
 
 export default View;

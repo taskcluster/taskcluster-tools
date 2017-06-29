@@ -1,25 +1,48 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
+import NotFound from '../components/NotFound';
 
 const LegacyRedirect = (props) => {
-  if (props.path === '/task-group-inspector' || props.path === '/push-inspector') {
-    const parts = props.location.hash.split('/');
+  const hash = props.location.hash.slice(1).split('/');
 
-    if (!parts.length) {
-      return <Redirect to={'/groups'} />;
+  switch (props.path) {
+    case '/task-group-inspector':
+    case '/task-graph-inspector':
+    case '/push-inspector': {
+      const [groupId, taskId] = hash;
+
+      if (!groupId && !taskId) {
+        return <Redirect to={'/groups'} />;
+      }
+
+      if (!taskId) {
+        return <Redirect to={`/groups/${groupId}`} />;
+      }
+
+      return <Redirect to={`/groups/${groupId}/tasks/${taskId}`} />;
     }
 
-    if (parts.length === 1) {
-      return <Redirect to={`/groups/${parts[0]}`} />;
+    case '/task-inspector': {
+      return <Redirect to={`/tasks/${hash}`} />;
     }
 
-    return <Redirect to={`/groups/${parts[0]}/tasks/${parts[1]}`} />;
-  } else if (props.path === '/task-inspector') {
-    return <Redirect to={`/tasks/${props.location.hash.slice(1)}`} />;
-  } else if (props.path === '/one-click-loaner') {
-    return props.location.hash ?
-      <Redirect to={`/tasks/${props.location.hash.slice(1)}/create/`} /> :
-      <Redirect to="/groups" />;
+    case '/task-creator': {
+      return <Redirect to={'/tasks/create'} />;
+    }
+
+    case '/one-click-loaner': {
+      return props.location.hash ?
+        <Redirect to={`/tasks/${hash}/create`} /> :
+        <Redirect to="/groups" />;
+    }
+
+    case '/interactive': {
+      return <Redirect to={{ pathname: '/shell', search: props.location.search }} />;
+    }
+
+    default: {
+      return <NotFound />;
+    }
   }
 };
 
