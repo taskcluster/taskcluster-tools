@@ -10,8 +10,7 @@
     "lint": "neutrino lint",
     "debug": "node --inspect ./node_modules/.bin/neutrino start",
     "build": "neutrino build",
-    "test": "yarn build",
-    "install": "yarn build"
+    "test": "yarn build"
   },
   "repository": "taskcluster/taskcluster-tools",
   "dependencies": {
