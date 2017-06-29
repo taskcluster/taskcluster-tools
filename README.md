@@ -1,14 +1,14 @@
-# TaskCluster Tools
+# Taskcluster Tools
 
-This repository contains a collection of useful tools for use with TaskCluster.
-Generally, we strive to not add UI to TaskCluster components, but instead offer
+This repository contains a collection of useful tools for use with Taskcluster.
+Generally, we strive to not add UI to Taskcluster components, but instead offer
 well documented APIs that can be easily consumed using a client library for
-TaskCluster. See [TaskCluster documentation site](https://docs.taskcluster.net)
+Taskcluster. See [Taskcluster documentation site](https://docs.taskcluster.net)
 for details.
 
-## Developing TaskCluster Tools
+## Developing Taskcluster Tools
 
-### Prerequisites for building TaskCluster Tools
+### Prerequisites for building Taskcluster Tools
 
 - Node version v6+
 - [Yarn](https://www.npmjs.com/package/yarn)
@@ -36,7 +36,7 @@ and the `src/tools-preset` to:
 
 - Compile ES2015+ syntax to ES5-compatible JS
 - Compile React JSX to de-sugared JS
-- Show ESLint errors based on TaskCluster rules
+- Show ESLint errors based on Taskcluster rules
 - Build application directories into page-specific bundles
 - LESS files to CSS
 

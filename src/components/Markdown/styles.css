@@ -1,0 +1,3 @@
+.container > :global(p:last-of-type) {
+  margin: 0;
+}
