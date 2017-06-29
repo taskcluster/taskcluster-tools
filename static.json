@@ -14,6 +14,9 @@
       "Referrer-Policy": "origin",
       "Content-Security-Policy": "frame-ancestors 'none'"
     },
+    "/index.html": {
+      "Cache-Control": "no-store, no-cache, must-revalidate"
+    },
     "/": {
       "Cache-Control": "no-store, no-cache, must-revalidate"
     }
