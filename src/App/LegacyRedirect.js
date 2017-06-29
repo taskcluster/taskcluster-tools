@@ -1,7 +1,7 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 
-const LegacyAPI = (props) => {
+const LegacyRedirect = (props) => {
   if (props.path === '/task-inspector') {
     return <Redirect to={`/tasks/${props.location.hash.slice(1)}`} />;
   } else if (props.path === '/one-click-loaner') {
@@ -11,4 +11,4 @@ const LegacyAPI = (props) => {
   }
 };
 
-export default LegacyAPI;
+export default LegacyRedirect;

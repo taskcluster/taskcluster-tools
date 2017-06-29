@@ -9,7 +9,7 @@ import NotFound from '../components/NotFound';
 import { getLoginUrl, loadable } from '../utils';
 import './styles.css';
 import iconUrl from '../taskcluster.png';
-import LegacyAPI from './LegacyAPI';
+import LegacyRedirect from './LegacyRedirect';
 
 const expirationTimeout = 5 * 60 * 1000; // time before expiration at which we warn
 const Home = loadable(() => import(/* webpackChunkName: 'Home' */ '../views/Home'));
@@ -170,8 +170,8 @@ export default class App extends React.Component {
 
           <Grid fluid id="container">
             <Switch>
-              <PropsRoute path="/task-inspector" component={LegacyAPI} />
-              <PropsRoute path="/one-click-loaner" component={LegacyAPI} />
+              <PropsRoute path="/task-inspector" component={LegacyRedirect} />
+              <PropsRoute path="/one-click-loaner" component={LegacyRedirect} />
               <Redirect from="/interactive" to="/shell" />
               <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
               <PropsRoute path="/" exact={true} component={Home} credentials={credentials} />
