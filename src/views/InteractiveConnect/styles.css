@@ -1,0 +1,22 @@
+.connectLinkButton {
+  display: inline-block;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.35s ease;
+}
+
+.connectLinkButton:hover {
+  color: #006071;
+}
+
+.connectLinkButton :global .fa-stack {
+  display: block;
+}
+
+.connectLinkButton :global .fa-stack .fa-stack-1x {
+  margin-left: 3px;
+}
+
+.connectLinkText {
+  font-size: 20px
+}

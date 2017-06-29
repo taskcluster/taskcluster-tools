@@ -1,0 +1,41 @@
+.navigation {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.navigation :global nav.navbar-inverse {
+  background: #006071 none;
+  border-color: #55e5ff;
+}
+
+.navigation :global nav.navbar-inverse .navbar-brand {
+  color: #fff;
+  font-size: 24px;
+  text-transform: uppercase;
+  text-shadow: none;
+  font-weight: 700;
+}
+
+.navigation :global nav.navbar-inverse .navbar-text,
+.navigation :global nav.navbar-inverse .navbar-text {
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.navigation :global nav.navbar-inverse .navbar-nav > li:hover {
+  background-color: #01778c;
+}
+
+.navigation :global nav.navbar-inverse .navbar-brand,
+.navigation :global nav.navbar-inverse .navbar-nav > li > a {
+  color: #fff;
+  text-shadow: none;
+}
+
+.navigation :global nav.navbar-inverse .navbar-nav > li.active > a {
+  background-color: #0091ab;
+}
+
+.navigation :global nav.navbar-inverse .navbar-brand > img {
+  display: inline;
+  margin-top: -3px;
+}

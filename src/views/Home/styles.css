@@ -1,0 +1,56 @@
+.header {
+  margin: 40px 0;
+  text-align: center;
+}
+
+.header :global(img) {
+  position: absolute;
+  opacity: 0.18;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.header :global(h2) {
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+  font-size: 38px;
+  z-index: 1;
+}
+
+.logo {
+  color: #00d8ff;
+}
+
+.hero {
+  background-color: #002c33;
+  color: white;
+  position: relative;
+  /*accounts for navbar's margin-bottom*/
+  top: -22px;
+  overflow: hidden;
+}
+
+.entry {
+  padding: 8px 15px;
+  text-decoration: none !important;
+  color: #424242 !important;
+  min-height: 155px;
+}
+
+.entry :global(p) {
+  font-size: 14px;
+}
+
+.entry :global(h4) {
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  font-size: 17px;
+}
+
+.description {
+  font-size: calc(1.3 * 16px);
+  padding: 0 30px;
+  margin-bottom: 25px;
+}
