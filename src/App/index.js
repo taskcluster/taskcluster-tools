@@ -1,10 +1,11 @@
 import React from 'react';
-import { BrowserRouter, Redirect, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { Helmet, link } from 'react-helmet';
 import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
 import Navigation from '../components/Navigation';
 import Login from '../views/Login';
+import NotFound from '../components/NotFound';
 import { getLoginUrl, loadable } from '../utils';
 import './styles.css';
 import iconUrl from '../taskcluster.png';
@@ -197,6 +198,7 @@ export default class App extends React.Component {
               <PropsRoute path="/credentials" component={CredentialsManager} credentials={credentials} />
               <PropsRoute path="/display" component={Displays} credentials={credentials} />
               <PropsRoute path="/shell" component={Shell} credentials={credentials} />
+              <Route component={NotFound} />
             </Switch>
           </Grid>
         </div>
