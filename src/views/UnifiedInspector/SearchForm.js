@@ -28,15 +28,25 @@ export default class SearchForm extends React.PureComponent {
   }
 
   componentWillReceiveProps({ taskGroupId, taskId }) {
-    this.setState({
-      taskGroupIdInput: taskGroupId || '',
-      taskIdInput: taskId || ''
-    });
+    if (taskGroupId !== this.props.taskGroupId && taskId !== this.props.taskId) {
+      this.setState({
+        taskGroupIdInput: taskGroupId || '',
+        taskIdInput: taskId || ''
+      });
+    } else if (taskGroupId !== this.props.taskGroupId) {
+      this.setState({ taskGroupIdInput: taskGroupId || '' });
+    } else if (taskId !== this.props.taskId) {
+      this.setState({ taskIdInput: taskId || '' });
+    }
   }
 
-  handleTaskGroupIdInputChange = e => this.setState({ taskGroupIdInput: e.target.value.trim() });
+  handleTaskGroupIdInputChange = (e) => {
+    this.setState({ taskGroupIdInput: e.target.value.trim() });
+  };
 
-  handleTaskIdInputChange = e => this.setState({ taskIdInput: e.target.value.trim() });
+  handleTaskIdInputChange = (e) => {
+    this.setState({ taskIdInput: e.target.value.trim() });
+  };
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -48,8 +58,8 @@ export default class SearchForm extends React.PureComponent {
     }
 
     this.props.onSearch({
-      taskGroupId: this.state.taskGroupIdInput || null,
-      taskId: this.state.taskIdInput || null
+      taskGroupId: this.state.taskGroupIdInput || '',
+      taskId: this.state.taskIdInput || ''
     });
   };
 

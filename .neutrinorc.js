@@ -40,10 +40,6 @@ module.exports = {
         },
         html: {
           title: 'TaskCluster Tools',
-          googleAnalytics: {
-            trackingId: 'UA-49796218-12',
-            pageViewOnLoad: true
-          },
           mobile: true,
           meta: [
             {
@@ -108,21 +104,26 @@ module.exports = {
       neutrino.config
         .entry('vendor')
         .merge([
-          '@skidding/react-codemirror',
-          'highlight.js',
-          'js-yaml',
+          'deepmerge',
+          'lodash.chunk',
+          'lodash.clonedeep',
+          'prop-types',
+          'ramda',
           'markdown-it',
+          'highlight.js',
           'moment',
           'qs',
-          'ramda',
           'react',
+          'react-tooltip',
           'react-bootstrap',
-          'react-datepicker',
+          'react-loadable',
+          'react-fontawesome',
+          'react-router-bootstrap',
+          'slugid',
           'react-dom',
           'react-helmet',
           'react-router-dom',
-          'react-tooltip',
-          'taskcluster-client'
+          'taskcluster-client',
         ]);
     }
   ],
