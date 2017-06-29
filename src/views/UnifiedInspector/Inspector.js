@@ -361,7 +361,7 @@ export default class Inspector extends React.PureComponent {
       return;
     }
 
-    return new Notification('TaskCluster', {
+    return new Notification('Taskcluster', {
       icon: iconUrl,
       body: message
     });

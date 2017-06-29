@@ -21,7 +21,7 @@ export default class Home extends React.PureComponent {
           <Col md={8} mdOffset={2} sm={10} smOffset={1}>
             <div className={header}>
               <h2>
-                Welcome to <span className={logo}>TaskCluster Tools</span>
+                Welcome to <span className={logo}>Taskcluster Tools</span>
               </h2>
             </div>
           </Col>
@@ -29,9 +29,9 @@ export default class Home extends React.PureComponent {
         <Row className={description}>
           <Col sm={12}>
             <p>
-              A collection of tools for TaskCluster components and elements in the TaskCluster
-              ecosystem. Here you will find tools to manage TaskCluster, as well as run, debug, inspect
-              and view tasks, task-graphs, and other TaskCluster related entities.
+              A collection of tools for Taskcluster components and elements in the Taskcluster
+              ecosystem. Here you will find tools to manage Taskcluster, as well as run, debug, inspect
+              and view tasks, task-graphs, and other Taskcluster related entities.
             </p>
           </Col>
         </Row>

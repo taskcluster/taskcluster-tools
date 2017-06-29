@@ -10,8 +10,8 @@
     "lint": "neutrino lint",
     "debug": "node --inspect ./node_modules/.bin/neutrino start",
     "build": "neutrino build",
-    "deploy": "yarn build && s3-deploy './build/**' --cwd './build/' --region us-west-2 --bucket taskcluster-tools --gzip --cache 0",
-    "test": "yarn build"
+    "test": "yarn build",
+    "install": "yarn build"
   },
   "repository": "taskcluster/taskcluster-tools",
   "dependencies": {
@@ -34,6 +34,9 @@
     "lodash.clonedeep": "^4.5.0",
     "markdown-it": "^8.3.1",
     "moment": "^2.15.0",
+    "neutrino": "^6.1.1",
+    "neutrino-middleware-env": "^6.1.1",
+    "neutrino-preset-mozilla-rpweb": "^4.2.0",
     "prop-types": "^15.5.9",
     "qs": "^6.4.0",
     "ramda": "^0.24.1",
@@ -53,17 +56,12 @@
     "react-tooltip": "^3.1.8",
     "react-treeview": "^0.4.7",
     "react-vnc-display": "^1.1.0",
+    "shebang-loader": "0.0.1",
     "slugid": "^1.1.0",
     "taskcluster-client": "^2.0.0",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
     "xml2js": "0.4.17"
-  },
-  "devDependencies": {
-    "neutrino": "^6.1.1",
-    "neutrino-middleware-env": "^6.1.1",
-    "neutrino-preset-mozilla-rpweb": "^4.2.0",
-    "shebang-loader": "0.0.1"
   },
   "optionalDependencies": {
     "bufferutil": "^3.0.1",

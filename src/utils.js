@@ -64,7 +64,7 @@ export const getLoginUrl = (location = window.location) => {
   const query = new URLSearchParams();
 
   query.set('target', new URL('/login', location));
-  query.set('description', 'TaskCluster Tools offers various way to create and inspect both tasks and task groups.');
+  query.set('description', 'Taskcluster Tools offers various way to create and inspect both tasks and task groups.');
 
   return `https://login.taskcluster.net/?${query.toString()}`;
 };

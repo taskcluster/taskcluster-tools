@@ -158,7 +158,7 @@ export default class InteractiveConnect extends React.PureComponent {
       return;
     }
 
-    const notification = new Notification('TaskCluster', {
+    const notification = new Notification('Taskcluster', {
       icon: iconUrl,
       body: 'Your interactive task is ready for connecting. Connect while the task is available.'
     });

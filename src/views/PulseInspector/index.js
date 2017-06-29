@@ -254,7 +254,7 @@ export default class PulseInspector extends React.PureComponent {
             maintained on the project Wiki, see&nbsp;
             <a href="https://wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges">
               wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
-            </a>. Notice that all exchanges from TaskCluster is formally
+            </a>. Notice that all exchanges from Taskcluster is formally
             documented on <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
           </p>
           <hr />
