@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Helmet, link } from 'react-helmet';
 import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
@@ -171,8 +171,13 @@ export default class App extends React.Component {
           <Grid fluid id="container">
             <Switch>
               <PropsRoute path="/task-inspector" component={LegacyRedirect} />
+              <PropsRoute path="/task-graph-inspector" component={LegacyRedirect} />
+              <PropsRoute path="/task-group-inspector" component={LegacyRedirect} />
+              <PropsRoute path="/push-inspector" component={LegacyRedirect} />
               <PropsRoute path="/one-click-loaner" component={LegacyRedirect} />
-              <Redirect from="/interactive" to="/shell" />
+              <PropsRoute path="/interactive" component={LegacyRedirect} />
+              <PropsRoute path="/task-creator" component={LegacyRedirect} />
+
               <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
               <PropsRoute path="/" exact={true} component={Home} credentials={credentials} />
               <PropsRoute path="/tasks/create" component={TaskCreator} credentials={credentials} />
