@@ -14,7 +14,7 @@ const View = ({ match, credentials, history, location }) => {
     return <Redirect to={`/index/artifacts/${ns}`} />;
   }
 
-  const { namespace, namespaceTaskId } = match.params;
+  const { namespace = '', namespaceTaskId } = match.params;
 
   return (
     <Clients credentials={credentials} Index Queue>
