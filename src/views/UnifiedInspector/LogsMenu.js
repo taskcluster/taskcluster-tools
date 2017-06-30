@@ -27,7 +27,7 @@ export default class LogsMenu extends React.PureComponent {
             to={`/groups/${taskGroupId}/tasks/${taskId}/runs/${runId}/logs/${encodeURIComponent(log.name)}`}
             key={`runs-menu-logs-${index}`}>
             <MenuItem>
-              <span style={log.name === 'public/logs/live_backing.log' ? { color: '#999' } : null}>
+              <span>
                 {log.name}
               </span>
             </MenuItem>

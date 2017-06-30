@@ -55,6 +55,10 @@ export default class HooksManager extends React.PureComponent {
   };
 
   selectHook = (hookGroupId, hookId) => {
+    if (hookId && hookId.includes('/')) {
+      hookId = encodeURIComponent(hookId);
+    }
+
     if (hookGroupId && hookId) {
       this.props.history.replace(`/hooks/${hookGroupId}/${hookId}`);
     } else if (hookGroupId) {
