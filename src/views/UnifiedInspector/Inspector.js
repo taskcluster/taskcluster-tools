@@ -85,7 +85,7 @@ export default class Inspector extends React.PureComponent {
       });
     }
 
-    if (taskGroupId) {
+    if (taskGroupId !== this.props.taskGroupId && taskGroupId) {
       this.loadTasks(nextProps);
     } else if (
       taskId &&
@@ -427,7 +427,7 @@ export default class Inspector extends React.PureComponent {
               path={PATHS.LOG}
               component={LogView}
               queue={queue}
-              taskId={taskId}
+              taskId={trackedTaskId}
               runId={runId}
               status={status}
               log={selectedLog}
