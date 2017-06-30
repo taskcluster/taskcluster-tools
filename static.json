@@ -6,7 +6,7 @@
   },
   "https_only": true,
   "headers": {
-    "/**": {
+    "/*.*": {
       "Cache-Control": "public, max-age=31536000, immutable",
       "X-Frame-Options": "deny",
       "X-Content-Type-Options": "nosniff",
