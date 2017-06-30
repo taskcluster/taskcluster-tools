@@ -6,6 +6,14 @@
   },
   "https_only": true,
   "headers": {
+    "/**": {
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+      "X-Frame-Options": "deny",
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "1; mode=block",
+      "Referrer-Policy": "origin",
+      "Content-Security-Policy": "frame-ancestors 'none'"
+    },
     "/*.*": {
       "Cache-Control": "public, max-age=31536000, immutable",
       "X-Frame-Options": "deny",
@@ -15,14 +23,6 @@
       "Content-Security-Policy": "frame-ancestors 'none'"
     },
     "/index.html": {
-      "Cache-Control": "no-store, no-cache, must-revalidate",
-      "X-Frame-Options": "deny",
-      "X-Content-Type-Options": "nosniff",
-      "X-XSS-Protection": "1; mode=block",
-      "Referrer-Policy": "origin",
-      "Content-Security-Policy": "frame-ancestors 'none'"
-    },
-    "/": {
       "Cache-Control": "no-store, no-cache, must-revalidate",
       "X-Frame-Options": "deny",
       "X-Content-Type-Options": "nosniff",
