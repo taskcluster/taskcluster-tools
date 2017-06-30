@@ -2,6 +2,7 @@ import React from 'react';
 import { bool, func, node, string } from 'prop-types';
 import { MenuItem, Modal, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import Error from '../Error';
 
 export default class ModalItem extends React.PureComponent {
   static propTypes = {
@@ -27,7 +28,8 @@ export default class ModalItem extends React.PureComponent {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
       show: false,
-      executing: false
+      executing: false,
+      error: null
     };
   }
 
@@ -45,25 +47,35 @@ export default class ModalItem extends React.PureComponent {
 
   handleSubmit() {
     this.setState({ executing: true }, async () => {
-      const result = await (this.props.onSubmit && this.props.onSubmit());
+      try {
+        const result = await (this.props.onSubmit && this.props.onSubmit());
 
-      this.setState({ executing: false, show: false }, () => {
-        if (this.props.onComplete) {
-          this.props.onComplete(result);
-        }
-      });
+        this.setState({ executing: false, show: false }, () => {
+          if (this.props.onComplete) {
+            this.props.onComplete(result);
+          }
+        });
+      } catch (err) {
+        this.setState({
+          error: err,
+          executing: false
+        });
+      }
     });
   }
 
   render() {
     const { disabled, body, children, button, bsStyle, bsSize } = this.props;
-    const { show, executing } = this.state;
+    const { show, executing, error } = this.state;
     const modal = (
       <Modal show={show} onHide={this.handleClose}>
         <Modal.Header>
           <Modal.Title>{children}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{body}</Modal.Body>
+        <Modal.Body>
+          {error && <Error error={error} />}
+          {body}
+        </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.handleClose}>Cancel</Button>
           <Button onClick={this.handleSubmit} disabled={executing} bsStyle={bsStyle}>

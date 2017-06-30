@@ -40,7 +40,7 @@ export default class WorkerTypeEditor extends React.PureComponent {
     const definition = this.cleanDefinition(clone(omit(['workerType'], props.definition)));
 
     return {
-      workerType: props.workerType,
+      workerType: props.workerType || '',
       definition: JSON.stringify(definition, null, 2),
       invalidDefinition: false
     };
@@ -87,14 +87,14 @@ export default class WorkerTypeEditor extends React.PureComponent {
   }
 
   save = async () => {
-    const definition = this.cleanDefinition();
+    const definition = this.cleanDefinition(this.state.definition);
 
     await this.props.awsProvisioner.updateWorkerType(this.state.workerType, definition);
     await this.props.updated(this.state.workerType);
   };
 
   create = async () => {
-    const definition = this.cleanDefinition();
+    const definition = this.cleanDefinition(this.state.definition);
 
     await this.props.awsProvisioner.createWorkerType(this.state.workerType, definition);
     await this.props.updated(this.state.workerType);
