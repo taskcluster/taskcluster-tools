@@ -18,7 +18,7 @@ export default class RunsMenu extends React.PureComponent {
   };
 
   getRunsTitle() {
-    const { runId } = this.props;
+    const { runId, status } = this.props;
 
     return runId === status.runs.length - 1 ?
       `Run ${runId} (Latest)` :
@@ -28,7 +28,7 @@ export default class RunsMenu extends React.PureComponent {
   render() {
     const { status, taskGroupId, taskId, active, runId } = this.props;
 
-    if (!status || !taskId || !taskGroupId || isNil(runId)) {
+    if (!status || !status.runs || !status.runs.length || !taskId || !taskGroupId || isNil(runId)) {
       return <NavItem disabled>No runs</NavItem>;
     }
 

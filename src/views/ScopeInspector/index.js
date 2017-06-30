@@ -1,11 +1,19 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import Clients from '../../components/Clients';
 import ScopeInspector from './ScopeInspector';
 
 const View = ({ credentials, match, history }) => {
   const [scope, entity] = location.hash.slice(1).split('/');
-  const selectedScope = decodeURIComponent(match.params.selectedScope || scope || '');
-  const selectedEntity = decodeURIComponent(match.params.selectedEntity || entity || '');
+
+  if (scope && entity) {
+    return <Redirect to={`/auth/scopes/${scope}/${entity}`} />;
+  } else if (scope) {
+    return <Redirect to={`/auth/scopes/${scope}`} />;
+  }
+
+  const selectedScope = decodeURIComponent(match.params.selectedScope || '');
+  const selectedEntity = decodeURIComponent(match.params.selectedEntity || '');
 
   return (
     <Clients credentials={credentials} Auth>

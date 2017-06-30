@@ -1,11 +1,16 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import Clients from '../../components/Clients';
 import WorkerTypeTable from './WorkerTypeTable';
 
 const View = ({ credentials, match, history, location }) => {
   const [worker, tab] = location.hash.slice(1).split('/');
-  const workerType = match.params.workerType || worker;
-  const currentTab = match.params.currentTab || tab;
+
+  if (worker && tab) {
+    return <Redirect to={`/aws-provisioner/${worker}/${tab}`} />;
+  } else if (worker) {
+    return <Redirect to={`/aws-provisioner/${worker}`} />;
+  }
 
   return (
     <Clients credentials={credentials} Queue AwsProvisioner={{ baseUrl: 'https://aws-provisioner.taskcluster.net/v1' }}>
@@ -14,8 +19,8 @@ const View = ({ credentials, match, history, location }) => {
           {...clients}
           history={history}
           provisionerId="aws-provisioner-v1"
-          workerType={workerType}
-          currentTab={currentTab} />
+          workerType={match.params.workerType}
+          currentTab={match.params.currentTab} />
       )}
     </Clients>
   );
