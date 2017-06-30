@@ -56,7 +56,7 @@ export default class HooksManager extends React.PureComponent {
 
   selectHook = (hookGroupId, hookId) => {
     if (hookId && hookId.includes('/')) {
-      hookId = encodeURIComponent(hookId);
+      hookId = encodeURIComponent(hookId); // eslint-disable-line no-param-reassign
     }
 
     if (hookGroupId && hookId) {
