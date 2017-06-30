@@ -25,24 +25,26 @@ yarn
 
 ### Code Organization
 
-- `src/` (Tools source code)
-- `src/<app>/`  (application specific-code, can be reused)
+- `src/`: source code
+- `src/App`: top-level component, holds page layout, route rendering, and login handling
+- `src/views`: route-based components typically matching a URL, e.g. `/groups` maps to `src/views/UnifiedInspector`
+- `src/components`: generic components that can be used in any view (not view-specific)
 
 ### Tasks and Configuration
 
-Building this project uses [neutrino](https://github.com/mozilla-neutrino/neutrino),
-[neutrino-preset-taskcluster-web](https://github.com/taskcluster/neutrino-preset-taskcluster-web),
-and the `src/tools-preset` to:
+Building this project uses [Neutrino](https://github.com/mozilla-neutrino/neutrino),
+[neutrino-preset-mozilla-rpweb](https://github.com/mozilla-rpweb/neutrino-preset-mozilla-rpweb) to:
 
 - Compile ES2015+ syntax to ES5-compatible JS
 - Compile React JSX to de-sugared JS
-- Show ESLint errors based on Taskcluster rules
-- Build application directories into page-specific bundles
-- LESS files to CSS
+- Show ESLint errors based on R&P rules
+- Build views into cacheable bundles
+- Importing files directly via JS and output to the bundle
 
 ### Testing changes
 
 Install npm dependencies and start it up:
+
 - `yarn`
 - `yarn start`
 
@@ -62,7 +64,7 @@ of memory for the amount of files being built during development. As a workaroun
 running `yarn start`, run the following to run the same command with more memory:
 
 ```sh
-PORT=9000 node --max-old-space-size=4096 node_modules/.bin/neutrino start -p tools-preset
+node --max-old-space-size=4096 node_modules/.bin/neutrino start
 ```
 
 You may need to adjust the memory size to your machine specs accordingly.
