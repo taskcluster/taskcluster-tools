@@ -62,7 +62,7 @@ export default class WorkerTypeEditor extends React.PureComponent {
     }
   };
 
-  workerTypeChange = value => this.setState({ workerType: value });
+  workerTypeChange = e => this.setState({ workerType: e.target.value });
 
   workerTypeValidationState() {
     return /^[a-zA-Z0-9_-]{1,22}$/.test(this.state.workerType) ? 'success' : 'error';
