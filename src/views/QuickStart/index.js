@@ -9,12 +9,6 @@ import { info } from './styles.css';
 
 const initialYaml = {
   version: 0,
-  metadata: {
-    name: '',
-    description: '',
-    owner: '{{ event.head.user.email }}',
-    source: '{{ event.head.repo.url }}'
-  },
   tasks: [
     {
       provisionerId: '{{ taskcluster.docker.provisionerId }}',
@@ -89,8 +83,6 @@ export default class YamlCreator extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      rootName: '',
-      rootDescription: '',
       tasks: [],
       events: new Set(),
       image: 'node',
@@ -150,8 +142,6 @@ export default class YamlCreator extends React.Component {
 
   resetAll = () => this.setState({
     resetActive: false,
-    rootName: '',
-    rootDescription: '',
     tasks: [],
     events: new Set(),
     taskName: '',
@@ -167,11 +157,6 @@ export default class YamlCreator extends React.Component {
   renderEditor() {
     const newYaml = safeDump({
       ...initialYaml,
-      metadata: {
-        ...initialYaml.metadata,
-        name: this.state.rootName,
-        description: this.state.rootDescription
-      },
       tasks: [{
         ...initialYaml.tasks[0],
         ...{
@@ -310,31 +295,6 @@ export default class YamlCreator extends React.Component {
 
         <Row>
           <Col md={5}>
-            <h5>Enter the name and description of your project or these tasks:</h5>
-            <p className={info}>
-              <Glyphicon glyph="info-sign" />&nbsp;
-              These will appear at the top of the file and help the reader understand what they are seeing.
-            </p>
-
-            <FormGroup>
-              <ControlLabel>Name:</ControlLabel>
-              <FormControl
-                type="text"
-                placeholder="Name"
-                name="rootName"
-                value={this.state.rootName}
-                onChange={e => this.saveTextInput(e)} />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>Description:</ControlLabel>
-              <FormControl
-                type="text"
-                placeholder="Description"
-                name="rootDescription"
-                value={this.state.rootDescription}
-                onChange={e => this.saveTextInput(e)} />
-            </FormGroup>
-            <hr />
             <h5>Define your task:</h5>
             <FormGroup>
               <ControlLabel>Name:</ControlLabel>
