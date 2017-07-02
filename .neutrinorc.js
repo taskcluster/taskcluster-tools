@@ -1,6 +1,7 @@
 const env = require('neutrino-middleware-env');
 const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
 
 const envs = {
   CORS_PROXY: 'https://cors-proxy.taskcluster.net/request',
@@ -61,6 +62,7 @@ module.exports = {
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
+      neutrino.config.plugin('revision').use(GitRevisionPlugin);
 
       neutrino.config.module
         .rule('plain-style')
