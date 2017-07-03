@@ -1,6 +1,6 @@
 import React from 'react';
 import { bool, func, object } from 'prop-types';
-import JsonInspector from 'react-json-inspector';
+import JsonInspector from '../../components/JsonInspector';
 
 /**
  * Message row implemented to only re-render when strictly necessary
