@@ -241,6 +241,8 @@ export default class Inspector extends React.PureComponent {
   };
 
   navigate = (taskGroupId, taskId) => {
+    const { history } = this.props;
+
     if (!taskGroupId && taskId) {
       history.push(`/tasks/${taskId}`);
     } else if (taskGroupId && !taskId) {
