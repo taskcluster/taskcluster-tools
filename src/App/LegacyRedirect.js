@@ -4,8 +4,21 @@ import NotFound from '../components/NotFound';
 
 const LegacyRedirect = (props) => {
   switch (props.path) {
+    case '/task-graph-inspector': {
+      const [groupId, taskId] = props.location.hash.slice(1).split('/');
+
+      if (!groupId && !taskId) {
+        return <Redirect to={'/groups'} />;
+      }
+
+      if (!taskId) {
+        return <Redirect to={`/groups/${groupId}`} />;
+      }
+
+      return <Redirect to={`/groups/${groupId}/tasks/${taskId}`} />;
+    }
+
     case '/task-group-inspector':
-    case '/task-graph-inspector':
     case '/push-inspector': {
       const [groupId, taskId] = props.location.hash.slice(2).split('/');
 
