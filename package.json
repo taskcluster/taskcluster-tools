@@ -11,7 +11,8 @@
     "debug": "node --inspect ./node_modules/.bin/neutrino start",
     "build": "neutrino build",
     "test": "yarn lint && yarn build",
-    "heroku-postbuild": "yarn"
+    "heroku-prebuild": "yarn",
+    "heroku-postbuild": "yarn build"
   },
   "repository": "taskcluster/taskcluster-tools",
   "dependencies": {
