@@ -1471,9 +1471,9 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-codemirror@^5.18.2, codemirror@^5.27.2:
-  version "5.27.2"
-  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.27.2.tgz#a292d42f079d5b98c68c3146fab99844f3d8776c"
+codemirror@^5.18.2, codemirror@^5.27.4:
+  version "5.27.4"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.27.4.tgz#0e817c839bfea9959dd16cd48ae14acc0e43c3b6"
 
 color-convert@^1.3.0:
   version "1.9.0"
@@ -4123,9 +4123,9 @@ neutrino-middleware-dev-server@^6.1.1:
     webpack "^2.6.1"
     webpack-dev-server "^2.4.5"
 
-neutrino-middleware-env@^6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/neutrino-middleware-env/-/neutrino-middleware-env-6.1.1.tgz#5933d62b5afa5c8653af93c1c94cffd86ab11315"
+neutrino-middleware-env@^6.1.1, neutrino-middleware-env@^6.1.4:
+  version "6.1.4"
+  resolved "https://registry.yarnpkg.com/neutrino-middleware-env/-/neutrino-middleware-env-6.1.4.tgz#9a40ff5910f3728e7ab77a43d74125cc10ac44a7"
   dependencies:
     webpack "^2.6.1"
 
@@ -4264,9 +4264,9 @@ neutrino-preset-web@^6.1.0:
     webpack-dev-server "^2.4.1"
     worker-loader "^0.8.0"
 
-neutrino@^6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/neutrino/-/neutrino-6.1.1.tgz#36f6438107a3e5ec0babe1bc76abdce3344129bc"
+neutrino@^6.1.4:
+  version "6.1.4"
+  resolved "https://registry.yarnpkg.com/neutrino/-/neutrino-6.1.4.tgz#b264b8e8a304a79aad0fefef58fd2b360a9f0a2d"
   dependencies:
     deep-sort-object "^1.0.2"
     deepmerge "^1.3.2"
@@ -5138,13 +5138,17 @@ qs@2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/qs/-/qs-2.3.3.tgz#e9e85adbe75da0bbe4c8e0476a086290f863b404"
 
-qs@6.4.0, qs@^6.4.0, qs@~6.4.0:
+qs@6.4.0, qs@~6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
 
 qs@^0.6.6:
   version "0.6.6"
   resolved "https://registry.yarnpkg.com/qs/-/qs-0.6.6.tgz#6e015098ff51968b8a3c819001d5f2c89bc4b107"
+
+qs@^6.5.0:
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.0.tgz#8d04954d364def3efc55b5a0793e1e2c8b1e6e49"
 
 query-string@^4.1.0:
   version "4.3.4"
@@ -5288,9 +5292,9 @@ react-json-inspector@^7.0.0:
     md5-o-matic "^0.1.1"
     object-assign "2.0.0"
 
-react-lazylog@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/react-lazylog/-/react-lazylog-1.1.3.tgz#ffd471055036bd5860fc8804633c24a0ee333ad9"
+react-lazylog@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-lazylog/-/react-lazylog-1.1.4.tgz#e4a5b5cf4fd5d6a33c983641b931f4c2e4a4f80e"
   dependencies:
     fetch-readablestream "^0.1.0"
     immutable "^3.8.1"
