@@ -5292,9 +5292,9 @@ react-json-inspector@^7.0.0:
     md5-o-matic "^0.1.1"
     object-assign "2.0.0"
 
-react-lazylog@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/react-lazylog/-/react-lazylog-1.1.4.tgz#e4a5b5cf4fd5d6a33c983641b931f4c2e4a4f80e"
+react-lazylog@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/react-lazylog/-/react-lazylog-1.1.5.tgz#a6dce7912130ec816c8bc750d85ddb0bd2042c3e"
   dependencies:
     fetch-readablestream "^0.1.0"
     immutable "^3.8.1"
