@@ -149,7 +149,7 @@ export default class TaskCreator extends React.PureComponent {
 
     // If loaded, redirect to task inspector. We'll show errors later if there are errors.
     if (createdTaskId) {
-      return <Redirect to={`/tasks/${createdTaskId}`} />;
+      return <Redirect to={`/tasks/${createdTaskId}`} push={true} />;
     }
 
     return (
