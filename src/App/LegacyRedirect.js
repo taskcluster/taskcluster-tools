@@ -43,8 +43,8 @@ const LegacyRedirect = (props) => {
 
     case '/one-click-loaner': {
       return props.location.hash ?
-        <Redirect to={`/tasks/${props.location.hash.slice(1)}/create`} /> :
-        <Redirect to="/groups" />;
+        <Redirect to={`/tasks/${props.location.hash.slice(1)}/interactive`} /> :
+        <Redirect to="/tasks/create/interactive" />;
     }
 
     case '/interactive': {

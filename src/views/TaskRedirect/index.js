@@ -5,7 +5,11 @@ import TaskRedirect from './TaskRedirect';
 const View = ({ credentials, match }) => (
   <Clients credentials={credentials} Queue>
     {({ queue }) => (
-      <TaskRedirect queue={queue} taskId={match.params.taskId} action={match.params.action} />
+      <TaskRedirect
+        queue={queue}
+        taskId={match.params.taskId}
+        action={match.params.action}
+        interactive={location.state && location.state.interactive} />
     )}
   </Clients>
 );

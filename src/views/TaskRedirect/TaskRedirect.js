@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
+import { parameterizeTask } from '../../utils';
 
 export default class TaskRedirect extends React.PureComponent {
   constructor(props) {
@@ -15,16 +16,20 @@ export default class TaskRedirect extends React.PureComponent {
   }
 
   async componentWillMount() {
-    const { taskId, queue } = this.props;
+    const { taskId, queue, action } = this.props;
 
     try {
-      if (this.props.action === 'create') {
+      if (action === 'create') {
         return this.setState({
           task: await queue.task(taskId)
         });
+      } else if (action === 'interactive') {
+        return this.setState({
+          task: parameterizeTask(await queue.task(taskId))
+        });
       }
 
-      const { status } = await this.props.queue.status(this.props.taskId);
+      const { status } = await queue.status(taskId);
 
       this.setState({ taskGroupId: status.taskGroupId });
     } catch (err) {
@@ -33,6 +38,7 @@ export default class TaskRedirect extends React.PureComponent {
   }
 
   renderTaskRedirect() {
+    const { taskId, action } = this.props;
     const { taskGroupId, task, error } = this.state;
 
     if (error) {
@@ -44,14 +50,16 @@ export default class TaskRedirect extends React.PureComponent {
     }
 
     if (task) {
-      return (<Redirect
-        to={{
-          pathname: '/tasks/create',
-          state: { task }
-        }} />);
+      return (
+        <Redirect
+          to={{
+            pathname: action === 'interactive' ? '/tasks/create/interactive' : '/tasks/create',
+            state: { task }
+          }} />
+      );
     }
 
-    return <Redirect to={`/groups/${taskGroupId}/tasks/${this.props.taskId}`} />;
+    return <Redirect to={`/groups/${taskGroupId}/tasks/${taskId}`} />;
   }
 
   render() {

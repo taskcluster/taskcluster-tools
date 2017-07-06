@@ -145,7 +145,12 @@ export default class TaskCreator extends React.PureComponent {
   }
 
   render() {
+    const { interactive } = this.props;
     const { createdTaskError, createdTaskId } = this.state;
+
+    if (createdTaskId && interactive) {
+      return <Redirect to={`/tasks/${createdTaskId}/connect`} push={true} />;
+    }
 
     // If loaded, redirect to task inspector. We'll show errors later if there are errors.
     if (createdTaskId) {
@@ -154,13 +159,13 @@ export default class TaskCreator extends React.PureComponent {
 
     return (
       <Col sm={12}>
-        <HelmetTitle title="Task Creator" />
-        <h4>Task Creator</h4>
+        <HelmetTitle title={interactive ? 'Create Interactive Task' : 'Create Task'} />
+        <h4>{interactive ? 'Create Interactive Task' : 'Create Task'}</h4>
         <p>
           Write and submit a task to Taskcluster. For details on what you can write, refer to the&nbsp;
           <a href="https://docs.taskcluster.net" target="_blank" rel="noopener noreferrer">documentation</a>.
-          When you submit a task here, you will be taken to the Task Inspector. Your task will be saved so you can
-          come back and experiment with variations.
+          When you submit a task here, you will be taken to {interactive ? 'connect to the interactive task' :
+          'inspect the created task'}. Your task will be saved so you can come back and experiment with variations.
         </p>
         <hr />
         {createdTaskError && <Error error={createdTaskError} />}
