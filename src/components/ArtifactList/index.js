@@ -13,11 +13,13 @@ export default class ArtifactList extends React.PureComponent {
       number
     ]),
     menu: bool,
-    queue: object.isRequired
+    queue: object.isRequired,
+    style: object
   };
 
   static defaultProps = {
-    menu: false
+    menu: false,
+    style: {}
   };
 
   constructor(props) {
@@ -88,13 +90,13 @@ export default class ArtifactList extends React.PureComponent {
   }
 
   render() {
-    const { menu } = this.props;
+    const { menu, style } = this.props;
     const { artifacts } = this.state;
 
     if (!artifacts || !artifacts.length) {
       return menu ?
         <NavItem disabled>No artifacts</NavItem> :
-        <div style={{ fontSize: 14 }}>No artifacts</div>;
+        <div style={{ fontSize: 14, ...style }}>No artifacts</div>;
     }
 
     return menu ?
@@ -108,7 +110,7 @@ export default class ArtifactList extends React.PureComponent {
         </NavDropdown>
       ) :
       (
-        <div style={{ fontSize: 14 }}>
+        <div style={{ fontSize: 14, ...style }}>
           {artifacts.map(({ name, icon, url }, index) => (
             <div key={`runs-menu-artifacts-${index}`} style={{ marginBottom: 8 }}>
               <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
