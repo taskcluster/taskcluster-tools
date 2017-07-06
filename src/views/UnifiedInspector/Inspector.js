@@ -203,42 +203,41 @@ export default class Inspector extends React.PureComponent {
     this.setState({ notify: permission === 'granted' });
   };
 
-  handleTaskMessage = ({ payload, exchange }) => {
+  handleTaskMessage = async ({ payload, exchange }) => {
     const { queueEvents, runId } = this.props;
+    const { taskId } = payload.status;
 
-    // Update status from message
-    this.setState({ status: payload.status });
+    if (exchange === queueEvents.artifactCreated().exchange) {
+      const runNumber = this.getRunNumber(runId, null, payload.status.runs);
+      const artifacts = await this.getArtifacts(taskId, runNumber);
 
-    // Give priority to exceptions to show without waiting for loop to happen
-    if (exchange === queueEvents.taskException().exchange) {
-      this.notify('A task exception occurred');
-    } else if (exchange === queueEvents.taskFailed().exchange) {
-      this.notify('A task failure occurred');
+      return this.setState({
+        artifacts,
+        status: payload.status
+      });
     }
 
-    if (exchange !== queueEvents.artifactCreated().exchange) {
-      return;
+    if (!taskId) {
+      return this.setState({ status: payload.status });
     }
 
-    const { selectedRun } = this.state;
-    const runNumber = this.getRunNumber(runId, selectedRun, payload.status.runs);
+    const [status, task] = await Promise.all([this.getStatus(taskId), this.getTask(taskId)]);
+    const tasks = this.state.tasks.map(item => ({
+      status: item.status.taskId === taskId ? status : item.status,
+      task: item.status.taskId === taskId ? task : item.task
+    }));
 
-    // Check that runId matches this run or if artifacts haven't been loaded, we return
-    if (payload.runId !== runNumber) {
-      return;
-    }
-
-    const artifacts = [...(this.state.artifacts || [])];
-    const index = artifacts.findIndex(artifact => payload.artifact.name === artifact.name);
-
-    if (index === -1) {
-      artifacts.push(payload.artifact);
-    } else {
-      artifacts[index] = payload.artifact;
-    }
-
-    // Add new artifact to collection, or update existing artifact
-    this.setState({ artifacts });
+    this.setState({
+      status,
+      task,
+      tasks
+    }, () => {
+      if (exchange === queueEvents.taskException().exchange) {
+        this.notify('A task exception occurred');
+      } else if (exchange === queueEvents.taskFailed().exchange) {
+        this.notify('A task failure occurred');
+      }
+    });
   };
 
   navigate = (taskGroupId, taskId) => {

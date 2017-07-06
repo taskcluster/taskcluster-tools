@@ -2,6 +2,7 @@ import React from 'react';
 import { array } from 'prop-types';
 import { ProgressBar, Label } from 'react-bootstrap';
 import { titleCase } from 'change-case';
+import equal from 'deep-equal';
 import { labels } from '../../utils';
 
 const groups = ['completed', 'failed', 'exception', 'unscheduled', 'running', 'pending'];
@@ -11,15 +12,68 @@ export default class GroupProgress extends React.PureComponent {
     tasks: array
   };
 
-  groupTasksByStatus() {
-    return this.props.tasks.reduce((groupings, task) => ({
+  constructor(props) {
+    super(props);
+    this.state = {
+      groupings: null,
+      percents: null,
+      weightedTotal: null
+    };
+  }
+
+  componentWillMount() {
+    if (!this.props.tasks) {
+      return;
+    }
+
+    const groupings = this.groupTasksByStatus(this.props.tasks);
+    const percents = this.getPercents(groupings, this.props.tasks);
+    const weightedTotal = Object
+      .values(percents)
+      .reduce((total, current) => total + current, 0);
+
+    this.setState({
+      groupings,
+      percents,
+      weightedTotal
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (equal(nextProps.tasks, this.props.tasks)) {
+      return;
+    }
+
+    if (!nextProps.tasks) {
+      return this.setState({
+        groupings: null,
+        percents: null,
+        weightedTotal: null
+      });
+    }
+
+    const groupings = this.groupTasksByStatus(nextProps.tasks);
+    const percents = this.getPercents(groupings, nextProps.tasks);
+    const weightedTotal = Object
+      .values(percents)
+      .reduce((total, current) => total + current, 0);
+
+    this.setState({
+      groupings,
+      percents,
+      weightedTotal
+    });
+  }
+
+  groupTasksByStatus(tasks) {
+    return tasks.reduce((groupings, task) => ({
       ...groupings,
       [task.status.state]: [...(groupings[task.status.state] || []), task]
     }), {});
   }
 
-  getPercents(groupings) {
-    const total = this.props.tasks.length;
+  getPercents(groupings, tasks) {
+    const total = tasks.length;
 
     return Object
       .entries(groupings)
@@ -36,11 +90,7 @@ export default class GroupProgress extends React.PureComponent {
       return null;
     }
 
-    const groupings = this.groupTasksByStatus();
-    const percents = this.getPercents(groupings);
-    const weightedTotal = Object
-      .values(percents)
-      .reduce((total, current) => total + current, 0);
+    const { groupings, percents, weightedTotal } = this.state;
 
     return (
       <div>
