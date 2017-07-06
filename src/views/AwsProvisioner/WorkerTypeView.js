@@ -73,6 +73,7 @@ export default class WorkerTypeView extends React.PureComponent {
     if (currentTab === 'edit') {
       return (
         <WorkerTypeEditor
+          awsProvisioner={this.props.awsProvisioner}
           workerType={this.state.workerType.workerType}
           definition={this.state.workerType}
           updated={this.props.reload} />

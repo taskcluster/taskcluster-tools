@@ -46,17 +46,17 @@ export default class WorkerTypeEditor extends React.PureComponent {
     };
   }
 
-  handleChange = (e) => {
+  handleChange = (value) => {
     try {
-      JSON.parse(e.target.value);
+      JSON.parse(value);
 
       this.setState({
-        definition: e.target.value,
+        definition: value,
         invalidDefinition: false
       });
     } catch (err) {
       this.setState({
-        definition: e.target.value,
+        definition: value,
         invalidDefinition: true
       });
     }
