@@ -180,7 +180,8 @@ export default class App extends React.Component {
 
               <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
               <PropsRoute path="/" exact={true} component={Home} credentials={credentials} />
-              <PropsRoute path="/tasks/create" component={TaskCreator} credentials={credentials} />
+              <PropsRoute path="/tasks/create/interactive" component={TaskCreator} credentials={credentials} interactive={true} />
+              <PropsRoute path="/tasks/create" component={TaskCreator} credentials={credentials} interactive={false} />
               <PropsRoute path="/tasks/:taskId/connect" component={InteractiveConnect} credentials={credentials} />
               <PropsRoute path="/tasks/:taskId?/:action?" component={TaskRedirect} credentials={credentials} />
               <PropsRoute path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?" component={UnifiedInspector} credentials={credentials} />
