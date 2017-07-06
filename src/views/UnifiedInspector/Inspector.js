@@ -28,7 +28,8 @@ const PATHS = {
   TASK_LIST: '/groups/:taskGroupId',
   TASK_DETAILS: '/groups/:taskGroupId/tasks/:taskId/details',
   RUN_DETAILS: '/groups/:taskGroupId/tasks/:taskId/runs/:run',
-  LOG: '/groups/:taskGroupId/tasks/:taskId/runs/:run/logs/:artifactId'
+  LOG: '/groups/:taskGroupId/tasks/:taskId/runs/:run/logs/:artifactId',
+  ARTIFACTS: '/groups/:taskGroupId/tasks/:taskId/runs/:run/artifacts'
 };
 const initialLogs = [
   'public/logs/terminal.log',
@@ -414,17 +415,25 @@ export default class Inspector extends React.PureComponent {
               taskId={trackedTaskId}
               runId={runNumber}
               active={subSectionId === 'logs'} />
-            <ArtifactList
-              queue={queue}
-              taskId={trackedTaskId}
-              artifacts={artifacts}
-              runId={runNumber}
-              menu={true} />
+            <LinkContainer
+              to={`/groups/${taskGroupId}/tasks/${trackedTaskId}/runs/${runNumber}/artifacts`}
+              disabled={!(artifacts && artifacts.length)}
+              active={subSectionId === 'artifacts'}>
+              <NavItem>{artifacts && artifacts.length ? 'Artifacts' : 'No artifacts'}</NavItem>
+            </LinkContainer>
           </Nav>
         </Row>
 
         <Row>
           <Switch>
+            <PropsRoute
+              path={PATHS.ARTIFACTS}
+              component={ArtifactList}
+              style={{ margin: 20 }}
+              queue={queue}
+              taskId={trackedTaskId}
+              artifacts={artifacts}
+              runId={runNumber} />
             <PropsRoute
               path={PATHS.LOG}
               component={LogView}
