@@ -78,6 +78,11 @@ export default class TaskDetails extends React.PureComponent {
             </tr>
 
             <tr>
+              <td>Priority</td>
+              <td><code>{task.priority}</code></td>
+            </tr>
+
+            <tr>
               <td>Provisioner</td>
               <td><code>{task.provisionerId}</code></td>
             </tr>
