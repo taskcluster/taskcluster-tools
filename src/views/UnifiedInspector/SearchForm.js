@@ -87,13 +87,12 @@ export default class SearchForm extends React.PureComponent {
         <Col lg={5} md={5} sm={4}>
           <FormGroup validationState={valid.taskGroupId ? null : 'error'} style={{ marginRight: 0 }}>
             <InputGroup>
-              <InputGroup.Addon style={{ textAlign: 'left' }}>TaskGroupId</InputGroup.Addon>
+              <InputGroup.Addon style={{ textAlign: 'left' }}>Task Group ID</InputGroup.Addon>
               <FormControl
                 type="text"
                 placeholder="Enter a task group ID"
                 value={taskGroupIdInput}
-                onChange={this.handleTaskGroupIdInputChange}
-                style={{ fontFamily: 'monospace' }} />
+                onChange={this.handleTaskGroupIdInputChange} />
             </InputGroup>
           </FormGroup>
         </Col>
@@ -101,19 +100,18 @@ export default class SearchForm extends React.PureComponent {
         <Col lg={5} md={5} sm={4}>
           <FormGroup validationState={valid.taskId ? null : 'error'} style={{ marginRight: 0 }}>
             <InputGroup>
-              <InputGroup.Addon style={{ textAlign: 'left' }}>TaskId</InputGroup.Addon>
+              <InputGroup.Addon style={{ textAlign: 'left' }}>Task ID</InputGroup.Addon>
               <FormControl
                 type="text"
                 placeholder="Enter a task ID or choose one from Tasks"
                 value={taskIdInput}
-                onChange={this.handleTaskIdInputChange}
-                style={{ fontFamily: 'monospace' }} />
+                onChange={this.handleTaskIdInputChange} />
             </InputGroup>
           </FormGroup>
         </Col>
 
         <Col lg={2} md={2} sm={4} style={{ padding: 0 }}>
-          <ButtonGroup>
+          <ButtonGroup style={{ marginBottom: 15 }}>
             <Button
               type="submit"
               disabled={!valid.form}>

@@ -461,6 +461,7 @@ export default class Inspector extends React.PureComponent {
     return (
       <div>
         <HelmetTitle title={`${task ? task.metadata.name : 'Task Inspector'}`} />
+        <h4>Task &amp; Group Inspector</h4>
         <Row>
           <Col xs={12}>
             <SearchForm
