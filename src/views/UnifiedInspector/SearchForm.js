@@ -1,6 +1,6 @@
 import React from 'react';
 import { array, func, string } from 'prop-types';
-import { Col, Form, FormGroup, InputGroup, FormControl, Button, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Col, Form, FormGroup, InputGroup, FormControl, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Icon from 'react-fontawesome';
 import { VALID_TASK } from '../../utils';
@@ -111,12 +111,12 @@ export default class SearchForm extends React.PureComponent {
         </Col>
 
         <Col lg={2} md={2} sm={4} style={{ padding: 0 }}>
-          <ButtonGroup style={{ marginBottom: 15 }}>
-            <Button
-              type="submit"
-              disabled={!valid.form}>
+          <ButtonGroup justified style={{ marginBottom: 15 }}>
+            <a
+              onClick={valid.form ? this.handleSubmit : null}
+              className={`btn btn-default${valid.form ? '' : ' btn-disabled'}`}>
               <Icon name="search" /> Inspect
-            </Button>
+            </a>
             <DropdownButton
               title="History"
               id="history-dropdown"
