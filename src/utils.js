@@ -69,6 +69,7 @@ export const getLoginUrl = (location = window.location) => {
   return `https://login.taskcluster.net/?${query.toString()}`;
 };
 
+// Transform task to a loaner task
 export const parameterizeTask = task => merge(omit([
   'taskGroupId',
   // 'schedulerId',
