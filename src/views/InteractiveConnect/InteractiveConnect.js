@@ -117,9 +117,9 @@ export default class InteractiveConnect extends React.PureComponent {
     return listener;
   }
 
-  handleTaskMessage = async ({ detail }) => {
+  handleTaskMessage = async ({ detail, exchange }) => {
     // Look for the shell.html artifact if the message originates from the artifact create exchange
-    if (detail.exchange === this.props.queueEvents.artifactCreated().exchange) {
+    if (exchange === this.props.queueEvents.artifactCreated().exchange) {
       this.setState({
         status: detail.payload.status,
         ...this.getConnectionUrlState(this.props.queue, this.props.taskId, [detail.payload.artifact])
