@@ -461,14 +461,6 @@ export default class Inspector extends React.PureComponent {
     return (
       <div>
         <HelmetTitle title={`${task ? task.metadata.name : 'Task Inspector'}`} />
-        <h4>Task &amp; Group Inspector</h4>
-        <p>
-          Given a task group ID or task ID, inspect task groups, monitor progress, view dependencies and states, and
-          inspect individual tasks&rsquo; state, runs, public and private artifacts, definition, and logs as they are
-          evaluated.
-        </p>
-        <hr />
-
         <Row>
           <Col xs={12}>
             <SearchForm

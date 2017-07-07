@@ -84,74 +84,72 @@ export default class SearchForm extends React.PureComponent {
 
     return (
       <Form onSubmit={this.handleSubmit} horizontal>
-        <Col lg={10} md={10} sm={9}>
-          <FormGroup validationState={valid.taskGroupId ? null : 'error'}>
+        <Col lg={5} md={5} sm={4}>
+          <FormGroup validationState={valid.taskGroupId ? null : 'error'} style={{ marginRight: 0 }}>
             <InputGroup>
-              <InputGroup.Addon style={{ textAlign: 'left' }}>Task Group</InputGroup.Addon>
+              <InputGroup.Addon style={{ textAlign: 'left' }}>TaskGroupId</InputGroup.Addon>
               <FormControl
                 type="text"
-                placeholder="Enter a task group ID, e.g. 8U3xVyssSBuinaXwRgJ_qQ"
+                placeholder="Enter a task group ID"
                 value={taskGroupIdInput}
-                onChange={this.handleTaskGroupIdInputChange} />
-            </InputGroup>
-          </FormGroup>
-
-          <FormGroup validationState={valid.taskId ? null : 'error'}>
-            <InputGroup>
-              <InputGroup.Addon style={{ textAlign: 'left' }}>Task</InputGroup.Addon>
-              <FormControl
-                type="text"
-                placeholder="Enter a task ID or choose one from Tasks, e.g. 8U3xVyssSBuinaXwRgJ_qQ"
-                value={taskIdInput}
-                onChange={this.handleTaskIdInputChange} />
+                onChange={this.handleTaskGroupIdInputChange}
+                style={{ fontFamily: 'monospace' }} />
             </InputGroup>
           </FormGroup>
         </Col>
 
-        <Col lg={2} md={2} sm={3}>
-          <Col sm={12} style={{ marginBottom: 15, padding: 0 }}>
+        <Col lg={5} md={5} sm={4}>
+          <FormGroup validationState={valid.taskId ? null : 'error'} style={{ marginRight: 0 }}>
+            <InputGroup>
+              <InputGroup.Addon style={{ textAlign: 'left' }}>TaskId</InputGroup.Addon>
+              <FormControl
+                type="text"
+                placeholder="Enter a task ID or choose one from Tasks"
+                value={taskIdInput}
+                onChange={this.handleTaskIdInputChange}
+                style={{ fontFamily: 'monospace' }} />
+            </InputGroup>
+          </FormGroup>
+        </Col>
+
+        <Col lg={2} md={2} sm={4} style={{ padding: 0 }}>
+          <ButtonGroup>
             <Button
               type="submit"
-              disabled={!valid.form}
-              block>
+              disabled={!valid.form}>
               <Icon name="search" /> Inspect
             </Button>
-          </Col>
-          <Col sm={12} style={{ marginBottom: 15, padding: 0 }}>
-            <ButtonGroup justified>
-              <DropdownButton
-                title="History"
-                id="history-dropdown"
-                style={{ width: '100%' }}
-                disabled={!taskGroupHistory.length && !taskHistory.length}
-                pullRight>
-                <MenuItem header>Task Groups</MenuItem>
-                {taskGroupHistory.length ?
-                  (
-                    taskGroupHistory.map((taskGroupId, index) => (
-                      <LinkContainer to={`/groups/${taskGroupId}`} key={`group-history-${index}`}>
-                        <MenuItem>{taskGroupId}</MenuItem>
-                      </LinkContainer>
-                    ))
-                  ) :
-                  null
-                }
+            <DropdownButton
+              title="History"
+              id="history-dropdown"
+              disabled={!taskGroupHistory.length && !taskHistory.length}
+              pullRight>
+              <MenuItem header>Task Groups</MenuItem>
+              {taskGroupHistory.length ?
+                (
+                  taskGroupHistory.map((taskGroupId, index) => (
+                    <LinkContainer to={`/groups/${taskGroupId}`} key={`group-history-${index}`}>
+                      <MenuItem>{taskGroupId}</MenuItem>
+                    </LinkContainer>
+                  ))
+                ) :
+                null
+              }
 
-                <MenuItem divider />
-                <MenuItem header>Tasks</MenuItem>
-                {taskHistory.length ?
-                  (
-                    taskHistory.map((taskId, index) => (
-                      <LinkContainer to={`/tasks/${taskId}`} key={`task-history-${index}`}>
-                        <MenuItem>{taskId}</MenuItem>
-                      </LinkContainer>
-                    ))
-                  ) :
-                  null
-                }
-              </DropdownButton>
-            </ButtonGroup>
-          </Col>
+              <MenuItem divider />
+              <MenuItem header>Tasks</MenuItem>
+              {taskHistory.length ?
+                (
+                  taskHistory.map((taskId, index) => (
+                    <LinkContainer to={`/tasks/${taskId}`} key={`task-history-${index}`}>
+                      <MenuItem>{taskId}</MenuItem>
+                    </LinkContainer>
+                  ))
+                ) :
+                null
+              }
+            </DropdownButton>
+          </ButtonGroup>
         </Col>
       </Form>
     );
