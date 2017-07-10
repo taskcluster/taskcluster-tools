@@ -418,7 +418,7 @@ export default class Inspector extends React.PureComponent {
               to={`/groups/${taskGroupId}/tasks/${trackedTaskId}/runs/${runNumber}/artifacts`}
               disabled={!(artifacts && artifacts.length)}
               active={subSectionId === 'artifacts'}>
-              <NavItem>{artifacts && artifacts.length ? 'Artifacts' : 'No artifacts'}</NavItem>
+              <NavItem>{artifacts && artifacts.length ? 'Run Artifacts' : 'No artifacts for run'}</NavItem>
             </LinkContainer>
           </Nav>
         </Row>

@@ -249,7 +249,7 @@ export default class ActionsMenu extends React.PureComponent {
     const { taskId } = this.props;
 
     if (!taskId) {
-      return <NavItem disabled>Actions</NavItem>;
+      return <NavItem disabled>Task Actions</NavItem>;
     }
 
     const { caches } = this.state;
@@ -257,7 +257,7 @@ export default class ActionsMenu extends React.PureComponent {
     const isResolved = status ? ['completed', 'failed', 'exception'].includes(status.state) : false;
 
     return (
-      <NavDropdown title="Actions" id="task-view-actions">
+      <NavDropdown title="Task Actions" id="task-view-actions">
         <ModalItem
           disabled={!(queue && task)}
           onSubmit={this.scheduleTask}
