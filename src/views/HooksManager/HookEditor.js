@@ -77,13 +77,12 @@ export default class HookEditor extends React.PureComponent {
   handleNewScheduleChange = e => this.setState({ newScheduleValue: e.target.value });
 
   validHook = () => {
+    const { hook } = this.state;
     const isValid = (
-      this.state.hook.hookGroupId &&
-      this.state.hook.hookId &&
-      this.state.hook.metadata.name &&
-      this.state.hook.metadata.description &&
-      this.state.hook.metadata.owner &&
-      this.state.hook.metadata.deadline
+      hook.metadata.name &&
+      hook.metadata.description &&
+      hook.metadata.owner &&
+      hook.deadline
     );
 
     if (!isValid) {
@@ -92,7 +91,7 @@ export default class HookEditor extends React.PureComponent {
 
     // TODO: parse against schema and show errors
     try {
-      JSON.parse(this.state.hook.task);
+      JSON.parse(JSON.stringify(hook.task));
       return true;
     } catch (err) {
       return false;
@@ -154,8 +153,8 @@ export default class HookEditor extends React.PureComponent {
     hook: assocPath(['deadline'], e.target.value, this.state.hook)
   });
 
-  onTaskChange = e => this.setState({
-    hook: assocPath(['task'], JSON.parse(e.target.value), this.state.hook)
+  onTaskChange = value => this.setState({
+    hook: assocPath(['task'], JSON.parse(value), this.state.hook)
   });
 
   getHookDefinition = () => {
