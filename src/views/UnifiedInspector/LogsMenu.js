@@ -17,11 +17,11 @@ export default class LogsMenu extends React.PureComponent {
     const { taskGroupId, taskId, runId, logs, active } = this.props;
 
     if (!taskGroupId || !taskId || isNil(runId) || !logs || !logs.length) {
-      return <NavItem disabled>No logs</NavItem>;
+      return <NavItem disabled>No logs for run</NavItem>;
     }
 
     return (
-      <NavDropdown title="Logs" active={active} id="logs-dropdown">
+      <NavDropdown title="Run Logs" active={active} id="logs-dropdown">
         {logs.map((log, index) => (
           <LinkContainer
             to={`/groups/${taskGroupId}/tasks/${taskId}/runs/${runId}/logs/${encodeURIComponent(log.name)}`}

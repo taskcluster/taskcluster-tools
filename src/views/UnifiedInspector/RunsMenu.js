@@ -21,21 +21,21 @@ export default class RunsMenu extends React.PureComponent {
     const { runId, status } = this.props;
 
     return runId === status.runs.length - 1 ?
-      `Run ${runId} (Latest)` :
-      `Run ${runId}`;
+      `Task Run ${runId} (Latest)` :
+      `Task Run ${runId}`;
   }
 
   render() {
     const { status, taskGroupId, taskId, active, runId } = this.props;
 
     if (!status || !status.runs || !status.runs.length || !taskId || !taskGroupId || isNil(runId)) {
-      return <NavItem disabled>No runs</NavItem>;
+      return <NavItem disabled>No runs for task</NavItem>;
     }
 
     if (status.runs.length === 1) {
       return (
         <LinkContainer to={`/groups/${taskGroupId}/tasks/${taskId}/runs/0`} exact={true}>
-          <NavItem>Run 0 (Latest)</NavItem>
+          <NavItem>Task Run 0 (Latest)</NavItem>
         </LinkContainer>
       );
     }
@@ -44,7 +44,7 @@ export default class RunsMenu extends React.PureComponent {
       <NavDropdown title={this.getRunsTitle()} active={active} id="runs-dropdown">
         {[...status.runs].reverse().map(({ runId }, index) => (
           <LinkContainer to={`/groups/${taskGroupId}/tasks/${taskId}/runs/${runId}`} key={`runs-menu-item-${index}`}>
-            <MenuItem>Run {runId}{index === 0 ? ' (Latest)' : ''}</MenuItem>
+            <MenuItem>Task Run {runId}{index === 0 ? ' (Latest)' : ''}</MenuItem>
           </LinkContainer>
         ))}
       </NavDropdown>
