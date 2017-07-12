@@ -372,6 +372,7 @@ export default class Inspector extends React.PureComponent {
   renderTaskGroup() {
     const { taskGroupId, taskId, queue, purgeCache, url, runId, sectionId, subSectionId, artifactId } = this.props;
     const { tasks, status, task, selectedTaskId, selectedRun, artifacts } = this.state;
+
     const trackedTaskId = taskId || selectedTaskId;
     const runNumber = this.getRunNumber(runId, selectedRun, status ? status.runs : []);
     const logs = artifacts && this.getLogsFromArtifacts(artifacts);
