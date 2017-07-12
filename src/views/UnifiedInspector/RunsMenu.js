@@ -42,7 +42,7 @@ export default class RunsMenu extends React.PureComponent {
 
     return (
       <NavDropdown title={this.getRunsTitle()} active={active} id="runs-dropdown">
-        {status.runs.reverse().map(({ runId }, index) => (
+        {Array.from(status.runs).reverse().map(({ runId }, index) => (
           <LinkContainer to={`/groups/${taskGroupId}/tasks/${taskId}/runs/${runId}`} key={`runs-menu-item-${index}`}>
             <MenuItem>Task Run {runId}{index === 0 ? ' (Latest)' : ''}</MenuItem>
           </LinkContainer>
