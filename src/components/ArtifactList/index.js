@@ -14,6 +14,7 @@ export default class ArtifactList extends React.PureComponent {
     ]),
     menu: bool,
     queue: object.isRequired,
+    credentials: object,
     style: object
   };
 
