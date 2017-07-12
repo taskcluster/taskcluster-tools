@@ -33,20 +33,27 @@ export default class IndexBrowser extends React.PureComponent {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.namespaceToken !== this.state.namespaceToken ||
+      prevState.tasksToken !== this.state.tasksToken) {
+      this.loadTasksAndNamespaces(this.props);
+    }
+  }
+
   async loadTasksAndNamespaces({ index, namespace }) {
     try {
       this.setState({
         error: null,
         namespaceInput: namespace,
-        namespaces: await index.listNamespaces(namespace, { continuationToken: this.state.namespaceToken }),
-        tasks: await index.listTasks(namespace, { continuationToken: this.state.tasksToken })
+        tasks: await index.listTasks(namespace, { continuationToken: this.state.tasksToken || undefined }),
+        namespaces: await index.listNamespaces(namespace, { continuationToken: this.state.namespaceToken || undefined })
       });
     } catch (err) {
       this.setState({
         error: err,
         namespaceInput: namespace,
-        namespaces: null,
-        tasks: null
+        tasks: null,
+        namespaces: null
       });
     }
   }
