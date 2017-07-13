@@ -17,6 +17,7 @@ const View = ({ credentials, match, history, location }) => {
           {...clients}
           url={match.url}
           history={history}
+          credentials={credentials}
           highlight={hasHighlight ? highlight : null}
           taskGroupId={match.params.taskGroupId}
           taskId={match.params.taskId}

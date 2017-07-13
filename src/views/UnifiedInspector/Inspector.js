@@ -432,6 +432,7 @@ export default class Inspector extends React.PureComponent {
               queue={queue}
               taskId={trackedTaskId}
               artifacts={artifacts}
+              credentials={this.props.credentials}
               runId={runNumber} />
             <PropsRoute
               path={PATHS.LOG}
