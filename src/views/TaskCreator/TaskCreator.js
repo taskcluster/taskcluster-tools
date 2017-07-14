@@ -14,7 +14,7 @@ const defaultTask = {
   provisionerId: 'aws-provisioner-v1',
   workerType: 'tutorial',
   created: moment().toISOString(),
-  deadline: moment().add(1, 'hours').toISOString(),
+  deadline: moment().add(3, 'hours').toISOString(),
   payload: {
     image: 'ubuntu:13.10',
     command: ['/bin/bash', '-c', 'for ((i=1;i<=600;i++)); do echo $i; sleep 1; done'],
