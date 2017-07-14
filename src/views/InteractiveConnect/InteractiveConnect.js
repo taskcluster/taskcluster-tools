@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert, Button, Label } from 'react-bootstrap';
+import Tooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
 import { WebListener } from 'taskcluster-client';
@@ -245,8 +246,12 @@ export default class InteractiveConnect extends React.PureComponent {
     if (['completed', 'failed', 'exception'].includes(status.state)) {
       return (
         <Alert bsStyle="warning">
-          <strong>Task Resolved!</strong> You can not attach to an interactive task after it has
+          <strong><Link to={`/tasks/${taskId}`} data-tip={true} data-for={taskId}>Task</Link> Resolved!</strong>
+          You can not attach to an interactive task after it has
           stopped running.
+          <Tooltip id={taskId} type="info" effect="float" place="top">
+            {taskId}
+          </Tooltip>
         </Alert>
       );
     }
