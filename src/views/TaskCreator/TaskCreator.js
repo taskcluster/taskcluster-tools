@@ -2,8 +2,8 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { Button, ButtonToolbar, Glyphicon, Col } from 'react-bootstrap';
 import { safeLoad, safeDump } from 'js-yaml';
-import merge from 'deepmerge';
 import { nice } from 'slugid';
+import moment from 'moment';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import CodeEditor from '../../components/CodeEditor';
@@ -13,8 +13,8 @@ const localStorageKey = 'tasks:create';
 const defaultTask = {
   provisionerId: 'aws-provisioner-v1',
   workerType: 'tutorial',
-  created: null,
-  deadline: null,
+  created: moment().toISOString(),
+  deadline: moment().add(1, 'hours').toISOString(),
   payload: {
     image: 'ubuntu:13.10',
     command: ['/bin/bash', '-c', 'for ((i=1;i<=600;i++)); do echo $i; sleep 1; done'],
@@ -74,16 +74,30 @@ export default class TaskCreator extends React.PureComponent {
   }
 
   parameterizeTask(task) {
-    const deadline = new Date();
+    const offset = moment().diff(moment(task.created));
+    const jsonDate = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 
-    deadline.setMinutes(deadline.getMinutes() + 60);
+    // Increment all timestamps in the task by offset
+    const iter = (obj) => {
+      switch (typeof obj) {
+        case 'object':
+          return Array.isArray(obj) ?
+            obj.map(iter) :
+            Object
+              .entries(obj)
+              .reduce((o, [key, value]) => ({ ...o, [key]: iter(value) }), {});
 
-    const clone = merge(task, {
-      created: new Date().toJSON(),
-      deadline: deadline.toJSON()
-    });
+        case 'string':
+          return jsonDate.test(obj) ?
+            moment(obj).add(offset).toISOString() :
+            obj;
 
-    return `${safeDump(clone, { noCompatMode: true, noRefs: true })}`;
+        default:
+          return obj;
+      }
+    };
+
+    return `${safeDump(iter(task), { noCompatMode: true, noRefs: true })}`;
   }
 
   handleCreateTask = async () => {
