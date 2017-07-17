@@ -99,16 +99,9 @@ export default class ActionsMenu extends React.PureComponent {
     'taskGroupId',
     'schedulerId',
     'priority',
-    'created',
-    'deadline',
     'dependencies',
     'requires'
-  ], {
-    ...this.props.task,
-    // filled in by task creator on load
-    created: null,
-    deadline: null
-  });
+  ], this.props.task);
 
   scheduleTask = () => this.props.queue.scheduleTask(this.props.taskId);
 
