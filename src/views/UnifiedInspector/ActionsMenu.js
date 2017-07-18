@@ -90,6 +90,8 @@ export default class ActionsMenu extends React.PureComponent {
       created: new Date(now).toJSON(),
       dependencies: task.dependencies.filter(requiredTask => requiredTask !== taskId)
     }));
+
+    return taskId;
   };
 
   // copy fields from the parent task, intentionally excluding some
