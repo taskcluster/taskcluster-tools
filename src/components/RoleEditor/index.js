@@ -1,6 +1,6 @@
 import React from 'react';
 import { func } from 'prop-types';
-import { Alert, ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 import { assoc } from 'ramda';
 import Icon from 'react-fontawesome';
 import Spinner from '../Spinner';
@@ -8,11 +8,12 @@ import ScopeEditor from '../ScopeEditor';
 import DateView from '../DateView';
 import Markdown from '../Markdown';
 import ModalItem from '../ModalItem';
+import Error from '../../components/Error';
 
 export default class RoleEditor extends React.PureComponent {
   static propTypes = {
     // Method to reload a role in the parent
-    reloadRoles: func.isRequired,
+    navigate: func.isRequired,
     deleteRole: func.isRequired
   };
 
@@ -60,12 +61,16 @@ export default class RoleEditor extends React.PureComponent {
       });
     }
 
-    this.setState({
-      role: await props.auth.role(props.currentRoleId),
-      editing: false,
-      working: false,
-      error: null
-    });
+    try {
+      this.setState({
+        role: await props.auth.role(props.currentRoleId),
+        editing: false,
+        working: false,
+        error: null
+      });
+    } catch (err) {
+      this.setState({ error: err });
+    }
   };
 
   validRoleId = () => (this.state.role.roleId || '').length > 0;
@@ -99,7 +104,7 @@ export default class RoleEditor extends React.PureComponent {
         editing: false,
         working: false,
         error: null
-      });
+      }, () => this.props.navigate(role.roleId));
     } catch (err) {
       this.setState({
         working: false,
@@ -126,11 +131,6 @@ export default class RoleEditor extends React.PureComponent {
     }
   };
 
-  dismissError = () => this.setState({
-    working: false,
-    error: null
-  });
-
   renderEditingToolbar() {
     return (
       <ButtonToolbar>
@@ -141,7 +141,8 @@ export default class RoleEditor extends React.PureComponent {
           button={true}
           bsStyle="danger"
           disabled={this.state.working}
-          onSubmit={this.props.deleteRole}
+          onSubmit={() => this.props.deleteRole(this.state.role.roleId)}
+          onComplete={this.props.navigate}
           body={(
             <span>
               Are you sure you want to delete role with role ID <code>{this.state.role.roleId}</code>?
@@ -194,6 +195,10 @@ export default class RoleEditor extends React.PureComponent {
       title = isEditing ? 'Edit Role' : 'View Role';
     }
 
+    if (this.state.error) {
+      return <Error error={this.state.error} />;
+    }
+
     if (!this.state.role) {
       return <Spinner />;
     }
@@ -202,12 +207,6 @@ export default class RoleEditor extends React.PureComponent {
       <div className="role-editor">
         <h4 style={{ marginTop: 0 }}>{title}</h4>
         <hr style={{ marginBottom: 10 }} />
-        {this.state.error && (
-          <Alert bsStyle="danger" onDismiss={this.dismissError}>
-            <strong>Error executing operation</strong>&nbsp;
-            {this.state.error.toString()}
-          </Alert>
-        )}
         <div className="form-horizontal">
           {
             isCreating ? (
