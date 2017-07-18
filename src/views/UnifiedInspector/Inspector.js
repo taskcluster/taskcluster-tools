@@ -134,7 +134,7 @@ export default class Inspector extends React.PureComponent {
     try {
       const [status, task] = await Promise.all([this.getStatus(taskId), this.getTask(taskId)]);
       const runNumber = this.getRunNumber(runId, null, status.runs);
-      const artifacts = await this.getArtifacts(taskId, runNumber);
+      const artifacts = status.state !== 'unscheduled' ? await this.getArtifacts(taskId, runNumber) : [];
 
       this.setState({
         selectedTaskId: taskId,
