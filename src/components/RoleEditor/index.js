@@ -69,7 +69,10 @@ export default class RoleEditor extends React.PureComponent {
         error: null
       });
     } catch (err) {
-      this.setState({ error: err });
+      this.setState({
+        error: err,
+        role: null
+      });
     }
   };
 
@@ -104,7 +107,7 @@ export default class RoleEditor extends React.PureComponent {
         editing: false,
         working: false,
         error: null
-      }, () => this.props.navigate(role.roleId));
+      }, () => this.props.navigate(roleId));
     } catch (err) {
       this.setState({
         working: false,
