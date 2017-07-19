@@ -71,13 +71,24 @@ export default class ClientEditor extends React.PureComponent {
       });
     }
 
+    const onLoadError = err => (
+      this.setState({
+        client: null,
+        error: err
+      })
+    );
+
     if (this.state.client && this.state.client.clientId === props.currentClientId) {
-      return this.setState({
-        client: await props.auth.client(props.currentClientId),
-        editing: false,
-        working: false,
-        error: null
-      });
+      try {
+        return this.setState({
+          client: await props.auth.client(props.currentClientId),
+          editing: false,
+          working: false,
+          error: null
+        });
+      } catch (err) {
+        return onLoadError(err);
+      }
     }
 
     try {
@@ -89,10 +100,7 @@ export default class ClientEditor extends React.PureComponent {
         error: null
       });
     } catch (err) {
-      this.setState({
-        client: null,
-        error: err
-      });
+      onLoadError(err);
     }
   }
 
