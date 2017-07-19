@@ -1,7 +1,7 @@
 import React from 'react';
 import { func } from 'prop-types';
 import {
-  Alert, OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar
+  OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar
 } from 'react-bootstrap';
 import moment from 'moment';
 import { assoc } from 'ramda';
@@ -12,11 +12,12 @@ import ModalItem from '../../components/ModalItem';
 import Markdown from '../../components/Markdown';
 import DateView from '../../components/DateView';
 import ScopeEditor from '../../components/ScopeEditor';
+import Error from '../../components/Error';
 
 export default class ClientEditor extends React.PureComponent {
   static propTypes = {
     // Method to reload a client in the parent
-    reloadClients: func.isRequired
+    navigate: func.isRequired
   };
 
   static defaultProps = {
@@ -70,9 +71,9 @@ export default class ClientEditor extends React.PureComponent {
       });
     }
 
-    // Load currentClientId, but avoid doing so after creating a new client
     if (this.state.client && this.state.client.clientId === props.currentClientId) {
-      this.setState({
+      return this.setState({
+        client: await props.auth.client(props.currentClientId),
         editing: false,
         working: false,
         error: null
@@ -96,12 +97,8 @@ export default class ClientEditor extends React.PureComponent {
   }
 
   render() {
-    if (this.state.error && !this.state.client) {
-      return (
-        <Alert bsStyle="danger" onDismiss={this.dismissError}>
-          <strong>Error executing operation</strong> {this.state.error.toString()}
-        </Alert>
-      );
+    if (this.state.error) {
+      return <Error error={this.state.error} />;
     }
 
     const isCreating = this.props.currentClientId === '' && this.state.accessToken === null;
@@ -128,11 +125,6 @@ export default class ClientEditor extends React.PureComponent {
       <div className="client-editor">
         <h4 style={{ marginTop: 0 }}>{title}</h4>
         <hr style={{ marginBottom: 10 }} />
-        {this.state.error && (
-          <Alert bsStyle="danger" onDismiss={this.dismissError}>
-            <strong>Error executing operation</strong> {this.state.error.toString()}
-          </Alert>
-        )}
         <div className="form-horizontal">
           {
             isCreating ? (
@@ -195,7 +187,7 @@ export default class ClientEditor extends React.PureComponent {
                     );
                   }
 
-                  if (this.state.accessToken != null) {
+                  if (this.state.accessToken !== null) {
                     return (
                       <Modal show={this.state.showModal} onHide={this.closeDialog}>
                         <Modal.Header closeButton={true}>Access Token</Modal.Header>
@@ -347,6 +339,7 @@ export default class ClientEditor extends React.PureComponent {
           button={true}
           disabled={this.state.working}
           onSubmit={this.deleteClient}
+          onComplete={this.props.navigate}
           body={(
             <span>
               Are you sure you want to delete credentials with client ID <code>{this.state.client.clientId}</code>?
@@ -490,9 +483,7 @@ export default class ClientEditor extends React.PureComponent {
         editing: false,
         working: false,
         error: null
-      });
-
-      this.props.reloadClients();
+      }, () => this.props.navigate(clientId));
     } catch (err) {
       this.setState({
         working: false,
@@ -512,7 +503,7 @@ export default class ClientEditor extends React.PureComponent {
         deleteOnExpiration: this.state.client.deleteOnExpiration
       });
 
-      this.props.reloadClients();
+      this.props.navigate(clientId);
 
       this.setState({
         editing: false,
@@ -557,10 +548,4 @@ export default class ClientEditor extends React.PureComponent {
       this.setState({ error: err });
     }
   };
-
-  /** Reset error state from operation*/
-  dismissError = () => this.setState({
-    working: false,
-    error: null
-  });
 }
