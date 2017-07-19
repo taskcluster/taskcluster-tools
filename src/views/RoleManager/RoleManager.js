@@ -19,7 +19,7 @@ export default class RoleManager extends React.PureComponent {
     this.load();
   }
 
-  async load() {
+  load = async () => {
     try {
       this.setState({
         roles: await this.props.auth.listRoles(),
@@ -31,7 +31,12 @@ export default class RoleManager extends React.PureComponent {
         error: err
       });
     }
-  }
+  };
+
+  navigate = (roleId) => {
+    this.load();
+    this.props.history.replace(`/auth/roles/${roleId ? encodeURIComponent(roleId) : ''}`);
+  };
 
   deleteRole = roleId => this.props.auth.deleteRole(roleId);
 
@@ -88,9 +93,10 @@ export default class RoleManager extends React.PureComponent {
         <Col md={7}>
           <RoleEditor
             auth={this.props.auth}
+            history={this.props.history}
             currentRoleId={this.props.roleId}
             deleteRole={this.deleteRole}
-            reloadRoles={this.load} />
+            navigate={this.navigate} />
         </Col>
       </Row>
     );
