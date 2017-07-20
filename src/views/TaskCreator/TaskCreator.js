@@ -79,6 +79,10 @@ export default class TaskCreator extends React.PureComponent {
 
     // Increment all timestamps in the task by offset
     const iter = (obj) => {
+      if (!obj) {
+        return obj;
+      }
+
       switch (typeof obj) {
         case 'object':
           return Array.isArray(obj) ?
