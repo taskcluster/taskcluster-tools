@@ -2,7 +2,6 @@ import React from 'react';
 import { func, object } from 'prop-types';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client';
-import moment from 'moment';
 import Icon from 'react-fontawesome';
 import Spinner from '../../components/Spinner';
 import TimeInput from '../../components/TimeInput';
@@ -87,7 +86,7 @@ export default class SecretEditor extends React.PureComponent {
   }
 
   onExpiresChange = date => this.setState({
-    expires: date.toDate().toJSON()
+    expires: date.toJSON()
   });
 
   handleSecretNameChange = e => this.setState({ secretNameValue: e.target.value });
@@ -215,8 +214,7 @@ export default class SecretEditor extends React.PureComponent {
                 editing ?
                   (
                     <TimeInput
-                      format="YYYY-MM-DD HH:mm:ss ZZ"
-                      value={moment(new Date(expires))}
+                      value={new Date(expires)}
                       onChange={this.onExpiresChange}
                       className="form-control" />
                   ) :
