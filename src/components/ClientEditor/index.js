@@ -3,7 +3,6 @@ import { func } from 'prop-types';
 import {
   OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar
 } from 'react-bootstrap';
-import moment from 'moment';
 import { assoc } from 'ramda';
 import Icon from 'react-fontawesome';
 import Spinner from '../../components/Spinner';
@@ -223,8 +222,7 @@ export default class ClientEditor extends React.PureComponent {
               {
                 isEditing ? (
                   <TimeInput
-                    format="YYYY-MM-DD HH:mm:ss ZZ"
-                    value={moment(new Date(this.state.client.expires))}
+                    value={new Date(this.state.client.expires)}
                     onChange={this.onExpiresChange}
                     className="form-control" />
                 ) : (
@@ -439,7 +437,7 @@ export default class ClientEditor extends React.PureComponent {
 
   /** When expires exchanges in the editor */
   onExpiresChange = date => this.setState({
-    client: assoc('expires', date.toDate().toJSON(), this.state.client)
+    client: assoc('expires', date.toJSON(), this.state.client)
   });
 
   onDOEChange = () => this.setState({
