@@ -28,16 +28,6 @@ export default class SecretEditor extends React.PureComponent {
       error: null,
       showSecret: false
     };
-
-    // this.onExpiresChange = this.onExpiresChange.bind(this);
-    // this.startEditing = this.startEditing.bind(this);
-    // this.openSecret = this.openSecret.bind(this);
-    // this.saveSecret = this.saveSecret.bind(this);
-    // this.deleteSecret = this.deleteSecret.bind(this);
-    // this.showError = this.showError.bind(this);
-    // this.dismissError = this.dismissError.bind(this);
-    // this.load = this.load.bind(this);
-    // this.onTaskclusterUpdate = this.onTaskclusterUpdate.bind(this);
   }
 
   componentWillMount() {
@@ -156,7 +146,7 @@ export default class SecretEditor extends React.PureComponent {
     const { secretId } = this.props;
     const { error, secret, expires, editing, working, secretNameValue } = this.state;
 
-    if (!secret) {
+    if (!secret && !error) {
       return <Spinner />;
     }
 
