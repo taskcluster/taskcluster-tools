@@ -66,6 +66,11 @@ export default class Inspector extends React.PureComponent {
   }
 
   componentWillUnmount() {
+    if (this.groupListener) {
+      this.groupListener.close();
+      this.groupListener = null;
+    }
+
     if (this.taskListener) {
       this.taskListener.close();
       this.taskListener = null;
@@ -106,6 +111,7 @@ export default class Inspector extends React.PureComponent {
     }
 
     this.updateLocalHistory(taskGroupId, taskGroupItemKey);
+    this.createGroupListener(taskGroupId);
 
     try {
       const { tasks, continuationToken } = await queue
@@ -162,6 +168,30 @@ export default class Inspector extends React.PureComponent {
     }
   }
 
+  createGroupListener(taskGroupId) {
+    if (this.groupListener) {
+      this.groupListener.close();
+      this.groupListener = null;
+    }
+
+    if (!taskGroupId) {
+      return;
+    }
+
+    const { queueEvents } = this.props;
+    const listener = new WebListener();
+    const routingKey = { taskGroupId };
+
+    ['taskDefined', 'taskPending', 'taskRunning', 'taskCompleted', 'taskFailed', 'taskException']
+      .map(binding => listener.bind(queueEvents[binding](routingKey)));
+
+    listener.on('message', this.handleGroupMessage);
+    listener.resume();
+    this.groupListener = listener;
+
+    return listener;
+  }
+
   createTaskListener(taskId) {
     if (this.taskListener) {
       this.taskListener.close();
@@ -176,9 +206,7 @@ export default class Inspector extends React.PureComponent {
     const listener = new WebListener();
     const routingKey = { taskId };
 
-    ['taskDefined', 'taskPending', 'taskRunning', 'artifactCreated', 'taskCompleted', 'taskFailed', 'taskException']
-      .map(binding => listener.bind(queueEvents[binding](routingKey)));
-
+    listener.bind(queueEvents.artifactCreated(routingKey));
     listener.on('message', this.handleTaskMessage);
     listener.resume();
     this.taskListener = listener;
@@ -207,6 +235,10 @@ export default class Inspector extends React.PureComponent {
     const { queueEvents, runId } = this.props;
     const { taskId } = payload.status;
 
+    if (!taskId) {
+      return;
+    }
+
     if (exchange === queueEvents.artifactCreated().exchange) {
       const runNumber = this.getRunNumber(runId, null, payload.status.runs);
       const artifacts = await this.getArtifacts(taskId, runNumber);
@@ -216,16 +248,23 @@ export default class Inspector extends React.PureComponent {
         status: payload.status
       });
     }
+  };
+
+  handleGroupMessage = async ({ payload, exchange }) => {
+    const { queueEvents } = this.props;
+    const { taskId } = payload.status;
 
     if (!taskId) {
       return this.setState({ status: payload.status });
     }
 
     const [status, task] = await Promise.all([this.getStatus(taskId), this.getTask(taskId)]);
-    const tasks = this.state.tasks.map(item => ({
-      status: item.status.taskId === taskId ? status : item.status,
-      task: item.status.taskId === taskId ? task : item.task
-    }));
+    const tasks = exchange === queueEvents.taskDefined().exchange ?
+      [...this.state.tasks, { status, task }] :
+      this.state.tasks.map(item => ({
+        status: item.status.taskId === taskId ? status : item.status,
+        task: item.status.taskId === taskId ? task : item.task
+      }));
 
     this.setState({
       status,
@@ -484,7 +523,7 @@ export default class Inspector extends React.PureComponent {
                   onClick={this.handleRequestNotify}
                   disabled={!('Notification' in window) || Notification.permission === 'denied'}>
                   <Icon name={notify ? 'check-square-o' : 'square-o'} />
-                  &nbsp;&nbsp;Notify me on status changes
+                  &nbsp;&nbsp;Notify me on task failures
                 </Button>
               </Col>
             </Row>
