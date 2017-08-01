@@ -266,17 +266,16 @@ export default class Inspector extends React.PureComponent {
         task: item.status.taskId === taskId ? task : item.task
       }));
 
-    this.setState({
-      status,
-      task,
-      tasks
-    }, () => {
-      if (exchange === queueEvents.taskException().exchange) {
-        this.notify('A task exception occurred');
-      } else if (exchange === queueEvents.taskFailed().exchange) {
-        this.notify('A task failure occurred');
-      }
-    });
+    this.setState(taskId === this.props.taskId ?
+      { status, task, tasks } :
+      { tasks },
+      () => {
+        if (exchange === queueEvents.taskException().exchange) {
+          this.notify('A task exception occurred');
+        } else if (exchange === queueEvents.taskFailed().exchange) {
+          this.notify('A task failure occurred');
+        }
+      });
   };
 
   navigate = (taskGroupId, taskId) => {
