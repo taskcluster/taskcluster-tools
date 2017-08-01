@@ -51,6 +51,7 @@
     "react-fontawesome": "^1.6.1",
     "react-helmet": "^5.0.3",
     "react-hot-loader": "3.0.0-beta.6",
+    "react-input-enhancements": "^0.5.4",
     "react-json-inspector": "^7.0.0",
     "react-lazylog": "^1.2.0",
     "react-loadable": "^4.0.4",
@@ -62,7 +63,7 @@
     "react-vnc-display": "^1.1.0",
     "shebang-loader": "0.0.1",
     "slugid": "^1.1.0",
-    "taskcluster-client": "^2.5.3",
+    "taskcluster-client": "^2.5.4",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
     "xml2js": "^0.4.18"
