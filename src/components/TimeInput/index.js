@@ -1,12 +1,10 @@
 import React from 'react';
-import { string, object, func } from 'prop-types';
+import { object, func } from 'prop-types';
 import { Glyphicon } from 'react-bootstrap';
-import moment from 'moment';
 import classNames from 'classnames';
 
 export default class TimeInput extends React.PureComponent {
   static propTypes = {
-    format: string.isRequired,
     value: object.isRequired,
     onChange: func
   };
@@ -18,8 +16,8 @@ export default class TimeInput extends React.PureComponent {
   }
 
   onChange = (e) => {
-    const parsed = moment(e.target.value);
-    const valid = parsed.format(this.props.format) === e.target.value;
+    const parsed = new Date(e.target.value);
+    const valid = parsed.toJSON() === e.target.value;
 
     this.setState({ valid });
 
@@ -29,9 +27,9 @@ export default class TimeInput extends React.PureComponent {
   };
 
   render() {
-    const { format, value, className } = this.props;
+    const { value, className } = this.props;
     const { valid } = this.state;
-    const formatted = value.format(format);
+    const formatted = value.toJSON();
     const inputClass = classNames('input-group', valid ? 'has-success' : 'has-error');
 
     return (

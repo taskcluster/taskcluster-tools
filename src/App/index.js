@@ -87,13 +87,14 @@ export default class App extends React.Component {
   };
 
   loadCredentials() {
-    const credentials = JSON.parse(localStorage.getItem('credentials'));
+    const storedCredentials = localStorage.getItem('credentials');
 
     // We have no credentials
-    if (!credentials) {
+    if (!storedCredentials) {
       return { credentials: null };
     }
 
+    const credentials = JSON.parse(storedCredentials);
     const { certificate } = credentials;
     const isExpired = certificate && certificate.expiry < Date.now();
 
@@ -147,7 +148,7 @@ export default class App extends React.Component {
     this.saveCredentials({
       clientId,
       accessToken,
-      certificate: certificate === '' ? certificate : JSON.parse(certificate)
+      certificate: certificate ? JSON.parse(certificate) : null
     });
   };
 

@@ -21,10 +21,7 @@ export default class ClientManager extends Component {
     this.loadClients();
   }
 
-  deleteClient = async (clientId) => {
-    await this.props.auth.deleteClient(clientId);
-    this.props.history.replace('/auth/clients');
-  };
+  deleteClient = clientId => this.props.auth.deleteClient(clientId);
 
   loadClients = async () => {
     const { clientPrefix } = this.state;
@@ -40,6 +37,11 @@ export default class ClientManager extends Component {
         error: err
       });
     }
+  };
+
+  navigate = (clientId) => {
+    this.loadClients();
+    this.props.history.replace(`/auth/clients/${clientId ? encodeURIComponent(clientId) : ''}`);
   };
 
   handlePrefixChange = e => this.setState({ clientPrefix: e.target.value });
@@ -127,7 +129,7 @@ export default class ClientManager extends Component {
             credentials={this.props.credentials}
             currentClientId={this.props.clientId}
             deleteClient={this.deleteClient}
-            reloadClients={this.loadClients} />
+            navigate={this.navigate} />
         </Col>
       </Row>
     );

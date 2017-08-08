@@ -279,7 +279,7 @@ export default class YamlCreator extends React.Component {
               </li>
               <li>
                 Make sure to install
-                the <a href="https://github.com/integration/taskcluster" target="_blank" rel="noopener noreferrer">
+                the <a href="https://github.com/apps/taskcluster" target="_blank" rel="noopener noreferrer">
                 Taskcluster-GitHub integration</a>.
               </li>
             </ul>
