@@ -58,6 +58,7 @@ export default class Inspector extends React.PureComponent {
   componentWillMount() {
     if (this.props.taskGroupId) {
       this.loadTasks(this.props);
+      this.loadActions(this.props);
     }
 
     if (this.props.taskId) {
@@ -87,12 +88,15 @@ export default class Inspector extends React.PureComponent {
         task: null,
         artifacts: null,
         selectedRun: null,
-        tasks: null
+        tasks: null,
+        actions: null,
+        decision: null
       });
     }
 
     if (taskGroupId !== this.props.taskGroupId && taskGroupId) {
       this.loadTasks(nextProps);
+      this.loadActions(nextProps);
     } else if (
       taskId &&
       (taskId !== this.state.selectedTaskId || (this.props.taskId && taskId !== this.props.taskId))
@@ -100,6 +104,27 @@ export default class Inspector extends React.PureComponent {
       this.loadTask(nextProps);
     } else if (runId && runId !== this.props.runId) {
       this.setState({ selectedRun: runId });
+    }
+  }
+
+  async loadActions(props) {
+    const { queue, taskGroupId } = props;
+
+    if (!taskGroupId) {
+      return;
+    }
+
+    try {
+      const decision = await queue.task(taskGroupId);
+      const url = queue.buildUrl(queue.getLatestArtifact, taskGroupId, 'public/actions.json');
+      const response = await fetch(url);
+      const actions = await response.json();
+
+      this.setState({ actions, decision });
+    } catch (err) {
+      if (err.statusCode !== 404) {
+        this.setState({ error: err });
+      }
     }
   }
 
@@ -378,6 +403,8 @@ export default class Inspector extends React.PureComponent {
 
   handleRetrigger = taskId => this.navigate(this.props.taskGroupId, taskId);
 
+  handleActionTask = taskId => this.navigate(this.props.taskGroupId, taskId);
+
   handleCreateInteractive = async taskId => this.props.history.push(`/tasks/${taskId}/connect`);
 
   getRunNumber(runId, selectedRun, runs) {
@@ -408,8 +435,28 @@ export default class Inspector extends React.PureComponent {
   }
 
   renderTaskGroup() {
-    const { taskGroupId, taskId, queue, purgeCache, url, runId, sectionId, subSectionId, artifactId } = this.props;
-    const { tasks, status, task, selectedTaskId, selectedRun, artifacts } = this.state;
+    const {
+      taskGroupId,
+      taskId,
+      queue,
+      purgeCache,
+      url,
+      runId,
+      sectionId,
+      subSectionId,
+      artifactId,
+      credentials
+    } = this.props;
+    const {
+      tasks,
+      actions,
+      status,
+      task,
+      selectedTaskId,
+      selectedRun,
+      artifacts,
+      decision
+    } = this.state;
 
     const trackedTaskId = taskId || selectedTaskId;
     const runNumber = this.getRunNumber(runId, selectedRun, status ? status.runs : []);
@@ -433,9 +480,14 @@ export default class Inspector extends React.PureComponent {
             <ActionsMenu
               queue={queue}
               purgeCache={purgeCache}
+              taskGroupId={taskGroupId}
               taskId={trackedTaskId}
               status={status}
               task={task}
+              actions={actions}
+              decision={decision}
+              credentials={credentials}
+              onActionTask={this.handleActionTask}
               onRetrigger={this.handleRetrigger}
               onEdit={this.handleEdit}
               onCreateInteractive={this.handleCreateInteractive}
