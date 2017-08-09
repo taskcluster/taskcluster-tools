@@ -144,7 +144,12 @@ export default class TaskCreator extends React.PureComponent {
 
     return (
       <div>
-        <CodeEditor mode="yaml" lint={true} value={task} onChange={this.handleTaskChange} />
+        <CodeEditor
+          gutters={['CodeMirror-lint-markers']}
+          mode="yaml"
+          lint={true}
+          value={task}
+          onChange={this.handleTaskChange} />
         <br />
 
         <ButtonToolbar>
