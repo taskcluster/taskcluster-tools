@@ -31,16 +31,19 @@ export default class LogView extends React.PureComponent {
       streaming,
       follow: streaming,
       isFullscreen: false,
-      fullscreenEnabled: fscreen.fullscreenEnabled
+      fullscreenEnabled: fscreen.fullscreenEnabled,
+      lazyViewerHeight: 800
     };
   }
 
   componentWillMount() {
     fscreen.addEventListener('fullscreenchange', this.handleFullscreenChange, false);
+    window.addEventListener('resize', this.handleLazyViewerHeight);
   }
 
   componentWillUnmount() {
     fscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+    window.removeEventListener('resize', this.handleLazyViewerHeight);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -53,6 +56,10 @@ export default class LogView extends React.PureComponent {
         isFullscreen: false
       });
     }
+  }
+
+  componentDidUpdate() {
+    this.handleLazyViewerHeight();
   }
 
   isStreaming(status) {
@@ -77,6 +84,12 @@ export default class LogView extends React.PureComponent {
     });
   };
 
+  handleLazyViewerHeight = () => {
+    if (this.lazylog) {
+      this.setState({ lazyViewerHeight: window.innerHeight - this.lazylog.getBoundingClientRect().top });
+    }
+  };
+
   registerChild = (ref) => {
     if (!ref) {
       return;
@@ -93,7 +106,7 @@ export default class LogView extends React.PureComponent {
 
   render() {
     const { queue, taskId, runId, status, log, highlight, onHighlight } = this.props;
-    const { streaming, follow, fullscreenEnabled, isFullscreen } = this.state;
+    const { streaming, follow, fullscreenEnabled, isFullscreen, lazyViewerHeight } = this.state;
 
     if (!queue || !taskId || isNil(runId) || !status || !log) {
       return null;
@@ -127,7 +140,7 @@ export default class LogView extends React.PureComponent {
             <LazyViewer
               ref={this.registerChild}
               url={url}
-              height={isFullscreen ? document.documentElement.clientHeight : 800}
+              height={isFullscreen ? document.documentElement.clientHeight : lazyViewerHeight}
               follow={follow}
               scrollToLine={!follow && highlight ? scrollToLine : null}
               scrollToAlignment="start"
