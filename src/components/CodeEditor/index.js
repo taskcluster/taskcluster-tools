@@ -5,6 +5,7 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/lint/lint.css';
+import './yaml-lint';
 import './styles.css';
 
 export default class CodeEditor extends React.PureComponent {
