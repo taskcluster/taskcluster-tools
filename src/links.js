@@ -27,12 +27,6 @@ export default [
     description: 'Manage worker types known to the AWS Provisioner and check on the status of AWS nodes.'
   },
   {
-    title: 'AWS Staging Provisioner',
-    link: '/aws-provisioner-staging',
-    icon: 'server',
-    description: 'Manage worker types known to the Staging AWS Provisioner and check on the status of AWS nodes.'
-  },
-  {
     title: 'Client Manager',
     link: '/auth/clients/',
     icon: 'users',

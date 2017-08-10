@@ -89,9 +89,9 @@ export default class WorkerTypeTable extends React.PureComponent {
   }
 
   setSelected = workerType => this.props.history
-    .replace(`/aws-provisioner/${workerType}/${this.props.currentTab}`);
+    .replace(`${this.props.routeRoot}/${workerType}/${this.props.currentTab}`);
 
-  handleTabChange = tab => this.props.history.replace(`/aws-provisioner/${this.props.workerType}/${tab}`);
+  handleTabChange = tab => this.props.history.replace(`${this.props.routeRoot}/${this.props.workerType}/${tab}`);
 
   workerTypeCreated = async (workerType) => {
     await this.loadWorkerTypeSummaries();
