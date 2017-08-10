@@ -18,6 +18,7 @@ const TaskRedirect = loadable(() => import(/* webpackChunkName: 'TaskRedirect' *
 const UnifiedInspector = loadable(() => import(/* webpackChunkName: 'UnifiedInspector' */ '../views/UnifiedInspector'));
 const QuickStart = loadable(() => import(/* webpackChunkName: 'QuickStart' */ '../views/QuickStart'));
 const AwsProvisioner = loadable(() => import(/* webpackChunkName: 'AwsProvisioner' */ '../views/AwsProvisioner'));
+const AwsProvisionerStaging = loadable(() => import(/* webpackChunkName: 'AwsProvisionerStaging' */ '../views/AwsProvisionerStaging'));
 const ClientManager = loadable(() => import(/* webpackChunkName: 'ClientManager' */ '../views/ClientManager'));
 const RoleManager = loadable(() => import(/* webpackChunkName: 'RoleManager' */ '../views/RoleManager'));
 const ScopeInspector = loadable(() => import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector'));
@@ -188,6 +189,7 @@ export default class App extends React.Component {
               <PropsRoute path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?" component={UnifiedInspector} credentials={credentials} />
               <PropsRoute path="/quickstart" component={QuickStart} credentials={credentials} />
               <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} />
+              <PropsRoute path="/aws-provisioner-staging/:workerType?/:currentTab?" component={AwsProvisionerStaging} credentials={credentials} />
               <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} credentials={credentials} />
               <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} credentials={credentials} />
               <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} credentials={credentials} />
