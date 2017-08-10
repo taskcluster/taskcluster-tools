@@ -1,25 +1,38 @@
 import React from 'react';
+import Ajv from 'ajv';
+import jsone from 'json-e';
 import { object, string, func } from 'prop-types';
-import { NavDropdown, NavItem, MenuItem } from 'react-bootstrap';
+import { Row, Col, NavDropdown, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { omit, pathOr } from 'ramda';
+import { Queue } from 'taskcluster-client';
 import { nice } from 'slugid';
 import merge from 'deepmerge';
 import clone from 'lodash.clonedeep';
+import jsonSchemaDefaults from 'json-schema-defaults';
+import { safeLoad, safeDump } from 'js-yaml';
 import ModalItem from '../../components/ModalItem';
+import Markdown from '../../components/Markdown';
+import CodeEditor from '../../components/CodeEditor';
+import Code from '../../components/Code';
 import { parameterizeTask } from '../../utils';
 
 export default class ActionsMenu extends React.PureComponent {
   static propTypes = {
     queue: object,
+    credentials: object,
     purgeCache: object,
+    taskGroupId: string,
     taskId: string,
     status: object,
     task: object,
+    decision: object,
+    actions: object,
     onRetrigger: func,
     onEdit: func,
     onCreateInteractive: func,
-    onEditInteractive: func
+    onEditInteractive: func,
+    onActionTask: func
   };
 
   constructor(props) {
@@ -27,10 +40,13 @@ export default class ActionsMenu extends React.PureComponent {
 
     const caches = this.getCachesFromTask(props.task);
 
+    this.ajv = new Ajv({ format: 'full', verbose: true, allErrors: true });
     this.state = {
       purged: null,
       caches,
-      selectedCaches: new Set(caches)
+      selectedCaches: new Set(caches),
+      taskActions: null,
+      groupActions: null
     };
   }
 
@@ -41,6 +57,58 @@ export default class ActionsMenu extends React.PureComponent {
       this.setState({
         caches,
         selectedCaches: new Set(caches)
+      });
+    }
+
+    if (nextProps.decision !== this.props.decision || nextProps.credentials !== this.props.credentials) {
+      const decision = nextProps.decision || this.props.decision;
+      const credentials = nextProps.credentials || this.props.credentials;
+
+      if (decision) {
+        this.actionsQueue = new Queue({
+          credentials,
+          authorizedScopes: decision.scopes || []
+        });
+      }
+    }
+
+    if (nextProps.actions !== this.props.actions ||
+        nextProps.taskGroupId !== this.props.taskGroupId ||
+        nextProps.taskId !== this.props.taskId ||
+        nextProps.task !== this.props.task
+    ) {
+      const actions = nextProps.actions || this.props.actions;
+      const task = nextProps.task || this.props.task;
+      const taskActions = [];
+      const groupActions = [];
+      const actionInputs = {};
+      const actionData = {};
+
+      if (actions && actions.actions) {
+        actions.actions.forEach((action) => {
+          const schema = action.schema || {};
+          const validate = this.ajv.compile(schema);
+          const form = safeDump(jsonSchemaDefaults(schema) || {});
+
+          actionInputs[action.name] = form;
+          actionData[action.name] = {
+            action,
+            validate
+          };
+
+          if (!action.context.length) {
+            groupActions.push(action.name);
+          } else if (task && task.tags && this.taskInContext(action.context, task.tags)) {
+            taskActions.push(action.name);
+          }
+        });
+      }
+
+      this.setState({
+        taskActions,
+        groupActions,
+        actionInputs,
+        actionData
       });
     }
   }
@@ -240,19 +308,88 @@ export default class ActionsMenu extends React.PureComponent {
     );
   }
 
-  render() {
-    const { taskId } = this.props;
+  taskInContext(tagSetList, taskTags) {
+    return tagSetList.some(tagSet =>
+      Object.keys(tagSet).every(tag => (
+        taskTags[tag] && taskTags[tag] === tagSet[tag]
+      ))
+    );
+  }
 
-    if (!taskId) {
-      return <NavItem disabled>Task Actions</NavItem>;
+  handleFormChange = (value, name) => this.setState({
+    actionInputs: {
+      ...this.state.actionInputs,
+      [name]: value
+    }
+  });
+
+  actionTaskModal = (name) => {
+    const { actionInputs, actionData } = this.state;
+    const { action } = actionData[name];
+    const form = actionInputs[name];
+
+    return (
+      <div>
+        <Markdown>{action.description}</Markdown><br />
+        {action.schema && (
+          <Row>
+            <Col lg={6} md={6} sm={12}>
+              <h4>Action</h4>
+              <CodeEditor mode="yaml" lint={true} value={form} onChange={value => this.handleFormChange(value, name)} />
+            </Col>
+            <Col lg={6} md={6} sm={12}>
+              <h4>Schema</h4>
+              <Code language="yaml" style={{ maxHeight: 250, overflow: 'scroll' }}>
+                {safeDump(action.schema || {})}
+              </Code>
+            </Col>
+          </Row>
+        )}
+      </div>
+    );
+  }
+
+  actionTaskSubmit = name => async () => {
+    const { task, taskId, taskGroupId, actions } = this.props;
+    const { actionInputs, actionData } = this.state;
+    const form = actionInputs[name];
+    const { validate, action } = actionData[name];
+    const input = safeLoad(form);
+    const valid = validate(input);
+
+    if (!valid) {
+      throw new Error(this.ajv.errorsText(validate.errors));
     }
 
-    const { caches } = this.state;
-    const { queue, purgeCache, status, task, onRetrigger, onEdit, onCreateInteractive, onEditInteractive } = this.props;
+    const newTaskId = nice();
+    const newTask = jsone(action.task, merge({
+      taskGroupId,
+      taskId,
+      task,
+      input
+    }, actions.variables));
+
+    await this.actionsQueue.createTask(newTaskId, newTask);
+    return newTaskId;
+  }
+
+  render() {
+    const { caches, actionData, taskActions, groupActions } = this.state;
+    const {
+      queue,
+      purgeCache,
+      status,
+      task,
+      onRetrigger,
+      onEdit,
+      onCreateInteractive,
+      onEditInteractive,
+      onActionTask
+    } = this.props;
     const isResolved = status ? ['completed', 'failed', 'exception'].includes(status.state) : false;
 
     return (
-      <NavDropdown title="Task Actions" id="task-view-actions">
+      <NavDropdown title="Actions" id="task-view-actions">
         <ModalItem
           disabled={!(queue && task)}
           onSubmit={this.scheduleTask}
@@ -269,7 +406,7 @@ export default class ActionsMenu extends React.PureComponent {
         </ModalItem>
 
         <ModalItem
-          disabled={isResolved}
+          disabled={isResolved || !(queue && task)}
           onSubmit={this.cancelTask}
           body={this.cancelTaskModal()}>
           <Icon name="calendar-check-o" /> Cancel Task
@@ -308,6 +445,34 @@ export default class ActionsMenu extends React.PureComponent {
           body={this.editInteractiveModal()}>
           <Icon name="edit" /> Edit as Interactive Task
         </ModalItem>
+
+        <MenuItem divider />
+        <MenuItem header>Task Actions</MenuItem>
+        {taskActions && taskActions.map(action => (
+          <ModalItem
+            modalSize={actionData[action].action.schema ? 'large' : null}
+            body={this.actionTaskModal(action)}
+            onSubmit={this.actionTaskSubmit(action)}
+            onComplete={onActionTask}
+            key={`taskaction-modal-item-${action}`}>
+            <Icon name="keyboard-o" /> {actionData[action].action.title}
+          </ModalItem>
+        ))}
+        {taskActions === null && <MenuItem disabled={true}>Loading...</MenuItem>}
+
+        <MenuItem divider />
+        <MenuItem header>Group Actions</MenuItem>
+        {groupActions && groupActions.map(action => (
+          <ModalItem
+            modalSize={actionData[action].action.schema ? 'large' : null}
+            body={this.actionTaskModal(action)}
+            onSubmit={this.actionTaskSubmit(action)}
+            onComplete={onActionTask}
+            key={`groupaction-modal-item-${action}`}>
+            <Icon name="keyboard-o" /> {actionData[action].action.title}
+          </ModalItem>
+        ))}
+        {groupActions === null && <MenuItem disabled={true}>Loading...</MenuItem>}
       </NavDropdown>
     );
   }

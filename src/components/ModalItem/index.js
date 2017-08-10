@@ -12,7 +12,8 @@ export default class ModalItem extends React.PureComponent {
     button: bool,
     body: node.isRequired,
     bsStyle: string,
-    bsSize: string
+    bsSize: string,
+    modalSize: string
   };
 
   static defaultProps = {
@@ -65,10 +66,10 @@ export default class ModalItem extends React.PureComponent {
   }
 
   render() {
-    const { disabled, body, children, button, bsStyle, bsSize } = this.props;
+    const { disabled, body, children, button, bsStyle, bsSize, modalSize } = this.props;
     const { show, executing, error } = this.state;
     const modal = (
-      <Modal show={show} onHide={this.handleClose}>
+      <Modal show={show} onHide={this.handleClose} bsSize={modalSize}>
         <Modal.Header>
           <Modal.Title>{children}</Modal.Title>
         </Modal.Header>
