@@ -47,7 +47,11 @@ export default class LogView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.status !== this.props.status) {
+    if (
+      nextProps.taskId !== this.props.taskId ||
+      nextProps.runId !== this.props.runId ||
+      nextProps.log.name !== this.props.log.name
+    ) {
       const streaming = this.isStreaming(nextProps.status);
 
       this.setState({
