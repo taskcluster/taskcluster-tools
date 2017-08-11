@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ClientEditor from '../../components/ClientEditor';
@@ -19,6 +20,12 @@ export default class ClientManager extends Component {
 
   componentWillMount() {
     this.loadClients();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
+    }
   }
 
   deleteClient = clientId => this.props.auth.deleteClient(clientId);

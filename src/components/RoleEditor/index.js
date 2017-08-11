@@ -3,6 +3,7 @@ import { func } from 'prop-types';
 import { ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 import { assoc } from 'ramda';
 import Icon from 'react-fontawesome';
+import equal from 'deep-equal';
 import Spinner from '../Spinner';
 import ScopeEditor from '../ScopeEditor';
 import DateView from '../DateView';
@@ -43,6 +44,8 @@ export default class RoleEditor extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (!nextProps.currentRoleId !== this.props.currentRoleId) {
       this.load(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 

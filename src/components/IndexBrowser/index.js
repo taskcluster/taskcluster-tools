@@ -1,6 +1,7 @@
 import React from 'react';
 import { string, object } from 'prop-types';
 import { Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl } from 'react-bootstrap';
+import equal from 'deep-equal';
 import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
 
@@ -30,6 +31,8 @@ export default class IndexBrowser extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.namespace !== this.props.namespace) {
       this.loadTasksAndNamespaces(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 

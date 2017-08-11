@@ -4,7 +4,14 @@ import TaskCreator from './TaskCreator';
 
 const View = ({ credentials, history, location, interactive }) => (
   <Clients credentials={credentials} Queue>
-    {({ queue }) => <TaskCreator queue={queue} history={history} location={location} interactive={interactive} />}
+    {({ queue }) => (
+      <TaskCreator
+        queue={queue}
+        history={history}
+        location={location}
+        interactive={interactive}
+        credentials={credentials} />
+    )}
   </Clients>
 );
 

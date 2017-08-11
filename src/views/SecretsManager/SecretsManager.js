@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -23,6 +24,8 @@ export default class SecretsManager extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.secretId !== this.props.secretId) {
       this.loadSecrets(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 
@@ -106,6 +109,7 @@ export default class SecretsManager extends React.PureComponent {
         </Col>
         <Col md={7}>
           <SecretEditor
+            credentials={this.props.credentials}
             secretId={secretId}
             secrets={this.props.secrets}
             reloadSecrets={this.reloadSecrets}

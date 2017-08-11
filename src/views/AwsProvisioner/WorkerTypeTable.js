@@ -1,6 +1,7 @@
 import React from 'react';
 import { string } from 'prop-types';
 import { ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
+import equal from 'deep-equal';
 import WorkerTypeView from './WorkerTypeView';
 import WorkerTypeEditor from './WorkerTypeEditor';
 import WorkerTypeRow from './WorkerTypeRow';
@@ -71,6 +72,8 @@ export default class WorkerTypeTable extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.provisionerId !== this.props.provisionerId || nextProps.workerType !== this.props.workerType) {
       this.loadWorkerTypeSummaries();
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 

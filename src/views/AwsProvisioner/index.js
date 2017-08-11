@@ -18,6 +18,7 @@ const View = ({ credentials, match, history, location }) => {
         <WorkerTypeTable
           {...clients}
           history={history}
+          credentials={credentials}
           provisionerId="aws-provisioner-v1"
           workerType={match.params.workerType}
           currentTab={match.params.currentTab} />

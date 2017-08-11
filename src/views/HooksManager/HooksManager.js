@@ -1,6 +1,7 @@
 import React from 'react';
 import { string } from 'prop-types';
 import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
+import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -33,6 +34,8 @@ export default class HooksManager extends React.PureComponent {
 
     if (needsUpdate) {
       this.loadGroups();
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 

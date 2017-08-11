@@ -3,6 +3,7 @@ import { func, object } from 'prop-types';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client';
 import Icon from 'react-fontawesome';
+import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import TimeInput from '../../components/TimeInput';
 import DateView from '../../components/DateView';
@@ -37,6 +38,8 @@ export default class SecretEditor extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.secretId !== this.props.secretId) {
       this.loadSecret(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 
