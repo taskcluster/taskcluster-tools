@@ -7,6 +7,7 @@ const View = ({ credentials, history, match }) => (
     {({ secrets }) => (
       <SecretsManager
         history={history}
+        credentials={credentials}
         secrets={secrets}
         secretId={match.params.secretId ? decodeURIComponent(match.params.secretId) : ''} />
     )}

@@ -16,6 +16,7 @@ const View = ({ credentials, history, match }) => {
         <RoleManager
           auth={auth}
           history={history}
+          credentials={credentials}
           roleId={match.params.roleId ? decodeURIComponent(match.params.roleId) : ''} />
       )}
     </Clients>

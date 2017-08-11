@@ -17,6 +17,7 @@ const View = ({ credentials, match, history, location }) => {
       {({ hooks }) => (
         <HooksManager
           history={history}
+          credentials={credentials}
           hooks={hooks}
           hookGroupId={match.params.hookGroupId && decodeURIComponent(match.params.hookGroupId)}
           hookId={match.params.hookId && decodeURIComponent(match.params.hookId)} />

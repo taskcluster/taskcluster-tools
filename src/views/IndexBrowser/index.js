@@ -24,10 +24,15 @@ const View = ({ match, credentials, history, location }) => {
           <IndexBrowser
             urlRoot="/index"
             history={history}
+            credentials={credentials}
             index={index}
             namespace={namespace}
             namespaceTaskId={namespaceTaskId}>
-            <EntryView index={index} namespace={namespace} namespaceTaskId={namespaceTaskId} />
+            <EntryView
+              index={index}
+              namespace={namespace}
+              namespaceTaskId={namespaceTaskId}
+              credentials={credentials} />
           </IndexBrowser>
         </div>
       )}

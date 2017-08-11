@@ -2,6 +2,7 @@ import React from 'react';
 import { Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
+import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
@@ -24,6 +25,12 @@ export default class ScopeInspector extends React.PureComponent {
 
   componentWillMount() {
     this.load();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
+    }
   }
 
   load = async () => {

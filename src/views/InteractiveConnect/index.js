@@ -5,7 +5,7 @@ import InteractiveConnect from './InteractiveConnect';
 const View = ({ credentials, match }) => (
   <Clients credentials={credentials} Queue QueueEvents>
     {clients => (
-      <InteractiveConnect{...clients} taskId={match.params.taskId || ''} />
+      <InteractiveConnect credentials={credentials} {...clients} taskId={match.params.taskId || ''} />
     )}
   </Clients>
 );

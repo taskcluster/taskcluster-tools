@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -17,6 +18,12 @@ export default class RoleManager extends React.PureComponent {
 
   componentWillMount() {
     this.load();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
+    }
   }
 
   load = async () => {

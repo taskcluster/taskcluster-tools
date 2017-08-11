@@ -1,6 +1,7 @@
 import React from 'react';
 import { Grid, Row, Col, ListGroup, ListGroupItem, Button, Glyphicon } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import equal from 'deep-equal';
 import VncDisplay from './VncDisplay';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -27,6 +28,8 @@ export default class DisplayList extends React.PureComponent {
       nextProps.shared !== this.props.shared
     ) {
       this.load(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 

@@ -4,6 +4,7 @@ import Tooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
 import { WebListener } from 'taskcluster-client';
+import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
@@ -34,6 +35,8 @@ export default class InteractiveConnect extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.taskId !== this.props.taskId) {
       this.load(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 

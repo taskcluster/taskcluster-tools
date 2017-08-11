@@ -1,6 +1,7 @@
 import React from 'react';
 import { string, object } from 'prop-types';
 import { Link } from 'react-router-dom';
+import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import ArtifactView from './ArtifactView';
 
@@ -29,6 +30,8 @@ export default class EntryView extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.namespace !== this.props.namespace || nextProps.namespaceTaskId !== this.props.namespaceTaskId) {
       this.loadTask(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 
@@ -76,6 +79,8 @@ export default class EntryView extends React.PureComponent {
       return null;
     }
 
+    const { queue, credentials } = this.props;
+
     return (
       <div>
         <dl className="dl-horizontal">
@@ -88,7 +93,7 @@ export default class EntryView extends React.PureComponent {
         <dl className="dl-horizontal">
           <dt>Latest Artifacts</dt>
           <dd>
-            <ArtifactView taskId={task.taskId} namespace={task.namespace} queue={this.props.queue} />
+            <ArtifactView taskId={task.taskId} namespace={task.namespace} queue={queue} credentials={credentials} />
             <br />
             <div className="alert alert-info" role="alert">
               <strong>Latest Artifacts</strong>&nbsp;

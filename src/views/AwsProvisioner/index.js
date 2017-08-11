@@ -18,6 +18,7 @@ const View = ({ credentials, match, history, location, baseUrl, provisionerId, r
         <WorkerTypeTable
           {...clients}
           history={history}
+          credentials={credentials}
           routeRoot={routeRoot}
           provisionerId={provisionerId}
           workerType={match.params.workerType}

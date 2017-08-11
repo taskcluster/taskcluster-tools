@@ -21,6 +21,7 @@ const View = ({ credentials, match, history }) => {
         <ScopeInspector
           auth={auth}
           history={history}
+          credentials={credentials}
           selectedScope={selectedScope}
           selectedEntity={selectedEntity} />
       )}

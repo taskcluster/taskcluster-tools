@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Row, Col, ButtonToolbar, Glyphicon, Table, Button, FormGroup, ControlLabel, FormControl, Alert
 } from 'react-bootstrap';
+import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -22,6 +23,12 @@ export default class CachePurgeInspector extends React.PureComponent {
 
   componentWillMount() {
     this.loadCaches();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.state.cachesError && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ cachesError: null });
+    }
   }
 
   loadCaches = async () => {

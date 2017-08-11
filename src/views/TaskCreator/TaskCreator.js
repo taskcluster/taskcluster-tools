@@ -4,6 +4,7 @@ import { Button, ButtonToolbar, Glyphicon, Col } from 'react-bootstrap';
 import { safeLoad, safeDump } from 'js-yaml';
 import { nice } from 'slugid';
 import moment from 'moment';
+import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import CodeEditor from '../../components/CodeEditor';
@@ -33,6 +34,7 @@ export default class TaskCreator extends React.PureComponent {
     super(props);
     this.state = {
       task: null,
+      error: null,
       createdTaskId: null,
       createdTaskError: null
     };
@@ -51,6 +53,15 @@ export default class TaskCreator extends React.PureComponent {
         error: err,
         task: null
       });
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      (this.state.error || this.state.createdTaskError) &&
+      !equal(nextProps.credentials, this.props.credentials)
+    ) {
+      this.setState({ error: null, createdTaskError: null });
     }
   }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { string, object } from 'prop-types';
+import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ArtifactList from '../../components/ArtifactList';
@@ -26,6 +27,8 @@ export default class ArtifactView extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.namespace !== this.props.namespace || nextProps.taskId !== this.props.taskId) {
       this.loadArtifacts(nextProps);
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 

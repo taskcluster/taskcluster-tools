@@ -5,6 +5,7 @@ import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { WebListener } from 'taskcluster-client';
 import { isNil } from 'ramda';
+import equal from 'deep-equal';
 import PropsRoute from '../../components/PropsRoute';
 import Error from '../../components/Error';
 import SearchForm from './SearchForm';
@@ -104,6 +105,8 @@ export default class Inspector extends React.PureComponent {
       this.loadTask(nextProps);
     } else if (runId && runId !== this.props.runId) {
       this.setState({ selectedRun: runId });
+    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+      this.setState({ error: null });
     }
   }
 
