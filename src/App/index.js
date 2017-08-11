@@ -187,7 +187,8 @@ export default class App extends React.Component {
               <PropsRoute path="/tasks/:taskId?/:action?" component={TaskRedirect} credentials={credentials} />
               <PropsRoute path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?" component={UnifiedInspector} credentials={credentials} />
               <PropsRoute path="/quickstart" component={QuickStart} credentials={credentials} />
-              <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} />
+              <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://aws-provisioner.taskcluster.net/v1" provisionerId="aws-provisioner-v1" routeRoot="/aws-provisioner" />
+              <PropsRoute path="/aws-provisioner-staging/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://provisioner-staging.herokuapp.com/v1" provisionerId="staging-aws" routeRoot="/aws-provisioner-staging" />
               <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} credentials={credentials} />
               <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} credentials={credentials} />
               <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} credentials={credentials} />
