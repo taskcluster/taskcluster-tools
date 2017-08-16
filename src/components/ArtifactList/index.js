@@ -44,7 +44,7 @@ export default class ArtifactList extends React.PureComponent {
     });
   }
 
-  getArtifactList({ runId, taskId, credentials, queue, artifacts, indexNamespace }) {
+  getArtifactList({ runId, taskId, credentials, queue, artifacts, namespace }) {
     if (!taskId || !artifacts) {
       return null;
     }
@@ -55,8 +55,8 @@ export default class ArtifactList extends React.PureComponent {
         const icon = getIconFromMime(contentType);
 
         // If we have a namespace, use a URL with that namespace to make it easier for users to copy/paste index URLs
-        if (indexNamespace) {
-          return { icon, name, url: `https://index.taskcluster.net/v1/task/${indexNamespace}/artifacts/${name}` };
+        if (namespace) {
+          return { icon, name, url: `https://index.taskcluster.net/v1/task/${namespace}/artifacts/${name}` };
         }
 
         // We could use queue.buildUrl, but this creates URLs where the artifact name has slashes encoded.
