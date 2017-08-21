@@ -107,12 +107,6 @@ export default [
       discussions or report new bugs in Taskcluster.`
   },
   {
-    title: 'Status',
-    link: '/status',
-    icon: 'cogs',
-    description: 'Display the status of Taskcluster services and underlying services Taskcluster depends on.'
-  },
-  {
     title: 'Diagnostics',
     link: '/diagnostics',
     icon: 'cogs',

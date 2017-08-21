@@ -27,7 +27,6 @@ const IndexedArtifactBrowser = loadable(() => import(/* webpackChunkName: 'Index
 const IndexBrowser = loadable(() => import(/* webpackChunkName: 'IndexBrowser' */ '../views/IndexBrowser'));
 const HooksManager = loadable(() => import(/* webpackChunkName: 'HooksManager' */ '../views/HooksManager'));
 const SecretsManager = loadable(() => import(/* webpackChunkName: 'SecretsManager' */ '../views/SecretsManager'));
-const Status = loadable(() => import(/* webpackChunkName: 'Status' */ '../views/Status'));
 const Diagnostics = loadable(() => import(/* webpackChunkName: 'Diagnostics' */ '../views/Diagnostics'));
 const CredentialsManager = loadable(() => import(/* webpackChunkName: 'CredentialsManager' */ '../views/CredentialsManager'));
 const Displays = loadable(() => import(/* webpackChunkName: 'Displays' */ '../views/Displays'));
@@ -198,7 +197,6 @@ export default class App extends React.Component {
               <PropsRoute path="/index/:namespace?/:namespaceTaskId?" component={IndexBrowser} credentials={credentials} />
               <PropsRoute path="/hooks/:hookGroupId?/:hookId?" component={HooksManager} credentials={credentials} />
               <PropsRoute path="/secrets/:secretId?" component={SecretsManager} credentials={credentials} />
-              <PropsRoute path="/status" component={Status} credentials={credentials} />
               <PropsRoute path="/diagnostics" component={Diagnostics} credentials={credentials} />
               <PropsRoute path="/credentials" component={CredentialsManager} credentials={credentials} />
               <PropsRoute path="/display" component={Displays} credentials={credentials} />
