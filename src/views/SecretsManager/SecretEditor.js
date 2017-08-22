@@ -49,7 +49,7 @@ export default class SecretEditor extends React.PureComponent {
       return this.setState({
         secret: {},
         secretValue: '{}',
-        expires: fromNow('1 day'),
+        expires: fromNow('1000 years'),
         editing: true,
         working: false,
         error: null
