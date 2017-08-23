@@ -73,6 +73,7 @@ export default class ModalItem extends React.PureComponent {
       button,
       bsStyle,
       bsSize,
+      style,
       modalSize
     } = this.props;
     const { show, executing, error } = this.state;
@@ -103,6 +104,7 @@ export default class ModalItem extends React.PureComponent {
         onClick={this.handleOpen}
         disabled={disabled}
         bsStyle={bsStyle}
+        style={style}
         bsSize={bsSize}>
         {children}
         {modal}
