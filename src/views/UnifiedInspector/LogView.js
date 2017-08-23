@@ -7,6 +7,8 @@ import { LazyLog, LazyStream, ScrollFollow } from 'react-lazylog';
 import { isNil } from 'ramda';
 import fscreen from 'fscreen';
 
+const VIEWER_HEIGHT_MIN = 400;
+
 const buttonStyle = {
   margin: '10px 0 10px 10px'
 };
@@ -90,7 +92,9 @@ export default class LogView extends React.PureComponent {
 
   handleLazyViewerHeight = () => {
     if (this.lazylog) {
-      this.setState({ lazyViewerHeight: window.innerHeight - this.lazylog.getBoundingClientRect().top });
+      const lazyViewerHeight = window.innerHeight - this.lazylog.getBoundingClientRect().top;
+
+      this.setState({ lazyViewerHeight: lazyViewerHeight > VIEWER_HEIGHT_MIN ? lazyViewerHeight : VIEWER_HEIGHT_MIN });
     }
   };
 

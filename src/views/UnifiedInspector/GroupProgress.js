@@ -107,9 +107,12 @@ export default class GroupProgress extends React.PureComponent {
           ))}
         </ProgressBar>
 
-        <div>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
           {groups.map((group, index) => (
-            <Label bsStyle={labels[group]} key={`legend-item-${index}`} style={{ borderRadius: 0, marginLeft: 10 }}>
+            <Label
+              bsStyle={labels[group]}
+              key={`legend-item-${index}`}
+              style={{ borderRadius: 0, marginLeft: 10, marginBottom: 5 }}>
               {group}
             </Label>
           ))}
