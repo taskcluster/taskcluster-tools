@@ -34,7 +34,7 @@ export default class LogView extends React.PureComponent {
       follow: streaming,
       isFullscreen: false,
       fullscreenEnabled: fscreen.fullscreenEnabled,
-      lazyViewerHeight: 800
+      lazyViewerHeight: VIEWER_HEIGHT_MIN
     };
   }
 
@@ -94,7 +94,9 @@ export default class LogView extends React.PureComponent {
     if (this.lazylog) {
       const lazyViewerHeight = window.innerHeight - this.lazylog.getBoundingClientRect().top;
 
-      this.setState({ lazyViewerHeight: lazyViewerHeight > VIEWER_HEIGHT_MIN ? lazyViewerHeight : VIEWER_HEIGHT_MIN });
+      if (lazyViewerHeight > VIEWER_HEIGHT_MIN) {
+        this.setState({ lazyViewerHeight });
+      }
     }
   };
 
