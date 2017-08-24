@@ -93,6 +93,14 @@ export default class Inspector extends React.PureComponent {
         actions: null,
         decision: null
       });
+    } else if (taskId !== this.props.taskId) {
+      this.setState({
+        selectedTaskId: null,
+        status: null,
+        task: null,
+        artifacts: null,
+        selectedRun: null
+      });
     }
 
     if (taskGroupId !== this.props.taskGroupId && taskGroupId) {
