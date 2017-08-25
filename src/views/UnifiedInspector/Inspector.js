@@ -111,8 +111,9 @@ export default class Inspector extends React.PureComponent {
       (taskId !== this.state.selectedTaskId || (this.props.taskId && taskId !== this.props.taskId))
     ) {
       this.loadTask(nextProps);
-    } else if (runId && runId !== this.props.runId) {
+    } else if (Number.isInteger(runId) && runId !== this.props.runId) {
       this.setState({ selectedRun: runId });
+      this.loadTask(nextProps);
     } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
       this.setState({ error: null });
     }
