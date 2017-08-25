@@ -79,7 +79,7 @@ export default class Inspector extends React.PureComponent {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  async componentWillReceiveProps(nextProps) {
     const { taskGroupId, taskId, runId } = nextProps;
 
     if (taskGroupId !== this.props.taskGroupId) {
@@ -112,8 +112,12 @@ export default class Inspector extends React.PureComponent {
     ) {
       this.loadTask(nextProps);
     } else if (Number.isInteger(runId) && runId !== this.props.runId) {
-      this.setState({ selectedRun: runId });
-      this.loadTask(nextProps);
+      this.setState({
+        selectedRun: runId,
+        artifacts: this.state.status.state !== 'unscheduled' ?
+          await this.getArtifacts(this.props.taskId, runId) :
+          []
+      });
     } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
       this.setState({ error: null });
     }
