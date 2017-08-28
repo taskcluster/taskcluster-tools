@@ -92,7 +92,7 @@ export default class LogView extends React.PureComponent {
 
   handleLazyViewerHeight = () => {
     if (this.lazylog) {
-      const lazyViewerHeight = window.innerHeight - this.lazylog.getBoundingClientRect().top;
+      const lazyViewerHeight = window.innerHeight - Math.round(this.lazylog.getBoundingClientRect().top);
 
       if (lazyViewerHeight > VIEWER_HEIGHT_MIN) {
         this.setState({ lazyViewerHeight });
