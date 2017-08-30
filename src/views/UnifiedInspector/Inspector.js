@@ -419,7 +419,18 @@ export default class Inspector extends React.PureComponent {
 
   handleRetrigger = taskId => this.navigate(this.props.taskGroupId, taskId);
 
-  handleActionTask = taskId => this.navigate(this.props.taskGroupId, taskId);
+  handleActionTask = action => (taskId) => {
+    switch (action) {
+      case 'docker-worker-linux-loaner':
+        this.props.history.push(`/tasks/${taskId}/connect`);
+        break;
+      case 'generic-worker-windows-loaner':
+        this.props.history.push(`/tasks/${taskId}/connect`);
+        break;
+      default:
+        this.navigate(this.props.taskGroupId, taskId);
+    }
+  };
 
   handleCreateInteractive = async taskId => this.props.history.push(`/tasks/${taskId}/connect`);
 
