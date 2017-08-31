@@ -453,7 +453,7 @@ export default class ActionsMenu extends React.PureComponent {
             modalSize={actionData[action].action.schema ? 'large' : null}
             body={this.actionTaskModal(action)}
             onSubmit={this.actionTaskSubmit(action)}
-            onComplete={onActionTask}
+            onComplete={onActionTask(action)}
             key={`taskaction-modal-item-${action}`}>
             <Icon name="keyboard-o" /> {actionData[action].action.title}
           </ModalItem>
@@ -467,7 +467,7 @@ export default class ActionsMenu extends React.PureComponent {
             modalSize={actionData[action].action.schema ? 'large' : null}
             body={this.actionTaskModal(action)}
             onSubmit={this.actionTaskSubmit(action)}
-            onComplete={onActionTask}
+            onComplete={onActionTask(action)}
             key={`groupaction-modal-item-${action}`}>
             <Icon name="keyboard-o" /> {actionData[action].action.title}
           </ModalItem>
