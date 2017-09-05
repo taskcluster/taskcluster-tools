@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  padding: 10px 5px 5px 0;
+}
+
+.card {
+  margin: 5px 5px 5px 0;
+  width: 200px;
+}
+
+.card tbody {
+  font-size: 0.9em;
+}
+
+.typeInput {
+  min-width: 300px;
+  max-width: 600px;
+  margin-top: 10px;
+}
+
+.optionsToolbar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.switchButton {
+  margin-left: 10px;
+}
+
+.tabular {
+  width: 100%;
+}
