@@ -3,7 +3,7 @@ import { Alert, Button, Label } from 'react-bootstrap';
 import Tooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
-import { WebListener } from 'taskcluster-client';
+import { WebListener } from 'taskcluster-client-web';
 import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';

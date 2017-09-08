@@ -1,4 +1,4 @@
-import taskcluster from 'taskcluster-client';
+import * as taskcluster from 'taskcluster-client-web';
 import { omit } from 'ramda';
 import merge from 'deepmerge';
 import cloneDeep from 'lodash.clonedeep';

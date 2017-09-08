@@ -5,7 +5,7 @@ import { object, string, func } from 'prop-types';
 import { Row, Col, NavDropdown, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { omit, pathOr } from 'ramda';
-import { Queue } from 'taskcluster-client';
+import { Queue } from 'taskcluster-client-web';
 import { nice } from 'slugid';
 import merge from 'deepmerge';
 import clone from 'lodash.clonedeep';
@@ -65,6 +65,8 @@ export default class ActionsMenu extends React.PureComponent {
       const credentials = nextProps.credentials || this.props.credentials;
 
       if (decision) {
+        // this includes authorizedScopes.  Could we use
+        // this.props.queue.use({authorizedScopes}).createTask
         this.actionsQueue = new Queue({
           credentials,
           authorizedScopes: decision.scopes || []
@@ -369,6 +371,7 @@ export default class ActionsMenu extends React.PureComponent {
       input
     }, actions.variables));
 
+    // TODO: use https://github.com/taskcluster/taskcluster-client/pull/79 equivalent for tc-client-web
     await this.actionsQueue.createTask(newTaskId, newTask);
     return newTaskId;
   }

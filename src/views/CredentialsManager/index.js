@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import equal from 'deep-equal';
-import { credentialInformation } from 'taskcluster-client';
+import { credentialInformation } from 'taskcluster-client-web';
 import HelmetTitle from '../../components/HelmetTitle';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';

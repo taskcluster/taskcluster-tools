@@ -123,7 +123,7 @@ module.exports = {
           'react-dom',
           'react-helmet',
           'react-router-dom',
-          'taskcluster-client',
+          'taskcluster-client-web',
         ]);
     }
   ],

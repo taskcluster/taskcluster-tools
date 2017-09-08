@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col, Form, FormGroup, FormControl, ControlLabel, Checkbox, ButtonToolbar, Button, Glyphicon }
   from 'react-bootstrap';
 import { safeDump } from 'js-yaml';
-import { Github } from 'taskcluster-client';
+import { Github } from 'taskcluster-client-web';
 import CodeEditor from '../../components/CodeEditor';
 import HelmetTitle from '../../components/HelmetTitle';
 import { info } from './styles.css';

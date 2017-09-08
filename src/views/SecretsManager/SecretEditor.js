@@ -1,7 +1,7 @@
 import React from 'react';
 import { func, object } from 'prop-types';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
-import { fromNow } from 'taskcluster-client';
+import { fromNow } from 'taskcluster-client-web';
 import Icon from 'react-fontawesome';
 import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
