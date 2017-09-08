@@ -59,7 +59,6 @@ export default class Inspector extends React.PureComponent {
   componentWillMount() {
     if (this.props.taskGroupId) {
       this.loadTasks(this.props);
-      this.loadActions(this.props);
     }
 
     if (this.props.taskId) {
@@ -105,7 +104,6 @@ export default class Inspector extends React.PureComponent {
 
     if (taskGroupId !== this.props.taskGroupId && taskGroupId) {
       this.loadTasks(nextProps);
-      this.loadActions(nextProps);
     } else if (
       taskId &&
       (taskId !== this.state.selectedTaskId || (this.props.taskId && taskId !== this.props.taskId))
@@ -151,8 +149,11 @@ export default class Inspector extends React.PureComponent {
       return;
     }
 
-    this.updateLocalHistory(taskGroupId, taskGroupItemKey);
-    this.createGroupListener(taskGroupId);
+    if (!token) {
+      await this.loadActions(props);
+      this.updateLocalHistory(taskGroupId, taskGroupItemKey);
+      this.createGroupListener(taskGroupId);
+    }
 
     try {
       const { tasks, continuationToken } = await queue
