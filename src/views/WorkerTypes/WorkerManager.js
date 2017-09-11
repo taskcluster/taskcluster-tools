@@ -84,13 +84,11 @@ export default class WorkerManager extends React.PureComponent {
           bsSize="small"
           title={`Provisioner: ${this.props.provisionerId || 'None'}`}
           onSelect={this.onProvisionerSelect}>
-          {
-            this.state.provisioners.map((provisioner, key) => (
-              <MenuItem eventKey={provisioner} key={`provisioner-dropdown-${key}`}>
-                {provisioner.provisionerId}
-              </MenuItem>
-            ))
-          }
+          {this.state.provisioners.map((provisioner, key) => (
+            <MenuItem eventKey={provisioner} key={`provisioner-dropdown-${key}`}>
+              {provisioner.provisionerId}
+            </MenuItem>
+          ))}
         </DropdownButton>
         {this.state.error && <Error error={this.state.error} />}
         {this.props.provisionerId &&
