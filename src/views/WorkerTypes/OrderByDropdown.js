@@ -3,7 +3,7 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { titleCase } from 'change-case';
 import { string, func, array } from 'prop-types';
 
-class OrderByDropdown extends PureComponent {
+export default class OrderByDropdown extends PureComponent {
   static propTypes = {
     orderBy: string,
     onSelect: func,
@@ -28,5 +28,3 @@ class OrderByDropdown extends PureComponent {
     );
   }
 }
-
-export default OrderByDropdown;

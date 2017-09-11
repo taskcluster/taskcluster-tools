@@ -38,7 +38,7 @@ export default class SearchForm extends PureComponent {
             <InputGroup bsSize="sm">
               <InputGroup.Addon>WorkerType Containing</InputGroup.Addon>
               <FormControl onChange={this.onChange} value={this.state.value} type="text" />
-              <InputGroup.Addon onClick={this.search} role="button"><Glyphicon glyph="search" /></InputGroup.Addon>
+              <InputGroup.Addon onClick={this.onSearch} role="button"><Glyphicon glyph="search" /></InputGroup.Addon>
             </InputGroup>
           </FormGroup>
         </Form>

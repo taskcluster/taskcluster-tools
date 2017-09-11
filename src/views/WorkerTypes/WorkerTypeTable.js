@@ -37,68 +37,70 @@ export default class WorkerTypeTable extends React.PureComponent {
     };
   }
 
+  readWorkerTypes(props) {
+    this.setState({ workerTypes: [], loading: true, error: null });
+    this.loadWorkerTypes(props);
+  }
+
   componentWillMount() {
     if (this.props.provisionerId) {
-      this.loadWorkerTypes(this.props);
+      this.readWorkerTypes(this.props);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.provisionerId !== nextProps.provisionerId) {
-      this.loadWorkerTypes(nextProps);
+    if (this.props.provisionerId && this.props.provisionerId !== nextProps.provisionerId) {
+      this.readWorkerTypes(nextProps);
     }
   }
 
   async loadWorkerTypes({ provisionerId }, token) {
-    this.setState({ workerTypes: [], loading: true, error: null }, async () => {
-      try {
-        const { workerTypes, continuationToken } = await this.props.queue
-          .listWorkerTypes(provisionerId, token ? { continuationToken: token, limit: 100 } : { limit: 100 });
+    try {
+      const { workerTypes, continuationToken } = await this.props.queue
+        .listWorkerTypes(provisionerId, token ? { continuationToken: token, limit: 100 } : { limit: 100 });
 
-        this.setState({
-          workerTypes: this.state.workerTypes ? this.state.workerTypes.concat(workerTypes) : workerTypes
-        });
+      this.setState({
+        workerTypes: this.state.workerTypes ? this.state.workerTypes.concat(workerTypes) : workerTypes
+      });
 
-        if (continuationToken) {
-          this.loadWorkerTypes(this.props, continuationToken);
-        }
-
-        const awsWorkerTypes = provisionerId === 'aws-provisioner-v1' ?
-          await this.props.awsProvisioner.listWorkerTypeSummaries() :
-          undefined;
-
-        const workerTypesNormalized = this.state.workerTypes.map(workerType => (
-          Object.assign(
-            {},
-            workerType,
-            awsWorkerTypes ? find(propEq('workerType', workerType.workerType))(awsWorkerTypes) : {})
-        ));
-
-        const workerTypeSummaries = await Promise.all(workerTypesNormalized.map(async (workerType) => {
-          const pendingTasks = await this.getPendingTasks(provisionerId, workerType.workerType);
-
-          const stable = {
-            provisionerId: workerType.provisionerId,
-            workerType: workerType.workerType,
-            pendingTasks,
-            stability: workerType.stability,
-            lastDateActive: workerType.lastDateActive
-          };
-
-          const dynamic = provisionerId === 'aws-provisioner-v1' ? {
-            runningCapacity: workerType.runningCapacity,
-            pendingCapacity: workerType.pendingCapacity
-          } : undefined;
-
-          return { ...stable, ...dynamic };
-        }));
-
-        this.props.setOrderableProperties(workerTypeSummaries[0]);
-        this.setState({ workerTypeSummaries, error: null, loading: false });
-      } catch (err) {
-        this.setState({ workerTypeSummaries: [], error: err, loading: false });
+      if (continuationToken) {
+        this.loadWorkerTypes(this.props, continuationToken);
       }
-    });
+
+      const awsWorkerTypes = provisionerId === 'aws-provisioner-v1' &&
+        await this.props.awsProvisioner.listWorkerTypeSummaries();
+
+      const workerTypesNormalized = this.state.workerTypes.map(workerType => (
+        Object.assign(
+          {},
+          workerType,
+          awsWorkerTypes ? find(propEq('workerType', workerType.workerType))(awsWorkerTypes) : {})
+      ));
+
+      const workerTypeSummaries = await Promise.all(workerTypesNormalized.map(async (workerType) => {
+        const pendingTasks = await this.getPendingTasks(provisionerId, workerType.workerType);
+
+        const stable = {
+          provisionerId: workerType.provisionerId,
+          workerType: workerType.workerType,
+          pendingTasks,
+          stability: workerType.stability,
+          lastDateActive: workerType.lastDateActive
+        };
+
+        const dynamic = provisionerId === 'aws-provisioner-v1' ? {
+          runningCapacity: workerType.runningCapacity,
+          pendingCapacity: workerType.pendingCapacity
+        } : {};
+
+        return { ...stable, ...dynamic };
+      }));
+
+      this.props.setOrderableProperties(workerTypeSummaries[0]);
+      this.setState({ workerTypeSummaries, error: null, loading: false });
+    } catch (err) {
+      this.setState({ workerTypeSummaries: [], error: err, loading: false });
+    }
   }
 
   async getPendingTasks(provisionerId, workerType) {
@@ -109,15 +111,11 @@ export default class WorkerTypeTable extends React.PureComponent {
 
   renderDescription = ({ description }) => (
     <Popover id="popover-trigger-click-root-close" title="Description">
-      {
-        description ?
-          <Markdown>{description}</Markdown> :
-          <Markdown>`-`</Markdown>
-      }
+      <Markdown>{description || '`-`'}</Markdown>
     </Popover>
   );
 
-  renderGridWorkerType = (workerType, index) => {
+  renderGridWorkerType = (workerType, key) => {
     const description = this.renderDescription(workerType);
     const Header = () => (
       <div>
@@ -132,20 +130,18 @@ export default class WorkerTypeTable extends React.PureComponent {
 
     return (
       <Panel
-        key={`worker-type-grid-${index}`}
+        key={`worker-type-grid-${key}`}
         className={styles.card}
-        header={<Header key={`worker-type-header-${index}`} />} bsStyle={`${stabilityColors[workerType.stability]}`}>
+        header={<Header key={`worker-type-header-${key}`} />} bsStyle={`${stabilityColors[workerType.stability]}`}>
         <Table fill>
           <tbody>
-            {
-              this.props.provisionerId === 'aws-provisioner-v1' ?
-                (['runningCapacity', 'pendingCapacity'].map((property, key) => (
-                  <tr key={`dynamic-data-${key}`}>
-                    <td>{property}</td>
-                    <td><Badge>{workerType[property]}</Badge></td>
-                  </tr>
-                ))) :
-                null
+            {this.props.provisionerId === 'aws-provisioner-v1' && ['runningCapacity', 'pendingCapacity']
+              .map((property, key) => (
+                <tr key={`dynamic-data-${key}`}>
+                  <td>{property}</td>
+                  <td><Badge>{workerType[property]}</Badge></td>
+                </tr>
+              ))
             }
             <tr>
               <td>Pending tasks</td>
@@ -174,19 +170,17 @@ export default class WorkerTypeTable extends React.PureComponent {
             <th>Stability</th>
             <th>Last active</th>
             <th>Pending tasks</th>
-            {
-              this.props.provisionerId === 'aws-provisioner-v1' ?
-                (['runningCapacity', 'pendingCapacity'].map((property, index) => (
-                  <th key={`tabular-dynamic-header-${index}`}>{property}</th>
-                ))) :
-                null
+            {this.props.provisionerId === 'aws-provisioner-v1' && ['runningCapacity', 'pendingCapacity']
+              .map((property, key) => (
+                <th key={`tabular-dynamic-header-${key}`}>{property}</th>
+              ))
             }
           </tr>
         </thead>
 
         <tbody>
-          {workerTypes.map((workerType, index) => (
-            <tr key={`worker-type-tabular-${index}`}>
+          {workerTypes.map((workerType, key) => (
+            <tr key={`worker-type-tabular-${key}`}>
               <td>
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={this.renderDescription(workerType)}>
                   <a role="button">{workerType.workerType}</a>
@@ -201,12 +195,12 @@ export default class WorkerTypeTable extends React.PureComponent {
               </td>
               <td>{moment(workerType.lastDateActive).fromNow()}</td>
               <td><Badge>{workerType.pendingTasks}</Badge></td>
-              {
-                this.props.provisionerId === 'aws-provisioner-v1' ?
-                  (['runningCapacity', 'pendingCapacity'].map((property, index) => (
-                    <td key={`tabular-dynamic-row-${index}`}><Badge>{workerType[property]}</Badge></td>
-                  ))) :
-                  null
+              {this.props.provisionerId === 'aws-provisioner-v1' && ['runningCapacity', 'pendingCapacity']
+                .map((property, key) => (
+                  <td key={`tabular-dynamic-row-${key}`}>
+                    <Badge>{workerType[property]}</Badge>
+                  </td>
+                ))
               }
             </tr>
           ))}
@@ -215,13 +209,11 @@ export default class WorkerTypeTable extends React.PureComponent {
     </div>
   );
 
-  renderWorkerType = (workerTypes) => {
-    if (this.props.gridLayout) {
-      return workerTypes.map(this.renderGridWorkerType);
-    }
-
-    return this.renderTabularWorkerType(workerTypes);
-  };
+  renderWorkerType = workerTypes => (
+    this.props.gridLayout ?
+      workerTypes.map(this.renderGridWorkerType) :
+      this.renderTabularWorkerType(workerTypes)
+  );
 
   sort = (a, b) => {
     if (this.props.lastActive) {
