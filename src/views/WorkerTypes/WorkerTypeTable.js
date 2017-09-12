@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Panel, Badge, Popover, OverlayTrigger, Label } from 'react-bootstrap';
 import moment from 'moment';
 import { func, string, bool, object } from 'prop-types';
+import { sentenceCase } from 'change-case';
 import { find, propEq } from 'ramda';
 import Icon from 'react-fontawesome';
 import Spinner from '../../components/Spinner';
@@ -70,12 +71,10 @@ export default class WorkerTypeTable extends React.PureComponent {
       const awsWorkerTypes = provisionerId === 'aws-provisioner-v1' &&
         await this.props.awsProvisioner.listWorkerTypeSummaries();
 
-      const workerTypesNormalized = this.state.workerTypes.map(workerType => (
-        Object.assign(
-          {},
-          workerType,
-          awsWorkerTypes ? find(propEq('workerType', workerType.workerType))(awsWorkerTypes) : {})
-      ));
+      const workerTypesNormalized = this.state.workerTypes.map(workerType => ({
+        ...workerType,
+        ...(awsWorkerTypes ? find(propEq('workerType', workerType.workerType))(awsWorkerTypes) : {})
+      }));
 
       const workerTypeSummaries = await Promise.all(workerTypesNormalized.map(async (workerType) => {
         const pendingTasks = await this.getPendingTasks(provisionerId, workerType.workerType);
@@ -88,10 +87,12 @@ export default class WorkerTypeTable extends React.PureComponent {
           lastDateActive: workerType.lastDateActive
         };
 
-        const dynamic = provisionerId === 'aws-provisioner-v1' ? {
-          runningCapacity: workerType.runningCapacity,
-          pendingCapacity: workerType.pendingCapacity
-        } : {};
+        const dynamic = provisionerId === 'aws-provisioner-v1' ?
+          ({
+            runningCapacity: workerType.runningCapacity,
+            pendingCapacity: workerType.pendingCapacity
+          }) :
+          {};
 
         return { ...stable, ...dynamic };
       }));
@@ -138,7 +139,7 @@ export default class WorkerTypeTable extends React.PureComponent {
             {this.props.provisionerId === 'aws-provisioner-v1' && ['runningCapacity', 'pendingCapacity']
               .map((property, key) => (
                 <tr key={`dynamic-data-${key}`}>
-                  <td>{property}</td>
+                  <td>{sentenceCase(property)}</td>
                   <td><Badge>{workerType[property]}</Badge></td>
                 </tr>
               ))
@@ -172,7 +173,7 @@ export default class WorkerTypeTable extends React.PureComponent {
             <th>Pending tasks</th>
             {this.props.provisionerId === 'aws-provisioner-v1' && ['runningCapacity', 'pendingCapacity']
               .map((property, key) => (
-                <th key={`tabular-dynamic-header-${key}`}>{property}</th>
+                <th key={`tabular-dynamic-header-${key}`}>{sentenceCase(property)}</th>
               ))
             }
           </tr>
@@ -209,11 +210,9 @@ export default class WorkerTypeTable extends React.PureComponent {
     </div>
   );
 
-  renderWorkerType = workerTypes => (
-    this.props.gridLayout ?
-      workerTypes.map(this.renderGridWorkerType) :
-      this.renderTabularWorkerType(workerTypes)
-  );
+  renderWorkerType = workerTypes => (this.props.gridLayout ?
+    workerTypes.map(this.renderGridWorkerType) :
+    this.renderTabularWorkerType(workerTypes));
 
   sort = (a, b) => {
     if (this.props.lastActive) {
@@ -221,7 +220,13 @@ export default class WorkerTypeTable extends React.PureComponent {
     }
 
     if (this.props.orderBy) {
-      return a[this.props.orderBy] - b[this.props.orderBy] < 0 ? 1 : -1;
+      const diff = a[this.props.orderBy] - b[this.props.orderBy];
+
+      if (diff === 0) {
+        return 0;
+      }
+
+      return diff < 0 ? 1 : -1;
     }
   };
 
@@ -235,11 +240,11 @@ export default class WorkerTypeTable extends React.PureComponent {
     }
 
     if (!this.state.workerTypeSummaries.length) {
-      return <div>No worker-types to display.</div>;
+      return <div>No worker types to display.</div>;
     }
 
     return (
-      <div className={styles.container} >
+      <div className={styles.container}>
         {this.renderWorkerType(
           this.state.workerTypeSummaries
             .filter(workerType => workerType.workerType.includes(this.props.searchTerm))

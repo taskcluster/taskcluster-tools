@@ -7,7 +7,7 @@
 
 .card {
   margin: 5px 5px 5px 0;
-  width: 200px;
+  width: 210px;
 }
 
 .card tbody {
@@ -22,13 +22,15 @@
 
 .optionsToolbar {
   display: flex;
+  margin-left: 0;
+  flex-wrap: wrap;
   align-items: center;
   width: 100%;
 }
 
-/*.switchButton {*/
-  /*margin-left: 10px;*/
-/*}*/
+.optionsToolbar > div {
+  margin-bottom: 5px;
+}
 
 .tabular {
   width: 100%;

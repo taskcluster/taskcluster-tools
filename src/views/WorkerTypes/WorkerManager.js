@@ -76,8 +76,8 @@ export default class WorkerManager extends React.PureComponent {
     return (
       <div>
         <div>
-          <HelmetTitle title="Worker-types Explorer" />
-          <h4>Worker-types Explorer</h4>
+          <HelmetTitle title="Worker Types Explorer" />
+          <h4>Worker Types Explorer</h4>
         </div>
         <DropdownButton
           id="provisioner-dropdown"
@@ -99,10 +99,12 @@ export default class WorkerManager extends React.PureComponent {
         {this.props.provisionerId &&
           <div>
             <ButtonToolbar className={styles.optionsToolbar}>
-              <Button onClick={this.handleLastActiveClick} bsSize="sm">
-                <Icon name={this.state.lastActive ? 'check-square-o' : 'square-o'} />
-                &nbsp;&nbsp;Last active
-              </Button>
+              <div>
+                <Button onClick={this.handleLastActiveClick} bsSize="sm">
+                  <Icon name={this.state.lastActive ? 'check-square-o' : 'square-o'} />
+                  &nbsp;&nbsp;Last active
+                </Button>
+              </div>
               <OrderByDropdown
                 onSelect={this.handleOrderBySelect}
                 orderBy={this.state.orderBy}
