@@ -18,6 +18,7 @@ const TaskRedirect = loadable(() => import(/* webpackChunkName: 'TaskRedirect' *
 const UnifiedInspector = loadable(() => import(/* webpackChunkName: 'UnifiedInspector' */ '../views/UnifiedInspector'));
 const QuickStart = loadable(() => import(/* webpackChunkName: 'QuickStart' */ '../views/QuickStart'));
 const AwsProvisioner = loadable(() => import(/* webpackChunkName: 'AwsProvisioner' */ '../views/AwsProvisioner'));
+const Worker = loadable(() => import(/* webpackChunkName: 'Worker' */ '../views/Worker'));
 const ClientManager = loadable(() => import(/* webpackChunkName: 'ClientManager' */ '../views/ClientManager'));
 const RoleManager = loadable(() => import(/* webpackChunkName: 'RoleManager' */ '../views/RoleManager'));
 const ScopeInspector = loadable(() => import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector'));
@@ -27,6 +28,7 @@ const IndexedArtifactBrowser = loadable(() => import(/* webpackChunkName: 'Index
 const IndexBrowser = loadable(() => import(/* webpackChunkName: 'IndexBrowser' */ '../views/IndexBrowser'));
 const HooksManager = loadable(() => import(/* webpackChunkName: 'HooksManager' */ '../views/HooksManager'));
 const SecretsManager = loadable(() => import(/* webpackChunkName: 'SecretsManager' */ '../views/SecretsManager'));
+const Status = loadable(() => import(/* webpackChunkName: 'Status' */ '../views/Status'));
 const Diagnostics = loadable(() => import(/* webpackChunkName: 'Diagnostics' */ '../views/Diagnostics'));
 const CredentialsManager = loadable(() => import(/* webpackChunkName: 'CredentialsManager' */ '../views/CredentialsManager'));
 const Displays = loadable(() => import(/* webpackChunkName: 'Displays' */ '../views/Displays'));
@@ -86,14 +88,13 @@ export default class App extends React.Component {
   };
 
   loadCredentials() {
-    const storedCredentials = localStorage.getItem('credentials');
+    const credentials = JSON.parse(localStorage.getItem('credentials'));
 
     // We have no credentials
-    if (!storedCredentials) {
+    if (!credentials) {
       return { credentials: null };
     }
 
-    const credentials = JSON.parse(storedCredentials);
     const { certificate } = credentials;
     const isExpired = certificate && certificate.expiry < Date.now();
 
@@ -147,7 +148,7 @@ export default class App extends React.Component {
     this.saveCredentials({
       clientId,
       accessToken,
-      certificate: certificate ? JSON.parse(certificate) : null
+      certificate: certificate === '' ? certificate : JSON.parse(certificate)
     });
   };
 
@@ -186,8 +187,8 @@ export default class App extends React.Component {
               <PropsRoute path="/tasks/:taskId?/:action?" component={TaskRedirect} credentials={credentials} />
               <PropsRoute path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?" component={UnifiedInspector} credentials={credentials} />
               <PropsRoute path="/quickstart" component={QuickStart} credentials={credentials} />
-              <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://aws-provisioner.taskcluster.net/v1" provisionerId="aws-provisioner-v1" routeRoot="/aws-provisioner" />
-              <PropsRoute path="/aws-provisioner-staging/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://provisioner-staging.herokuapp.com/v1" provisionerId="staging-aws" routeRoot="/aws-provisioner-staging" />
+              <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} />
+              <PropsRoute path="/worker/:provisionerId?/:workerType?/:workerGroup?/:workerId?" component={Worker} credentials={credentials} />
               <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} credentials={credentials} />
               <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} credentials={credentials} />
               <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} credentials={credentials} />
@@ -197,6 +198,7 @@ export default class App extends React.Component {
               <PropsRoute path="/index/:namespace?/:namespaceTaskId?" component={IndexBrowser} credentials={credentials} />
               <PropsRoute path="/hooks/:hookGroupId?/:hookId?" component={HooksManager} credentials={credentials} />
               <PropsRoute path="/secrets/:secretId?" component={SecretsManager} credentials={credentials} />
+              <PropsRoute path="/status" component={Status} credentials={credentials} />
               <PropsRoute path="/diagnostics" component={Diagnostics} credentials={credentials} />
               <PropsRoute path="/credentials" component={CredentialsManager} credentials={credentials} />
               <PropsRoute path="/display" component={Displays} credentials={credentials} />
