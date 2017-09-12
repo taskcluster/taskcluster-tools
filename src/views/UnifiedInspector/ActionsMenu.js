@@ -5,7 +5,6 @@ import { object, string, func } from 'prop-types';
 import { Row, Col, NavDropdown, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { omit, pathOr } from 'ramda';
-import { Queue } from 'taskcluster-client-web';
 import { nice } from 'slugid';
 import merge from 'deepmerge';
 import clone from 'lodash.clonedeep';
@@ -58,20 +57,6 @@ export default class ActionsMenu extends React.PureComponent {
         caches,
         selectedCaches: new Set(caches)
       });
-    }
-
-    if (nextProps.decision !== this.props.decision || nextProps.credentials !== this.props.credentials) {
-      const decision = nextProps.decision || this.props.decision;
-      const credentials = nextProps.credentials || this.props.credentials;
-
-      if (decision) {
-        // this includes authorizedScopes.  Could we use
-        // this.props.queue.use({authorizedScopes}).createTask
-        this.actionsQueue = new Queue({
-          credentials,
-          authorizedScopes: decision.scopes || []
-        });
-      }
     }
 
     if (nextProps.actions !== this.props.actions ||
@@ -371,8 +356,17 @@ export default class ActionsMenu extends React.PureComponent {
       input
     }, actions.variables));
 
-    // TODO: use https://github.com/taskcluster/taskcluster-client/pull/79 equivalent for tc-client-web
-    await this.actionsQueue.createTask(newTaskId, newTask);
+    if (!this.props.decision) {
+      throw new Error('no action task found');  // .. how did we find an action, then?
+    }
+
+    // call the queue with the decision task's scopes, as directed by the action spec
+    const actionsQueue = this.props.queue.use({
+      authorizedScopes: this.props.decision.scopes || []
+    });
+
+    await actionsQueue.createTask(newTaskId, newTask);
+
     return newTaskId;
   }
 

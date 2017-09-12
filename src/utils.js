@@ -1,4 +1,4 @@
-import * as taskcluster from 'taskcluster-client-web';
+import { fromNowJSON } from 'taskcluster-client-web';
 import { omit } from 'ramda';
 import merge from 'deepmerge';
 import cloneDeep from 'lodash.clonedeep';
@@ -80,9 +80,9 @@ export const parameterizeTask = task => merge(omit([
   'payload'
 ], cloneDeep(task)), {
   retries: 0,
-  deadline: taskcluster.fromNowJSON('12 hours'),
-  created: taskcluster.fromNowJSON(),
-  expires: taskcluster.fromNowJSON('7 days'),
+  deadline: fromNowJSON('12 hours'),
+  created: fromNowJSON(),
+  expires: fromNowJSON('7 days'),
   scopes: task.scopes.filter(scope => !/^docker-worker:cache:/.test(scope)), // Delete cache scopes
   payload: merge(omit(['artifacts', 'cache'], task.payload || {}), {
     maxRunTime: Math.max(task.payload && task.payload.maxRunTime, 3 * 60 * 60),
