@@ -3,6 +3,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Glyphicon, NavDropdown, NavItem, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import OktaLogin from './OktaLogin';
+import Auth0Login from './Auth0Login';
 import DevelopmentLogin from './DevelopmentLogin';
 import EmailLogin from './EmailLogin';
 import ManualLogin from './ManualLogin';
@@ -49,6 +50,7 @@ class CredentialsMenu extends React.PureComponent {
       // handle expanding and collapsing this manually
       <NavDropdown id="sign-in-menu" key="sign-in-menu" title={title} ref={registerChild} open={open} onToggle={onToggle}>
         {canSignInUsing('okta') && <OktaLogin />}
+        {canSignInUsing('auth0') && <Auth0Login />}
         {canSignInUsing('development') && <DevelopmentLogin onSelect={onDevelopment} />}
         {canSignInUsing('email') && <EmailLogin />}
         {canSignInUsing('manual') && <ManualLogin onSelect={onManualModal} />}

@@ -5,6 +5,7 @@ import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
 import Navigation from '../components/Navigation';
 import Login from '../views/Login';
+import Auth0Login from '../views/Auth0Login';
 import NotFound from '../components/NotFound';
 import { getLoginUrl, loadable } from '../utils';
 import './styles.css';
@@ -180,6 +181,7 @@ export default class App extends React.Component {
               <PropsRoute path="/interactive" component={LegacyRedirect} />
               <PropsRoute path="/task-creator" component={LegacyRedirect} />
 
+              <PropsRoute path="/login/auth0" component={Auth0Login} />
               <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
               <PropsRoute path="/" exact={true} component={Home} credentials={credentials} />
               <PropsRoute path="/tasks/create/interactive" component={TaskCreator} credentials={credentials} interactive={true} />

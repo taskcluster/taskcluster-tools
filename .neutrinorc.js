@@ -3,6 +3,9 @@ const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
 
 const envs = {
+  AUTH0_DOMAIN: 'auth.mozilla.auth0.com',
+  AUTH0_CLIENT_ID: 'TBD',
+  AUTH0_AUDIENCE: 'login.taskcluster.net',
   SIGN_IN_METHODS: process.env.NODE_ENV === 'development' ? 'development' : 'okta email manual'
 };
 
