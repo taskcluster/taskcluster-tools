@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 import Clients from '../../components/Clients';
 import HooksManager from './HooksManager';
 
-const View = ({ credentials, match, history, location }) => {
+const View = ({ userSession, match, history, location }) => {
   const [groupId, id] = location.hash.slice(1).split('/');
 
   if (groupId && id) {
@@ -13,11 +13,11 @@ const View = ({ credentials, match, history, location }) => {
   }
 
   return (
-    <Clients credentials={credentials} Hooks>
+    <Clients userSession={userSession} Hooks>
       {({ hooks }) => (
         <HooksManager
           history={history}
-          credentials={credentials}
+          userSession={userSession}
           hooks={hooks}
           hookGroupId={match.params.hookGroupId && decodeURIComponent(match.params.hookGroupId)}
           hookId={match.params.hookId && decodeURIComponent(match.params.hookId)} />

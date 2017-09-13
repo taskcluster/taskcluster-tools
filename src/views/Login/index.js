@@ -1,5 +1,6 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
+import UserSession from '../../UserSession';
 
 export default class Login extends React.PureComponent {
   constructor(props) {
@@ -17,11 +18,12 @@ export default class Login extends React.PureComponent {
   }
 
   componentDidMount() {
-    const { saveCredentials, history } = this.props;
+    const { saveUserSession, history } = this.props;
     const { credentials } = this.state;
 
     if (credentials.clientId && credentials.accessToken) {
-      saveCredentials(credentials);
+      const userSession = UserSession.fromCredentials(credentials);
+      saveUserSession(userSession);
 
       if (window.opener) {
         window.close();

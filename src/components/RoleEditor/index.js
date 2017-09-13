@@ -44,7 +44,7 @@ export default class RoleEditor extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (!nextProps.currentRoleId !== this.props.currentRoleId) {
       this.load(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }

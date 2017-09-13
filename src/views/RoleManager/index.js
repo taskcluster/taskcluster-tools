@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 import Clients from '../../components/Clients';
 import RoleManager from './RoleManager';
 
-const View = ({ credentials, history, match }) => {
+const View = ({ userSession, history, match }) => {
   const roleId = location.hash.slice(1);
 
   if (roleId) {
@@ -11,12 +11,12 @@ const View = ({ credentials, history, match }) => {
   }
 
   return (
-    <Clients credentials={credentials} Auth>
+    <Clients userSession={userSession} Auth>
       {({ auth }) => (
         <RoleManager
           auth={auth}
           history={history}
-          credentials={credentials}
+          userSession={userSession}
           roleId={match.params.roleId ? decodeURIComponent(match.params.roleId) : ''} />
       )}
     </Clients>

@@ -19,7 +19,7 @@ import { parameterizeTask } from '../../utils';
 export default class ActionsMenu extends React.PureComponent {
   static propTypes = {
     queue: object,
-    credentials: object,
+    userSession: object,
     purgeCache: object,
     taskGroupId: string,
     taskId: string,

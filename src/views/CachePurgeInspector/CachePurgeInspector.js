@@ -26,7 +26,7 @@ export default class CachePurgeInspector extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.cachesError && !equal(nextProps.credentials, this.props.credentials)) {
+    if (this.state.cachesError && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ cachesError: null });
     }
   }

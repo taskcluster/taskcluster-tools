@@ -116,7 +116,7 @@ export default class Inspector extends React.PureComponent {
           await this.getArtifacts(this.props.taskId, runId) :
           []
       });
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }
@@ -473,7 +473,7 @@ export default class Inspector extends React.PureComponent {
       sectionId,
       subSectionId,
       artifactId,
-      credentials
+      userSession
     } = this.props;
     const {
       tasks,
@@ -514,7 +514,7 @@ export default class Inspector extends React.PureComponent {
               task={task}
               actions={actions}
               decision={decision}
-              credentials={credentials}
+              userSession={userSession}
               onActionTask={this.handleActionTask}
               onRetrigger={this.handleRetrigger}
               onEdit={this.handleEdit}
@@ -550,7 +550,7 @@ export default class Inspector extends React.PureComponent {
               queue={queue}
               taskId={trackedTaskId}
               artifacts={artifacts}
-              credentials={this.props.credentials}
+              userSession={this.props.userSession}
               runId={runNumber} />
             <PropsRoute
               path={PATHS.LOG}

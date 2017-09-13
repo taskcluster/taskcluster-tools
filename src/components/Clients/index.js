@@ -14,21 +14,22 @@ export default class Clients extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.credentials !== this.props.credentials) {
+    if (nextProps.userSession !== this.props.userSession) {
       this.setState(this.getClients(nextProps));
     }
   }
 
   getClients(props) {
-    const { children, credentials, ...clients } = props;
+    const { children, userSession, ...clients } = props;
+    const clientArgs = userSession ? userSession.clientArgs : null;
 
     return Object
       .entries(clients)
       .reduce((reduction, [key, value]) => ({
         ...reduction,
         [camelCase(key)]: value === true ?
-          new taskcluster[key]({ credentials }) :
-          new taskcluster[key]({ credentials, ...value })
+          new taskcluster[key]({ ...clientArgs }) :
+          new taskcluster[key]({ ...clientArgs, ...value })
       }), {});
   }
 

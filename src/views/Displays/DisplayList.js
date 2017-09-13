@@ -28,7 +28,7 @@ export default class DisplayList extends React.PureComponent {
       nextProps.shared !== this.props.shared
     ) {
       this.load(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }

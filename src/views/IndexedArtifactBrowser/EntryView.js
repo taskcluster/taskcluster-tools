@@ -30,7 +30,7 @@ export default class EntryView extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.namespace !== this.props.namespace || nextProps.namespaceTaskId !== this.props.namespaceTaskId) {
       this.loadTask(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }
@@ -79,7 +79,7 @@ export default class EntryView extends React.PureComponent {
       return null;
     }
 
-    const { queue, credentials } = this.props;
+    const { queue, userSession } = this.props;
 
     return (
       <div>
@@ -93,7 +93,7 @@ export default class EntryView extends React.PureComponent {
         <dl className="dl-horizontal">
           <dt>Latest Artifacts</dt>
           <dd>
-            <ArtifactView taskId={task.taskId} namespace={task.namespace} queue={queue} credentials={credentials} />
+            <ArtifactView taskId={task.taskId} namespace={task.namespace} queue={queue} userSession={userSession} />
             <br />
             <div className="alert alert-info" role="alert">
               <strong>Latest Artifacts</strong>&nbsp;

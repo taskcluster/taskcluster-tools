@@ -11,13 +11,13 @@ import ManualLogin from './ManualLogin';
 const canSignInUsing = method => process.env.SIGN_IN_METHODS.includes(method);
 
 class CredentialsMenu extends React.PureComponent {
-  renderWithCredentials() {
-    const { credentials, credentialsExpiringSoon, open, onSignOut, onToggle, registerChild } = this.props;
+  renderWithUser() {
+    const { userSession, credentialsExpiringSoon, open, onSignOut, onToggle, registerChild } = this.props;
     const title = (
       <span>
         <Glyphicon
           glyph={credentialsExpiringSoon ? 'exclamation-sign' : 'user'}
-          className={credentialsExpiringSoon ? 'text-warning' : null} /> &nbsp;{credentials.clientId}
+          className={credentialsExpiringSoon ? 'text-warning' : null} /> &nbsp;{userSession.name}
       </span>
     );
 
@@ -37,7 +37,7 @@ class CredentialsMenu extends React.PureComponent {
     );
   }
 
-  renderWithoutCredentials() {
+  renderWithoutUser() {
     const { registerChild, open, onToggle, onDevelopment, onManualModal } = this.props;
     const title = (
       <span>
@@ -59,9 +59,9 @@ class CredentialsMenu extends React.PureComponent {
   }
 
   render() {
-    return this.props.credentials ?
-      this.renderWithCredentials() :
-      this.renderWithoutCredentials();
+    return this.props.userSession ?
+      this.renderWithUser() :
+      this.renderWithoutUser();
   }
 }
 

@@ -38,7 +38,7 @@ export default class SecretEditor extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.secretId !== this.props.secretId) {
       this.loadSecret(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }

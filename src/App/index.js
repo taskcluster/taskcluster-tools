@@ -8,11 +8,11 @@ import Login from '../views/Login';
 import Auth0Login from '../views/Auth0Login';
 import NotFound from '../components/NotFound';
 import { getLoginUrl, loadable } from '../utils';
+import UserSession from '../UserSession';
 import './styles.css';
 import iconUrl from '../taskcluster.png';
 import LegacyRedirect from './LegacyRedirect';
 
-const expirationTimeout = 5 * 60 * 1000; // time before expiration at which we warn
 const Home = loadable(() => import(/* webpackChunkName: 'Home' */ '../views/Home'));
 const TaskCreator = loadable(() => import(/* webpackChunkName: 'TaskCreator' */ '../views/TaskCreator'));
 const TaskRedirect = loadable(() => import(/* webpackChunkName: 'TaskRedirect' */ '../views/TaskRedirect'));
@@ -40,11 +40,7 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      ...this.loadCredentials(),
-      credentialsExpiringSoon: false,
-      manualClientId: '',
-      manualAccessToken: '',
-      manualCertificate: ''
+      userSession: this.loadUserSession()
     };
   }
 
@@ -52,110 +48,35 @@ export default class App extends React.Component {
     window.addEventListener('storage', this.handleStorage);
   }
 
-  componentDidMount() {
-    this.startExpirationTimer();
-  }
-
-  componentWillUnmount() {
-    this.stopExpirationTimer();
-  }
-
-  handleStorage = ({ storageArea, key, newValue }) => {
-    if (storageArea === localStorage && key === 'credentials') {
-      this.setState({ credentials: newValue ? JSON.parse(newValue) : null });
+  handleStorage = ({ storageArea, key }) => {
+    if (storageArea === localStorage && key === 'userSession') {
+      this.setState({ userSession: this.loadUserSession() });
     }
   };
 
-  handleCredentialsChanged = () => {
-    this.setState({ ...this.loadCredentials(), credentialsExpiringSoon: false });
-    this.startExpirationTimer();
-  };
-
-  saveCredentials = (credentials) => {
-    if (!credentials) {
-      localStorage.removeItem('credentials');
-      this.setState({ credentials: null });
+  saveUserSession = (userSession) => {
+    if (!userSession) {
+      localStorage.removeItem('userSession');
+      this.setState({ userSession: null });
     } else {
-      const clone = {
-        ...credentials,
-        certificate: typeof credentials.certificate === 'string' ?
-          JSON.parse(credentials.certificate) :
-          credentials.certificate
-      };
-
-      this.setState({ credentials: clone });
-      localStorage.setItem('credentials', JSON.stringify(clone));
+      this.setState({ userSession });
+      localStorage.setItem('userSession', userSession.serialize());
     }
-  };
-
-  loadCredentials() {
-    const storedCredentials = localStorage.getItem('credentials');
-
-    // We have no credentials
-    if (!storedCredentials) {
-      return { credentials: null };
-    }
-
-    const credentials = JSON.parse(storedCredentials);
-    const { certificate } = credentials;
-    const isExpired = certificate && certificate.expiry < Date.now();
-
-    if (isExpired && this.state && this.state.credentialsExpiredTimeout) {
-      clearTimeout(this.state.credentialsExpiredTimeout);
-    }
-
-    return {
-      credentials: isExpired ? null : credentials,
-      credentialsExpiredTimeout: credentials && certificate && certificate.expiry ?
-        setTimeout(() => this.setState({ credentials: null }), certificate.expiry - Date.now()) :
-        null
-    };
   }
 
-  startExpirationTimer = () => {
-    this.stopExpirationTimer();
-
-    const { credentials } = this.state;
-
-    // We only support monitoring expiration of temporary credentials.
-    // Anything else requires hitting the auth API, and temporary credentials are the common case.
-    if (!credentials || !credentials.certificate || !credentials.certificate.expiry) {
-      return;
+  loadUserSession() {
+    const userSession = localStorage.getItem('userSession');
+    if (!userSession) {
+      return null;
     }
 
-    const { expiry } = credentials.certificate;
+    return UserSession.deserialize(userSession);
+  }
 
-    if (expiry < (Date.now() + expirationTimeout)) {
-      this.setState({ credentialsExpiringSoon: true });
-      return;
-    }
-
-    const timeout = (expiry - Date.now()) - (expirationTimeout + 500);
-
-    this.setState({
-      expirationTimer: setTimeout(() => this.setState({ credentialsExpiringSoon: true }), timeout)
-    });
-  };
-
-  stopExpirationTimer = () => {
-    if (this.state.expirationTimer) {
-      clearTimeout(this.state.expirationTimer);
-      this.setState({ expirationTimer: null });
-    }
-  };
-
-  signOut = () => this.saveCredentials(null);
-
-  signInManually = ({ clientId, accessToken, certificate }) => {
-    this.saveCredentials({
-      clientId,
-      accessToken,
-      certificate: certificate ? JSON.parse(certificate) : null
-    });
-  };
+  signOut = () => this.saveUserSession(null);
 
   render() {
-    const { credentials, credentialsExpiringSoon } = this.state;
+    const { userSession } = this.state;
 
     return (
       <BrowserRouter>
@@ -165,9 +86,8 @@ export default class App extends React.Component {
           </Helmet>
           <PropsRoute
             component={Navigation}
-            credentials={credentials}
-            credentialsExpiringSoon={credentialsExpiringSoon}
-            signInManually={this.signInManually}
+            userSession={userSession}
+            saveUserSession={this.saveUserSession}
             loginUrl={getLoginUrl()}
             onSignOut={this.signOut} />
 
@@ -181,32 +101,32 @@ export default class App extends React.Component {
               <PropsRoute path="/interactive" component={LegacyRedirect} />
               <PropsRoute path="/task-creator" component={LegacyRedirect} />
 
-              <PropsRoute path="/login/auth0" component={Auth0Login} />
-              <PropsRoute path="/login" component={Login} saveCredentials={this.saveCredentials} />
-              <PropsRoute path="/" exact={true} component={Home} credentials={credentials} />
-              <PropsRoute path="/tasks/create/interactive" component={TaskCreator} credentials={credentials} interactive={true} />
-              <PropsRoute path="/tasks/create" component={TaskCreator} credentials={credentials} interactive={false} />
-              <PropsRoute path="/tasks/:taskId/connect" component={InteractiveConnect} credentials={credentials} />
-              <PropsRoute path="/tasks/:taskId?/:action?" component={TaskRedirect} credentials={credentials} />
-              <PropsRoute path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?" component={UnifiedInspector} credentials={credentials} />
-              <PropsRoute path="/quickstart" component={QuickStart} credentials={credentials} />
-              <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://aws-provisioner.taskcluster.net/v1" provisionerId="aws-provisioner-v1" routeRoot="/aws-provisioner" />
-              <PropsRoute path="/aws-provisioner-staging/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://provisioner-staging.herokuapp.com/v1" provisionerId="staging-aws" routeRoot="/aws-provisioner-staging" />
-              <PropsRoute path="/worker-types/:provisionerId?" component={WorkerTypes} credentials={credentials} />
-              <PropsRoute path="/workers/:provisionerId?/:workerType?/:workerGroup?/:workerId?" component={WorkerManager} credentials={credentials} />
-              <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} credentials={credentials} />
-              <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} credentials={credentials} />
-              <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} credentials={credentials} />
-              <PropsRoute path="/pulse-inspector" component={PulseInspector} credentials={credentials} />
-              <PropsRoute path="/purge-caches" component={CachePurgeInspector} credentials={credentials} />
-              <PropsRoute path="/index/artifacts/:namespace?/:namespaceTaskId?" component={IndexedArtifactBrowser} credentials={credentials} />
-              <PropsRoute path="/index/:namespace?/:namespaceTaskId?" component={IndexBrowser} credentials={credentials} />
-              <PropsRoute path="/hooks/:hookGroupId?/:hookId?" component={HooksManager} credentials={credentials} />
-              <PropsRoute path="/secrets/:secretId?" component={SecretsManager} credentials={credentials} />
-              <PropsRoute path="/diagnostics" component={Diagnostics} credentials={credentials} />
-              <PropsRoute path="/credentials" component={CredentialsManager} credentials={credentials} />
-              <PropsRoute path="/display" component={Displays} credentials={credentials} />
-              <PropsRoute path="/shell" component={Shell} credentials={credentials} />
+              <PropsRoute path="/login/auth0" component={Auth0Login} saveUserSession={this.saveUserSession} />
+              <PropsRoute path="/login" component={Login} saveUserSession={this.saveUserSession} />
+              <PropsRoute path="/" exact={true} component={Home} userSession={userSession} />
+              <PropsRoute path="/tasks/create/interactive" component={TaskCreator} userSession={userSession} interactive={true} />
+              <PropsRoute path="/tasks/create" component={TaskCreator} userSession={userSession} interactive={false} />
+              <PropsRoute path="/tasks/:taskId/connect" component={InteractiveConnect} userSession={userSession} />
+              <PropsRoute path="/tasks/:taskId?/:action?" component={TaskRedirect} userSession={userSession} />
+              <PropsRoute path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?" component={UnifiedInspector} userSession={userSession} />
+              <PropsRoute path="/quickstart" component={QuickStart} userSession={userSession} />
+              <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} userSession={userSession} baseUrl="https://aws-provisioner.taskcluster.net/v1" provisionerId="aws-provisioner-v1" routeRoot="/aws-provisioner" />
+              <PropsRoute path="/aws-provisioner-staging/:workerType?/:currentTab?" component={AwsProvisioner} userSession={userSession} baseUrl="https://provisioner-staging.herokuapp.com/v1" provisionerId="staging-aws" routeRoot="/aws-provisioner-staging" />
+              <PropsRoute path="/worker-types/:provisionerId?" component={WorkerTypes} userSession={userSession} />
+              <PropsRoute path="/workers/:provisionerId?/:workerType?/:workerGroup?/:workerId?" component={WorkerManager} userSession={userSession} />
+              <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} userSession={userSession} />
+              <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} userSession={userSession} />
+              <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} userSession={userSession} />
+              <PropsRoute path="/pulse-inspector" component={PulseInspector} userSession={userSession} />
+              <PropsRoute path="/purge-caches" component={CachePurgeInspector} userSession={userSession} />
+              <PropsRoute path="/index/artifacts/:namespace?/:namespaceTaskId?" component={IndexedArtifactBrowser} userSession={userSession} />
+              <PropsRoute path="/index/:namespace?/:namespaceTaskId?" component={IndexBrowser} userSession={userSession} />
+              <PropsRoute path="/hooks/:hookGroupId?/:hookId?" component={HooksManager} userSession={userSession} />
+              <PropsRoute path="/secrets/:secretId?" component={SecretsManager} userSession={userSession} />
+              <PropsRoute path="/diagnostics" component={Diagnostics} userSession={userSession} />
+              <PropsRoute path="/credentials" component={CredentialsManager} userSession={userSession} />
+              <PropsRoute path="/display" component={Displays} userSession={userSession} />
+              <PropsRoute path="/shell" component={Shell} userSession={userSession} />
               <Route component={NotFound} />
             </Switch>
           </Grid>

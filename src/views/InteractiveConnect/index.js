@@ -2,10 +2,10 @@ import React from 'react';
 import Clients from '../../components/Clients';
 import InteractiveConnect from './InteractiveConnect';
 
-const View = ({ credentials, match }) => (
-  <Clients credentials={credentials} Queue QueueEvents>
+const View = ({ userSession, match }) => (
+  <Clients userSession={userSession} Queue QueueEvents>
     {clients => (
-      <InteractiveConnect credentials={credentials} {...clients} taskId={match.params.taskId || ''} />
+      <InteractiveConnect userSession={userSession} {...clients} taskId={match.params.taskId || ''} />
     )}
   </Clients>
 );
