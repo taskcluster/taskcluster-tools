@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ButtonToolbar, DropdownButton, MenuItem, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, ButtonToolbar, DropdownButton, MenuItem, ToggleButtonGroup, ToggleButton, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -73,6 +73,8 @@ export default class WorkerManager extends React.PureComponent {
   };
 
   render() {
+    const tooltip = <Tooltip id="last-active">Last active may be off by up-to 6 hours.</Tooltip>;
+
     return (
       <div>
         <div>
@@ -100,10 +102,12 @@ export default class WorkerManager extends React.PureComponent {
           <div>
             <ButtonToolbar className={styles.optionsToolbar}>
               <div>
-                <Button onClick={this.handleLastActiveClick} bsSize="sm">
-                  <Icon name={this.state.lastActive ? 'check-square-o' : 'square-o'} />
-                  &nbsp;&nbsp;Last active
-                </Button>
+                <OverlayTrigger placement="right" overlay={tooltip}>
+                  <Button onClick={this.handleLastActiveClick} bsSize="sm">
+                    <Icon name={this.state.lastActive ? 'check-square-o' : 'square-o'} />
+                    &nbsp;&nbsp;Last active
+                  </Button>
+                </OverlayTrigger>
               </div>
               <OrderByDropdown
                 onSelect={this.handleOrderBySelect}
