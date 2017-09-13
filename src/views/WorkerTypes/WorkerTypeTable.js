@@ -228,6 +228,8 @@ export default class WorkerTypeTable extends React.PureComponent {
 
       return diff < 0 ? 1 : -1;
     }
+
+    return a.workerType.localeCompare(b.workerType);
   };
 
   render() {
