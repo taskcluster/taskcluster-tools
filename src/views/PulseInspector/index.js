@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Row, Col, ButtonToolbar, Button, Glyphicon, Table, Alert, FormGroup, FormControl, ControlLabel
 } from 'react-bootstrap';
-import { WebListener } from 'taskcluster-client';
+import { WebListener } from 'taskcluster-client-web';
 import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';

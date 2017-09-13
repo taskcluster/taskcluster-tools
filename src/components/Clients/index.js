@@ -1,7 +1,7 @@
 import React from 'react';
 import { func } from 'prop-types';
 import { camelCase } from 'change-case';
-import taskcluster from 'taskcluster-client';
+import * as taskcluster from 'taskcluster-client-web';
 
 export default class Clients extends React.PureComponent {
   static propTypes = {

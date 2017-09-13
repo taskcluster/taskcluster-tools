@@ -3,7 +3,7 @@ import { Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { WebListener } from 'taskcluster-client';
+import { WebListener } from 'taskcluster-client-web';
 import { isNil } from 'ramda';
 import equal from 'deep-equal';
 import PropsRoute from '../../components/PropsRoute';
