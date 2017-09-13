@@ -5,6 +5,7 @@ import { func, string, bool, object } from 'prop-types';
 import { sentenceCase } from 'change-case';
 import { find, propEq } from 'ramda';
 import Icon from 'react-fontawesome';
+import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
 import Error from '../../components/Error';
@@ -154,7 +155,7 @@ export default class WorkerTypeTable extends React.PureComponent {
             </tr>
             <tr>
               <td>Last active</td>
-              <td>{moment(workerType.lastDateActive).fromNow()}</td>
+              <td><DateView date={workerType.lastDateActive} /></td>
             </tr>
           </tbody>
         </Table>
@@ -194,7 +195,7 @@ export default class WorkerTypeTable extends React.PureComponent {
                   {workerType.stability}
                 </Label>
               </td>
-              <td>{moment(workerType.lastDateActive).fromNow()}</td>
+              <td><DateView date={workerType.lastDateActive} /></td>
               <td><Badge>{workerType.pendingTasks}</Badge></td>
               {this.props.provisionerId === 'aws-provisioner-v1' && ['runningCapacity', 'pendingCapacity']
                 .map((property, key) => (
