@@ -62,7 +62,7 @@ export default class EntryView extends React.PureComponent {
   renderTask() {
     const { fullNamespace, error, task } = this.state;
 
-    if (error && error.statusCode === 404) {
+    if (error && error.response.status === 404) {
       return (
         <div className="alert alert-warning" role="alert">
           <strong>Task not found!</strong>&nbsp;
