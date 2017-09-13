@@ -1,6 +1,7 @@
 import React from 'react';
 import { WebAuth } from 'auth0-js';
 import Error from '../../components/Error';
+import UserSession from '../../UserSession';
 
 export default class Auth0Login extends React.PureComponent {
   state = {};
@@ -25,7 +26,8 @@ export default class Auth0Login extends React.PureComponent {
           return this.setState({ loginError });
         }
 
-        // later commits will actually use the information in authResult!
+        const userSession = UserSession.fromOIDC('mozilla-auth0', authResult.accessToken, authResult.idTokenPayload);
+        this.props.saveUserSession(userSession);
 
         // return from whence we came..
         if (window.opener) {

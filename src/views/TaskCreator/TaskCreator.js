@@ -59,7 +59,7 @@ export default class TaskCreator extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (
       (this.state.error || this.state.createdTaskError) &&
-      !equal(nextProps.credentials, this.props.credentials)
+      !equal(nextProps.userSession, this.props.userSession)
     ) {
       this.setState({ error: null, createdTaskError: null });
     }

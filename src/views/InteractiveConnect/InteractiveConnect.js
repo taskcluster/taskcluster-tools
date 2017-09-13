@@ -35,7 +35,7 @@ export default class InteractiveConnect extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.taskId !== this.props.taskId) {
       this.load(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }
@@ -153,9 +153,13 @@ export default class InteractiveConnect extends React.PureComponent {
     this.setState({ notify: permission === 'granted' });
   };
 
-  openShell = () => window.open(this.props.queue.buildSignedUrl(...this.state.shellUrl), '_blank');
+  openShell = async () => {
+    window.open(await this.props.queue.buildSignedUrl(...this.state.shellUrl), '_blank');
+  }
 
-  openDisplay = () => window.open(this.props.queue.buildSignedUrl(...this.state.displayUrl), '_blank');
+  openDisplay = async () => {
+    window.open(await this.props.queue.buildSignedUrl(...this.state.displayUrl), '_blank');
+  }
 
   notify() {
     if (!this.state.notify) {

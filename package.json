@@ -64,7 +64,7 @@
     "react-vnc-display": "^1.1.0",
     "shebang-loader": "0.0.1",
     "slugid": "^1.1.0",
-    "taskcluster-client-web": "^2.0.1",
+    "taskcluster-client-web": "3.0.4",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
     "xml2js": "^0.4.18"

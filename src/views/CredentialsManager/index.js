@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import equal from 'deep-equal';
 import { credentialInformation } from 'taskcluster-client-web';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -13,8 +13,6 @@ export default class CredentialsManager extends React.PureComponent {
 
     this.state = {
       info: null,
-      showToken: false,
-      loading: true,
       error: null
     };
   }
@@ -24,107 +22,97 @@ export default class CredentialsManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!equal(nextProps.credentials, this.props.credentials)) {
+    if (!equal(nextProps.userSession, this.props.userSession)) {
       this.load(nextProps);
     }
   }
 
   async load(props) {
-    if (!props.credentials) {
-      this.setState({
-        info: null,
-        error: null,
-        loading: false
-      });
-    }
+    this.setState({
+      info: null,
+      error: null
+    });
 
-    try {
-      this.setState({
-        info: props.credentials ? await credentialInformation(props.credentials) : null,
-        error: null,
-        loading: false
-      });
-    } catch (err) {
-      this.setState({
-        info: null,
-        error: err,
-        loading: false
-      });
+    // get new credential information if there is a userSession
+    if (props.userSession) {
+      try {
+        this.setState({
+          info: await this.loadCredentialInfo(props.userSession),
+          error: null
+        });
+      } catch (err) {
+        this.setState({
+          info: null,
+          error: err
+        });
+      }
     }
   }
 
-  showToken = () => this.setState({ showToken: true });
-
-  renderCredentials() {
-    const { credentials } = this.props;
-    const { info, showToken, error, loading } = this.state;
-
-    if (error) {
-      return <Error error={error} />;
+  async loadCredentialInfo(userSession) {
+    if (!userSession) {
+      return;
     }
 
-    if (loading) {
-      return <Spinner />;
-    }
+    return credentialInformation(await userSession.getCredentials());
+  }
 
-    if (!info) {
-      return (
-        <div style={{ marginTop: 20 }}>
-          <p>No credentials loaded. Please sign in.</p>
-        </div>
-      );
-    }
+  renderSignin() {
+    const { info, error } = this.state;
+    const { userSession } = this.props;
+    const isOidc = userSession.type === 'oidc';
+    const isCredentials = userSession.type === 'credentials';
+    const haveCreds = !!info;
 
     return (
       <div style={{ marginTop: 20 }}>
         <table className="table">
           <tbody>
             <tr>
-              <td>ClientId</td>
-              <td><code>{info.clientId}</code></td>
+              <td>Signed In As</td>
+              <td>{userSession.name}</td>
             </tr>
 
-            <tr>
-              <td>AccessToken</td>
-              {showToken && credentials ?
-              (
+            {isOidc && (
+              <tr>
+                <td>OIDC User ID</td>
+                <td><code>{userSession.oidcSubject}</code></td>
+              </tr>
+            )}
+
+            {haveCreds && (
+              <tr>
+                <td>ClientId</td>
+                <td><code>{info.clientId}</code></td>
+              </tr>
+            )}
+
+            {haveCreds && isCredentials && (
+              <tr>
+                <td>Type</td>
+                <td>{info.type}</td>
+              </tr>
+            )}
+
+            {haveCreds && isCredentials && info.start && (
+              <tr>
+                <td>Valid From</td>
+                <td><DateView date={info.start} /></td>
+              </tr>
+            )}
+
+            {haveCreds && isCredentials && info.expiry && (
+              <tr>
+                <td>Expires</td>
+                <td><DateView date={info.expiry} /></td>
+              </tr>
+            )}
+
+            {haveCreds && (
+              <tr>
+                <td>Scopes</td>
                 <td>
-                  <code>{credentials.accessToken}</code>
-                </td>
-              ) :
-              (
-                <td>
-                  <Button bsStyle="primary" bsSize="xs" onClick={this.showToken}>show</Button>
-                </td>
-              )
-            }
-            </tr>
-
-            <tr>
-              <td>Type</td>
-              <td>{info.type}</td>
-            </tr>
-
-            {info.start && (
-            <tr>
-              <td>Valid From</td>
-              <td><DateView date={info.start} /></td>
-            </tr>
-          )}
-
-            {info.expiry && (
-            <tr>
-              <td>Expires</td>
-              <td><DateView date={info.expiry} /></td>
-            </tr>
-          )}
-
-            <tr>
-              <td>Scopes</td>
-              <td>
-                {
-                info.scopes.length ?
-                  (
+                  {info.scopes.length ? (
                     <div style={{ lineHeight: 1.8 }}>
                       {info.scopes.map((scope, key) => (
                         <div key={`credentials-scopes-${key}`}>
@@ -132,11 +120,18 @@ export default class CredentialsManager extends React.PureComponent {
                         </div>
                       ))}
                     </div>
-                  ) :
-                  'none (or accessToken is invalid)'
-              }
-              </td>
-            </tr>
+                  ) : 'none'
+                }
+                </td>
+              </tr>
+            )}
+
+            {!haveCreds && (
+              <tr>
+                <td></td>
+                <td>{error ? <Error error={error} /> : <Spinner />}</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -147,10 +142,18 @@ export default class CredentialsManager extends React.PureComponent {
     return (
       <Row>
         <HelmetTitle title="Credentials Manager" />
-        <Col sm={12}>
-          <h4>Taskcluster Credentials</h4>
-          {this.renderCredentials()}
-        </Col>
+        {this.props.userSession ?
+          (
+            <Col sm={12}>
+              <h4>Credential Information</h4>
+              {this.renderSignin()}
+            </Col>
+          ) : (
+            <Col sm={12}>
+              <h4>Not Signed In</h4>
+              Not signed in - no credentials available.
+            </Col>
+          )}
       </Row>
     );
   }

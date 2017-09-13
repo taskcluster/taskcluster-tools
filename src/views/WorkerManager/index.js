@@ -2,8 +2,8 @@ import React from 'react';
 import Clients from '../../components/Clients';
 import WorkerManager from './WorkerManager';
 
-const View = ({ credentials, history, match }) => (
-  <Clients credentials={credentials} Queue>
+const View = ({ userSession, history, match }) => (
+  <Clients userSession={userSession} Queue>
     {clients => (
       <WorkerManager
         {...clients}

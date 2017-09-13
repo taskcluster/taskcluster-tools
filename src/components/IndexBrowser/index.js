@@ -31,7 +31,7 @@ export default class IndexBrowser extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.namespace !== this.props.namespace) {
       this.loadTasksAndNamespaces(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }

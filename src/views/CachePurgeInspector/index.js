@@ -2,10 +2,10 @@ import React from 'react';
 import Clients from '../../components/Clients';
 import CachePurgeInspector from './CachePurgeInspector';
 
-const View = ({ credentials }) => (
-  <Clients credentials={credentials} PurgeCache>
+const View = ({ userSession }) => (
+  <Clients userSession={userSession} PurgeCache>
     {({ purgeCache }) => (
-      <CachePurgeInspector purgeCache={purgeCache} credentials={credentials} />
+      <CachePurgeInspector purgeCache={purgeCache} userSession={userSession} />
     )}
   </Clients>
 );

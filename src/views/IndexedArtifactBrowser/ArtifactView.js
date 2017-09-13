@@ -27,7 +27,7 @@ export default class ArtifactView extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.namespace !== this.props.namespace || nextProps.taskId !== this.props.taskId) {
       this.loadArtifacts(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }
@@ -49,7 +49,7 @@ export default class ArtifactView extends React.PureComponent {
   }
 
   render() {
-    const { queue, taskId, namespace } = this.props;
+    const { queue, taskId, namespace, userSession } = this.props;
     const { error, artifacts } = this.state;
 
     if (error) {
@@ -60,6 +60,13 @@ export default class ArtifactView extends React.PureComponent {
       return <Spinner />;
     }
 
-    return <ArtifactList queue={queue} namespace={namespace} artifacts={this.state.artifacts} taskId={taskId} />;
+    return (
+      <ArtifactList
+        queue={queue}
+        namespace={namespace}
+        artifacts={this.state.artifacts}
+        taskId={taskId}
+        userSession={userSession} />
+    );
   }
 }

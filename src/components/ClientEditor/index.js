@@ -52,8 +52,8 @@ export default class ClientEditor extends React.PureComponent {
   async load(props) {
     // If there is no currentClientId, we're creating a new client
     if (props.currentClientId === '') {
-      const { credentials } = props;
-      const clientId = credentials ? `${credentials.clientId}/` : '';
+      const { clientPrefix } = props;
+      const clientId = clientPrefix;
 
       return this.setState({
         client: {
@@ -116,8 +116,7 @@ export default class ClientEditor extends React.PureComponent {
       title = isEditing ? 'Edit Client' : 'View Client';
     }
 
-    const creds = this.props.credentials;
-    const clientId = creds ? `${creds.clientId}/` : '';
+    const clientId = this.props.clientPrefix;
     const tooltip = (
       <Tooltip id="clientId">
         You can create as many clients as you would like that begin with &quot;{clientId}&quot;.

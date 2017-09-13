@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 import Clients from '../../components/Clients';
 import ScopeInspector from './ScopeInspector';
 
-const View = ({ credentials, match, history }) => {
+const View = ({ userSession, match, history }) => {
   const [scope, entity] = location.hash.slice(1).split('/');
 
   if (scope && entity) {
@@ -16,12 +16,12 @@ const View = ({ credentials, match, history }) => {
   const selectedEntity = decodeURIComponent(match.params.selectedEntity || '');
 
   return (
-    <Clients credentials={credentials} Auth>
+    <Clients userSession={userSession} Auth>
       {({ auth }) => (
         <ScopeInspector
           auth={auth}
           history={history}
-          credentials={credentials}
+          userSession={userSession}
           selectedScope={selectedScope}
           selectedEntity={selectedEntity} />
       )}

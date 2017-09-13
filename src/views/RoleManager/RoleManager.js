@@ -21,7 +21,7 @@ export default class RoleManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }

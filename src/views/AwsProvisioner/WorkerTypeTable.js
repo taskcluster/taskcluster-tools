@@ -72,7 +72,7 @@ export default class WorkerTypeTable extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.provisionerId !== this.props.provisionerId || nextProps.workerType !== this.props.workerType) {
       this.loadWorkerTypeSummaries();
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }

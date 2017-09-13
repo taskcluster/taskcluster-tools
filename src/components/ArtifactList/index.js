@@ -14,7 +14,7 @@ export default class ArtifactList extends React.PureComponent {
     ]),
     menu: bool,
     queue: object.isRequired,
-    credentials: object,
+    userSession: object,
     style: object
   };
 
@@ -32,25 +32,25 @@ export default class ArtifactList extends React.PureComponent {
     };
   }
 
-  componentWillMount() {
+  async componentWillMount() {
     this.setState({
-      artifacts: this.getArtifactList(this.props)
+      artifacts: await this.getArtifactList(this.props)
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  async componentWillReceiveProps(nextProps) {
     this.setState({
-      artifacts: this.getArtifactList(nextProps)
+      artifacts: await this.getArtifactList(nextProps)
     });
   }
 
-  getArtifactList({ runId, taskId, credentials, queue, artifacts, namespace }) {
+  getArtifactList({ runId, taskId, userSession, queue, artifacts, namespace }) {
     if (!taskId || !artifacts) {
       return null;
     }
 
     // Build the URLs here so that they'll be updated when people login
-    return artifacts.map(({ name, contentType }) => {
+    return Promise.all(artifacts.map(async ({ name, contentType }) => {
       if (/^public\//.test(name)) {
         const icon = getIconFromMime(contentType);
 
@@ -70,15 +70,15 @@ export default class ArtifactList extends React.PureComponent {
         return { icon, name, url: `https://queue.taskcluster.net/v1/task/${taskId}/artifacts/${name}` };
       }
 
-      // If we have credentials we create a signed URL.
+      // If we have userSession we create a signed URL.
       // Note that signed URLs always point to the task directly, as they are not useful for users copy/pasting.
-      if (credentials) {
+      if (userSession) {
         return {
           name,
           icon: getIconFromMime(contentType),
           url: isNil(runId) ?
-            queue.buildSignedUrl(queue.getLatestArtifact, taskId, name) :
-            queue.buildSignedUrl(queue.getArtifact, taskId, runId, name)
+            await queue.buildSignedUrl(queue.getLatestArtifact, taskId, name) :
+            await queue.buildSignedUrl(queue.getArtifact, taskId, runId, name)
         };
       }
 
@@ -87,7 +87,7 @@ export default class ArtifactList extends React.PureComponent {
         url: null,
         icon: 'lock'
       };
-    });
+    }));
   }
 
   render() {

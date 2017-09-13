@@ -29,7 +29,7 @@ export default class EntryView extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.namespace !== this.props.namespace || nextProps.namespaceTaskId !== this.props.namespaceTaskId) {
       this.loadTask(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }

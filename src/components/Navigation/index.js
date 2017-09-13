@@ -9,6 +9,7 @@ import ManualModal from '../ManualModal';
 import links from '../../links';
 import { navigation } from './styles.css';
 import logoUrl from '../../taskcluster.png';
+import UserSession from '../../UserSession';
 
 export default class Navigation extends React.PureComponent {
   constructor(props) {
@@ -24,8 +25,8 @@ export default class Navigation extends React.PureComponent {
     this.setState(this.getCredentialsMessage(nextProps));
   }
 
-  getCredentialsMessage(props) {
-    const { credentialsExpiringSoon } = props;
+  getCredentialsMessage() {
+    const credentialsExpiringSoon = false; // TOOD: bring back
 
     if (credentialsExpiringSoon) {
       return {
@@ -42,7 +43,7 @@ export default class Navigation extends React.PureComponent {
 
   render() {
     const {
-      credentials, credentialsExpiringSoon, loginUrl, onSignOut, signInManually
+      userSession, credentialsExpiringSoon, loginUrl, onSignOut, saveUserSession
     } = this.props;
     const { title, message, credentialsMenuExpanded, showManualModal } = this.state;
 
@@ -80,7 +81,7 @@ export default class Navigation extends React.PureComponent {
               onDevelopment={() => window.open(loginUrl, '_blank')}
               onManualModal={() => this.setState({ showManualModal: true })}
               onSignOut={onSignOut}
-              credentials={credentials}
+              userSession={userSession}
               credentialsExpiringSoon={credentialsExpiringSoon}
               registerChild={ref => this.credentialsMenu = ref} />
           </Nav>
@@ -96,7 +97,8 @@ export default class Navigation extends React.PureComponent {
             <ManualModal
               onClose={() => this.setState({ showManualModal: false })}
               onSubmit={(creds) => {
-                signInManually && signInManually(creds);
+                const userSession = UserSession.fromCredentials(creds);
+                saveUserSession(userSession);
                 this.setState({ credentialsMenuExpanded: false, showManualModal: false });
               }} />
           )}

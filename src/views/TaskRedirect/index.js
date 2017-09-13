@@ -2,8 +2,8 @@ import React from 'react';
 import Clients from '../../components/Clients';
 import TaskRedirect from './TaskRedirect';
 
-const View = ({ credentials, match }) => (
-  <Clients credentials={credentials} Queue>
+const View = ({ userSession, match }) => (
+  <Clients userSession={userSession} Queue>
     {({ queue }) => (
       <TaskRedirect
         queue={queue}

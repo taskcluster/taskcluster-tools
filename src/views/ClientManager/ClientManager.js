@@ -13,7 +13,8 @@ export default class ClientManager extends Component {
 
     this.state = {
       clients: null,
-      clientPrefix: props.credentials ? `${props.credentials.clientId}/` : '',
+      clientPrefixLoaded: false,
+      clientPrefix: null,
       error: null
     };
   }
@@ -23,14 +24,36 @@ export default class ClientManager extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }
 
   deleteClient = clientId => this.props.auth.deleteClient(clientId);
 
-  loadClients = async () => {
+  async loadClientPrefix() {
+    if (this.state.clientPrefixLoaded) {
+      return;
+    }
+
+    if (!this.props.userSession) {
+      this.setState({ clientPrefixLoaded: true, clientPrefix: '' });
+      return;
+    }
+
+    try {
+      const creds = await this.props.userSession.getCredentials();
+
+      this.setState({ clientPrefixLoaded: true, clientPrefix: `${creds.clientId}/` });
+    } catch (err) {
+      // on error, act like when there's no login
+      this.setState({ clientPrefixLoaded: true, clientPrefix: '' });
+    }
+  }
+
+  async loadClients() {
+    await this.loadClientPrefix();
+
     const { clientPrefix } = this.state;
 
     try {
@@ -44,7 +67,7 @@ export default class ClientManager extends Component {
         error: err
       });
     }
-  };
+  }
 
   navigate = (clientId) => {
     this.loadClients();
@@ -76,13 +99,13 @@ export default class ClientManager extends Component {
   }
 
   renderClientsTable() {
-    const { clients, error } = this.state;
+    const { clients, clientPrefixLoaded, error } = this.state;
 
     if (error) {
       return <Error error={error} />;
     }
 
-    if (!clients) {
+    if (!clientPrefixLoaded || !clients) {
       return <Spinner />;
     }
 
@@ -115,6 +138,12 @@ export default class ClientManager extends Component {
   };
 
   render() {
+    const { clients, clientPrefixLoaded, clientPrefix } = this.state;
+
+    if (!clientPrefixLoaded) {
+      return <Spinner />;
+    }
+
     return (
       <Row style={{ marginTop: 10 }}>
         <HelmetTitle title="Client Manager" />
@@ -125,18 +154,22 @@ export default class ClientManager extends Component {
             <Button href={'/auth/clients'} bsStyle="primary" disabled={this.props.clientId === ''}>
               <Glyphicon glyph="plus" /> Add Client
             </Button>
-            <Button bsStyle="success" onClick={this.loadClients} disabled={!this.state.clients}>
+            <Button bsStyle="success" onClick={this.loadClients} disabled={!clients}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar>
         </Col>
         <Col md={7}>
-          <ClientEditor
-            auth={this.props.auth}
-            credentials={this.props.credentials}
-            currentClientId={this.props.clientId}
-            deleteClient={this.deleteClient}
-            navigate={this.navigate} />
+          {clientPrefixLoaded ? (
+            <ClientEditor
+              auth={this.props.auth}
+              clientPrefix={clientPrefix}
+              currentClientId={this.props.clientId}
+              deleteClient={this.deleteClient}
+              navigate={this.navigate} />
+            ) :
+            <Spinner />
+          }
         </Col>
       </Row>
     );

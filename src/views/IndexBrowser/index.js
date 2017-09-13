@@ -5,7 +5,7 @@ import IndexBrowser from '../../components/IndexBrowser';
 import HelmetTitle from '../../components/HelmetTitle';
 import EntryView from './EntryView';
 
-const View = ({ match, credentials, history, location }) => {
+const View = ({ match, userSession, history, location }) => {
   const [ns, nsId] = location.hash.slice(1).split('/');
 
   if (ns && nsId) {
@@ -17,14 +17,14 @@ const View = ({ match, credentials, history, location }) => {
   const { namespace = '', namespaceTaskId } = match.params;
 
   return (
-    <Clients credentials={credentials} Index>
+    <Clients userSession={userSession} Index>
       {({ index }) => (
         <div>
           <HelmetTitle title="Index Browser" />
           <IndexBrowser
             urlRoot="/index"
             history={history}
-            credentials={credentials}
+            userSession={userSession}
             index={index}
             namespace={namespace}
             namespaceTaskId={namespaceTaskId}>
@@ -32,7 +32,7 @@ const View = ({ match, credentials, history, location }) => {
               index={index}
               namespace={namespace}
               namespaceTaskId={namespaceTaskId}
-              credentials={credentials} />
+              userSession={userSession} />
           </IndexBrowser>
         </div>
       )}

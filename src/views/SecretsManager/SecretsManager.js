@@ -24,7 +24,7 @@ export default class SecretsManager extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.secretId !== this.props.secretId) {
       this.loadSecrets(nextProps);
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }
@@ -109,7 +109,7 @@ export default class SecretsManager extends React.PureComponent {
         </Col>
         <Col md={7}>
           <SecretEditor
-            credentials={this.props.credentials}
+            userSession={this.props.userSession}
             secretId={secretId}
             secrets={this.props.secrets}
             reloadSecrets={this.reloadSecrets}

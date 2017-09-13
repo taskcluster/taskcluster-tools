@@ -34,7 +34,7 @@ export default class HooksManager extends React.PureComponent {
 
     if (needsUpdate) {
       this.loadGroups();
-    } else if (this.state.error && !equal(nextProps.credentials, this.props.credentials)) {
+    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
       this.setState({ error: null });
     }
   }
