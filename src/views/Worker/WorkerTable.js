@@ -5,6 +5,7 @@ import { array } from 'prop-types';
 import Icon from 'react-fontawesome';
 import { titleCase } from 'change-case';
 import Markdown from '../../components/Markdown';
+import DateView from '../../components/DateView';
 import { labels } from '../../utils';
 import styles from './styles.css';
 
@@ -56,8 +57,8 @@ export default class WorkerTable extends React.PureComponent {
             {status.taskId}
           </a>
         </td>
-        <td>{run.started ? moment(run.started).fromNow() : '-'}</td>
-        <td>{run.resolved ? moment(run.resolved).fromNow() : '-'}</td>
+        <td>{run.started ? <DateView placement="bottom" date={run.started} /> : '-'}</td>
+        <td>{run.resolved ? <DateView placement="bottom" date={run.resolved} /> : '-'}</td>
       </tr>
     );
   };
@@ -76,8 +77,13 @@ export default class WorkerTable extends React.PureComponent {
       .sort((a, b) => {
         const runIdA = a.status.runs.length - 1;
         const runIdB = b.status.runs.length - 1;
+        const diff = moment(a.status.runs[runIdA].started).diff(moment(b.status.runs[runIdB].started));
 
-        return moment(a.status.runs[runIdA].started).diff(moment(b.status.runs[runIdB].started)) < 0 ? 1 : -1;
+        if (diff === 0) {
+          return 0;
+        }
+
+        return diff < 0 ? 1 : -1;
       }
     );
 
