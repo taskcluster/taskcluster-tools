@@ -11,7 +11,7 @@ export default class Error extends React.PureComponent {
   handleOpen = () => this.setState({ open: !this.state.open });
 
   getTitle() {
-    const { error } = this.state;
+    const { error } = this.props;
 
     if (error.body && error.body.code) {
       return `Error ${error.body.code} `;
