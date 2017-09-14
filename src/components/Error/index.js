@@ -1,5 +1,4 @@
 import React from 'react';
-import { titleCase } from 'change-case';
 import { Alert, Button, Collapse } from 'react-bootstrap';
 import Markdown from '../Markdown';
 
@@ -9,30 +8,26 @@ export default class Error extends React.PureComponent {
     this.state = {};
   }
 
-  getTitle() {
-    const { error } = this.props;
-
-    if (error.code) {
-      return `${titleCase(error.code.replace('Error', ''))} Error!`;
-    }
-
-    if (error.statusCode) {
-      return `HTTP ${error.statusCode}`;
-    }
-
-    if (error.name) {
-      return error.name;
-    }
-
-    return 'Unknown Error';
-  }
-
   handleOpen = () => this.setState({ open: !this.state.open });
+
+  getTitle() {
+    const { error } = this.state;
+
+    if (error.body && error.body.code) {
+      return `Error ${error.body.code} `;
+    }
+
+    if (error.response && error.response.status) {
+      return `HTTP ${error.response.status} `;
+    }
+
+    return 'Error ';
+  }
 
   render() {
     const { error } = this.props;
 
-    if (error.statusCode === 403) {
+    if (error.response && error.response.status === 403) {
       return (
         <Alert bsStyle="danger">
           <p>You are not authorized to perform the requested action. Please sign in and try again.</p>
@@ -42,20 +37,12 @@ export default class Error extends React.PureComponent {
 
     return (
       <Alert bsStyle="danger">
-        <strong>{this.getTitle()}&nbsp;</strong>
+        <strong>{this.getTitle()}</strong>
         <Markdown>
-          {(() => {
-            if (!error.message) {
-              return `\`\`\`\n${error.stack}\n\`\`\``;
-            }
-
-            const index = error.message.indexOf('----');
-
-            return index === -1 ? error.message : error.message.slice(0, index);
-          })()}
+          {error.message}
         </Markdown>
         {process.env.NODE_ENV === 'development' && <pre>{error.stack}</pre>}
-        {error.body && (
+        {error.body && error.body.requestInfo && (
           <div>
             <Button
               bsSize="xsmall"
@@ -63,7 +50,7 @@ export default class Error extends React.PureComponent {
               Additional details...
             </Button>
             <Collapse in={this.state.open}>
-              <pre>{JSON.stringify(error.body, null, 2)}</pre>
+              <pre>{JSON.stringify(error.body.requestInfo, null, 2)}</pre>
             </Collapse>
           </div>
         )}
