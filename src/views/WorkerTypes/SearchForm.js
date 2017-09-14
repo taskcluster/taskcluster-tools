@@ -14,6 +14,12 @@ export default class SearchForm extends PureComponent {
     this.state = { value: '' };
   }
 
+  componentWillMount() {
+    if (this.props.default) {
+      this.setState({ value: this.props.default });
+    }
+  }
+
   componentWillReceiveProps({ provisionerId }) {
     if (provisionerId !== this.props.provisionerId) {
       this.setState({ value: '' }, this.onSearch);

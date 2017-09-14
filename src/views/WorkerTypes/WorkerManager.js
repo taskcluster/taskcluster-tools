@@ -69,8 +69,10 @@ export default class WorkerManager extends React.PureComponent {
   getSettingsFromProps = (props) => {
     const settings = parse(props.location.search.slice(1));
 
-    if (Object.prototype.hasOwnProperty.call(settings, 'lastActive') && settings.lastActive !== 'false' && settings.lastActive !== 'true') {
-      settings.lastActive = true;
+    if (Object.prototype.hasOwnProperty.call(settings, 'lastActive')) {
+      settings.lastActive = settings.lastActive !== 'false' && settings.lastActive !== 'true' ?
+        true :
+        JSON.parse(settings.lastActive);
     }
 
     return settings;
@@ -80,7 +82,7 @@ export default class WorkerManager extends React.PureComponent {
     const query = { ...q };
     const oldQuery = parse(this.props.location.search.slice(1));
 
-    Object.entries({ ...query }).forEach(([key, value]) => {
+    Object.entries(query).forEach(([key, value]) => {
       if (typeof value !== 'boolean' && !value) {
         delete oldQuery[key];
         delete query[key];
@@ -128,6 +130,7 @@ export default class WorkerManager extends React.PureComponent {
         {this.state.error && <Error error={this.state.error} />}
         {this.props.provisionerId &&
           <SearchForm
+            default={this.state.search}
             provisionerId={this.props.provisionerId}
             onSearch={this.setWorkerType} />
         }
@@ -163,7 +166,7 @@ export default class WorkerManager extends React.PureComponent {
             queue={this.props.queue}
             awsProvisioner={this.props.awsProvisioner}
             provisionerId={this.props.provisionerId}
-            lastActive={JSON.parse(this.state.lastActive)}
+            lastActive={this.state.lastActive}
             setOrderableProperties={this.setOrderableProperties}
             orderBy={this.state.orderBy}
             layout={this.state.layout}
