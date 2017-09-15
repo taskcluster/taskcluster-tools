@@ -35,7 +35,7 @@ class ManualModal extends React.PureComponent {
 
     return (
       <Modal show={true}>
-        <form className="login-form" onSubmit={onSubmit}>
+        <form className="login-form" onSubmit={() => onSubmit(this.state)}>
           <Modal.Header>
             <h4>Manual Sign-In</h4>
           </Modal.Header>

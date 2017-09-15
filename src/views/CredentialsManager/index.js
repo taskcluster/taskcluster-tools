@@ -40,7 +40,7 @@ export default class CredentialsManager extends React.PureComponent {
 
     try {
       this.setState({
-        info: await credentialInformation(props.credentials),
+        info: props.credentials ? await credentialInformation(props.credentials) : null,
         error: null,
         loading: false
       });
