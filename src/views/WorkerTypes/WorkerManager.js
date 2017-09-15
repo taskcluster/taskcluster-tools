@@ -20,15 +20,13 @@ export default class WorkerManager extends React.PureComponent {
       lastActive: true,
       layout: 'grid',
       orderBy: null,
-      error: null
+      error: null,
+      ...this.getSettingsFromProps(props)
     };
   }
 
   componentWillMount() {
-    const settings = this.getSettingsFromProps(this.props);
-
     this.loadProvisioners();
-    this.setState(settings);
   }
 
   async loadProvisioners(token) {
@@ -69,7 +67,7 @@ export default class WorkerManager extends React.PureComponent {
   getSettingsFromProps = (props) => {
     const settings = parse(props.location.search.slice(1));
 
-    if (Object.prototype.hasOwnProperty.call(settings, 'lastActive')) {
+    if ('lastActive' in settings) {
       settings.lastActive = settings.lastActive !== 'false' && settings.lastActive !== 'true' ?
         true :
         JSON.parse(settings.lastActive);
@@ -82,12 +80,14 @@ export default class WorkerManager extends React.PureComponent {
     const query = { ...q };
     const oldQuery = parse(this.props.location.search.slice(1));
 
-    Object.entries(query).forEach(([key, value]) => {
-      if (typeof value !== 'boolean' && !value) {
-        delete oldQuery[key];
-        delete query[key];
-      }
-    });
+    Object
+      .entries(query)
+      .forEach(([key, value]) => {
+        if (typeof value !== 'boolean' && !value) {
+          delete oldQuery[key];
+          delete query[key];
+        }
+      });
 
     return stringify({ ...oldQuery, ...query });
   };
