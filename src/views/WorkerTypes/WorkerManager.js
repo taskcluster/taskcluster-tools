@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, ButtonToolbar, DropdownButton, MenuItem, ToggleButtonGroup, ToggleButton, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import { parse, stringify } from 'qs';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
 import SearchForm from './SearchForm';
@@ -13,13 +14,14 @@ export default class WorkerManager extends React.PureComponent {
     super(props);
 
     this.state = {
-      workerTypeContains: '',
+      search: '',
       provisioners: [],
       orderableProperties: [],
       lastActive: true,
-      gridLayout: true,
+      layout: 'grid',
       orderBy: null,
-      error: null
+      error: null,
+      ...this.getSettingsFromProps(props)
     };
   }
 
@@ -50,19 +52,52 @@ export default class WorkerManager extends React.PureComponent {
   }
 
   onProvisionerSelect = ({ provisionerId }) => {
-    this.setState({ lastActive: true, orderBy: null });
+    this.setQuery({ orderBy: 'None' });
     this.props.history.replace(
-      `/worker-types/${provisionerId ? encodeURIComponent(provisionerId) : ''}`
+      `/worker-types/${provisionerId || ''}${this.props.location.search}`
     );
   };
 
-  handleLayoutChange = () => this.setState({ gridLayout: !this.state.gridLayout });
+  handleLayoutChange = () => this.setQuery({ layout: this.state.layout === 'grid' ? 'table' : 'grid' });
 
-  handleLastActiveClick = () => this.setState({ lastActive: !this.state.lastActive, orderBy: null });
+  handleLastActiveClick = () => this.setQuery({ lastActive: !this.state.lastActive, orderBy: null });
 
-  handleOrderBySelect = orderBy => this.setState({ orderBy, lastActive: false });
+  handleOrderBySelect = orderBy => this.setQuery({ orderBy, lastActive: false });
 
-  setWorkerType = value => this.setState({ workerTypeContains: value });
+  getSettingsFromProps = (props) => {
+    const settings = parse(props.location.search.slice(1));
+
+    if ('lastActive' in settings) {
+      settings.lastActive = settings.lastActive !== 'false' && settings.lastActive !== 'true' ?
+        true :
+        JSON.parse(settings.lastActive);
+    }
+
+    return settings;
+  };
+
+  constructQuery = (q) => {
+    const query = { ...q };
+    const oldQuery = parse(this.props.location.search.slice(1));
+
+    Object
+      .entries(query)
+      .forEach(([key, value]) => {
+        if (typeof value !== 'boolean' && !value) {
+          delete oldQuery[key];
+          delete query[key];
+        }
+      });
+
+    return stringify({ ...oldQuery, ...query });
+  };
+
+  setQuery = (queryObj) => {
+    this.setState(queryObj);
+    this.props.history.replace(`${this.props.location.pathname}?${this.constructQuery(queryObj)}`);
+  };
+
+  setWorkerType = value => this.setQuery({ search: value });
 
   setOrderableProperties = (sample = {}) => {
     this.setState({
@@ -95,6 +130,7 @@ export default class WorkerManager extends React.PureComponent {
         {this.state.error && <Error error={this.state.error} />}
         {this.props.provisionerId &&
           <SearchForm
+            default={this.state.search}
             provisionerId={this.props.provisionerId}
             onSearch={this.setWorkerType} />
         }
@@ -113,9 +149,14 @@ export default class WorkerManager extends React.PureComponent {
                 onSelect={this.handleOrderBySelect}
                 orderBy={this.state.orderBy}
                 orderableProperties={this.state.orderableProperties} />
-              <ToggleButtonGroup bsSize="sm" onChange={this.handleLayoutChange} type="radio" name="options" defaultValue={1}>
-                <ToggleButton value={1}><Icon name="table" />&nbsp;&nbsp;Grid</ToggleButton>
-                <ToggleButton value={2}><Icon name="th" />&nbsp;&nbsp;Table</ToggleButton>
+              <ToggleButtonGroup
+                bsSize="sm"
+                onChange={this.handleLayoutChange}
+                type="radio"
+                name="options"
+                defaultValue={this.state.layout}>
+                <ToggleButton value="grid"><Icon name="table" />&nbsp;&nbsp;Grid</ToggleButton>
+                <ToggleButton value="table"><Icon name="th" />&nbsp;&nbsp;Table</ToggleButton>
               </ToggleButtonGroup>
             </ButtonToolbar>
           </div>
@@ -128,8 +169,8 @@ export default class WorkerManager extends React.PureComponent {
             lastActive={this.state.lastActive}
             setOrderableProperties={this.setOrderableProperties}
             orderBy={this.state.orderBy}
-            gridLayout={this.state.gridLayout}
-            searchTerm={this.state.workerTypeContains} />
+            layout={this.state.layout}
+            searchTerm={this.state.search} />
         }
       </div>
     );

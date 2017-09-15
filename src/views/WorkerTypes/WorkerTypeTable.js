@@ -211,7 +211,7 @@ export default class WorkerTypeTable extends React.PureComponent {
     </div>
   );
 
-  renderWorkerType = workerTypes => (this.props.gridLayout ?
+  renderWorkerType = workerTypes => (this.props.layout === 'grid' ?
     workerTypes.map(this.renderGridWorkerType) :
     this.renderTabularWorkerType(workerTypes));
 
