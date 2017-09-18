@@ -43,6 +43,10 @@ export default class LogView extends React.PureComponent {
     window.addEventListener('resize', this.handleLazyViewerHeight);
   }
 
+  componentDidMount() {
+    this.handleLazyViewerHeight();
+  }
+
   componentWillUnmount() {
     fscreen.removeEventListener('fullscreenchange', this.handleFullscreenChange);
     window.removeEventListener('resize', this.handleLazyViewerHeight);
