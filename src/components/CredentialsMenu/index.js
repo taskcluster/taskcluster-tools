@@ -13,13 +13,14 @@ const canSignInUsing = method => process.env.SIGN_IN_METHODS.includes(method);
 class CredentialsMenu extends React.PureComponent {
   renderWithUser() {
     const { userSession, credentialsExpiringSoon, open, onSignOut, onToggle, registerChild } = this.props;
-    const title = (
-      <span>
-        <Glyphicon
-          glyph={credentialsExpiringSoon ? 'exclamation-sign' : 'user'}
-          className={credentialsExpiringSoon ? 'text-warning' : null} /> &nbsp;{userSession.name}
-      </span>
+    const icon = userSession.picture ? (
+      <img src={userSession.picture} style={{ width: 18, height: 18, borderRadius: 9 }} />
+    ) : (
+      <Glyphicon
+        glyph={credentialsExpiringSoon ? 'exclamation-sign' : 'user'}
+        className={credentialsExpiringSoon ? 'text-warning' : null} />
     );
+    const title = <span>{icon}&nbsp;{userSession.name}</span>;
 
     return (
       // Due to https://github.com/react-bootstrap/react-bootstrap/issues/1301,
