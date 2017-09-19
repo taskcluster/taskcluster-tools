@@ -2,6 +2,7 @@ import React from 'react';
 import { array, bool, oneOfType, number, string, object } from 'prop-types';
 import { MenuItem, NavItem, NavDropdown } from 'react-bootstrap';
 import { isNil } from 'ramda';
+import Error from '../../components/Error';
 import { getIconFromMime } from '../../utils';
 
 export default class ArtifactList extends React.PureComponent {
@@ -15,7 +16,8 @@ export default class ArtifactList extends React.PureComponent {
     menu: bool,
     queue: object.isRequired,
     userSession: object,
-    style: object
+    style: object,
+    error: null
   };
 
   static defaultProps = {
@@ -32,67 +34,70 @@ export default class ArtifactList extends React.PureComponent {
     };
   }
 
-  async componentWillMount() {
-    this.setState({
-      artifacts: await this.getArtifactList(this.props)
-    });
+  componentWillMount() {
+    this.loadArtifactList(this.props);
   }
 
-  async componentWillReceiveProps(nextProps) {
-    this.setState({
-      artifacts: await this.getArtifactList(nextProps)
-    });
+  componentWillReceiveProps(nextProps) {
+    this.loadArtifactList(nextProps);
   }
 
-  getArtifactList({ runId, taskId, userSession, queue, artifacts, namespace }) {
+  loadArtifactList({ runId, taskId, userSession, queue, artifacts, namespace }) {
     if (!taskId || !artifacts) {
       return null;
     }
 
     // Build the URLs here so that they'll be updated when people login
-    return Promise.all(artifacts.map(async ({ name, contentType }) => {
-      if (/^public\//.test(name)) {
-        const icon = getIconFromMime(contentType);
+    Promise
+      .all(artifacts.map(async ({ name, contentType }) => {
+        if (/^public\//.test(name)) {
+          const icon = getIconFromMime(contentType);
 
-        // If we have a namespace, use a URL with that namespace to make it easier for users to copy/paste index URLs
-        if (namespace) {
-          return { icon, name, url: `https://index.taskcluster.net/v1/task/${namespace}/artifacts/${name}` };
+          // If we have a namespace, use a URL with that namespace to make it easier for users to copy/paste index URLs
+          if (namespace) {
+            return { icon, name, url: `https://index.taskcluster.net/v1/task/${namespace}/artifacts/${name}` };
+          }
+
+          // We could use queue.buildUrl, but this creates URLs where the artifact name has slashes encoded.
+          // For artifacts we specifically allow slashes in the name unencoded, as this make things like
+          // `wget ${URL}` create files with nice names.
+
+          if (!isNil(runId)) {
+            return { icon, name, url: `https://queue.taskcluster.net/v1/task/${taskId}/runs/${runId}/artifacts/${name}` };
+          }
+
+          return { icon, name, url: `https://queue.taskcluster.net/v1/task/${taskId}/artifacts/${name}` };
         }
 
-        // We could use queue.buildUrl, but this creates URLs where the artifact name has slashes encoded.
-        // For artifacts we specifically allow slashes in the name unencoded, as this make things like
-        // `wget ${URL}` create files with nice names.
-
-        if (!isNil(runId)) {
-          return { icon, name, url: `https://queue.taskcluster.net/v1/task/${taskId}/runs/${runId}/artifacts/${name}` };
+        // If we have userSession we create a signed URL.
+        // Note that signed URLs always point to the task directly, as they are not useful for users copy/pasting.
+        if (userSession) {
+          return {
+            name,
+            icon: getIconFromMime(contentType),
+            url: isNil(runId) ?
+              await queue.buildSignedUrl(queue.getLatestArtifact, taskId, name) :
+              await queue.buildSignedUrl(queue.getArtifact, taskId, runId, name)
+          };
         }
 
-        return { icon, name, url: `https://queue.taskcluster.net/v1/task/${taskId}/artifacts/${name}` };
-      }
-
-      // If we have userSession we create a signed URL.
-      // Note that signed URLs always point to the task directly, as they are not useful for users copy/pasting.
-      if (userSession) {
         return {
           name,
-          icon: getIconFromMime(contentType),
-          url: isNil(runId) ?
-            await queue.buildSignedUrl(queue.getLatestArtifact, taskId, name) :
-            await queue.buildSignedUrl(queue.getArtifact, taskId, runId, name)
+          url: null,
+          icon: 'lock'
         };
-      }
-
-      return {
-        name,
-        url: null,
-        icon: 'lock'
-      };
-    }));
+      }))
+      .then(artifacts => this.setState({ error: null, artifacts }))
+      .catch(error => this.setState({ error, artifacts: [] }));
   }
 
   render() {
     const { menu, style } = this.props;
-    const { artifacts } = this.state;
+    const { artifacts, error } = this.state;
+
+    if (error) {
+      return <Error error={error} />;
+    }
 
     if (!artifacts || !artifacts.length) {
       return menu ?

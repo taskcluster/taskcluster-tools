@@ -4,6 +4,7 @@ import { Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl 
 import equal from 'deep-equal';
 import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
+import Error from '../../components/Error';
 
 export default class IndexBrowser extends React.PureComponent {
   static propTypes = {
@@ -188,6 +189,12 @@ export default class IndexBrowser extends React.PureComponent {
   }
 
   render() {
+    const { error } = this.state;
+
+    if (error) {
+      return <Error error={error} />;
+    }
+
     return (
       <Row>
         <Col md={6} className="index-browser">
