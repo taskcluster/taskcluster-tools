@@ -3,6 +3,7 @@ import { string, object } from 'prop-types';
 import { Link } from 'react-router-dom';
 import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
+import Error from '../../components/Error';
 import ArtifactView from './ArtifactView';
 
 export default class EntryView extends React.PureComponent {
@@ -62,13 +63,17 @@ export default class EntryView extends React.PureComponent {
   renderTask() {
     const { fullNamespace, error, task } = this.state;
 
-    if (error && error.response.status === 404) {
-      return (
-        <div className="alert alert-warning" role="alert">
-          <strong>Task not found!</strong>&nbsp;
-          No task is indexed under <code>{fullNamespace}</code>.
-        </div>
-      );
+    if (error) {
+      if (error.response.status === 404) {
+        return (
+          <div className="alert alert-warning" role="alert">
+            <strong>Task not found!</strong>&nbsp;
+            No task is indexed under <code>{fullNamespace}</code>.
+          </div>
+        );
+      }
+
+      return <Error error={error} />;
     }
 
     if (!task) {
