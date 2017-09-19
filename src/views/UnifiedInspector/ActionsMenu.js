@@ -348,12 +348,13 @@ export default class ActionsMenu extends React.PureComponent {
       throw new Error(this.ajv.errorsText(validate.errors));
     }
 
-    const newTaskId = nice();
+    const ownTaskId = nice();
     const newTask = jsone(action.task, merge({
       taskGroupId,
       taskId,
       task,
-      input
+      input,
+      ownTaskId
     }, actions.variables));
 
     if (!this.props.decision) {
@@ -365,9 +366,9 @@ export default class ActionsMenu extends React.PureComponent {
       authorizedScopes: this.props.decision.scopes || []
     });
 
-    await actionsQueue.createTask(newTaskId, newTask);
+    await actionsQueue.createTask(ownTaskId, newTask);
 
-    return newTaskId;
+    return ownTaskId;
   }
 
   render() {
