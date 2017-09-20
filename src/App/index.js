@@ -4,14 +4,12 @@ import { Helmet, link } from 'react-helmet';
 import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
 import Navigation from '../components/Navigation';
-import Login from '../views/Login';
-import Auth0Login from '../views/Auth0Login';
 import NotFound from '../components/NotFound';
-import { getLoginUrl, loadable } from '../utils';
-import UserSession from '../UserSession';
+import { loadable } from '../utils';
 import './styles.css';
 import iconUrl from '../taskcluster.png';
 import LegacyRedirect from './LegacyRedirect';
+import AuthController from '../auth/AuthController';
 
 const Home = loadable(() => import(/* webpackChunkName: 'Home' */ '../views/Home'));
 const TaskCreator = loadable(() => import(/* webpackChunkName: 'TaskCreator' */ '../views/TaskCreator'));
@@ -39,41 +37,17 @@ const InteractiveConnect = loadable(() => import(/* webpackChunkName: 'Interacti
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+    this.authController = new AuthController();
     this.state = {
-      userSession: this.loadUserSession()
+      userSession: null
     };
   }
 
   componentWillMount() {
-    window.addEventListener('storage', this.handleStorage);
+    this.authController.onUserSessionChanged(userSession => this.setState({ userSession }));
+
+    this.authController.loadUserSession();
   }
-
-  handleStorage = ({ storageArea, key }) => {
-    if (storageArea === localStorage && key === 'userSession') {
-      this.setState({ userSession: this.loadUserSession() });
-    }
-  };
-
-  saveUserSession = (userSession) => {
-    if (!userSession) {
-      localStorage.removeItem('userSession');
-      this.setState({ userSession: null });
-    } else {
-      this.setState({ userSession });
-      localStorage.setItem('userSession', userSession.serialize());
-    }
-  }
-
-  loadUserSession() {
-    const userSession = localStorage.getItem('userSession');
-    if (!userSession) {
-      return null;
-    }
-
-    return UserSession.deserialize(userSession);
-  }
-
-  signOut = () => this.saveUserSession(null);
 
   render() {
     const { userSession } = this.state;
@@ -87,10 +61,7 @@ export default class App extends React.Component {
           <PropsRoute
             component={Navigation}
             userSession={userSession}
-            saveUserSession={this.saveUserSession}
-            loginUrl={getLoginUrl()}
-            onSignOut={this.signOut} />
-
+            authController={this.authController} />
           <Grid fluid id="container">
             <Switch>
               <PropsRoute path="/task-inspector" component={LegacyRedirect} />
@@ -101,8 +72,6 @@ export default class App extends React.Component {
               <PropsRoute path="/interactive" component={LegacyRedirect} />
               <PropsRoute path="/task-creator" component={LegacyRedirect} />
 
-              <PropsRoute path="/login/auth0" component={Auth0Login} saveUserSession={this.saveUserSession} />
-              <PropsRoute path="/login" component={Login} saveUserSession={this.saveUserSession} />
               <PropsRoute path="/" exact={true} component={Home} userSession={userSession} />
               <PropsRoute path="/tasks/create/interactive" component={TaskCreator} userSession={userSession} interactive={true} />
               <PropsRoute path="/tasks/create" component={TaskCreator} userSession={userSession} interactive={false} />
@@ -127,6 +96,7 @@ export default class App extends React.Component {
               <PropsRoute path="/credentials" component={CredentialsManager} userSession={userSession} />
               <PropsRoute path="/display" component={Displays} userSession={userSession} />
               <PropsRoute path="/shell" component={Shell} userSession={userSession} />
+              {this.authController.routes()}
               <Route component={NotFound} />
             </Switch>
           </Grid>

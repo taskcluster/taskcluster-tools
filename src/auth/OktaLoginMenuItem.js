@@ -3,8 +3,7 @@ import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
 
 // This authenticates to Okta by opening a new Window where Okta will do its thing,
 // then closing that window once creds are acquired.
-
-export default class OktaLogin extends React.PureComponent {
+export default class OktaLoginMenuItem extends React.PureComponent {
   render() {
     const tooltip = (
       <Tooltip id="okta-signin">
@@ -16,17 +15,14 @@ export default class OktaLogin extends React.PureComponent {
 
     return (
       <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
-        <NavItem onSelect={this.props.onSelect}>
+        <NavItem onSelect={this.onSelect}>
           <Glyphicon glyph="log-in" /> Sign In with Okta
         </NavItem>
       </OverlayTrigger>
     );
   }
-}
 
-OktaLogin.defaultProps = {
-  // Just loading this login.t.n page is sufficient. It eventually redirects back to
-  // https://tools.t.n/login, which updates LocalStorage. Auth listens for
-  // such updates and loads the creds out of storage.
-  onSelect: () => window.open('https://login.taskcluster.net/sso/login', '_blank')
-};
+  onSelect() {
+    window.open('https://login.taskcluster.net/sso/login', '_blank');
+  }
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import UserSession from '../../auth/UserSession';
 
-export default class Login extends React.Component {
+export default class DevelopmentLogin extends React.Component {
   constructor(props) {
     super(props);
 
@@ -35,12 +35,6 @@ export default class Login extends React.Component {
   }
 
   render() {
-    const { credentials } = this.state;
-
-    if (credentials.clientId && credentials.accessToken) {
-      return null;
-    }
-
-    return <Redirect to={this.props.loginUrl} />;
+    return <Redirect to="/" />;
   }
 }
