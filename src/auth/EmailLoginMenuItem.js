@@ -4,8 +4,7 @@ import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
 // This authenticates with Auth0's passwordless lock by opening a new Window
 // where Auth0 will do its thing, then closing that window once creds are
 // acquired.
-
-export default class EmailLogin extends Component {
+export default class EmailLoginMenuItem extends Component {
   render() {
     const tooltip = (
       <Tooltip id="passwordless-signin">
@@ -25,11 +24,11 @@ export default class EmailLogin extends Component {
       </OverlayTrigger>
     );
   }
-}
 
-EmailLogin.defaultProps = {
-  // Just loading this login.t.n page is sufficient. It eventually redirects back to
-  // https://tools.t.n/login, which updates LocalStorage. Auth listens for
-  // such updates and loads the creds out of storage.
-  onSelect: () => window.open('https://login.taskcluster.net/auth0/login', '_blank')
-};
+  onSelect() {
+    // Just loading this login.t.n page is sufficient. It eventually redirects back to
+    // https://tools.t.n/login, which updates LocalStorage. Auth listens for
+    // such updates and loads the creds out of storage.
+    window.open('https://login.taskcluster.net/auth0/login', '_blank');
+  }
+}

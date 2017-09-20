@@ -60,15 +60,6 @@ export const getIconFromMime = (contentType) => {
   return icon;
 };
 
-export const getLoginUrl = (location = window.location) => {
-  const query = new URLSearchParams();
-
-  query.set('target', new URL('/login', location));
-  query.set('description', 'Taskcluster Tools offers various way to create and inspect both tasks and task groups.');
-
-  return `https://login.taskcluster.net/?${query.toString()}`;
-};
-
 // Transform task to a loaner task
 export const parameterizeTask = task => merge(omit([
   'taskGroupId',

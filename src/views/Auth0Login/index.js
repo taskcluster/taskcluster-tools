@@ -1,7 +1,7 @@
 import React from 'react';
 import { WebAuth } from 'auth0-js';
 import Error from '../../components/Error';
-import UserSession from '../../UserSession';
+import UserSession from '../../auth/UserSession';
 
 export default class Auth0Login extends React.PureComponent {
   state = {};
@@ -27,7 +27,7 @@ export default class Auth0Login extends React.PureComponent {
         }
 
         const userSession = UserSession.fromOIDC('mozilla-auth0', authResult.accessToken, authResult.idTokenPayload);
-        this.props.saveUserSession(userSession);
+        this.props.setUserSession(userSession);
 
         // return from whence we came..
         if (window.opener) {

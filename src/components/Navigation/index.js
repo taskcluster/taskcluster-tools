@@ -4,52 +4,17 @@ import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
 import { Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap';
 import CredentialsMenu from '../CredentialsMenu';
-import CredentialsPopover from '../CredentialsPopover';
-import ManualModal from '../ManualModal';
 import links from '../../links';
 import { navigation } from './styles.css';
 import logoUrl from '../../taskcluster.png';
-import UserSession from '../../UserSession';
 
 export default class Navigation extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      credentialsMenuExpanded: false,
-      showManualModal: false,
-      ...this.getCredentialsMessage(props)
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState(this.getCredentialsMessage(nextProps));
-  }
-
-  getCredentialsMessage() {
-    const credentialsExpiringSoon = false; // TOOD: bring back
-
-    if (credentialsExpiringSoon) {
-      return {
-        title: 'Expiring Soon',
-        message: 'Your temporary credentials will expire soon. Sign in again to refresh them.'
-      };
-    }
-
-    return {
-      title: null,
-      message: null
-    };
-  }
-
   render() {
-    const {
-      userSession, credentialsExpiringSoon, loginUrl, onSignOut, saveUserSession
-    } = this.props;
-    const { title, message, credentialsMenuExpanded, showManualModal } = this.state;
+    const { userSession, authController } = this.props;
 
     return (
       <div className={navigation}>
-        <Navbar fluid={true} inverse={true} staticTop={true}>
+        <Navbar fluid={true} inverse={true} staticTop={true} collapseOnSelect={true}>
           <Navbar.Header>
             <Navbar.Brand>
               <Link to="/">
@@ -76,32 +41,9 @@ export default class Navigation extends React.PureComponent {
             </NavDropdown>
 
             <CredentialsMenu
-              open={credentialsMenuExpanded}
-              onToggle={expanded => this.setState({ credentialsMenuExpanded: expanded })}
-              onDevelopment={() => window.open(loginUrl, '_blank')}
-              onManualModal={() => this.setState({ showManualModal: true })}
-              onSignOut={onSignOut}
               userSession={userSession}
-              credentialsExpiringSoon={credentialsExpiringSoon}
-              registerChild={ref => this.credentialsMenu = ref} />
+              authController={authController} />
           </Nav>
-
-          {message && (
-            <CredentialsPopover
-              target={this.credentialsMenu}
-              onHide={() => this.setState({ message: null, title: null })}
-              message={message}
-              title={title} />
-          )}
-          {showManualModal && (
-            <ManualModal
-              onClose={() => this.setState({ showManualModal: false })}
-              onSubmit={(creds) => {
-                const userSession = UserSession.fromCredentials(creds);
-                saveUserSession(userSession);
-                this.setState({ credentialsMenuExpanded: false, showManualModal: false });
-              }} />
-          )}
         </Navbar>
       </div>
     );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
 
-export default class ManualLogin extends React.PureComponent {
+export default class ManualLoginMenuItem extends React.PureComponent {
   render() {
     const tooltip = (
       <Tooltip id="manual-signin">
@@ -11,10 +11,15 @@ export default class ManualLogin extends React.PureComponent {
 
     return (
       <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
-        <NavItem onSelect={this.props.onSelect}>
+        <NavItem onSelect={this.onSelect}>
           <Glyphicon glyph="paste" /> Sign In Manually
         </NavItem>
       </OverlayTrigger>
     );
+  }
+
+  onSelect() {
+    // open the login view in a new tab/window
+    window.open(new URL('/login/manual', window.location), '_blank');
   }
 }
