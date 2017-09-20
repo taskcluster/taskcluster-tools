@@ -19,6 +19,7 @@ const UnifiedInspector = loadable(() => import(/* webpackChunkName: 'UnifiedInsp
 const QuickStart = loadable(() => import(/* webpackChunkName: 'QuickStart' */ '../views/QuickStart'));
 const AwsProvisioner = loadable(() => import(/* webpackChunkName: 'AwsProvisioner' */ '../views/AwsProvisioner'));
 const WorkerTypes = loadable(() => import(/* webpackChunkName: 'WorkerTypes' */ '../views/WorkerTypes'));
+const WorkerManager = loadable(() => import(/* webpackChunkName: 'WorkerManager' */ '../views/WorkerManager'));
 const ClientManager = loadable(() => import(/* webpackChunkName: 'ClientManager' */ '../views/ClientManager'));
 const RoleManager = loadable(() => import(/* webpackChunkName: 'RoleManager' */ '../views/RoleManager'));
 const ScopeInspector = loadable(() => import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector'));
@@ -190,6 +191,7 @@ export default class App extends React.Component {
               <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://aws-provisioner.taskcluster.net/v1" provisionerId="aws-provisioner-v1" routeRoot="/aws-provisioner" />
               <PropsRoute path="/aws-provisioner-staging/:workerType?/:currentTab?" component={AwsProvisioner} credentials={credentials} baseUrl="https://provisioner-staging.herokuapp.com/v1" provisionerId="staging-aws" routeRoot="/aws-provisioner-staging" />
               <PropsRoute path="/worker-types/:provisionerId?" component={WorkerTypes} credentials={credentials} />
+              <PropsRoute path="/workers/:provisionerId?/:workerType?/:workerGroup?/:workerId?" component={WorkerManager} credentials={credentials} />
               <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} credentials={credentials} />
               <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} credentials={credentials} />
               <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} credentials={credentials} />
