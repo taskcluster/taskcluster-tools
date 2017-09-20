@@ -115,12 +115,12 @@ export default class WorkerManager extends React.PureComponent {
     this.props.history[push ? 'push' : 'replace'](url);
   };
 
-  disableWorker = async (disable) => {
-    const { provisionerId, workerType, workerGroup, workerId } = this.state.worker;
+  toggleWorkerStatus = async () => {
+    const { provisionerId, workerType, workerGroup, workerId, disabled } = this.state.worker;
 
     try {
       const worker = await this.props.queue.declareWorker(
-        provisionerId, workerType, workerGroup, workerId, { disabled: disable }
+        provisionerId, workerType, workerGroup, workerId, { disabled: !disabled }
       );
 
       this.setState({ worker });
@@ -172,7 +172,7 @@ export default class WorkerManager extends React.PureComponent {
                       <Button disabled title="Coming soon!" bsSize="small" bsStyle="info">Reboot</Button>
                       <OverlayTrigger delay={600} placement="bottom" overlay={disableTooltip}>
                         <Button
-                          onClick={() => this.disableWorker(!worker.disabled)}
+                          onClick={this.toggleWorkerStatus}
                           bsSize="small"
                           bsStyle="warning">
                           {worker.disabled ? 'Enable' : 'Disable'}
