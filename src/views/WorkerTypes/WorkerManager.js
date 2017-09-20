@@ -54,7 +54,7 @@ export default class WorkerManager extends React.PureComponent {
   onProvisionerSelect = ({ provisionerId }) => {
     this.setQuery({ orderBy: 'None' });
     this.props.history.replace(
-      `/worker-types/${provisionerId || ''}${this.props.location.search}`
+      `/workers/provisioners/${provisionerId || ''}${this.props.location.search}`
     );
   };
 

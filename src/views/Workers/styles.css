@@ -1,0 +1,11 @@
+.filters {
+ margin-bottom: 20px;
+}
+
+.pagination {
+  display: flex;
+}
+
+.pagination > button {
+  margin-right: 5px;
+}
