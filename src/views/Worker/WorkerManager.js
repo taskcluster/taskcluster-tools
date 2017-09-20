@@ -93,26 +93,28 @@ export default class WorkerManager extends React.PureComponent {
         const recentTasks = await this.loadRecentTasks(worker.recentTasks);
 
         this.setState({ worker, recentTasks, loading: false, error: null });
-      } catch (err) {
-        this.setState({ worker: null, recentTasks: [], loading: false, error: err });
+      } catch (error) {
+        this.setState({ worker: null, recentTasks: [], loading: false, error });
       }
     });
   };
 
   loadRecentTasks = taskIds => (
     Promise.all(taskIds.map(async (taskId) => {
-      const task = this.props.queue.task(taskId);
-      const status = this.props.queue.status(taskId);
+      const [task, { status }] = await Promise.all([
+        this.props.queue.task(taskId),
+        this.props.queue.status(taskId)
+      ]);
 
-      return { task: await task, status: (await status).status };
+      return { task, status };
     }))
   );
 
   updateURI = (provisionerId, workerType, workerGroup, workerId, push) => {
-    const URL = [provisionerId, workerType, workerGroup, workerId]
+    const url = [provisionerId, workerType, workerGroup, workerId]
       .reduce((uri, param) => uri.concat(param ? `/${param}` : ''), '/workers');
 
-    this.props.history[push ? 'push' : 'replace'](URL);
+    this.props.history[push ? 'push' : 'replace'](url);
   };
 
   disableWorker = async (disable) => {
@@ -145,7 +147,6 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
-        {error && <Error key="error" error={error} />}
         <SearchForm
           key="input-form"
           provisioners={provisioners}
@@ -156,6 +157,7 @@ export default class WorkerManager extends React.PureComponent {
           workerId={this.props.workerId}
           updateURI={this.updateURI}
           loadWorker={this.loadWorker} />
+        {error && <Error key="error" error={error} />}
         {loading && <Spinner key="spinner" />}
         {worker && (
           <div>

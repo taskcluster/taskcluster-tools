@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Label, Popover, OverlayTrigger, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
 import { array } from 'prop-types';
 import Icon from 'react-fontawesome';
 import { titleCase } from 'change-case';
@@ -21,6 +22,7 @@ export default class WorkerTable extends React.PureComponent {
       filterStatus: 'all'
     };
   }
+
   renderTaskDescription = description => (
     <Popover
       className={styles.taskPopover}
@@ -53,9 +55,7 @@ export default class WorkerTable extends React.PureComponent {
           </OverlayTrigger>
         </td>
         <td>
-          <a target="_blank" rel="noopener noreferrer" href={`/groups/${status.taskGroupId}/tasks/${status.taskId}`}>
-            {status.taskId}
-          </a>
+          <Link to={`/groups/${status.taskGroupId}/tasks/${status.taskId}`}>{status.taskId}</Link>
         </td>
         <td>{run.started ? <DateView placement="bottom" date={run.started} /> : '-'}</td>
         <td>{run.resolved ? <DateView placement="bottom" date={run.resolved} /> : '-'}</td>
