@@ -99,16 +99,14 @@ export default class WorkerManager extends React.PureComponent {
     });
   };
 
-  loadRecentTasks = taskIds => (
-    Promise.all(taskIds.map(async (taskId) => {
-      const [task, { status }] = await Promise.all([
-        this.props.queue.task(taskId),
-        this.props.queue.status(taskId)
-      ]);
+  loadRecentTasks = taskIds => Promise.all(taskIds.map(async (taskId) => {
+    const [task, { status }] = await Promise.all([
+      this.props.queue.task(taskId),
+      this.props.queue.status(taskId)
+    ]);
 
-      return { task, status };
-    }))
-  );
+    return { task, status };
+  }));
 
   updateURI = (provisionerId, workerType, workerGroup, workerId, push) => {
     const url = [provisionerId, workerType, workerGroup, workerId]
