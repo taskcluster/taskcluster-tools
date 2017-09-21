@@ -21,6 +21,8 @@ export default class WorkerTable extends React.PureComponent {
     this.state = {
       filterStatus: 'all'
     };
+
+    delete labels.pending;
   }
 
   renderTaskDescription = description => (
