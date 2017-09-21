@@ -1,7 +1,6 @@
 import React from 'react';
 import { string } from 'prop-types';
 import { ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
-import equal from 'deep-equal';
 import WorkerTypeView from './WorkerTypeView';
 import WorkerTypeEditor from './WorkerTypeEditor';
 import WorkerTypeRow from './WorkerTypeRow';
@@ -9,6 +8,7 @@ import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
 import { workerTypes } from './styles.css';
+import UserSession from '../../auth/UserSession';
 
 const defaultWorkerType = {
   minCapacity: 0,
@@ -70,10 +70,12 @@ export default class WorkerTypeTable extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (nextProps.provisionerId !== this.props.provisionerId || nextProps.workerType !== this.props.workerType) {
       this.loadWorkerTypeSummaries();
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

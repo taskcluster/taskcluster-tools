@@ -4,11 +4,11 @@ import { Button, ButtonToolbar, Glyphicon, Col } from 'react-bootstrap';
 import { safeLoad, safeDump } from 'js-yaml';
 import { nice } from 'slugid';
 import moment from 'moment';
-import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import CodeEditor from '../../components/CodeEditor';
 import HelmetTitle from '../../components/HelmetTitle';
+import UserSession from '../../auth/UserSession';
 
 const localStorageKey = 'tasks:create';
 const defaultTask = {
@@ -57,11 +57,8 @@ export default class TaskCreator extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (
-      (this.state.error || this.state.createdTaskError) &&
-      !equal(nextProps.userSession, this.props.userSession)
-    ) {
-      this.setState({ error: null, createdTaskError: null });
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ createdTaskError: null, error: null });
     }
   }
 

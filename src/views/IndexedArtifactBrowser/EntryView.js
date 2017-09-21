@@ -1,10 +1,10 @@
 import React from 'react';
 import { string, object } from 'prop-types';
 import { Link } from 'react-router-dom';
-import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
 import ArtifactView from './ArtifactView';
+import UserSession from '../../auth/UserSession';
 
 export default class EntryView extends React.PureComponent {
   static propTypes = {
@@ -29,10 +29,12 @@ export default class EntryView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (nextProps.namespace !== this.props.namespace || nextProps.namespaceTaskId !== this.props.namespaceTaskId) {
       this.loadTask(nextProps);
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

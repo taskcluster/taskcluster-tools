@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ClientEditor from '../../components/ClientEditor';
 import HelmetTitle from '../../components/HelmetTitle';
+import UserSession from '../../auth/UserSession';
 
 export default class ClientManager extends Component {
   constructor(props) {
@@ -24,7 +24,7 @@ export default class ClientManager extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
       this.setState({ error: null });
     }
   }

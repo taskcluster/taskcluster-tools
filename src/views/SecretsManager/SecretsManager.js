@@ -1,11 +1,11 @@
 import React from 'react';
 import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
 import SecretEditor from './SecretEditor';
+import UserSession from '../../auth/UserSession';
 
 export default class SecretsManager extends React.PureComponent {
   constructor(props) {
@@ -22,10 +22,9 @@ export default class SecretsManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.secretId !== this.props.secretId) {
-      this.loadSecrets(nextProps);
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
       this.setState({ error: null });
+      this.loadSecrets(nextProps);
     }
   }
 

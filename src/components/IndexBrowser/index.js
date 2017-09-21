@@ -1,10 +1,10 @@
 import React from 'react';
 import { string, object } from 'prop-types';
 import { Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl } from 'react-bootstrap';
-import equal from 'deep-equal';
 import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
+import UserSession from '../../auth/UserSession';
 
 export default class IndexBrowser extends React.PureComponent {
   static propTypes = {
@@ -30,10 +30,12 @@ export default class IndexBrowser extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (nextProps.namespace !== this.props.namespace) {
       this.loadTasksAndNamespaces(nextProps);
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

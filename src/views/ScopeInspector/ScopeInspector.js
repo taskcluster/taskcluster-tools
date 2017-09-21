@@ -2,12 +2,12 @@ import React from 'react';
 import { Row, Col, Button, Glyphicon, InputGroup, FormControl, DropdownButton, MenuItem, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
-import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
 import ClientEditor from '../../components/ClientEditor';
 import HelmetTitle from '../../components/HelmetTitle';
+import UserSession from '../../auth/UserSession';
 
 const flatten = list => list.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
 
@@ -28,7 +28,7 @@ export default class ScopeInspector extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
       this.setState({ error: null });
     }
   }

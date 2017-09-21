@@ -1,9 +1,9 @@
 import React from 'react';
 import { string, object } from 'prop-types';
-import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ArtifactList from '../../components/ArtifactList';
+import UserSession from '../../auth/UserSession';
 
 export default class ArtifactView extends React.PureComponent {
   static propTypes = {
@@ -25,10 +25,12 @@ export default class ArtifactView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (nextProps.namespace !== this.props.namespace || nextProps.taskId !== this.props.taskId) {
       this.loadArtifacts(nextProps);
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

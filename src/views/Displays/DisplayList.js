@@ -1,10 +1,10 @@
 import React from 'react';
 import { Grid, Row, Col, ListGroup, ListGroupItem, Button, Glyphicon } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import equal from 'deep-equal';
 import VncDisplay from './VncDisplay';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
+import UserSession from '../../auth/UserSession';
 
 export default class DisplayList extends React.PureComponent {
   constructor(props) {
@@ -22,14 +22,16 @@ export default class DisplayList extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (
       nextProps.displaysUrl !== this.props.displaysUrl ||
       nextProps.socketUrl !== this.props.socketUrl ||
       nextProps.shared !== this.props.shared
     ) {
       this.load(nextProps);
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

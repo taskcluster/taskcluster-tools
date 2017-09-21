@@ -3,12 +3,12 @@ import { func, object } from 'prop-types';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client-web';
 import Icon from 'react-fontawesome';
-import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import TimeInput from '../../components/TimeInput';
 import DateView from '../../components/DateView';
 import CodeEditor from '../../components/CodeEditor';
 import ModalItem from '../../components/ModalItem';
+import UserSession from '../../auth/UserSession';
 
 export default class SecretEditor extends React.PureComponent {
   static propTypes = {
@@ -36,10 +36,12 @@ export default class SecretEditor extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (nextProps.secretId !== this.props.secretId) {
       this.loadSecret(nextProps);
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 
