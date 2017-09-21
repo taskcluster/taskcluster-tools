@@ -21,8 +21,6 @@ export default class WorkerTable extends React.PureComponent {
     this.state = {
       filterStatus: 'all'
     };
-
-    delete labels.pending;
   }
 
   renderTaskDescription = description => (
@@ -97,7 +95,9 @@ export default class WorkerTable extends React.PureComponent {
   };
 
   render() {
-    const groups = Object.keys(labels);
+    const groups = Object
+      .keys(labels)
+      .filter(label => !label.includes('pending'));
     const tasksToRender = this.tasksToRender();
     const { filterStatus } = this.state;
 
