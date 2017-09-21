@@ -5,13 +5,16 @@ import { OIDCCredentialAgent } from 'taskcluster-client-web';
  * so this combines them all in a single representation.
  *
  * UserSessions are immutable -- when anything about the session changes, a new instance
- * replaces the old.
+ * replaces the old.  The `userChanged` method is useful to distinguish changes to the
+ * user identity from mere token renewals.
  *
  * Common properties are:
  *
  * - type - 'oidc' or 'credentials'
  * - name - user name
  * - clientArgs - arguments to pass to taskcluster-client-web Client constructors
+ * - renewAfter - date (Date or string) after which this session should be renewed,
+ *                if applicable
  *
  * When type is 'oidc':
  *
@@ -41,21 +44,25 @@ export default class UserSession {
   }
 
   static fromCredentials(credentials) {
-    return new UserSession({
-      type: 'credentials',
-      credentials
-    });
+    return new UserSession({ type: 'credentials', credentials });
   }
 
-  static fromOIDC(oidcProvider, accessToken, idTokenPayload) {
-    return new UserSession({
-      type: 'oidc',
-      oidcProvider,
-      accessToken,
-      fullName: idTokenPayload.nickname,
-      picture: idTokenPayload.picture,
-      oidcSubject: idTokenPayload.sub
-    });
+  static fromOIDC(options) {
+    return new UserSession({ type: 'oidc', ...options });
+  }
+
+  // determine whether the user changed from old to new; this is used by other components
+  // to determine when to update in response to a sign-in/sign-out event
+  static userChanged(oldUser, newUser) {
+    if (!oldUser && !newUser) {
+      return false;
+    }
+
+    if (!oldUser || !newUser) {
+      return true;
+    }
+
+    return oldUser.type !== newUser.type || oldUser.name !== newUser.name;
   }
 
   // get the user's name

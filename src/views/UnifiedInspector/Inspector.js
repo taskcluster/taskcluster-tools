@@ -5,7 +5,6 @@ import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { WebListener } from 'taskcluster-client-web';
 import { isNil } from 'ramda';
-import equal from 'deep-equal';
 import PropsRoute from '../../components/PropsRoute';
 import Error from '../../components/Error';
 import SearchForm from './SearchForm';
@@ -16,6 +15,7 @@ import ArtifactList from '../../components/ArtifactList';
 import HelmetTitle from '../../components/HelmetTitle';
 import { loadable } from '../../utils';
 import iconUrl from '../../taskcluster.png';
+import UserSession from '../../auth/UserSession';
 
 const GroupProgress = loadable(() => import(/* webpackChunkName: 'GroupProgress' */ './GroupProgress'));
 const GroupDetails = loadable(() => import(/* webpackChunkName: 'GroupDetails' */ './GroupDetails'));
@@ -102,6 +102,10 @@ export default class Inspector extends React.PureComponent {
       });
     }
 
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (taskGroupId !== this.props.taskGroupId && taskGroupId) {
       this.loadTasks(nextProps);
     } else if (
@@ -116,8 +120,6 @@ export default class Inspector extends React.PureComponent {
           await this.getArtifacts(this.props.taskId, runId) :
           []
       });
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

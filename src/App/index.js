@@ -46,7 +46,11 @@ export default class App extends React.Component {
   componentWillMount() {
     this.authController.onUserSessionChanged(userSession => this.setState({ userSession }));
 
-    this.authController.loadUserSession();
+    // we do not want to automatically load a user session on the login views; this is
+    // a hack until they get an entry point of their own with no UI.
+    if (!window.location.pathname.startsWith('/login')) {
+      this.authController.loadUserSession();
+    }
   }
 
   render() {

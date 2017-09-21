@@ -2,6 +2,8 @@ import React from 'react';
 import PropsRoute from '../components/PropsRoute';
 import UserSession from './UserSession';
 
+import { renew as auth0Renew } from './auth0';
+
 import Login from '../views/Login';
 import Auth0Login from '../views/Auth0Login';
 import DevelopmentLogin from '../views/DevelopmentLogin';
@@ -25,6 +27,7 @@ const canSignInUsing = method => process.env.SIGN_IN_METHODS.includes(method);
 export default class AuthController {
   constructor() {
     this.userSessionChangedCallbacks = [];
+    this.renewalTimer = null;
 
     window.addEventListener('storage', ({ storageArea, key }) => {
       if (storageArea === localStorage && key === 'userSession') {
@@ -33,6 +36,29 @@ export default class AuthController {
     });
 
     this.setUserSession = this.setUserSession.bind(this);
+  }
+
+  resetRenewalTimer(userSession) {
+    if (this.renewalTimer) {
+      window.clearTimeout(this.renewalTimer);
+      this.renewalTimer = null;
+    }
+
+    if (userSession && userSession.renewAfter) {
+      let timeout = Math.max(0, new Date(userSession.renewAfter) - new Date());
+
+      // if the timeout is in the future, apply up to a few minutes to it
+      // randomly.  This avoids multiple tabs all trying to renew at the
+      // same time.
+      if (timeout > 0) {
+        timeout += Math.random() * 5 * 60 * 1000;
+      }
+
+      this.renewalTimer = window.setTimeout(() => {
+        this.renewalTimer = null;
+        this.renew({ userSession });
+      }, timeout);
+    }
   }
 
   /**
@@ -47,6 +73,7 @@ export default class AuthController {
       UserSession.deserialize(storedUserSession) :
       null;
 
+    this.resetRenewalTimer(userSession);
     this.userSessionChangedCallbacks.forEach(cb => cb(userSession));
   }
 
@@ -97,6 +124,24 @@ export default class AuthController {
     // localStorage updates do not trigger event listeners on the current window/tab,
     // so invoke it directly
     this.loadUserSession();
+  }
+
+  /**
+   * Renew the user session.  This is not possible for all auth methods, and will trivially succeed
+   * for methods that do not support it.  If it fails, the user will be logged out.
+   */
+  async renew({ userSession }) {
+    try {
+      if (canSignInUsing('auth0')) {
+        await auth0Renew({ userSession, authController: this });
+      }
+    } catch (err) {
+      this.setUserSession(null);
+      // usually this is just "user interaction required" or the like, but just
+      // in case the user wants to peek, put it in the console
+      /* eslint-disable no-console */
+      console.error('Could not renew login:', err);
+    }
   }
 
   /**

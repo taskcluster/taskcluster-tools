@@ -22,6 +22,7 @@ export default class CredentialsManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    // try to load info on any change to userSession (including renewal)
     if (!equal(nextProps.userSession, this.props.userSession)) {
       this.load(nextProps);
     }

@@ -3,13 +3,13 @@ import { func } from 'prop-types';
 import { ButtonToolbar, Button, Glyphicon, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 import { assoc } from 'ramda';
 import Icon from 'react-fontawesome';
-import equal from 'deep-equal';
 import Spinner from '../Spinner';
 import ScopeEditor from '../ScopeEditor';
 import DateView from '../DateView';
 import Markdown from '../Markdown';
 import ModalItem from '../ModalItem';
 import Error from '../../components/Error';
+import UserSession from '../../auth/UserSession';
 
 export default class RoleEditor extends React.PureComponent {
   static propTypes = {
@@ -42,10 +42,12 @@ export default class RoleEditor extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     if (!nextProps.currentRoleId !== this.props.currentRoleId) {
       this.load(nextProps);
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

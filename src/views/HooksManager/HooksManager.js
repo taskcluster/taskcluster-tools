@@ -1,12 +1,12 @@
 import React from 'react';
 import { string } from 'prop-types';
 import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
-import equal from 'deep-equal';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
 import HookBrowser from './HookBrowser';
 import HookEditView from './HookEditView';
+import UserSession from '../../auth/UserSession';
 import './styles.css';
 
 export default class HooksManager extends React.PureComponent {
@@ -29,13 +29,15 @@ export default class HooksManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+      this.setState({ error: null });
+    }
+
     const needsUpdate = nextProps.currentHookGroupId !== this.props.currentHookGroupId ||
       nextProps.currentHookId !== this.props.currentHookId;
 
     if (needsUpdate) {
       this.loadGroups();
-    } else if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
-      this.setState({ error: null });
     }
   }
 

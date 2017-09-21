@@ -14,6 +14,8 @@ export default class Clients extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    // we want to regnerate clients on every userSession change, not
+    // just user sign-in/sign-out
     if (nextProps.userSession !== this.props.userSession) {
       this.setState(this.getClients(nextProps));
     }
