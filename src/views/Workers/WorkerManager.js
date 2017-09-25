@@ -36,9 +36,9 @@ export default class WorkerManager extends React.PureComponent {
   async loadWorkers({ provisionerId, workerType }) {
     try {
       const workers = await this.props.queue.listWorkers(provisionerId, workerType, {
-        ...this.state.workerToken ? { continuationToken: this.state.workerToken } : {},
+        ...(this.state.workerToken ? { continuationToken: this.state.workerToken } : {}),
         ...{ limit: 15 },
-        ...this.state.filter.includes('disabled') ? { disabled: true } : {}
+        ...(this.state.filter.includes('disabled') ? { disabled: true } : {})
       });
 
       this.setState({ workers, loading: false, error: null });
