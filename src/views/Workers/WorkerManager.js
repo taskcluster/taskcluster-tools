@@ -54,6 +54,8 @@ export default class WorkerManager extends React.PureComponent {
   onFilterSelect = filter => this.setState({ filter: filter.includes('disabled') ? 'disabled' : filter });
 
   render() {
+    const { filter, workers, workerToken, loading, error } = this.state;
+
     return (
       <div>
         <div key="header">
@@ -74,7 +76,7 @@ export default class WorkerManager extends React.PureComponent {
           <DropdownButton
             id="workers-dropdown"
             bsSize="small"
-            title={`Filter by: ${this.state.filter || 'None'}`}
+            title={`Filter by: ${filter || 'None'}`}
             onSelect={this.onFilterSelect}>
             <MenuItem eventKey="None">None</MenuItem>
             <MenuItem divider />
@@ -85,8 +87,8 @@ export default class WorkerManager extends React.PureComponent {
             ))}
           </DropdownButton>
         </div>
-        {this.state.error && <Error error={this.state.error} />}
-        {this.state.loading && <Spinner />}
+        {error && <Error error={error} />}
+        {loading && <Spinner />}
         <Table responsive condensed={true} hover={true}>
           <thead>
             <tr>
@@ -97,8 +99,8 @@ export default class WorkerManager extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {!this.state.loading && this.state.workers && (
-              this.state.workers.workers.map(({ workerGroup, workerId, latestTask, firstClaim, disabled }, index) => (
+            {!loading && workers && (
+              workers.workers.map(({ workerGroup, workerId, latestTask, firstClaim, disabled }, index) => (
                 <tr key={`worker-${index}`}>
                   <td>
                     <Link
@@ -117,18 +119,18 @@ export default class WorkerManager extends React.PureComponent {
             )}
           </tbody>
         </Table>
-        {this.state.workers && !this.state.workers.workers.length && !this.state.loading && (
-          <div>{`There are no ${this.state.filter} workers in this worker-type`}</div>
+        {workers && !workers.workers.length && !loading && (
+          <div>There are no {filter !== 'None' ? filter : ''} workers in <code>{`${this.props.provisionerId}/${this.props.workerType}`}</code></div>
         )}
         <div className={styles.pagination}>
           <ButtonGroup>
             <Button
-              disabled={!this.state.workerToken}
+              disabled={!workerToken}
               onClick={this.clearWorkerToken}>
               <Glyphicon glyph="arrow-left" />&nbsp;&nbsp;Back to start
             </Button>
             <Button
-              disabled={this.state.workers && !this.state.workers.continuationToken}
+              disabled={workers && !workers.continuationToken}
               onClick={this.nextWorkers}>More workers&nbsp;&nbsp;<Glyphicon glyph="arrow-right" />
             </Button>
           </ButtonGroup>
