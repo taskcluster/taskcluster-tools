@@ -60,7 +60,7 @@ export default class WorkerManager extends React.PureComponent {
       <div>
         <div key="header">
           <HelmetTitle title="Workers" />
-          <h4>Workers</h4>
+          <h4>Workers Explorer</h4>
         </div>
         <div>
           <Breadcrumb>
@@ -89,7 +89,7 @@ export default class WorkerManager extends React.PureComponent {
         </div>
         {error && <Error error={error} />}
         {loading && <Spinner />}
-        <Table responsive condensed={true} hover={true}>
+        <Table className={styles.workersTable} responsive condensed={true} hover={true}>
           <thead>
             <tr>
               <th>Worker ID</th>
