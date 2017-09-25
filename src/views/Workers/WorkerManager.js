@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Breadcrumb, Button, Glyphicon, DropdownButton, MenuItem, Label } from 'react-bootstrap';
+import { Table, Breadcrumb, Button, ButtonGroup, Glyphicon, DropdownButton, MenuItem, Label } from 'react-bootstrap';
 import HelmetTitle from '../../components/HelmetTitle';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -47,9 +47,9 @@ export default class WorkerManager extends React.PureComponent {
     }
   }
 
-  clearWorkerToken = () => this.setState({ workerToken: null });
+  clearWorkerToken = () => !this.state.loading && this.setState({ workerToken: null });
 
-  nextWorkers = () => this.setState({ workerToken: this.state.workers.continuationToken });
+  nextWorkers = () => !this.state.loading && this.setState({ workerToken: this.state.workers.continuationToken });
 
   onFilterSelect = filter => this.setState({ filter: filter.includes('disabled') ? 'disabled' : filter });
 
@@ -121,19 +121,17 @@ export default class WorkerManager extends React.PureComponent {
           <div>{`There are no ${this.state.filter} workers in this worker-type`}</div>
         )}
         <div className={styles.pagination}>
-          {this.state.workerToken && (
-            <Button bsStyle="default" onClick={this.clearWorkerToken} className="pull-left">
-              <Glyphicon glyph="arrow-left" /> Back to start
+          <ButtonGroup>
+            <Button
+              disabled={!this.state.workerToken}
+              onClick={this.clearWorkerToken}>
+              <Glyphicon glyph="arrow-left" />&nbsp;&nbsp;Back to start
             </Button>
-          )}
-          {this.state.workers && this.state.workers.continuationToken ?
-            (
-              <Button bsStyle="default" onClick={this.nextWorkers} className="pull-right">
-                More workers <Glyphicon glyph="arrow-right" />
-              </Button>
-            ) :
-            null
-          }
+            <Button
+              disabled={this.state.workers && !this.state.workers.continuationToken}
+              onClick={this.nextWorkers}>More workers&nbsp;&nbsp;<Glyphicon glyph="arrow-right" />
+            </Button>
+          </ButtonGroup>
         </div>
       </div>
     );

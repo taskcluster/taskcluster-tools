@@ -3,9 +3,5 @@
 }
 
 .pagination {
-  display: flex;
-}
-
-.pagination > button {
-  margin-right: 5px;
+ margin: 20px 0 20px 0;
 }
