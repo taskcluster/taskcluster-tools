@@ -24,14 +24,22 @@ export default class WorkerManager extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    const newState = {};
+
     if (prevState.workerToken !== this.state.workerToken) {
-      this.setState({ loading: true }, () => this.loadWorkers(this.props));
+      newState.loading = true;
     }
 
     if (prevState.filter !== this.state.filter) {
-      this.setState({ workers: null, loading: true }, () => this.loadWorkers(this.props));
+      newState.loading = true;
+      newState.workers = null;
+    }
+
+    if (Object.keys(newState).length) {
+      this.setState(newState, () => this.loadWorkers(this.props));
     }
   }
+
 
   async loadWorkers({ provisionerId, workerType }) {
     try {
@@ -108,8 +116,7 @@ export default class WorkerManager extends React.PureComponent {
                       {workerId}
                     </Link>
                   </td>
-                  <td>{latestTask ? <Link to={`/tasks/${latestTask}`}>{latestTask}</Link> : '-'}
-                  </td>
+                  <td>{latestTask ? <Link to={`/tasks/${latestTask}`}>{latestTask}</Link> : '-'}</td>
                   <td><DateView date={firstClaim} /></td>
                   <td>
                     <Label bsSize="sm" bsStyle={disabled ? 'danger' : 'success'}>{disabled ? 'disabled' : 'enabled'}</Label>
