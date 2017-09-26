@@ -9,7 +9,6 @@ export default class DevelopmentLoginMenuItem extends React.PureComponent {
       </Tooltip>
     );
 
-
     return (
       <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
         <NavItem onSelect={this.onSelect}>
