@@ -1,21 +1,6 @@
-import React from 'react';
-import PropsRoute from '../components/PropsRoute';
 import UserSession from './UserSession';
 
 import { renew as auth0Renew } from './auth0';
-
-import Login from '../views/Login';
-import Auth0Login from '../views/Auth0Login';
-import DevelopmentLogin from '../views/DevelopmentLogin';
-import ManualLogin from '../views/ManualLogin';
-
-import OktaLoginMenuItem from './OktaLoginMenuItem';
-import Auth0LoginMenuItem from './Auth0LoginMenuItem';
-import DevelopmentLoginMenuItem from './DevelopmentLoginMenuItem';
-import EmailLoginMenuItem from './EmailLoginMenuItem';
-import ManualLoginMenuItem from './ManualLoginMenuItem';
-
-const canSignInUsing = method => process.env.SIGN_IN_METHODS.includes(method);
 
 /**
  * Controller for authentication-related pieces of the site.
@@ -38,6 +23,17 @@ export default class AuthController {
     this.setUserSession = this.setUserSession.bind(this);
   }
 
+  /**
+   * Determine whether the given sign-in method is enabled.  This is a static configuration
+   * of the site and will not change at runtime.
+   */
+  canSignInUsing(method) {
+    return process.env.SIGN_IN_METHODS.includes(method);
+  }
+
+  /**
+   * Reset the renewal timer based on the given user session.
+   */
   resetRenewalTimer(userSession) {
     if (this.renewalTimer) {
       window.clearTimeout(this.renewalTimer);
@@ -78,37 +74,6 @@ export default class AuthController {
   }
 
   /**
-   * Get an array of credentials menu items for the available sign-in
-   * methods.
-   */
-  credentialsMenuItems() {
-    return [
-      canSignInUsing('okta') && <OktaLoginMenuItem key="okta" />,
-      canSignInUsing('auth0') && <Auth0LoginMenuItem key="auth0" />,
-      canSignInUsing('development') && <DevelopmentLoginMenuItem key="development" />,
-      canSignInUsing('email') && <EmailLoginMenuItem key="email" />,
-      canSignInUsing('manual') && <ManualLoginMenuItem key="manual" />
-    ].filter(Boolean);
-  }
-
-  /**
-   * Get an array of routes for authentication-related views
-   */
-  routes() {
-    return [
-      canSignInUsing('auth0') &&
-        <PropsRoute key="/login/auth0" path="/login/auth0" component={Auth0Login} setUserSession={() => this.setUserSession()} />,
-      // this route will go away soon..
-      (canSignInUsing('okta') || canSignInUsing('email')) &&
-        <PropsRoute key="/login" path="/login" component={Login} setUserSession={() => this.setUserSession()} />,
-      canSignInUsing('development') &&
-        <PropsRoute key="/login/development" path="/login/development" component={DevelopmentLogin} setUserSession={() => this.setUserSession()} />,
-      canSignInUsing('manual') &&
-        <PropsRoute key="/login/manual" path="/login/manual" component={ManualLogin} setUserSession={() => this.setUserSession()} />
-    ].filter(Boolean);
-  }
-
-  /**
    * Set the current user session, or (if null) delete the current user session.
    *
    * This will change the user session in all open windows/tabs, eventually triggering
@@ -132,7 +97,7 @@ export default class AuthController {
    */
   async renew({ userSession }) {
     try {
-      if (canSignInUsing('auth0')) {
+      if (this.canSignInUsing('auth0')) {
         await auth0Renew({ userSession, authController: this });
       }
     } catch (err) {
