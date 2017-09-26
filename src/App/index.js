@@ -33,6 +33,10 @@ const CredentialsManager = loadable(() => import(/* webpackChunkName: 'Credentia
 const Displays = loadable(() => import(/* webpackChunkName: 'Displays' */ '../views/Displays'));
 const Shell = loadable(() => import(/* webpackChunkName: 'Shell' */ '../views/Shell'));
 const InteractiveConnect = loadable(() => import(/* webpackChunkName: 'InteractiveConnect' */ '../views/InteractiveConnect'));
+const Login = loadable(() => import(/* webpackChunkName: 'Login' */ '../views/Login'));
+const Auth0Login = loadable(() => import(/* webpackChunkName: 'Auth0Login' */ '../views/Auth0Login'));
+const DevelopmentLogin = loadable(() => import(/* webpackChunkName: 'DevelopmentLogin' */ '../views/DevelopmentLogin'));
+const ManualLogin = loadable(() => import(/* webpackChunkName: 'ManualLogin' */ '../views/ManualLogin'));
 
 export default class App extends React.Component {
   constructor(props) {
@@ -55,6 +59,7 @@ export default class App extends React.Component {
 
   render() {
     const { userSession } = this.state;
+    const { authController } = this;
 
     return (
       <BrowserRouter>
@@ -65,7 +70,7 @@ export default class App extends React.Component {
           <PropsRoute
             component={Navigation}
             userSession={userSession}
-            authController={this.authController} />
+            authController={authController} />
           <Grid fluid id="container">
             <Switch>
               <PropsRoute path="/task-inspector" component={LegacyRedirect} />
@@ -100,7 +105,10 @@ export default class App extends React.Component {
               <PropsRoute path="/credentials" component={CredentialsManager} userSession={userSession} />
               <PropsRoute path="/display" component={Displays} userSession={userSession} />
               <PropsRoute path="/shell" component={Shell} userSession={userSession} />
-              {this.authController.routes()}
+              {authController.canSignInUsing('auth0') && <PropsRoute path="/login/auth0" component={Auth0Login} setUserSession={authController.setUserSession} />}
+              {authController.canSignInUsing('development') && <PropsRoute path="/login/development" component={DevelopmentLogin} setUserSession={authController.setUserSession} />}
+              {authController.canSignInUsing('manual') && <PropsRoute path="/login/manual" component={ManualLogin} setUserSession={authController.setUserSession} />}
+              {(authController.canSignInUsing('okta') || authController.canSignInUsing('email')) && <PropsRoute path="/login" component={Login} setUserSession={authController.setUserSession} />}
               <Route component={NotFound} />
             </Switch>
           </Grid>
