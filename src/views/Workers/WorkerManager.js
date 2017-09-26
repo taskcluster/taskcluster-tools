@@ -23,20 +23,14 @@ export default class WorkerManager extends React.PureComponent {
     this.loadWorkers(this.props);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const newState = {};
+  componentDidUpdate(prevProps, { workerToken, filter }) {
+    const filterChanged = filter !== this.state.filter;
 
-    if (prevState.workerToken !== this.state.workerToken) {
-      newState.loading = true;
-    }
-
-    if (prevState.filter !== this.state.filter) {
-      newState.loading = true;
-      newState.workers = null;
-    }
-
-    if (Object.keys(newState).length) {
-      this.setState(newState, () => this.loadWorkers(this.props));
+    if (workerToken !== this.state.workerToken || filterChanged) {
+      this.setState({
+        loading: true,
+        ...(filterChanged ? { workers: null } : {})
+      }, () => this.loadWorkers(this.props));
     }
   }
 
