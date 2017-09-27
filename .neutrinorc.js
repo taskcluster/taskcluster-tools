@@ -1,4 +1,3 @@
-const env = require('neutrino-middleware-env');
 const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
 
@@ -56,6 +55,7 @@ module.exports = {
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
+      neutrino.config.when(process.env.CI === 'true', (config) => config.devtool(false));
 
       neutrino.config.module
         .rule('plain-style')
