@@ -154,7 +154,10 @@ export default class Inspector extends React.PureComponent {
     if (!token) {
       await this.loadActions(props);
       this.updateLocalHistory(taskGroupId, taskGroupItemKey);
-      this.createGroupListener(taskGroupId);
+
+      if (!this.groupListener) {
+        this.createGroupListener(taskGroupId);
+      }
     }
 
     try {
@@ -162,7 +165,17 @@ export default class Inspector extends React.PureComponent {
         .listTaskGroup(taskGroupId, token ? { continuationToken: token, limit: 100 } : { limit: 100 });
 
       this.setState({
-        tasks: this.state.tasks ? this.state.tasks.concat(tasks) : tasks
+        tasks: tasks.reduce((reduction, task) => {
+          const index = reduction.findIndex(({ status }) => status.taskId === task.status.taskId);
+
+          if (index > -1) {
+            reduction[index] = task; // eslint-disable-line no-param-reassign
+          } else {
+            reduction.push(task);
+          }
+
+          return reduction;
+        }, [...(this.state.tasks || [])])
       });
 
       if (continuationToken) {
@@ -179,7 +192,10 @@ export default class Inspector extends React.PureComponent {
     }
 
     this.updateLocalHistory(taskId, taskItemKey);
-    this.createTaskListener(taskId);
+
+    if (!this.taskListener) {
+      this.createTaskListener(taskId);
+    }
 
     try {
       const [status, task] = await Promise.all([this.getStatus(taskId), this.getTask(taskId)]);
@@ -226,12 +242,12 @@ export default class Inspector extends React.PureComponent {
     const listener = new WebListener();
     const routingKey = { taskGroupId };
 
+    this.groupListener = listener;
     ['taskDefined', 'taskPending', 'taskRunning', 'taskCompleted', 'taskFailed', 'taskException']
       .map(binding => listener.bind(queueEvents[binding](routingKey)));
-
     listener.on('message', this.handleGroupMessage);
-    listener.resume();
-    this.groupListener = listener;
+    listener.on('reconnect', () => this.loadTasks(this.props));
+    listener.connect();
 
     return listener;
   }
@@ -250,10 +266,11 @@ export default class Inspector extends React.PureComponent {
     const listener = new WebListener();
     const routingKey = { taskId };
 
+    this.taskListener = listener;
     listener.bind(queueEvents.artifactCreated(routingKey));
     listener.on('message', this.handleTaskMessage);
-    listener.resume();
-    this.taskListener = listener;
+    listener.on('reconnect', () => this.loadTask(this.props));
+    listener.connect();
 
     return listener;
   }
