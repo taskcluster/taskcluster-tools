@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { Table, Button, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Table, Button, ButtonToolbar, OverlayTrigger, Tooltip, Breadcrumb } from 'react-bootstrap';
 import HelmetTitle from '../../components/HelmetTitle';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -145,6 +145,20 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
+        <Breadcrumb>
+          <Breadcrumb.Item href={`/workers/provisioners/${this.props.provisionerId}`}>
+            {this.props.provisionerId}
+          </Breadcrumb.Item>
+          <Breadcrumb.Item href={`/workers/provisioners/${this.props.provisionerId}/worker-types/${this.props.workerType}`}>
+            {this.props.workerType}
+          </Breadcrumb.Item>
+          <Breadcrumb.Item active>
+            {this.props.workerGroup}
+          </Breadcrumb.Item>
+          <Breadcrumb.Item active>
+            {this.props.workerId}
+          </Breadcrumb.Item>
+        </Breadcrumb>
         <SearchForm
           key="input-form"
           provisioners={provisioners}
