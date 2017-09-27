@@ -138,6 +138,7 @@ export default class WorkerManager extends React.PureComponent {
           'Disabling a worker allows the machine to remain alive but not accept jobs.'}
       </Tooltip>
     );
+    const firstClaim = worker && moment(worker.firstClaim);
 
     return (
       <div>
@@ -177,7 +178,7 @@ export default class WorkerManager extends React.PureComponent {
               <tbody>
                 <tr>
                   <td>First Claim</td>
-                  <td>{moment(worker.firstClaim).fromNow()}</td>
+                  <td>{firstClaim.isAfter('2000-01-01') ? firstClaim.fromNow() : '-'}</td>
                 </tr>
                 <tr>
                   <td style={{ verticalAlign: 'inherit' }}>Actions</td>
