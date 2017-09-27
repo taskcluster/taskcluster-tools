@@ -126,7 +126,7 @@ export default class PulseInspector extends React.PureComponent {
 
   startListening = () => {
     this.setState({ listening: true });
-    this.listener.resume();
+    this.listener.connect();
   };
 
   /** Set expanded message, note we rely on object reference comparison here */

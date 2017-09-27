@@ -57,7 +57,9 @@ export default class InteractiveConnect extends React.PureComponent {
       });
     }
 
-    this.createTaskListener(taskId);
+    if (!this.taskListener) {
+      this.createTaskListener(taskId);
+    }
 
     try {
       const [{ status }, task, { artifacts }] = await Promise.all([
@@ -117,7 +119,8 @@ export default class InteractiveConnect extends React.PureComponent {
       .map(binding => listener.bind(queueEvents[binding](routingKey)));
 
     listener.on('message', this.handleTaskMessage);
-    listener.resume();
+    listener.on('reconnect', () => this.load(this.props));
+    listener.connect();
     this.taskListener = listener;
 
     return listener;
