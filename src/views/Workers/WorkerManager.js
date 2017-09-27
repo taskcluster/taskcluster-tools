@@ -40,12 +40,12 @@ export default class WorkerManager extends React.PureComponent {
     }
 
     const { status } = await this.props.queue.status(taskId);
-
     const runs = status.runs.length - 1;
-    const lastClaimStarted = status.runs[runs].started;
-    const lastClaimResolved = status.runs[runs].resolved;
 
-    return { lastClaimStarted, lastClaimResolved };
+    return {
+      lastClaimStarted: status.runs[runs].started,
+      lastClaimResolved: status.runs[runs].resolved
+    };
   };
 
   async loadWorkers({ provisionerId, workerType }) {
@@ -111,12 +111,12 @@ export default class WorkerManager extends React.PureComponent {
         <Table className={styles.workersTable} responsive condensed={true} hover={true}>
           <thead>
             <tr>
-              <th title="Worker ID">Worker ID</th>
-              <th title="Most Recent Task">MRT</th>
-              <th title="First Claim">First Claim</th>
-              <th title="Most Recent Task Started">MRT Started</th>
-              <th title="Most Recent Task Resolved">MRT Resolved</th>
-              <th title="Status">Status</th>
+              <th>Worker ID</th>
+              <th>Most Recent Task</th>
+              <th>Task Started</th>
+              <th>Task Resolved</th>
+              <th>First Claim</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -130,9 +130,9 @@ export default class WorkerManager extends React.PureComponent {
                     </Link>
                   </td>
                   <td>{worker.latestTask ? <Link to={`/tasks/${worker.latestTask}`}>{worker.latestTask}</Link> : '-'}</td>
-                  <td>{worker.firstClaim ? <DateView date={worker.firstClaim} /> : '-'}</td>
                   <td>{worker.lastClaimStarted ? <DateView date={worker.lastClaimStarted} /> : '-'}</td>
                   <td>{worker.lastClaimResolved ? <DateView date={worker.lastClaimResolved} since={worker.lastClaimStarted} /> : '-'}</td>
+                  <td>{worker.firstClaim ? <DateView date={worker.firstClaim} /> : '-'}</td>
                   <td>
                     <Label bsSize="sm" bsStyle={worker.disabled ? 'danger' : 'success'}>{worker.disabled ? 'disabled' : 'enabled'}</Label>
                   </td>
