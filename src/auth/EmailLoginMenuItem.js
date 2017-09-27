@@ -18,7 +18,7 @@ export default class EmailLoginMenuItem extends Component {
 
     return (
       <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
-        <NavItem onSelect={this.props.onSelect}>
+        <NavItem onSelect={this.onSelect}>
           <Glyphicon glyph="log-in" /> Sign In with Email
         </NavItem>
       </OverlayTrigger>
