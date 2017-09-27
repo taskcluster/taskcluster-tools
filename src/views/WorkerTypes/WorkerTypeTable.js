@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Panel, Badge, Popover, OverlayTrigger, Label } from 'react-bootstrap';
 import moment from 'moment';
 import { func, string, bool, object } from 'prop-types';
+import { Link } from 'react-router-dom';
 import { sentenceCase } from 'change-case';
 import { find, propEq } from 'ramda';
 import Icon from 'react-fontawesome';
@@ -126,7 +127,7 @@ export default class WorkerTypeTable extends React.PureComponent {
             <Icon role="button" name="info" />
           </div>
         </OverlayTrigger>
-        <span>{workerType.workerType}</span>
+        <span><Link to={`/workers/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>{workerType.workerType}</Link></span>
       </div>
     );
 
@@ -184,8 +185,10 @@ export default class WorkerTypeTable extends React.PureComponent {
           {workerTypes.map((workerType, key) => (
             <tr key={`worker-type-tabular-${key}`}>
               <td>
+                <Link to={`/workers/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>{workerType.workerType}</Link>
+                &nbsp;&nbsp;&nbsp;
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={this.renderDescription(workerType)}>
-                  <a role="button">{workerType.workerType}</a>
+                  <Icon role="button" name="info" />
                 </OverlayTrigger>
               </td>
               <td>

@@ -19,6 +19,7 @@ const QuickStart = loadable(() => import(/* webpackChunkName: 'QuickStart' */ '.
 const AwsProvisioner = loadable(() => import(/* webpackChunkName: 'AwsProvisioner' */ '../views/AwsProvisioner'));
 const WorkerTypes = loadable(() => import(/* webpackChunkName: 'WorkerTypes' */ '../views/WorkerTypes'));
 const WorkerManager = loadable(() => import(/* webpackChunkName: 'WorkerManager' */ '../views/WorkerManager'));
+const Workers = loadable(() => import(/* webpackChunkName: 'Workers' */ '../views/Workers'));
 const ClientManager = loadable(() => import(/* webpackChunkName: 'ClientManager' */ '../views/ClientManager'));
 const RoleManager = loadable(() => import(/* webpackChunkName: 'RoleManager' */ '../views/RoleManager'));
 const ScopeInspector = loadable(() => import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector'));
@@ -90,8 +91,9 @@ export default class App extends React.Component {
               <PropsRoute path="/quickstart" component={QuickStart} userSession={userSession} />
               <PropsRoute path="/aws-provisioner/:workerType?/:currentTab?" component={AwsProvisioner} userSession={userSession} baseUrl="https://aws-provisioner.taskcluster.net/v1" provisionerId="aws-provisioner-v1" routeRoot="/aws-provisioner" />
               <PropsRoute path="/aws-provisioner-staging/:workerType?/:currentTab?" component={AwsProvisioner} userSession={userSession} baseUrl="https://provisioner-staging.herokuapp.com/v1" provisionerId="staging-aws" routeRoot="/aws-provisioner-staging" />
-              <PropsRoute path="/worker-types/:provisionerId?" component={WorkerTypes} userSession={userSession} />
-              <PropsRoute path="/workers/:provisionerId?/:workerType?/:workerGroup?/:workerId?" component={WorkerManager} userSession={userSession} />
+              <PropsRoute path="/workers/provisioners/:provisionerId?/worker-types/:workerType/workers/:workerGroup?/:workerId?" component={WorkerManager} userSession={userSession} />
+              <PropsRoute path="/workers/:provisionerId?/:provisionerId/worker-types/:workerType" component={Workers} userSession={userSession} />
+              <PropsRoute path="/workers/provisioners/:provisionerId?" component={WorkerTypes} userSession={userSession} />
               <PropsRoute path="/auth/clients/:clientId?" component={ClientManager} userSession={userSession} />
               <PropsRoute path="/auth/roles/:roleId?" component={RoleManager} userSession={userSession} />
               <PropsRoute path="/auth/scopes/:selectedScope?/:selectedEntity?" component={ScopeInspector} userSession={userSession} />
