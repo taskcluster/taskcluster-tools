@@ -1,6 +1,5 @@
 .metadataTable {
   max-width: 324px;
-  margin-top: 20px;
   margin-bottom: 0;
 }
 
@@ -11,6 +10,7 @@
 .searchForm {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .searchForm > div {
