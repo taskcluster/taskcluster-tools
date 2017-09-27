@@ -34,6 +34,19 @@ export default class WorkerManager extends React.PureComponent {
     }
   }
 
+  loadStatus = async (taskId) => {
+    if (!taskId) {
+      return {};
+    }
+
+    const { status } = await this.props.queue.status(taskId);
+
+    const runs = status.runs.length - 1;
+    const lastClaimStarted = status.runs[runs].started;
+    const lastClaimResolved = status.runs[runs].resolved;
+
+    return { lastClaimStarted, lastClaimResolved };
+  };
 
   async loadWorkers({ provisionerId, workerType }) {
     try {
@@ -42,6 +55,10 @@ export default class WorkerManager extends React.PureComponent {
         ...{ limit: 15 },
         ...(this.state.filter.includes('disabled') ? { disabled: true } : {})
       });
+
+      workers.workers = await Promise.all(
+        workers.workers.map(async worker => ({ ...worker, ...(await this.loadStatus(worker.latestTask)) }))
+      );
 
       this.setState({ workers, loading: false, error: null });
     } catch (error) {
@@ -94,26 +111,30 @@ export default class WorkerManager extends React.PureComponent {
         <Table className={styles.workersTable} responsive condensed={true} hover={true}>
           <thead>
             <tr>
-              <th>Worker ID</th>
-              <th>Most Recent Task</th>
-              <th>First Claim</th>
-              <th>Status</th>
+              <th title="Worker ID">Worker ID</th>
+              <th title="Most Recent Task">MRT</th>
+              <th title="First Claim">First Claim</th>
+              <th title="Most Recent Task Started">MRT Started</th>
+              <th title="Most Recent Task Resolved">MRT Resolved</th>
+              <th title="Status">Status</th>
             </tr>
           </thead>
           <tbody>
             {!loading && workers && (
-              workers.workers.map(({ workerGroup, workerId, latestTask, firstClaim, disabled }, index) => (
+              workers.workers.map((worker, index) => (
                 <tr key={`worker-${index}`}>
                   <td>
                     <Link
-                      to={`/workers/provisioners/${this.props.provisionerId}/worker-types/${this.props.workerType}/workers/${workerGroup}/${workerId}`}>
-                      {workerId}
+                      to={`/workers/provisioners/${this.props.provisionerId}/worker-types/${this.props.workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
+                      {worker.workerId}
                     </Link>
                   </td>
-                  <td>{latestTask ? <Link to={`/tasks/${latestTask}`}>{latestTask}</Link> : '-'}</td>
-                  <td><DateView date={firstClaim} /></td>
+                  <td>{worker.latestTask ? <Link to={`/tasks/${worker.latestTask}`}>{worker.latestTask}</Link> : '-'}</td>
+                  <td>{worker.firstClaim ? <DateView date={worker.firstClaim} /> : '-'}</td>
+                  <td>{worker.lastClaimStarted ? <DateView date={worker.lastClaimStarted} /> : '-'}</td>
+                  <td>{worker.lastClaimResolved ? <DateView date={worker.lastClaimResolved} since={worker.lastClaimStarted} /> : '-'}</td>
                   <td>
-                    <Label bsSize="sm" bsStyle={disabled ? 'danger' : 'success'}>{disabled ? 'disabled' : 'enabled'}</Label>
+                    <Label bsSize="sm" bsStyle={worker.disabled ? 'danger' : 'success'}>{worker.disabled ? 'disabled' : 'enabled'}</Label>
                   </td>
                 </tr>
               ))
