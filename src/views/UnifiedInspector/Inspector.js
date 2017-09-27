@@ -123,7 +123,7 @@ export default class Inspector extends React.PureComponent {
     }
   }
 
-  async loadActions(props) {
+  async getActions(props) {
     const { queue, taskGroupId } = props;
 
     if (!taskGroupId) {
@@ -131,16 +131,19 @@ export default class Inspector extends React.PureComponent {
     }
 
     try {
-      const decision = await queue.task(taskGroupId);
       const url = queue.buildUrl(queue.getLatestArtifact, taskGroupId, 'public/actions.json');
-      const response = await fetch(url);
-      const actions = await response.json();
+      const [decision, actions] = await Promise.all([
+        queue.task(taskGroupId),
+        fetch(url).then(response => response.json())
+      ]);
 
-      this.setState({ actions, decision });
+      return { decision, actions };
     } catch (err) {
       if (err.statusCode !== 404) {
-        this.setState({ error: err });
+        throw err;
       }
+
+      return Promise.resolve({ decision: null, actions: null });
     }
   }
 
@@ -152,7 +155,6 @@ export default class Inspector extends React.PureComponent {
     }
 
     if (!token) {
-      await this.loadActions(props);
       this.updateLocalHistory(taskGroupId, taskGroupItemKey);
 
       if (!this.groupListener) {
@@ -161,10 +163,14 @@ export default class Inspector extends React.PureComponent {
     }
 
     try {
-      const { tasks, continuationToken } = await queue
-        .listTaskGroup(taskGroupId, token ? { continuationToken: token, limit: 100 } : { limit: 100 });
+      const [{ decision, actions }, { tasks, continuationToken }] = await Promise.all([
+        token ? Promise.resolve(this.state) : this.getActions(props),
+        queue.listTaskGroup(taskGroupId, token ? { continuationToken: token, limit: 200 } : { limit: 20 })
+      ]);
 
       this.setState({
+        actions,
+        decision,
         tasks: tasks.reduce((reduction, task) => {
           const index = reduction.findIndex(({ status }) => status.taskId === task.status.taskId);
 
@@ -179,7 +185,7 @@ export default class Inspector extends React.PureComponent {
       });
 
       if (continuationToken) {
-        await this.loadTasks(props, continuationToken);
+        this.loadTasks(props, continuationToken);
       }
     } catch (err) {
       this.setState({ error: err });
