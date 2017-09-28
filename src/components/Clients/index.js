@@ -25,14 +25,16 @@ export default class Clients extends React.PureComponent {
     const { children, userSession, ...clients } = props;
     const clientArgs = userSession ? userSession.clientArgs : null;
 
-    return Object
-      .entries(clients)
-      .reduce((reduction, [key, value]) => ({
+    return Object.entries(clients).reduce(
+      (reduction, [key, value]) => ({
         ...reduction,
-        [camelCase(key)]: value === true ?
-          new taskcluster[key]({ ...clientArgs }) :
-          new taskcluster[key]({ ...clientArgs, ...value })
-      }), {});
+        [camelCase(key)]:
+          value === true
+            ? new taskcluster[key]({ ...clientArgs })
+            : new taskcluster[key]({ ...clientArgs, ...value })
+      }),
+      {}
+    );
   }
 
   render() {

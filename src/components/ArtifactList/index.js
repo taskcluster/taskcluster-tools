@@ -9,10 +9,7 @@ export default class ArtifactList extends React.PureComponent {
   static propTypes = {
     artifacts: array,
     taskId: string,
-    runId: oneOfType([
-      string,
-      number
-    ]),
+    runId: oneOfType([string, number]),
     menu: bool,
     queue: object.isRequired,
     userSession: object,
@@ -42,20 +39,31 @@ export default class ArtifactList extends React.PureComponent {
     this.loadArtifactList(nextProps);
   }
 
-  loadArtifactList({ runId, taskId, userSession, queue, artifacts, namespace }) {
+  loadArtifactList({
+    runId,
+    taskId,
+    userSession,
+    queue,
+    artifacts,
+    namespace
+  }) {
     if (!taskId || !artifacts) {
       return null;
     }
 
     // Build the URLs here so that they'll be updated when people login
-    Promise
-      .all(artifacts.map(async ({ name, contentType }) => {
+    Promise.all(
+      artifacts.map(async ({ name, contentType }) => {
         if (/^public\//.test(name)) {
           const icon = getIconFromMime(contentType);
 
           // If we have a namespace, use a URL with that namespace to make it easier for users to copy/paste index URLs
           if (namespace) {
-            return { icon, name, url: `https://index.taskcluster.net/v1/task/${namespace}/artifacts/${name}` };
+            return {
+              icon,
+              name,
+              url: `https://index.taskcluster.net/v1/task/${namespace}/artifacts/${name}`
+            };
           }
 
           // We could use queue.buildUrl, but this creates URLs where the artifact name has slashes encoded.
@@ -63,10 +71,18 @@ export default class ArtifactList extends React.PureComponent {
           // `wget ${URL}` create files with nice names.
 
           if (!isNil(runId)) {
-            return { icon, name, url: `https://queue.taskcluster.net/v1/task/${taskId}/runs/${runId}/artifacts/${name}` };
+            return {
+              icon,
+              name,
+              url: `https://queue.taskcluster.net/v1/task/${taskId}/runs/${runId}/artifacts/${name}`
+            };
           }
 
-          return { icon, name, url: `https://queue.taskcluster.net/v1/task/${taskId}/artifacts/${name}` };
+          return {
+            icon,
+            name,
+            url: `https://queue.taskcluster.net/v1/task/${taskId}/artifacts/${name}`
+          };
         }
 
         // If we have userSession we create a signed URL.
@@ -75,9 +91,18 @@ export default class ArtifactList extends React.PureComponent {
           return {
             name,
             icon: getIconFromMime(contentType),
-            url: isNil(runId) ?
-              await queue.buildSignedUrl(queue.getLatestArtifact, taskId, name) :
-              await queue.buildSignedUrl(queue.getArtifact, taskId, runId, name)
+            url: isNil(runId)
+              ? await queue.buildSignedUrl(
+                  queue.getLatestArtifact,
+                  taskId,
+                  name
+                )
+              : await queue.buildSignedUrl(
+                  queue.getArtifact,
+                  taskId,
+                  runId,
+                  name
+                )
           };
         }
 
@@ -86,7 +111,8 @@ export default class ArtifactList extends React.PureComponent {
           url: null,
           icon: 'lock'
         };
-      }))
+      })
+    )
       .then(artifacts => this.setState({ error: null, artifacts }))
       .catch(error => this.setState({ error, artifacts: [] }));
   }
@@ -100,30 +126,36 @@ export default class ArtifactList extends React.PureComponent {
     }
 
     if (!artifacts || !artifacts.length) {
-      return menu ?
-        <NavItem disabled>No artifacts</NavItem> :
-        <div style={{ fontSize: 14, ...style }}>No artifacts</div>;
+      return menu ? (
+        <NavItem disabled>No artifacts</NavItem>
+      ) : (
+        <div style={{ fontSize: 14, ...style }}>No artifacts</div>
+      );
     }
 
-    return menu ?
-      (
-        <NavDropdown title="Artifacts" id="artifacts-dropdown">
-          {artifacts.map(({ name, icon, url }, index) => (
-            <MenuItem href={url} target="_blank" rel="noopener noreferrer" key={`runs-menu-artifacts-${index}`}>
-              <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} /> {name}
-            </MenuItem>
-          ))}
-        </NavDropdown>
-      ) :
-      (
-        <div style={{ fontSize: 14, ...style }}>
-          {artifacts.map(({ name, icon, url }, index) => (
-            <div key={`runs-menu-artifacts-${index}`} style={{ marginBottom: 8 }}>
-              <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
-              <a href={url} target="_blank" rel="noopener noreferrer">{name}</a>
-            </div>
-          ))}
-        </div>
-      );
+    return menu ? (
+      <NavDropdown title="Artifacts" id="artifacts-dropdown">
+        {artifacts.map(({ name, icon, url }, index) => (
+          <MenuItem
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            key={`runs-menu-artifacts-${index}`}>
+            <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} /> {name}
+          </MenuItem>
+        ))}
+      </NavDropdown>
+    ) : (
+      <div style={{ fontSize: 14, ...style }}>
+        {artifacts.map(({ name, icon, url }, index) => (
+          <div key={`runs-menu-artifacts-${index}`} style={{ marginBottom: 8 }}>
+            <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              {name}
+            </a>
+          </div>
+        ))}
+      </div>
+    );
   }
 }

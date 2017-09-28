@@ -5,7 +5,14 @@ import { titleCase } from 'change-case';
 import equal from 'deep-equal';
 import { labels } from '../../utils';
 
-const groups = ['completed', 'failed', 'exception', 'unscheduled', 'running', 'pending'];
+const groups = [
+  'completed',
+  'failed',
+  'exception',
+  'unscheduled',
+  'running',
+  'pending'
+];
 
 export default class GroupProgress extends React.PureComponent {
   static propTypes = {
@@ -28,9 +35,10 @@ export default class GroupProgress extends React.PureComponent {
 
     const groupings = this.groupTasksByStatus(this.props.tasks);
     const percents = this.getPercents(groupings, this.props.tasks);
-    const weightedTotal = Object
-      .values(percents)
-      .reduce((total, current) => total + current, 0);
+    const weightedTotal = Object.values(percents).reduce(
+      (total, current) => total + current,
+      0
+    );
 
     this.setState({
       groupings,
@@ -54,9 +62,10 @@ export default class GroupProgress extends React.PureComponent {
 
     const groupings = this.groupTasksByStatus(nextProps.tasks);
     const percents = this.getPercents(groupings, nextProps.tasks);
-    const weightedTotal = Object
-      .values(percents)
-      .reduce((total, current) => total + current, 0);
+    const weightedTotal = Object.values(percents).reduce(
+      (total, current) => total + current,
+      0
+    );
 
     this.setState({
       groupings,
@@ -66,21 +75,25 @@ export default class GroupProgress extends React.PureComponent {
   }
 
   groupTasksByStatus(tasks) {
-    return tasks.reduce((groupings, task) => ({
-      ...groupings,
-      [task.status.state]: [...(groupings[task.status.state] || []), task]
-    }), {});
+    return tasks.reduce(
+      (groupings, task) => ({
+        ...groupings,
+        [task.status.state]: [...(groupings[task.status.state] || []), task]
+      }),
+      {}
+    );
   }
 
   getPercents(groupings, tasks) {
     const total = tasks.length;
 
-    return Object
-      .entries(groupings)
-      .reduce((percents, [group, tasks]) => ({
+    return Object.entries(groupings).reduce(
+      (percents, [group, tasks]) => ({
         ...percents,
-        [group]: Math.max(5, (tasks.length / total) * 100)
-      }), {});
+        [group]: Math.max(5, tasks.length / total * 100)
+      }),
+      {}
+    );
   }
 
   render() {
@@ -99,15 +112,29 @@ export default class GroupProgress extends React.PureComponent {
             <ProgressBar
               key={`group-progress-bar-${group}`}
               title={`${titleCase(group)} (${tasks.length})`}
-              bsStyle={group === 'unscheduled' || group === 'running' ? null : labels[group]}
+              bsStyle={
+                group === 'unscheduled' || group === 'running'
+                  ? null
+                  : labels[group]
+              }
               style={group === 'unscheduled' ? { background: '#777' } : null}
               active={group === 'running'}
-              now={(percents[group] / weightedTotal) * 100}
-              label={tasks.length ? `${group[0].toUpperCase()}(${tasks.length})` : '...'} />
+              now={percents[group] / weightedTotal * 100}
+              label={
+                tasks.length
+                  ? `${group[0].toUpperCase()}(${tasks.length})`
+                  : '...'
+              }
+            />
           ))}
         </ProgressBar>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            flexWrap: 'wrap'
+          }}>
           {groups.map((group, index) => (
             <Label
               bsStyle={labels[group]}

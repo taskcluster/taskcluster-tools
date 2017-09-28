@@ -74,16 +74,16 @@ export default class HookEditor extends React.PureComponent {
     }
   }
 
-  handleNewScheduleChange = e => this.setState({ newScheduleValue: e.target.value });
+  handleNewScheduleChange = e =>
+    this.setState({ newScheduleValue: e.target.value });
 
   validHook = () => {
     const { hook } = this.state;
-    const isValid = (
+    const isValid =
       hook.metadata.name &&
       hook.metadata.description &&
       hook.metadata.owner &&
-      hook.deadline
-    );
+      hook.deadline;
 
     if (!isValid) {
       return false;
@@ -98,31 +98,45 @@ export default class HookEditor extends React.PureComponent {
     }
   };
 
-  onHookGroupIdChange = e => this.setState({
-    hook: assocPath(['hookGroupId'], e.target.value, this.state.hook)
-  });
+  onHookGroupIdChange = e =>
+    this.setState({
+      hook: assocPath(['hookGroupId'], e.target.value, this.state.hook)
+    });
 
-  onHookIdChange = e => this.setState({
-    hook: assocPath(['hookId'], e.target.value, this.state.hook)
-  });
+  onHookIdChange = e =>
+    this.setState({
+      hook: assocPath(['hookId'], e.target.value, this.state.hook)
+    });
 
-  onNameChange = e => this.setState({
-    hook: assocPath(['metadata', 'name'], e.target.value, this.state.hook)
-  });
+  onNameChange = e =>
+    this.setState({
+      hook: assocPath(['metadata', 'name'], e.target.value, this.state.hook)
+    });
 
-  onDescriptionChange = e => this.setState({
-    hook: assocPath(['metadata', 'description'], e.target.value, this.state.hook)
-  });
+  onDescriptionChange = e =>
+    this.setState({
+      hook: assocPath(
+        ['metadata', 'description'],
+        e.target.value,
+        this.state.hook
+      )
+    });
 
-  onOwnerChange = e => this.setState({
-    hook: assocPath(['metadata', 'owner'], e.target.value, this.state.hook)
-  });
+  onOwnerChange = e =>
+    this.setState({
+      hook: assocPath(['metadata', 'owner'], e.target.value, this.state.hook)
+    });
 
-  onEmailOnErrorChange = () => this.setState({
-    hook: assocPath(['metadata', 'emailOnError'], !this.state.hook.metadata.emailOnError, this.state.hook)
-  });
+  onEmailOnErrorChange = () =>
+    this.setState({
+      hook: assocPath(
+        ['metadata', 'emailOnError'],
+        !this.state.hook.metadata.emailOnError,
+        this.state.hook
+      )
+    });
 
-  removeScheduleItem = (index) => {
+  removeScheduleItem = index => {
     const schedule = [...this.state.hook.schedule];
 
     schedule.splice(index, 1);
@@ -136,26 +150,34 @@ export default class HookEditor extends React.PureComponent {
     if (newScheduleValue) {
       this.setState({
         newScheduleValue: '',
-        hook: assocPath(['schedule'], [...clone(this.state.hook.schedule), newScheduleValue], this.state.hook)
+        hook: assocPath(
+          ['schedule'],
+          [...clone(this.state.hook.schedule), newScheduleValue],
+          this.state.hook
+        )
       });
     }
   };
 
-  onScheduleTextChange = e => this.setState({
-    hook: assocPath(['scheduleText'], e.target.value, this.state.hook)
-  });
+  onScheduleTextChange = e =>
+    this.setState({
+      hook: assocPath(['scheduleText'], e.target.value, this.state.hook)
+    });
 
-  onExpiresChange = e => this.setState({
-    hook: assocPath(['expires'], e.target.value, this.state.hook)
-  });
+  onExpiresChange = e =>
+    this.setState({
+      hook: assocPath(['expires'], e.target.value, this.state.hook)
+    });
 
-  onDeadlineChange = e => this.setState({
-    hook: assocPath(['deadline'], e.target.value, this.state.hook)
-  });
+  onDeadlineChange = e =>
+    this.setState({
+      hook: assocPath(['deadline'], e.target.value, this.state.hook)
+    });
 
-  onTaskChange = value => this.setState({
-    hook: assocPath(['task'], JSON.parse(value), this.state.hook)
-  });
+  onTaskChange = value =>
+    this.setState({
+      hook: assocPath(['task'], JSON.parse(value), this.state.hook)
+    });
 
   getHookDefinition = () => {
     const { hook } = this.state;
@@ -178,7 +200,11 @@ export default class HookEditor extends React.PureComponent {
   createHook = () => {
     const { hook } = this.state;
 
-    this.props.createHook(hook.hookGroupId, hook.hookId, this.getHookDefinition());
+    this.props.createHook(
+      hook.hookGroupId,
+      hook.hookId,
+      this.getHookDefinition()
+    );
   };
 
   updateHook = () => this.props.updateHook(this.getHookDefinition());
@@ -189,7 +215,10 @@ export default class HookEditor extends React.PureComponent {
     if (isCreating) {
       return (
         <ButtonToolbar style={{ float: 'right' }}>
-          <Button bsStyle="primary" onClick={this.createHook} disabled={!this.validHook()}>
+          <Button
+            bsStyle="primary"
+            onClick={this.createHook}
+            disabled={!this.validHook()}>
             <Glyphicon glyph="plus" /> Create Hook
           </Button>
         </ButtonToolbar>
@@ -198,14 +227,24 @@ export default class HookEditor extends React.PureComponent {
 
     return (
       <ButtonToolbar style={{ float: 'right' }}>
-        <Button bsStyle="success" onClick={this.updateHook} disabled={!this.validHook()}>
+        <Button
+          bsStyle="success"
+          onClick={this.updateHook}
+          disabled={!this.validHook()}>
           <Glyphicon glyph="ok" /> Save Changes
         </Button>
         <ModalItem
           button={true}
           bsStyle="danger"
           onSubmit={this.props.deleteHook}
-          body={<span>Are you sure you want to delete hook <code>{hookGroupId}/{hookId}</code>?</span>}>
+          body={
+            <span>
+              Are you sure you want to delete hook{' '}
+              <code>
+                {hookGroupId}/{hookId}
+              </code>?
+            </span>
+          }>
           <Icon name="trash" /> Delete Hook
         </ModalItem>
       </ButtonToolbar>
@@ -225,41 +264,33 @@ export default class HookEditor extends React.PureComponent {
         <div className="form-group" style={{ marginBottom: 10 }}>
           <label className="control-label col-md-2">HookGroupId</label>
           <div className="col-md-10">
-            {
-              isCreating ?
-                (
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={hook.hookGroupId}
-                    onChange={this.onHookGroupIdChange}
-                    placeholder="hookGroupId" />
-                ) :
-                (
-                  <div className="form-control-static">
-                    {hookGroupId}
-                  </div>
-                )
-            }
+            {isCreating ? (
+              <input
+                type="text"
+                className="form-control"
+                value={hook.hookGroupId}
+                onChange={this.onHookGroupIdChange}
+                placeholder="hookGroupId"
+              />
+            ) : (
+              <div className="form-control-static">{hookGroupId}</div>
+            )}
           </div>
         </div>
         <div className="form-group">
           <label className="control-label col-md-2">HookId</label>
           <div className="col-md-10">
-            {
-              isCreating ? (
-                <input
-                  type="text"
-                  className="form-control"
-                  value={hook.hookId}
-                  onChange={this.onHookIdChange}
-                  placeholder="hookId" />
-              ) : (
-                <div className="form-control-static">
-                  {hookId}
-                </div>
-              )
-            }
+            {isCreating ? (
+              <input
+                type="text"
+                className="form-control"
+                value={hook.hookId}
+                onChange={this.onHookIdChange}
+                placeholder="hookId"
+              />
+            ) : (
+              <div className="form-control-static">{hookId}</div>
+            )}
           </div>
         </div>
         <div className="form-group">
@@ -270,7 +301,8 @@ export default class HookEditor extends React.PureComponent {
               className="form-control"
               defaultValue={hook.metadata.name}
               onChange={this.onNameChange}
-              placeholder="Hook Name" />
+              placeholder="Hook Name"
+            />
           </div>
         </div>
         <div className="form-group">
@@ -281,7 +313,8 @@ export default class HookEditor extends React.PureComponent {
               defaultValue={hook.metadata.description}
               onChange={this.onDescriptionChange}
               rows={8}
-              placeholder="Hook Description (markdown)" />
+              placeholder="Hook Description (markdown)"
+            />
           </div>
         </div>
         <div className="form-group">
@@ -292,7 +325,8 @@ export default class HookEditor extends React.PureComponent {
               className="form-control"
               defaultValue={hook.metadata.owner}
               onChange={this.onOwnerChange}
-              placeholder="Owner email" />
+              placeholder="Owner email"
+            />
           </div>
         </div>
         <div className="form-group">
@@ -301,11 +335,17 @@ export default class HookEditor extends React.PureComponent {
             <input
               type="checkbox"
               checked={hook.metadata.emailOnError}
-              onChange={this.onEmailOnErrorChange} />&nbsp;
+              onChange={this.onEmailOnErrorChange}
+            />&nbsp;
             <span className="text-info">
-              Email the owner when an error occurs while creating a task.
-              Note: to be notified of tasks that fail once created,
-              use <a href="https://docs.taskcluster.net/reference/core/taskcluster-notify" target="_blank" rel="noopener noreferrer">notify routes</a>.
+              Email the owner when an error occurs while creating a task. Note:
+              to be notified of tasks that fail once created, use{' '}
+              <a
+                href="https://docs.taskcluster.net/reference/core/taskcluster-notify"
+                target="_blank"
+                rel="noopener noreferrer">
+                notify routes
+              </a>.
             </span>
           </div>
         </div>
@@ -313,8 +353,14 @@ export default class HookEditor extends React.PureComponent {
           <label className="control-label col-md-2">Schedule</label>
           <div className="col-md-10">
             <p className="text-info">
-              See <a href="https://www.npmjs.com/package/cron-parser" target="_blank" rel="noopener noreferrer">
-              cron-parser</a> for format information. Times are in UTC.
+              See{' '}
+              <a
+                href="https://www.npmjs.com/package/cron-parser"
+                target="_blank"
+                rel="noopener noreferrer">
+                cron-parser
+              </a>{' '}
+              for format information. Times are in UTC.
             </p>
             <ul style={{ paddingLeft: 20 }}>
               {hook.schedule.map((schedule, index) => (
@@ -335,7 +381,8 @@ export default class HookEditor extends React.PureComponent {
                 className="form-control"
                 placeholder="* * * * * *"
                 value={this.state.newScheduleValue}
-                onChange={this.handleNewScheduleChange} />
+                onChange={this.handleNewScheduleChange}
+              />
               <span className="input-group-btn">
                 <button
                   className="btn btn-success"
@@ -355,7 +402,8 @@ export default class HookEditor extends React.PureComponent {
               className="form-control"
               defaultValue={hook.expires}
               onChange={this.onExpiresChange}
-              placeholder="Task expiration (relative)" />
+              placeholder="Task expiration (relative)"
+            />
           </div>
         </div>
         <div className="form-group">
@@ -366,13 +414,18 @@ export default class HookEditor extends React.PureComponent {
               className="form-control"
               defaultValue={hook.deadline}
               onChange={this.onDeadlineChange}
-              placeholder="Task deadline (relative)" />
+              placeholder="Task deadline (relative)"
+            />
           </div>
         </div>
         <div className="form-group">
           <label className="control-label col-md-2">Task</label>
           <div className="col-md-10">
-            <CodeEditor mode="json" value={JSON.stringify(hook.task, null, 2)} onChange={this.onTaskChange} />
+            <CodeEditor
+              mode="json"
+              value={JSON.stringify(hook.task, null, 2)}
+              onChange={this.onTaskChange}
+            />
           </div>
         </div>
         {this.renderButtonBar()}

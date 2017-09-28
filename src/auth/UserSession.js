@@ -67,21 +67,25 @@ export default class UserSession {
 
   // get the user's name
   get name() {
-    return this.fullName || (this.credentials && this.credentials.clientId) || 'unknown';
+    return (
+      this.fullName ||
+      (this.credentials && this.credentials.clientId) ||
+      'unknown'
+    );
   }
 
   // get the args used to create a new client object
   get clientArgs() {
-    return this.credentialAgent ?
-      { credentialAgent: this.credentialAgent } :
-      { credentials: this.credentials };
+    return this.credentialAgent
+      ? { credentialAgent: this.credentialAgent }
+      : { credentials: this.credentials };
   }
 
   // load Taskcluster credentials for this user
   getCredentials() {
-    return this.credentials ?
-      Promise.resolve(this.credentials) :
-      this.credentialAgent.getCredentials({});
+    return this.credentials
+      ? Promise.resolve(this.credentials)
+      : this.credentialAgent.getCredentials({});
   }
 
   static deserialize(value) {

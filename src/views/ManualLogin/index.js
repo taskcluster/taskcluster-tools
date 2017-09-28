@@ -3,7 +3,7 @@ import UserSession from '../../auth/UserSession';
 import ManualModal from '../../components/ManualModal';
 
 export default class Login extends React.PureComponent {
-  handleSubmit = (credentials) => {
+  handleSubmit = credentials => {
     const userSession = UserSession.fromCredentials(credentials);
     this.props.setUserSession(userSession);
     this.close();
@@ -13,15 +13,13 @@ export default class Login extends React.PureComponent {
     if (window.opener) {
       window.close();
     } else {
-      history.push('/');
+      this.props.history.push('/');
     }
   }
 
   render() {
     return (
-      <ManualModal
-        handleSubmit={this.handleSubmit}
-        onClose={this.close} />
+      <ManualModal handleSubmit={this.handleSubmit} onClose={this.close} />
     );
   }
 }

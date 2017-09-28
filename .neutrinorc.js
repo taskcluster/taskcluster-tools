@@ -17,13 +17,27 @@ module.exports = {
   use: [
     ['neutrino-preset-mozilla-rpweb', {
       eslint: {
+        baseConfig: {
+          extends: [
+            'eslint-config-prettier'
+          ]
+        },
+        plugins: ['eslint-plugin-prettier'],
         rules: {
+          'prettier/prettier': ['error', {
+            singleQuote: true,
+            trailingComma: 'none',
+            bracketSpacing: true,
+            jsxBracketSameLine: true
+          }],
           'consistent-return': 'off',
           'no-unused-expressions': 'off',
           'no-shadow': 'off',
           'no-return-assign': 'off',
           'babel/new-cap': 'off',
-          'no-mixed-operators': 'off'
+          'no-mixed-operators': 'off',
+          'react/jsx-closing-bracket-location': 'off',
+          'react/jsx-indent': 'off'
         }
       },
       react: {

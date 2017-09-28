@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  ButtonToolbar,
+  Button,
+  Glyphicon,
+  Table
+} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -24,7 +31,9 @@ export default class ClientManager extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
   }
@@ -44,7 +53,10 @@ export default class ClientManager extends Component {
     try {
       const creds = await this.props.userSession.getCredentials();
 
-      this.setState({ clientPrefixLoaded: true, clientPrefix: `${creds.clientId}/` });
+      this.setState({
+        clientPrefixLoaded: true,
+        clientPrefix: `${creds.clientId}/`
+      });
     } catch (err) {
       // on error, act like when there's no login
       this.setState({ clientPrefixLoaded: true, clientPrefix: '' });
@@ -58,7 +70,9 @@ export default class ClientManager extends Component {
 
     try {
       this.setState({
-        clients: await this.props.auth.listClients(clientPrefix ? { prefix: clientPrefix } : null),
+        clients: await this.props.auth.listClients(
+          clientPrefix ? { prefix: clientPrefix } : null
+        ),
         error: null
       });
     } catch (err) {
@@ -69,14 +83,16 @@ export default class ClientManager extends Component {
     }
   }
 
-  navigate = (clientId) => {
+  navigate = clientId => {
     this.loadClients();
-    this.props.history.replace(`/auth/clients/${clientId ? encodeURIComponent(clientId) : ''}`);
+    this.props.history.replace(
+      `/auth/clients/${clientId ? encodeURIComponent(clientId) : ''}`
+    );
   };
 
   handlePrefixChange = e => this.setState({ clientPrefix: e.target.value });
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
     this.loadClients();
   };
@@ -86,12 +102,15 @@ export default class ClientManager extends Component {
       <form onSubmit={this.handleSubmit}>
         <div className="form-group form-group-sm">
           <div className="input-group">
-            <div className="input-group-addon text-sm"><em>ClientIds beginning with</em></div>
+            <div className="input-group-addon text-sm">
+              <em>ClientIds beginning with</em>
+            </div>
             <input
               type="search"
               className="form-control"
               value={this.state.clientPrefix}
-              onChange={this.handlePrefixChange} />
+              onChange={this.handlePrefixChange}
+            />
           </div>
         </div>
       </form>
@@ -110,15 +129,16 @@ export default class ClientManager extends Component {
     }
 
     return (
-      <Table condensed={true} hover={true} className="client-manager-client-table">
+      <Table
+        condensed={true}
+        hover={true}
+        className="client-manager-client-table">
         <thead>
           <tr>
             <th>ClientId</th>
           </tr>
         </thead>
-        <tbody>
-          {this.state.clients.map(this.renderClientRow)}
-        </tbody>
+        <tbody>{this.state.clients.map(this.renderClientRow)}</tbody>
       </Table>
     );
   }
@@ -151,10 +171,16 @@ export default class ClientManager extends Component {
           {this.renderPrefixInput()}
           {this.renderClientsTable()}
           <ButtonToolbar>
-            <Button href={'/auth/clients'} bsStyle="primary" disabled={this.props.clientId === ''}>
+            <Button
+              href={'/auth/clients'}
+              bsStyle="primary"
+              disabled={this.props.clientId === ''}>
               <Glyphicon glyph="plus" /> Add Client
             </Button>
-            <Button bsStyle="success" onClick={this.loadClients} disabled={!clients}>
+            <Button
+              bsStyle="success"
+              onClick={this.loadClients}
+              disabled={!clients}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar>
@@ -166,10 +192,11 @@ export default class ClientManager extends Component {
               clientPrefix={clientPrefix}
               currentClientId={this.props.clientId}
               deleteClient={this.deleteClient}
-              navigate={this.navigate} />
-            ) :
+              navigate={this.navigate}
+            />
+          ) : (
             <Spinner />
-          }
+          )}
         </Col>
       </Row>
     );

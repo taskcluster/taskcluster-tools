@@ -19,8 +19,14 @@ const View = ({ userSession, match, history, location }) => {
           history={history}
           userSession={userSession}
           hooks={hooks}
-          hookGroupId={match.params.hookGroupId && decodeURIComponent(match.params.hookGroupId)}
-          hookId={match.params.hookId && decodeURIComponent(match.params.hookId)} />
+          hookGroupId={
+            match.params.hookGroupId &&
+            decodeURIComponent(match.params.hookGroupId)
+          }
+          hookId={
+            match.params.hookId && decodeURIComponent(match.params.hookId)
+          }
+        />
       )}
     </Clients>
   );

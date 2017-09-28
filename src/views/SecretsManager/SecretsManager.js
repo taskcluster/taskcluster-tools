@@ -1,5 +1,12 @@
 import React from 'react';
-import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  ButtonToolbar,
+  Button,
+  Glyphicon,
+  Table
+} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -22,7 +29,9 @@ export default class SecretsManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
       this.loadSecrets(nextProps);
     }
@@ -44,7 +53,10 @@ export default class SecretsManager extends React.PureComponent {
     }
   };
 
-  selectSecretId = (id = '') => this.props.history.replace(`/secrets${id ? `/${encodeURIComponent(id)}` : ''}`);
+  selectSecretId = (id = '') =>
+    this.props.history.replace(
+      `/secrets${id ? `/${encodeURIComponent(id)}` : ''}`
+    );
 
   reloadSecrets = () => this.props.history.replace('/secrets');
 
@@ -69,7 +81,9 @@ export default class SecretsManager extends React.PureComponent {
         </thead>
         <tbody>
           {secrets.map((id, index) => (
-            <tr key={`secret-row-${index}`} className={secretId === id ? 'info' : null}>
+            <tr
+              key={`secret-row-${index}`}
+              className={secretId === id ? 'info' : null}>
               <td>
                 <Link to={`/secrets/${encodeURIComponent(id)}`}>
                   <code>{id}</code>
@@ -112,7 +126,8 @@ export default class SecretsManager extends React.PureComponent {
             secretId={secretId}
             secrets={this.props.secrets}
             reloadSecrets={this.reloadSecrets}
-            selectSecretId={this.selectSecretId} />
+            selectSecretId={this.selectSecretId}
+          />
         </Col>
       </Row>
     );

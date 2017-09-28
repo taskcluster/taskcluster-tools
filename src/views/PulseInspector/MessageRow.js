@@ -17,8 +17,10 @@ export default class MessageRow extends React.PureComponent {
 
   shouldComponentUpdate(nextProps) {
     // Just compare the _idForInspector
-    // eslint-disable-next-line no-underscore-dangle
-    if (this.props.message._idForInspector !== nextProps.message._idForInspector) {
+    if (
+      // eslint-disable-next-line no-underscore-dangle
+      this.props.message._idForInspector !== nextProps.message._idForInspector
+    ) {
       return true;
     }
 
@@ -34,9 +36,15 @@ export default class MessageRow extends React.PureComponent {
 
     if (!this.props.expanded) {
       return (
-        <tr onClick={this.handleClick} className="pulse-inspector-unexpanded-message">
-          <td><code>{message.exchange}</code></td>
-          <td><code>{message.routingKey}</code></td>
+        <tr
+          onClick={this.handleClick}
+          className="pulse-inspector-unexpanded-message">
+          <td>
+            <code>{message.exchange}</code>
+          </td>
+          <td>
+            <code>{message.routingKey}</code>
+          </td>
         </tr>
       );
     }
@@ -46,15 +54,21 @@ export default class MessageRow extends React.PureComponent {
         <td colSpan={2} className="pulse-inspector-expanded-message">
           <dl className="dl-horizontal">
             <dt>Exchange</dt>
-            <dd><code>{message.exchange}</code></dd>
+            <dd>
+              <code>{message.exchange}</code>
+            </dd>
             <dt>Routing Key</dt>
-            <dd><code>{message.routingKey}</code></dd>
+            <dd>
+              <code>{message.routingKey}</code>
+            </dd>
             {hasCustomRoutes && <dt>Custom Routes</dt>}
             {hasCustomRoutes && (
               <dd>
                 <ul>
                   {message.routes.map((route, index) => (
-                    <li key={index}><code>route.{route}</code></li>
+                    <li key={index}>
+                      <code>route.{route}</code>
+                    </li>
                   ))}
                 </ul>
               </dd>

@@ -24,7 +24,11 @@ export function userSessionFromAuthResult(authResult) {
 }
 
 export async function renew({ userSession, authController }) {
-  if (!userSession || userSession.type !== 'oidc' || userSession.oidcProvider !== 'mozilla-auth0') {
+  if (
+    !userSession ||
+    userSession.type !== 'oidc' ||
+    userSession.oidcProvider !== 'mozilla-auth0'
+  ) {
     return;
   }
 

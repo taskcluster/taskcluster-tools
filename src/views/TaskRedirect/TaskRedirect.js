@@ -53,9 +53,13 @@ export default class TaskRedirect extends React.PureComponent {
       return (
         <Redirect
           to={{
-            pathname: action === 'interactive' ? '/tasks/create/interactive' : '/tasks/create',
+            pathname:
+              action === 'interactive'
+                ? '/tasks/create/interactive'
+                : '/tasks/create',
             state: { task }
-          }} />
+          }}
+        />
       );
     }
 

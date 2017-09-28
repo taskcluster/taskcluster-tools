@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import NotFound from '../components/NotFound';
 
-const LegacyRedirect = (props) => {
+const LegacyRedirect = props => {
   switch (props.path) {
     case '/task-graph-inspector': {
       const [groupId, taskId] = props.location.hash.slice(1).split('/');
@@ -42,13 +42,17 @@ const LegacyRedirect = (props) => {
     }
 
     case '/one-click-loaner': {
-      return props.location.hash ?
-        <Redirect to={`/tasks/${props.location.hash.slice(1)}/interactive`} /> :
-        <Redirect to="/tasks/create/interactive" />;
+      return props.location.hash ? (
+        <Redirect to={`/tasks/${props.location.hash.slice(1)}/interactive`} />
+      ) : (
+        <Redirect to="/tasks/create/interactive" />
+      );
     }
 
     case '/interactive': {
-      return <Redirect to={{ pathname: '/shell', search: props.location.search }} />;
+      return (
+        <Redirect to={{ pathname: '/shell', search: props.location.search }} />
+      );
     }
 
     default: {

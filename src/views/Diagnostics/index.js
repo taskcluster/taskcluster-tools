@@ -21,8 +21,7 @@ export default class Diagnostics extends React.Component {
   async componentWillMount() {
     const prodJSON = await retrieve.getLatestLog('production', 'JSON');
     const jsonLog = retrieve.parseResult(JSON.parse(prodJSON.log));
-    const testId = prodJSON.testId;
-    const testDate = prodJSON.testDate;
+    const { testId, testDate } = prodJSON;
 
     this.setState({
       jsonLog,
@@ -31,7 +30,8 @@ export default class Diagnostics extends React.Component {
     });
 
     const prodRaw = await retrieve.getLatestLog('production', 'RAW');
-    const rawLog = prodRaw.log.replace(/\\n/g, '\n')
+    const rawLog = prodRaw.log
+      .replace(/\\n/g, '\n')
       .replace(/\\"/g, '"')
       .replace(/\\r/g, '\n')
       .replace(/\\/g, '');
@@ -48,9 +48,13 @@ export default class Diagnostics extends React.Component {
         <h4>Date: {this.state.testDate}</h4>
         <h4>TestId: {this.state.testId}</h4>
         <Row>
-          {Object.entries(this.state.jsonLog).map(([key, value]) => <Service key={key} title={key} test={value} />)}
+          {Object.entries(this.state.jsonLog).map(([key, value]) => (
+            <Service key={key} title={key} test={value} />
+          ))}
         </Row>
-        <Button onClick={this.toggleShow} bsStyle="primary" bsSize="small">Show Log</Button>
+        <Button onClick={this.toggleShow} bsStyle="primary" bsSize="small">
+          Show Log
+        </Button>
         {this.state.showRawLog && <RawLog text={this.state.rawLog} />}
       </Grid>
     );

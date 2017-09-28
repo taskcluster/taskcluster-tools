@@ -24,12 +24,12 @@ export default class LogsMenu extends React.PureComponent {
       <NavDropdown title="Run Logs" active={active} id="logs-dropdown">
         {logs.map((log, index) => (
           <LinkContainer
-            to={`/groups/${taskGroupId}/tasks/${taskId}/runs/${runId}/logs/${encodeURIComponent(log.name)}`}
+            to={`/groups/${taskGroupId}/tasks/${taskId}/runs/${runId}/logs/${encodeURIComponent(
+              log.name
+            )}`}
             key={`runs-menu-logs-${index}`}>
             <MenuItem>
-              <span>
-                {log.name}
-              </span>
+              <span>{log.name}</span>
             </MenuItem>
           </LinkContainer>
         ))}

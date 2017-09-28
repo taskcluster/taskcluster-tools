@@ -33,7 +33,8 @@ const View = ({ match, userSession, history, location }) => {
               queue={queue}
               namespace={namespace}
               namespaceTaskId={namespaceTaskId}
-              userSession={userSession} />
+              userSession={userSession}
+            />
           </IndexBrowser>
         </div>
       )}

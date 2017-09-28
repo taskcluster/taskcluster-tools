@@ -14,12 +14,15 @@ export default class DateView extends React.PureComponent {
 
   render() {
     const { date, since, placement, format } = this.props;
-    const tooltip = <Tooltip id={this.state.id}>{moment(date).format(format)}</Tooltip>;
+    const tooltip = (
+      <Tooltip id={this.state.id}>{moment(date).format(format)}</Tooltip>
+    );
 
     return (
       <OverlayTrigger placement={placement} overlay={tooltip}>
         <span id={this.state.id}>
-          {moment(date).fromNow()} {since && `(${moment(date).from(since, true)} later)`}
+          {moment(date).fromNow()}{' '}
+          {since && `(${moment(date).from(since, true)} later)`}
         </span>
       </OverlayTrigger>
     );

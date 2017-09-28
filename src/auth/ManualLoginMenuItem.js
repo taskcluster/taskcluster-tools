@@ -5,7 +5,8 @@ export default class ManualLoginMenuItem extends React.PureComponent {
   render() {
     const tooltip = (
       <Tooltip id="manual-signin">
-        Use this option to provide a clientId, accessToken, and certificate manually.
+        Use this option to provide a clientId, accessToken, and certificate
+        manually.
       </Tooltip>
     );
 

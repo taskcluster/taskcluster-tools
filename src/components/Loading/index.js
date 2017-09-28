@@ -16,7 +16,9 @@ export default class Loading extends React.PureComponent {
 
     if (isLoading) {
       if (timedOut) {
-        return <div>A timeout occurred while loading the associated component.</div>;
+        return (
+          <div>A timeout occurred while loading the associated component.</div>
+        );
       }
 
       return pastDelay ? <Spinner /> : null;

@@ -14,7 +14,11 @@ export default class Navigation extends React.PureComponent {
 
     return (
       <div className={navigation}>
-        <Navbar fluid={true} inverse={true} staticTop={true} collapseOnSelect={true}>
+        <Navbar
+          fluid={true}
+          inverse={true}
+          staticTop={true}
+          collapseOnSelect={true}>
           <Navbar.Header>
             <Navbar.Brand>
               <Link to="/">
@@ -24,25 +28,30 @@ export default class Navigation extends React.PureComponent {
           </Navbar.Header>
           <Nav pullRight={true}>
             <NavDropdown key={1} title="Tools" id="tools">
-              {links.map(({ title, link, icon }) => (link.startsWith('/') ?
-                (
-                  <LinkContainer to={link} key={`navigation-link-${link}`}>
-                    <MenuItem>
+              {links.map(
+                ({ title, link, icon }) =>
+                  link.startsWith('/') ? (
+                    <LinkContainer to={link} key={`navigation-link-${link}`}>
+                      <MenuItem>
+                        <Icon name={icon} fixedWidth={true} /> {title}
+                      </MenuItem>
+                    </LinkContainer>
+                  ) : (
+                    <MenuItem
+                      href={link}
+                      key={`navigation-link-${link}`}
+                      target="_blank"
+                      rel="noopener noreferrer">
                       <Icon name={icon} fixedWidth={true} /> {title}
                     </MenuItem>
-                  </LinkContainer>
-                ) :
-                (
-                  <MenuItem href={link} key={`navigation-link-${link}`} target="_blank" rel="noopener noreferrer">
-                    <Icon name={icon} fixedWidth={true} /> {title}
-                  </MenuItem>
-                )
-              ))}
+                  )
+              )}
             </NavDropdown>
 
             <CredentialsMenu
               userSession={userSession}
-              authController={authController} />
+              authController={authController}
+            />
           </Nav>
         </Navbar>
       </div>

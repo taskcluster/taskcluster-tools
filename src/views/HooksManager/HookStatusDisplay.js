@@ -36,7 +36,10 @@ export default class HookStatusDisplay extends React.PureComponent {
 
     return (
       <span>
-        Created task <Link to={`/tasks/${hookStatus.lastFire.taskId}`}>{hookStatus.lastFire.taskId}</Link>
+        Created task{' '}
+        <Link to={`/tasks/${hookStatus.lastFire.taskId}`}>
+          {hookStatus.lastFire.taskId}
+        </Link>
       </span>
     );
   }
@@ -63,11 +66,11 @@ export default class HookStatusDisplay extends React.PureComponent {
 
         <dt>Next Scheduled Fire</dt>
         <dd>
-          {
-            hookStatus.nextScheduledDate ?
-              <DateView date={hookStatus.nextScheduledDate} /> :
-              <span className="text-muted">Not Scheduled</span>
-          }
+          {hookStatus.nextScheduledDate ? (
+            <DateView date={hookStatus.nextScheduledDate} />
+          ) : (
+            <span className="text-muted">Not Scheduled</span>
+          )}
         </dd>
       </dl>
     );

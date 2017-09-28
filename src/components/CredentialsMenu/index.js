@@ -4,19 +4,38 @@ import { Glyphicon, NavDropdown, NavItem, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { loadable } from '../../utils';
 
-const OktaLoginMenuItem = loadable(() => import(/* webpackChunkName: 'OktaLoginMenuItem' */ '../../auth/OktaLoginMenuItem'));
-const Auth0LoginMenuItem = loadable(() => import(/* webpackChunkName: 'Auth0LoginMenuItem' */ '../../auth/Auth0LoginMenuItem'));
-const DevelopmentLoginMenuItem = loadable(() => import(/* webpackChunkName: 'DevelopmentLoginMenuItem' */ '../../auth/DevelopmentLoginMenuItem'));
-const EmailLoginMenuItem = loadable(() => import(/* webpackChunkName: 'EmailLoginMenuItem' */ '../../auth/EmailLoginMenuItem'));
-const ManualLoginMenuItem = loadable(() => import(/* webpackChunkName: 'ManualLoginMenuItem' */ '../../auth/ManualLoginMenuItem'));
+const OktaLoginMenuItem = loadable(() =>
+  import(/* webpackChunkName: 'OktaLoginMenuItem' */ '../../auth/OktaLoginMenuItem')
+);
+const Auth0LoginMenuItem = loadable(() =>
+  import(/* webpackChunkName: 'Auth0LoginMenuItem' */ '../../auth/Auth0LoginMenuItem')
+);
+const DevelopmentLoginMenuItem = loadable(() =>
+  import(/* webpackChunkName: 'DevelopmentLoginMenuItem' */ '../../auth/DevelopmentLoginMenuItem')
+);
+const EmailLoginMenuItem = loadable(() =>
+  import(/* webpackChunkName: 'EmailLoginMenuItem' */ '../../auth/EmailLoginMenuItem')
+);
+const ManualLoginMenuItem = loadable(() =>
+  import(/* webpackChunkName: 'ManualLoginMenuItem' */ '../../auth/ManualLoginMenuItem')
+);
 
 class CredentialsMenu extends React.PureComponent {
   renderWithUser() {
     const { userSession, authController } = this.props;
-    const icon = userSession.picture ?
-      <img src={userSession.picture} style={{ width: 18, height: 18, borderRadius: 9 }} /> :
-      <Glyphicon glyph="user" />;
-    const title = <span>{icon}&nbsp;{userSession.name}</span>;
+    const icon = userSession.picture ? (
+      <img
+        src={userSession.picture}
+        style={{ width: 18, height: 18, borderRadius: 9 }}
+      />
+    ) : (
+      <Glyphicon glyph="user" />
+    );
+    const title = (
+      <span>
+        {icon}&nbsp;{userSession.name}
+      </span>
+    );
 
     return (
       <NavDropdown id="sign-in-menu" key="sign-in-menu" title={title}>
@@ -41,20 +60,34 @@ class CredentialsMenu extends React.PureComponent {
     );
 
     return (
-      <NavDropdown id="sign-in-menu" key="sign-in-menu" title={title} ref={registerChild}>
-        {authController.canSignInUsing('okta') && <OktaLoginMenuItem key="okta" />}
-        {authController.canSignInUsing('auth0') && <Auth0LoginMenuItem key="auth0" />}
-        {authController.canSignInUsing('development') && <DevelopmentLoginMenuItem key="development" />}
-        {authController.canSignInUsing('email') && <EmailLoginMenuItem key="email" />}
-        {authController.canSignInUsing('manual') && <ManualLoginMenuItem key="manual" />}
+      <NavDropdown
+        id="sign-in-menu"
+        key="sign-in-menu"
+        title={title}
+        ref={registerChild}>
+        {authController.canSignInUsing('okta') && (
+          <OktaLoginMenuItem key="okta" />
+        )}
+        {authController.canSignInUsing('auth0') && (
+          <Auth0LoginMenuItem key="auth0" />
+        )}
+        {authController.canSignInUsing('development') && (
+          <DevelopmentLoginMenuItem key="development" />
+        )}
+        {authController.canSignInUsing('email') && (
+          <EmailLoginMenuItem key="email" />
+        )}
+        {authController.canSignInUsing('manual') && (
+          <ManualLoginMenuItem key="manual" />
+        )}
       </NavDropdown>
     );
   }
 
   render() {
-    return this.props.userSession ?
-      this.renderWithUser() :
-      this.renderWithoutUser();
+    return this.props.userSession
+      ? this.renderWithUser()
+      : this.renderWithoutUser();
   }
 }
 

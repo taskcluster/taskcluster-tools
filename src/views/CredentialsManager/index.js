@@ -77,37 +77,50 @@ export default class CredentialsManager extends React.PureComponent {
             {isOidc && (
               <tr>
                 <td>OIDC User ID</td>
-                <td><code>{userSession.oidcSubject}</code></td>
+                <td>
+                  <code>{userSession.oidcSubject}</code>
+                </td>
               </tr>
             )}
 
             {haveCreds && (
               <tr>
                 <td>ClientId</td>
-                <td><code>{info.clientId}</code></td>
+                <td>
+                  <code>{info.clientId}</code>
+                </td>
               </tr>
             )}
 
-            {haveCreds && isCredentials && (
-              <tr>
-                <td>Type</td>
-                <td>{info.type}</td>
-              </tr>
-            )}
+            {haveCreds &&
+              isCredentials && (
+                <tr>
+                  <td>Type</td>
+                  <td>{info.type}</td>
+                </tr>
+              )}
 
-            {haveCreds && isCredentials && info.start && (
-              <tr>
-                <td>Valid From</td>
-                <td><DateView date={info.start} /></td>
-              </tr>
-            )}
+            {haveCreds &&
+              isCredentials &&
+              info.start && (
+                <tr>
+                  <td>Valid From</td>
+                  <td>
+                    <DateView date={info.start} />
+                  </td>
+                </tr>
+              )}
 
-            {haveCreds && isCredentials && info.expiry && (
-              <tr>
-                <td>Expires</td>
-                <td><DateView date={info.expiry} /></td>
-              </tr>
-            )}
+            {haveCreds &&
+              isCredentials &&
+              info.expiry && (
+                <tr>
+                  <td>Expires</td>
+                  <td>
+                    <DateView date={info.expiry} />
+                  </td>
+                </tr>
+              )}
 
             {haveCreds && (
               <tr>
@@ -121,15 +134,16 @@ export default class CredentialsManager extends React.PureComponent {
                         </div>
                       ))}
                     </div>
-                  ) : 'none'
-                }
+                  ) : (
+                    'none'
+                  )}
                 </td>
               </tr>
             )}
 
             {!haveCreds && (
               <tr>
-                <td></td>
+                <td />
                 <td>{error ? <Error error={error} /> : <Spinner />}</td>
               </tr>
             )}
@@ -143,18 +157,17 @@ export default class CredentialsManager extends React.PureComponent {
     return (
       <Row>
         <HelmetTitle title="Credentials Manager" />
-        {this.props.userSession ?
-          (
-            <Col sm={12}>
-              <h4>Credential Information</h4>
-              {this.renderSignin()}
-            </Col>
-          ) : (
-            <Col sm={12}>
-              <h4>Not Signed In</h4>
-              Not signed in - no credentials available.
-            </Col>
-          )}
+        {this.props.userSession ? (
+          <Col sm={12}>
+            <h4>Credential Information</h4>
+            {this.renderSignin()}
+          </Col>
+        ) : (
+          <Col sm={12}>
+            <h4>Not Signed In</h4>
+            Not signed in - no credentials available.
+          </Col>
+        )}
       </Row>
     );
   }

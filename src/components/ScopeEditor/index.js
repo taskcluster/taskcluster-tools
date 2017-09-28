@@ -17,7 +17,8 @@ export default class ScopeEditor extends React.Component {
     // If we've gotten an update to the set of scopes, and it does
     // not correspond to what's in the textarea right now, update
     // the textarea, even at the cost of hurting user input
-    const notEqual = !equal(this.props.scopes, prevProps.scopes) &&
+    const notEqual =
+      !equal(this.props.scopes, prevProps.scopes) &&
       !equal(this.props.scopes, this.getScopesFromTextarea());
 
     if (notEqual) {
@@ -60,7 +61,8 @@ export default class ScopeEditor extends React.Component {
           rows={scopes.length + 1}
           defaultValue={scopes.join('\n')}
           onChange={this.onChange}
-          ref={ref => this.scopeText = ref} />
+          ref={ref => (this.scopeText = ref)}
+        />
       </div>
     );
   }
@@ -71,14 +73,16 @@ export default class ScopeEditor extends React.Component {
 
     return (
       <ul className="form-control-static" style={{ paddingLeft: 20 }}>
-        {scopes.map(scope => <li key={`scope-editor-${scope}`}><code>{scope}</code></li>)}
+        {scopes.map(scope => (
+          <li key={`scope-editor-${scope}`}>
+            <code>{scope}</code>
+          </li>
+        ))}
       </ul>
     );
   }
 
   render() {
-    return this.props.editing ?
-      this.renderScopeEditor() :
-      this.renderScopes();
+    return this.props.editing ? this.renderScopeEditor() : this.renderScopes();
   }
 }

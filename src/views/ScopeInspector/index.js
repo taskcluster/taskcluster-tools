@@ -4,7 +4,7 @@ import Clients from '../../components/Clients';
 import ScopeInspector from './ScopeInspector';
 
 const View = ({ userSession, match, history }) => {
-  const [scope, entity] = location.hash.slice(1).split('/');
+  const [scope, entity] = window.location.hash.slice(1).split('/');
 
   if (scope && entity) {
     return <Redirect to={`/auth/scopes/${scope}/${entity}`} />;
@@ -23,7 +23,8 @@ const View = ({ userSession, match, history }) => {
           history={history}
           userSession={userSession}
           selectedScope={selectedScope}
-          selectedEntity={selectedEntity} />
+          selectedEntity={selectedEntity}
+        />
       )}
     </Clients>
   );
