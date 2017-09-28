@@ -18,8 +18,6 @@ export default class Login extends React.PureComponent {
   }
 
   render() {
-    return (
-      <ManualModal handleSubmit={this.handleSubmit} onClose={this.close} />
-    );
+    return <ManualModal onSubmit={this.handleSubmit} onClose={this.close} />;
   }
 }
