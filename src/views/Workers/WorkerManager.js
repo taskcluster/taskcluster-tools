@@ -5,6 +5,7 @@ import HelmetTitle from '../../components/HelmetTitle';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
+import { labels } from '../../utils';
 import styles from './styles.css';
 
 export default class WorkerManager extends React.PureComponent {
@@ -43,6 +44,7 @@ export default class WorkerManager extends React.PureComponent {
     const runs = status.runs.length - 1;
 
     return {
+      state: status.state,
       lastClaimStarted: status.runs[runs].started,
       lastClaimResolved: status.runs[runs].resolved
     };
@@ -113,6 +115,7 @@ export default class WorkerManager extends React.PureComponent {
             <tr>
               <th>Worker ID</th>
               <th>Most Recent Task</th>
+              <th>Task State</th>
               <th>Task Started</th>
               <th>Task Resolved</th>
               <th>First Claim</th>
@@ -130,6 +133,7 @@ export default class WorkerManager extends React.PureComponent {
                     </Link>
                   </td>
                   <td>{worker.latestTask ? <Link to={`/tasks/${worker.latestTask}`}>{worker.latestTask}</Link> : '-'}</td>
+                  <td><Label bsSize="sm" bsStyle={labels[worker.state]}>{worker.state}</Label></td>
                   <td>{worker.lastClaimStarted ? <DateView date={worker.lastClaimStarted} /> : '-'}</td>
                   <td>{worker.lastClaimResolved ? <DateView date={worker.lastClaimResolved} since={worker.lastClaimStarted} /> : '-'}</td>
                   <td>{worker.firstClaim ? <DateView date={worker.firstClaim} /> : '-'}</td>
