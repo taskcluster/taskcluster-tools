@@ -26,6 +26,7 @@
     "@skidding/react-codemirror": "^1.0.1",
     "ajv": "^5.2.2",
     "auth0-js": "^8.9.3",
+    "babel-polyfill": "^6.26.0",
     "bootstrap": "^3.3.7",
     "change-case": "^3.0.0",
     "classnames": "^2.2.5",
