@@ -113,6 +113,7 @@ export default class WorkerManager extends React.PureComponent {
         <Table className={styles.workersTable} responsive condensed={true} hover={true}>
           <thead>
             <tr>
+              <th>Worker Group</th>
               <th>Worker ID</th>
               <th>Most Recent Task</th>
               <th>Task State</th>
@@ -126,6 +127,7 @@ export default class WorkerManager extends React.PureComponent {
             {!loading && workers && (
               workers.workers.map((worker, index) => (
                 <tr key={`worker-${index}`}>
+                  <td>{worker.workerGroup}</td>
                   <td>
                     <Link
                       to={`/workers/provisioners/${this.props.provisionerId}/worker-types/${this.props.workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
