@@ -52,7 +52,8 @@ export default class Inspector extends React.PureComponent {
       task: null,
       artifacts: null,
       selectedRun: null,
-      notify: 'Notification' in window && localStorage.getItem(notifyKey) === 'true'
+      notify: 'Notification' in window && localStorage.getItem(notifyKey) === 'true',
+      filterStatus: 'all'
     };
   }
 
@@ -487,6 +488,8 @@ export default class Inspector extends React.PureComponent {
     });
   }
 
+  onFilterChange = filterStatus => this.setState({ filterStatus });
+
   renderTaskGroup() {
     const {
       taskGroupId,
@@ -589,7 +592,13 @@ export default class Inspector extends React.PureComponent {
               onHighlight={this.handleHighlight} />
             <PropsRoute path={PATHS.RUN_DETAILS} component={RunDetails} run={status ? status.runs[runId] : null} />
             <PropsRoute path={PATHS.TASK_DETAILS} component={TaskDetails} status={status} task={task} />
-            <PropsRoute path={PATHS.TASK_LIST} component={GroupDetails} taskGroupId={taskGroupId} tasks={tasks} />
+            <PropsRoute
+              path={PATHS.TASK_LIST}
+              component={GroupDetails}
+              onFilterChange={this.onFilterChange}
+              filterStatus={this.state.filterStatus}
+              taskGroupId={taskGroupId}
+              tasks={tasks} />
           </Switch>
         </Row>
       </div>
