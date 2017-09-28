@@ -488,7 +488,7 @@ export default class Inspector extends React.PureComponent {
     });
   }
 
-  onFilterChange = filterStatus => this.setState({ filterStatus });
+  handleFilterChange = filterStatus => this.setState({ filterStatus });
 
   renderTaskGroup() {
     const {
@@ -595,7 +595,7 @@ export default class Inspector extends React.PureComponent {
             <PropsRoute
               path={PATHS.TASK_LIST}
               component={GroupDetails}
-              onFilterChange={this.onFilterChange}
+              onFilterChange={this.handleFilterChange}
               filterStatus={this.state.filterStatus}
               taskGroupId={taskGroupId}
               tasks={tasks} />
