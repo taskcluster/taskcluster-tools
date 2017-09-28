@@ -69,7 +69,9 @@ module.exports = {
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
-      neutrino.config.when(process.env.CI === 'true', (config) => config.devtool(false));
+      neutrino.config
+        .when(process.env.CI === 'true' && process.env.TRAVIS_BRANCH !== 'master',
+          (config) => config.devtool(false));
 
       neutrino.config.module
         .rule('plain-style')
