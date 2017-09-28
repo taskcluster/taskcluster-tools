@@ -15,18 +15,9 @@ export default class GroupDetails extends React.PureComponent {
     tasks: array
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      filterStatus: 'all'
-    };
-  }
-
-  handleSelect = filterStatus => this.setState({ filterStatus });
-
   getTasksToRender() {
     const { tasks } = this.props;
-    const { filterStatus } = this.state;
+    const { filterStatus } = this.props;
 
     if (!tasks) {
       return [];
@@ -49,7 +40,7 @@ export default class GroupDetails extends React.PureComponent {
       return <Loading isLoading={true} pastDelay={true} />;
     }
 
-    const { filterStatus } = this.state;
+    const { filterStatus } = this.props;
     const tasksToRender = this.getTasksToRender();
 
     return (
@@ -63,7 +54,7 @@ export default class GroupDetails extends React.PureComponent {
                     bsSize="xsmall"
                     title={`Status: ${titleCase(filterStatus)}`}
                     id="group-details-status-dropdown"
-                    onSelect={this.handleSelect}>
+                    onSelect={this.props.onFilterChange}>
                     <MenuItem eventKey="all">All</MenuItem>
                     <MenuItem divider />
                     {groups.map(group => (
