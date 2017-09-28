@@ -17,11 +17,21 @@ import { loadable } from '../../utils';
 import iconUrl from '../../taskcluster.png';
 import UserSession from '../../auth/UserSession';
 
-const GroupProgress = loadable(() => import(/* webpackChunkName: 'GroupProgress' */ './GroupProgress'));
-const GroupDetails = loadable(() => import(/* webpackChunkName: 'GroupDetails' */ './GroupDetails'));
-const TaskDetails = loadable(() => import(/* webpackChunkName: 'TaskDetails' */ './TaskDetails'));
-const RunDetails = loadable(() => import(/* webpackChunkName: 'RunDetails' */ './RunDetails'));
-const LogView = loadable(() => import(/* webpackChunkName: 'LogView' */ './LogView'));
+const GroupProgress = loadable(() =>
+  import(/* webpackChunkName: 'GroupProgress' */ './GroupProgress')
+);
+const GroupDetails = loadable(() =>
+  import(/* webpackChunkName: 'GroupDetails' */ './GroupDetails')
+);
+const TaskDetails = loadable(() =>
+  import(/* webpackChunkName: 'TaskDetails' */ './TaskDetails')
+);
+const RunDetails = loadable(() =>
+  import(/* webpackChunkName: 'RunDetails' */ './RunDetails')
+);
+const LogView = loadable(() =>
+  import(/* webpackChunkName: 'LogView' */ './LogView')
+);
 const taskGroupItemKey = 'inspector-items-taskGroupId';
 const taskItemKey = 'inspector-items-taskId';
 const notifyKey = 'inspector-notify';
@@ -32,10 +42,7 @@ const PATHS = {
   LOG: '/groups/:taskGroupId/tasks/:taskId/runs/:run/logs/:artifactId',
   ARTIFACTS: '/groups/:taskGroupId/tasks/:taskId/runs/:run/artifacts'
 };
-const initialLogs = [
-  'public/logs/terminal.log',
-  'public/logs/live.log'
-];
+const initialLogs = ['public/logs/terminal.log', 'public/logs/live.log'];
 
 export default class Inspector extends React.PureComponent {
   static defaultProps = {
@@ -52,7 +59,8 @@ export default class Inspector extends React.PureComponent {
       task: null,
       artifacts: null,
       selectedRun: null,
-      notify: 'Notification' in window && localStorage.getItem(notifyKey) === 'true',
+      notify:
+        'Notification' in window && localStorage.getItem(notifyKey) === 'true',
       filterStatus: 'all'
     };
   }
@@ -81,9 +89,15 @@ export default class Inspector extends React.PureComponent {
 
   async componentWillReceiveProps(nextProps) {
     const { taskGroupId, taskId, runId } = nextProps;
+    const userChanged = UserSession.userChanged(
+      this.props.userSession,
+      nextProps.userSession
+    );
+    const error = userChanged ? null : this.state.error;
 
     if (taskGroupId !== this.props.taskGroupId) {
       this.setState({
+        error,
         selectedTaskId: null,
         status: null,
         task: null,
@@ -93,33 +107,33 @@ export default class Inspector extends React.PureComponent {
         actions: null,
         decision: null
       });
-    } else if (taskId !== this.props.taskId) {
+
+      if (taskGroupId) {
+        this.loadTasks(nextProps);
+      }
+    } else if (
+      taskId &&
+      (taskId !== this.state.selectedTaskId ||
+        (this.props.taskId && taskId !== this.props.taskId))
+    ) {
       this.setState({
-        selectedTaskId: null,
+        error,
+        selectedTaskId: taskId ? null : this.state.selectedTaskId,
         status: null,
         task: null,
         artifacts: null,
         selectedRun: null
       });
-    }
 
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
-      this.setState({ error: null });
-    }
-
-    if (taskGroupId !== this.props.taskGroupId && taskGroupId) {
-      this.loadTasks(nextProps);
-    } else if (
-      taskId &&
-      (taskId !== this.state.selectedTaskId || (this.props.taskId && taskId !== this.props.taskId))
-    ) {
       this.loadTask(nextProps);
     } else if (Number.isInteger(runId) && runId !== this.props.runId) {
       this.setState({
+        error,
         selectedRun: runId,
-        artifacts: this.state.status.state !== 'unscheduled' ?
-          await this.getArtifacts(this.props.taskId, runId) :
-          []
+        artifacts:
+          this.state.status.state !== 'unscheduled'
+            ? await this.getArtifacts(this.props.taskId, runId)
+            : []
       });
     }
   }
@@ -132,7 +146,11 @@ export default class Inspector extends React.PureComponent {
     }
 
     try {
-      const url = queue.buildUrl(queue.getLatestArtifact, taskGroupId, 'public/actions.json');
+      const url = queue.buildUrl(
+        queue.getLatestArtifact,
+        taskGroupId,
+        'public/actions.json'
+      );
       const [decision, actions] = await Promise.all([
         queue.task(taskGroupId),
         fetch(url).then(response => response.json())
@@ -164,25 +182,36 @@ export default class Inspector extends React.PureComponent {
     }
 
     try {
-      const [{ decision, actions }, { tasks, continuationToken }] = await Promise.all([
+      const [
+        { decision, actions },
+        { tasks, continuationToken }
+      ] = await Promise.all([
         token ? Promise.resolve(this.state) : this.getActions(props),
-        queue.listTaskGroup(taskGroupId, token ? { continuationToken: token, limit: 200 } : { limit: 20 })
+        queue.listTaskGroup(
+          taskGroupId,
+          token ? { continuationToken: token, limit: 200 } : { limit: 20 }
+        )
       ]);
 
       this.setState({
         actions,
         decision,
-        tasks: tasks.reduce((reduction, task) => {
-          const index = reduction.findIndex(({ status }) => status.taskId === task.status.taskId);
+        tasks: tasks.reduce(
+          (reduction, task) => {
+            const index = reduction.findIndex(
+              ({ status }) => status.taskId === task.status.taskId
+            );
 
-          if (index > -1) {
-            reduction[index] = task; // eslint-disable-line no-param-reassign
-          } else {
-            reduction.push(task);
-          }
+            if (index > -1) {
+              reduction[index] = task; // eslint-disable-line no-param-reassign
+            } else {
+              reduction.push(task);
+            }
 
-          return reduction;
-        }, [...(this.state.tasks || [])])
+            return reduction;
+          },
+          [...(this.state.tasks || [])]
+        )
       });
 
       if (continuationToken) {
@@ -205,9 +234,15 @@ export default class Inspector extends React.PureComponent {
     }
 
     try {
-      const [status, task] = await Promise.all([this.getStatus(taskId), this.getTask(taskId)]);
+      const [status, task] = await Promise.all([
+        this.getStatus(taskId),
+        this.getTask(taskId)
+      ]);
       const runNumber = this.getRunNumber(runId, null, status.runs);
-      const artifacts = status.state !== 'unscheduled' ? await this.getArtifacts(taskId, runNumber) : [];
+      const artifacts =
+        status.state !== 'unscheduled'
+          ? await this.getArtifacts(taskId, runNumber)
+          : [];
 
       this.setState({
         selectedTaskId: taskId,
@@ -219,11 +254,16 @@ export default class Inspector extends React.PureComponent {
 
       if (!sectionId) {
         const logs = this.getLogsFromArtifacts(artifacts);
-        const log = logs.find(({ name }) => initialLogs.includes(name)) || logs[0];
+        const log =
+          logs.find(({ name }) => initialLogs.includes(name)) || logs[0];
 
-        history.replace(log ?
-          `/groups/${taskGroupId}/tasks/${taskId}/runs/${runNumber}/logs/${encodeURIComponent(log.name)}` :
-          `/groups/${taskGroupId}/tasks/${taskId}/details`);
+        history.replace(
+          log
+            ? `/groups/${taskGroupId}/tasks/${taskId}/runs/${runNumber}/logs/${encodeURIComponent(
+                log.name
+              )}`
+            : `/groups/${taskGroupId}/tasks/${taskId}/details`
+        );
       }
     } catch (err) {
       this.setState({
@@ -250,8 +290,14 @@ export default class Inspector extends React.PureComponent {
     const routingKey = { taskGroupId };
 
     this.groupListener = listener;
-    ['taskDefined', 'taskPending', 'taskRunning', 'taskCompleted', 'taskFailed', 'taskException']
-      .map(binding => listener.bind(queueEvents[binding](routingKey)));
+    [
+      'taskDefined',
+      'taskPending',
+      'taskRunning',
+      'taskCompleted',
+      'taskFailed',
+      'taskException'
+    ].map(binding => listener.bind(queueEvents[binding](routingKey)));
     listener.on('message', this.handleGroupMessage);
     listener.on('reconnect', () => this.loadTasks(this.props));
     listener.connect();
@@ -326,24 +372,28 @@ export default class Inspector extends React.PureComponent {
       return this.setState({ status: payload.status });
     }
 
-    const [status, task] = await Promise.all([this.getStatus(taskId), this.getTask(taskId)]);
-    const tasks = exchange === queueEvents.taskDefined().exchange ?
-      [...this.state.tasks, { status, task }] :
-      this.state.tasks.map(item => ({
-        status: item.status.taskId === taskId ? status : item.status,
-        task: item.status.taskId === taskId ? task : item.task
-      }));
+    const [status, task] = await Promise.all([
+      this.getStatus(taskId),
+      this.getTask(taskId)
+    ]);
+    const tasks =
+      exchange === queueEvents.taskDefined().exchange
+        ? [...this.state.tasks, { status, task }]
+        : this.state.tasks.map(item => ({
+            status: item.status.taskId === taskId ? status : item.status,
+            task: item.status.taskId === taskId ? task : item.task
+          }));
 
-    this.setState(taskId === this.props.taskId ?
-      { status, task, tasks } :
-      { tasks },
+    this.setState(
+      taskId === this.props.taskId ? { status, task, tasks } : { tasks },
       () => {
         if (exchange === queueEvents.taskException().exchange) {
           this.notify('A task exception occurred');
         } else if (exchange === queueEvents.taskFailed().exchange) {
           this.notify('A task failure occurred');
         }
-      });
+      }
+    );
   };
 
   navigate = (taskGroupId, taskId) => {
@@ -361,12 +411,18 @@ export default class Inspector extends React.PureComponent {
   };
 
   handleSearch = ({ taskGroupId, taskId }) => {
-    if (taskId === this.props.taskId && taskGroupId === this.props.taskGroupId) {
+    if (
+      taskId === this.props.taskId &&
+      taskGroupId === this.props.taskGroupId
+    ) {
       // Return if nothing has changed
       return;
     }
 
-    if (taskId !== this.props.taskId && taskGroupId !== this.props.taskGroupId) {
+    if (
+      taskId !== this.props.taskId &&
+      taskGroupId !== this.props.taskGroupId
+    ) {
       this.navigate(taskGroupId, taskId);
     } else if (taskGroupId !== this.props.taskGroupId) {
       this.navigate(taskGroupId);
@@ -382,7 +438,7 @@ export default class Inspector extends React.PureComponent {
     }
   };
 
-  handleHighlight = (range) => {
+  handleHighlight = range => {
     if (this.highlightRange && this.highlightRange.equals(range)) {
       return;
     }
@@ -436,17 +492,21 @@ export default class Inspector extends React.PureComponent {
     ids.add(id);
 
     // Keep the 5 most recent history items in the collection
-    localStorage.setItem(localKey, JSON.stringify([...ids].slice(-5).reverse()));
+    localStorage.setItem(
+      localKey,
+      JSON.stringify([...ids].slice(-5).reverse())
+    );
   }
 
-  handleEdit = task => this.props.history.push({
-    pathname: '/tasks/create',
-    state: { task }
-  });
+  handleEdit = task =>
+    this.props.history.push({
+      pathname: '/tasks/create',
+      state: { task }
+    });
 
   handleRetrigger = taskId => this.navigate(this.props.taskGroupId, taskId);
 
-  handleActionTask = action => (taskId) => {
+  handleActionTask = action => taskId => {
     switch (action) {
       case 'docker-worker-linux-loaner':
         this.props.history.push(`/tasks/${taskId}/connect`);
@@ -459,7 +519,8 @@ export default class Inspector extends React.PureComponent {
     }
   };
 
-  handleCreateInteractive = async taskId => this.props.history.push(`/tasks/${taskId}/connect`);
+  handleCreateInteractive = async taskId =>
+    this.props.history.push(`/tasks/${taskId}/connect`);
 
   getRunNumber(runId, selectedRun, runs) {
     if (!isNil(runId)) {
@@ -515,7 +576,11 @@ export default class Inspector extends React.PureComponent {
     } = this.state;
 
     const trackedTaskId = taskId || selectedTaskId;
-    const runNumber = this.getRunNumber(runId, selectedRun, status ? status.runs : []);
+    const runNumber = this.getRunNumber(
+      runId,
+      selectedRun,
+      status ? status.runs : []
+    );
     const logs = artifacts && this.getLogsFromArtifacts(artifacts);
     const selectedLog = logs && logs.find(({ name }) => name === artifactId);
 
@@ -530,7 +595,9 @@ export default class Inspector extends React.PureComponent {
             <LinkContainer exact to={`/groups/${taskGroupId}`}>
               <NavItem>Task Group</NavItem>
             </LinkContainer>
-            <LinkContainer to={`/groups/${taskGroupId}/tasks/${trackedTaskId}/details`} disabled={!trackedTaskId}>
+            <LinkContainer
+              to={`/groups/${taskGroupId}/tasks/${trackedTaskId}/details`}
+              disabled={!trackedTaskId}>
               <NavItem>Task Details</NavItem>
             </LinkContainer>
             <ActionsMenu
@@ -547,24 +614,31 @@ export default class Inspector extends React.PureComponent {
               onRetrigger={this.handleRetrigger}
               onEdit={this.handleEdit}
               onCreateInteractive={this.handleCreateInteractive}
-              onEditInteractive={this.handleEdit} />
+              onEditInteractive={this.handleEdit}
+            />
             <RunsMenu
               taskGroupId={taskGroupId}
               taskId={trackedTaskId}
               status={status}
               runId={runNumber}
-              active={sectionId === 'runs' && !subSectionId} />
+              active={sectionId === 'runs' && !subSectionId}
+            />
             <LogsMenu
               logs={logs}
               taskGroupId={taskGroupId}
               taskId={trackedTaskId}
               runId={runNumber}
-              active={subSectionId === 'logs'} />
+              active={subSectionId === 'logs'}
+            />
             <LinkContainer
               to={`/groups/${taskGroupId}/tasks/${trackedTaskId}/runs/${runNumber}/artifacts`}
               disabled={!(artifacts && artifacts.length)}
               active={subSectionId === 'artifacts'}>
-              <NavItem>{artifacts && artifacts.length ? 'Run Artifacts' : 'No artifacts for run'}</NavItem>
+              <NavItem>
+                {artifacts && artifacts.length
+                  ? 'Run Artifacts'
+                  : 'No artifacts for run'}
+              </NavItem>
             </LinkContainer>
           </Nav>
         </Row>
@@ -579,7 +653,8 @@ export default class Inspector extends React.PureComponent {
               taskId={trackedTaskId}
               artifacts={artifacts}
               userSession={this.props.userSession}
-              runId={runNumber} />
+              runId={runNumber}
+            />
             <PropsRoute
               path={PATHS.LOG}
               component={LogView}
@@ -589,16 +664,27 @@ export default class Inspector extends React.PureComponent {
               status={status}
               log={selectedLog}
               highlight={this.props.highlight}
-              onHighlight={this.handleHighlight} />
-            <PropsRoute path={PATHS.RUN_DETAILS} component={RunDetails} run={status ? status.runs[runId] : null} />
-            <PropsRoute path={PATHS.TASK_DETAILS} component={TaskDetails} status={status} task={task} />
+              onHighlight={this.handleHighlight}
+            />
+            <PropsRoute
+              path={PATHS.RUN_DETAILS}
+              component={RunDetails}
+              run={status ? status.runs[runId] : null}
+            />
+            <PropsRoute
+              path={PATHS.TASK_DETAILS}
+              component={TaskDetails}
+              status={status}
+              task={task}
+            />
             <PropsRoute
               path={PATHS.TASK_LIST}
               component={GroupDetails}
               onFilterChange={this.handleFilterChange}
               filterStatus={this.state.filterStatus}
               taskGroupId={taskGroupId}
-              tasks={tasks} />
+              tasks={tasks}
+            />
           </Switch>
         </Row>
       </div>
@@ -613,7 +699,9 @@ export default class Inspector extends React.PureComponent {
 
     return (
       <div>
-        <HelmetTitle title={`${task ? task.metadata.name : 'Task Inspector'}`} />
+        <HelmetTitle
+          title={`${task ? task.metadata.name : 'Task Inspector'}`}
+        />
         <h4>Task &amp; Group Inspector</h4>
         <Row>
           <Col xs={12}>
@@ -622,27 +710,28 @@ export default class Inspector extends React.PureComponent {
               taskGroupId={taskGroupId}
               taskId={trackedTaskId}
               taskGroupHistory={this.getLocalHistory(taskGroupItemKey)}
-              taskHistory={this.getLocalHistory(taskItemKey)} />
+              taskHistory={this.getLocalHistory(taskItemKey)}
+            />
           </Col>
         </Row>
 
-        {'Notification' in window ?
-          (
-            <Row>
-              <Col xs={12}>
-                <Button
-                  bsSize="sm"
-                  bsStyle="primary"
-                  onClick={this.handleRequestNotify}
-                  disabled={!('Notification' in window) || Notification.permission === 'denied'}>
-                  <Icon name={notify ? 'check-square-o' : 'square-o'} />
-                  &nbsp;&nbsp;Notify me on task failures
-                </Button>
-              </Col>
-            </Row>
-          ) :
-          null
-        }
+        {'Notification' in window ? (
+          <Row>
+            <Col xs={12}>
+              <Button
+                bsSize="sm"
+                bsStyle="primary"
+                onClick={this.handleRequestNotify}
+                disabled={
+                  !('Notification' in window) ||
+                  Notification.permission === 'denied'
+                }>
+                <Icon name={notify ? 'check-square-o' : 'square-o'} />
+                &nbsp;&nbsp;Notify me on task failures
+              </Button>
+            </Col>
+          </Row>
+        ) : null}
 
         {error && <Error error={error} />}
         {taskGroupId && this.renderTaskGroup()}

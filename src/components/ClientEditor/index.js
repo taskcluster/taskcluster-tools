@@ -1,7 +1,15 @@
 import React from 'react';
 import { func } from 'prop-types';
 import {
-  OverlayTrigger, Tooltip, Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon, ButtonToolbar
+  OverlayTrigger,
+  Tooltip,
+  Modal,
+  FormGroup,
+  ControlLabel,
+  FormControl,
+  Button,
+  Glyphicon,
+  ButtonToolbar
 } from 'react-bootstrap';
 import { assoc } from 'ramda';
 import Icon from 'react-fontawesome';
@@ -70,14 +78,16 @@ export default class ClientEditor extends React.PureComponent {
       });
     }
 
-    const onLoadError = err => (
+    const onLoadError = err =>
       this.setState({
         client: null,
         error: err
-      })
-    );
+      });
 
-    if (this.state.client && this.state.client.clientId === props.currentClientId) {
+    if (
+      this.state.client &&
+      this.state.client.clientId === props.currentClientId
+    ) {
       try {
         return this.setState({
           client: await props.auth.client(props.currentClientId),
@@ -108,8 +118,9 @@ export default class ClientEditor extends React.PureComponent {
       return <Error error={this.state.error} />;
     }
 
-    const isCreating = this.props.currentClientId === '' && this.state.accessToken === null;
-    const isEditing = (isCreating || this.state.editing);
+    const isCreating =
+      this.props.currentClientId === '' && this.state.accessToken === null;
+    const isEditing = isCreating || this.state.editing;
     let title = 'Create New Client';
 
     if (!isCreating) {
@@ -132,83 +143,81 @@ export default class ClientEditor extends React.PureComponent {
         <h4 style={{ marginTop: 0 }}>{title}</h4>
         <hr style={{ marginBottom: 10 }} />
         <div className="form-horizontal">
-          {
-            isCreating ? (
-              <OverlayTrigger
-                placement="bottom"
-                trigger="focus"
-                defaultOverlayShown={clientId !== ''}
-                overlay={tooltip}>
-                <FormGroup validationState={this.validClientId() ? 'success' : 'error'}>
-                  <ControlLabel className="col-md-3">ClientId</ControlLabel>
-                  <div className="col-md-9">
-                    <FormControl
-                      type="text"
-                      placeholder="ClientId"
-                      value={this.state.client.clientId}
-                      onChange={this.onClientIdChange} />
-                    <FormControl.Feedback />
-                  </div>
-                </FormGroup>
-              </OverlayTrigger>
-            ) : (
-              <div className="form-group">
-                <label className="control-label col-md-3">ClientId</label>
+          {isCreating ? (
+            <OverlayTrigger
+              placement="bottom"
+              trigger="focus"
+              defaultOverlayShown={clientId !== ''}
+              overlay={tooltip}>
+              <FormGroup
+                validationState={this.validClientId() ? 'success' : 'error'}>
+                <ControlLabel className="col-md-3">ClientId</ControlLabel>
                 <div className="col-md-9">
-                  <div className="form-control-static">
-                    {this.state.client.clientId}
-                  </div>
+                  <FormControl
+                    type="text"
+                    placeholder="ClientId"
+                    value={this.state.client.clientId}
+                    onChange={this.onClientIdChange}
+                  />
+                  <FormControl.Feedback />
+                </div>
+              </FormGroup>
+            </OverlayTrigger>
+          ) : (
+            <div className="form-group">
+              <label className="control-label col-md-3">ClientId</label>
+              <div className="col-md-9">
+                <div className="form-control-static">
+                  {this.state.client.clientId}
                 </div>
               </div>
-            )
-          }
-          {
-            this.state.client.disabled ? (
-              <div className="form-group">
-                <label className="control-label col-md-3">Disabled</label>
-                <div className="col-md-9">
-                  This client is disabled
-                </div>
-              </div>
-            ) :
-              null
-          }
-          {
-            (isEditing && !isCreating) || this.state.accessToken !== null ? (
-              <div className="form-group">
-                {(() => {
-                  if (isEditing && !isCreating) {
-                    return (
-                      <div>
-                        <label className="control-label col-md-3">AccessToken</label>
-                        <div className="col-md-9">
-                          <Button
-                            bsStyle="warning"
-                            onClick={this.resetAccessToken}
-                            disabled={this.state.working}>
-                            <Glyphicon glyph="fire" /> Reset accessToken
-                          </Button>
-                        </div>
+            </div>
+          )}
+          {this.state.client.disabled ? (
+            <div className="form-group">
+              <label className="control-label col-md-3">Disabled</label>
+              <div className="col-md-9">This client is disabled</div>
+            </div>
+          ) : null}
+          {(isEditing && !isCreating) || this.state.accessToken !== null ? (
+            <div className="form-group">
+              {(() => {
+                if (isEditing && !isCreating) {
+                  return (
+                    <div>
+                      <label className="control-label col-md-3">
+                        AccessToken
+                      </label>
+                      <div className="col-md-9">
+                        <Button
+                          bsStyle="warning"
+                          onClick={this.resetAccessToken}
+                          disabled={this.state.working}>
+                          <Glyphicon glyph="fire" /> Reset accessToken
+                        </Button>
                       </div>
-                    );
-                  }
+                    </div>
+                  );
+                }
 
-                  if (this.state.accessToken !== null) {
-                    return (
-                      <Modal show={this.state.showModal} onHide={this.closeDialog}>
-                        <Modal.Header closeButton={true}>Access Token</Modal.Header>
-                        <Modal.Body>
-                          <p>The access token for this clientId is:</p>
-                          <code>{this.state.accessToken}</code>
-                        </Modal.Body>
-                      </Modal>
-                    );
-                  }
-                })()}
-              </div>
-            ) :
-              null
-          }
+                if (this.state.accessToken !== null) {
+                  return (
+                    <Modal
+                      show={this.state.showModal}
+                      onHide={this.closeDialog}>
+                      <Modal.Header closeButton={true}>
+                        Access Token
+                      </Modal.Header>
+                      <Modal.Body>
+                        <p>The access token for this clientId is:</p>
+                        <code>{this.state.accessToken}</code>
+                      </Modal.Body>
+                    </Modal>
+                  );
+                }
+              })()}
+            </div>
+          ) : null}
           <div className="form-group">
             <label className="control-label col-md-3">Description</label>
             <div className="col-md-9">
@@ -218,97 +227,91 @@ export default class ClientEditor extends React.PureComponent {
           <div className="form-group">
             <label className="control-label col-md-3">Expires</label>
             <div className="col-md-9">
-              {
-                isEditing ? (
-                  <TimeInput
-                    value={new Date(this.state.client.expires)}
-                    onChange={this.onExpiresChange}
-                    className="form-control" />
-                ) : (
-                  <div className="form-control-static">
-                    <DateView date={this.state.client.expires} />
-                    {
-                      this.state.client.deleteOnExpiration && (
-                        <span> (this client will be deleted on expiration)</span>
-                      )
-                    }
-                  </div>
-                )
-              }
+              {isEditing ? (
+                <TimeInput
+                  value={new Date(this.state.client.expires)}
+                  onChange={this.onExpiresChange}
+                  className="form-control"
+                />
+              ) : (
+                <div className="form-control-static">
+                  <DateView date={this.state.client.expires} />
+                  {this.state.client.deleteOnExpiration && (
+                    <span> (this client will be deleted on expiration)</span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
-          {
-            isEditing && (
-              <div className="form-group">
-                <label className="control-label col-md-3">Delete on Expiration</label>
-                <div className="col-md-9">
-                  <input
-                    type="checkbox"
-                    checked={this.state.client.deleteOnExpiration}
-                    onChange={this.onDOEChange} />
-                  {' '}Automatically delete this client when it expires
-                </div>
+          {isEditing && (
+            <div className="form-group">
+              <label className="control-label col-md-3">
+                Delete on Expiration
+              </label>
+              <div className="col-md-9">
+                <input
+                  type="checkbox"
+                  checked={this.state.client.deleteOnExpiration}
+                  onChange={this.onDOEChange}
+                />{' '}
+                Automatically delete this client when it expires
               </div>
-            )
-          }
-          {
-            Object
-              .entries({
-                created: 'Created',
-                lastModified: 'Last Modified',
-                lastDateUsed: 'Last Date Used',
-                lastRotated: 'Last Rotated'
-              })
-              .map(([prop, label]) => {
-                if (!this.state.client[prop]) {
-                  return null;
-                }
+            </div>
+          )}
+          {Object.entries({
+            created: 'Created',
+            lastModified: 'Last Modified',
+            lastDateUsed: 'Last Date Used',
+            lastRotated: 'Last Rotated'
+          })
+            .map(([prop, label]) => {
+              if (!this.state.client[prop]) {
+                return null;
+              }
 
-                return (
-                  <div className="form-group" key={prop}>
-                    <label className="control-label col-md-3">{label}</label>
-                    <div className="col-md-9">
-                      <div className="form-control-static">
-                        <DateView date={this.state.client[prop]} />
-                      </div>
+              return (
+                <div className="form-group" key={prop}>
+                  <label className="control-label col-md-3">{label}</label>
+                  <div className="col-md-9">
+                    <div className="form-control-static">
+                      <DateView date={this.state.client[prop]} />
                     </div>
                   </div>
-                );
-              })
-              .filter(Boolean)
-          }
+                </div>
+              );
+            })
+            .filter(Boolean)}
           <div className="form-group">
             <label className="control-label col-md-3">Client Scopes</label>
             <div className="col-md-9">
               <ScopeEditor
                 editing={isEditing}
                 scopes={this.state.client.scopes}
-                scopesUpdated={this.onScopesUpdated} />
+                scopesUpdated={this.onScopesUpdated}
+              />
             </div>
           </div>
-          {
-            !isEditing && !isCreating ? (
-              <div className="form-group">
-                <label className="control-label col-md-3">Expanded Scopes</label>
-                <div className="col-md-9">
-                  <span className="text-muted">Expanded scopes are determined from the client
-                    scopes, expanding roles for scopes beginning with <code>assume:</code>.
-                  </span>
-                  <ScopeEditor scopes={this.state.client.expandedScopes} />
-                </div>
+          {!isEditing && !isCreating ? (
+            <div className="form-group">
+              <label className="control-label col-md-3">Expanded Scopes</label>
+              <div className="col-md-9">
+                <span className="text-muted">
+                  Expanded scopes are determined from the client scopes,
+                  expanding roles for scopes beginning with <code>assume:</code>.
+                </span>
+                <ScopeEditor scopes={this.state.client.expandedScopes} />
               </div>
-            ) :
-              null
-          }
+            </div>
+          ) : null}
           <hr />
           <div className="form-group">
             <div className="col-md-9 col-md-offset-3">
               <div className="form-control-static">
                 {(() => {
                   if (isEditing) {
-                    return isCreating ?
-                      this.renderCreatingToolbar() :
-                      this.renderEditingToolbar();
+                    return isCreating
+                      ? this.renderCreatingToolbar()
+                      : this.renderEditingToolbar();
                   }
 
                   return (
@@ -331,13 +334,17 @@ export default class ClientEditor extends React.PureComponent {
   }
 
   /** Determine if clientId is valid */
-  validClientId = () => /^[A-Za-z0-9@/:._-]+$/.test(this.state.client.clientId || '');
+  validClientId = () =>
+    /^[A-Za-z0-9@/:._-]+$/.test(this.state.client.clientId || '');
 
   /** Render editing toolbar */
   renderEditingToolbar() {
     return (
       <ButtonToolbar>
-        <Button bsStyle="success" onClick={this.saveClient} disabled={this.state.working}>
+        <Button
+          bsStyle="success"
+          onClick={this.saveClient}
+          disabled={this.state.working}>
           <Glyphicon glyph="ok" /> Save Changes
         </Button>
         <ModalItem
@@ -345,44 +352,45 @@ export default class ClientEditor extends React.PureComponent {
           disabled={this.state.working}
           onSubmit={this.deleteClient}
           onComplete={this.props.navigate}
-          body={(
+          body={
             <span>
-              Are you sure you want to delete credentials with client ID <code>{this.state.client.clientId}</code>?
+              Are you sure you want to delete credentials with client ID{' '}
+              <code>{this.state.client.clientId}</code>?
             </span>
-          )}>
+          }>
           <Icon name="trash" /> Delete Client
         </ModalItem>
-        {
-          this.state.client.disabled ? (
-            <ModalItem
-              button={true}
-              bsStyle="warning"
-              disabled={this.state.working}
-              onSubmit={this.enableClient}
-              onComplete={() => this.load(this.props)}
-              body={(
-                <span>
-                  Are you sure you want to enable client ID <code>{this.state.client.clientId}</code>?
-                </span>
-              )}>
-              <Icon name="check-circle-o" /> Enable Client
-            </ModalItem>
-          ) : (
-            <ModalItem
-              button={true}
-              bsStyle="warning"
-              disabled={this.state.working}
-              onSubmit={this.disableClient}
-              onComplete={() => this.load(this.props)}
-              body={(
-                <span>
-                  Are you sure you want to disable client ID <code>{this.state.client.clientId}</code>?
-                </span>
-              )}>
-              <Icon name="times-circle-o" /> Disable Client
-            </ModalItem>
-          )
-        }
+        {this.state.client.disabled ? (
+          <ModalItem
+            button={true}
+            bsStyle="warning"
+            disabled={this.state.working}
+            onSubmit={this.enableClient}
+            onComplete={() => this.load(this.props)}
+            body={
+              <span>
+                Are you sure you want to enable client ID{' '}
+                <code>{this.state.client.clientId}</code>?
+              </span>
+            }>
+            <Icon name="check-circle-o" /> Enable Client
+          </ModalItem>
+        ) : (
+          <ModalItem
+            button={true}
+            bsStyle="warning"
+            disabled={this.state.working}
+            onSubmit={this.disableClient}
+            onComplete={() => this.load(this.props)}
+            body={
+              <span>
+                Are you sure you want to disable client ID{' '}
+                <code>{this.state.client.clientId}</code>?
+              </span>
+            }>
+            <Icon name="times-circle-o" /> Disable Client
+          </ModalItem>
+        )}
       </ButtonToolbar>
     );
   }
@@ -409,7 +417,8 @@ export default class ClientEditor extends React.PureComponent {
         value={this.state.client.description}
         onChange={this.onDescriptionChange}
         rows={8}
-        placeholder="Description in markdown..." />
+        placeholder="Description in markdown..."
+      />
     );
   }
 
@@ -422,31 +431,42 @@ export default class ClientEditor extends React.PureComponent {
     );
   }
 
-  onDescriptionChange = e => this.setState({
-    client: assoc('description', e.target.value, this.state.client)
-  });
+  onDescriptionChange = e =>
+    this.setState({
+      client: assoc('description', e.target.value, this.state.client)
+    });
 
-  onClientIdChange = e => this.setState({
-    client: assoc('clientId', e.target.value, this.state.client)
-  });
+  onClientIdChange = e =>
+    this.setState({
+      client: assoc('clientId', e.target.value, this.state.client)
+    });
 
-  onScopesUpdated = scopes => this.setState({
-    client: assoc('scopes', scopes, this.state.client)
-  });
+  onScopesUpdated = scopes =>
+    this.setState({
+      client: assoc('scopes', scopes, this.state.client)
+    });
 
   /** When expires exchanges in the editor */
-  onExpiresChange = date => this.setState({
-    client: assoc('expires', date.toJSON(), this.state.client)
-  });
+  onExpiresChange = date =>
+    this.setState({
+      client: assoc('expires', date.toJSON(), this.state.client)
+    });
 
-  onDOEChange = () => this.setState({
-    client: assoc('deleteOnExpiration', !this.state.client.deleteOnExpiration, this.state.client)
-  });
+  onDOEChange = () =>
+    this.setState({
+      client: assoc(
+        'deleteOnExpiration',
+        !this.state.client.deleteOnExpiration,
+        this.state.client
+      )
+    });
 
   /** Reset accessToken for current client */
   resetAccessToken = async () => {
     try {
-      const client = await this.props.auth.resetAccessToken(this.state.client.clientId);
+      const client = await this.props.auth.resetAccessToken(
+        this.state.client.clientId
+      );
 
       this.setState({
         client,
@@ -457,9 +477,9 @@ export default class ClientEditor extends React.PureComponent {
     } catch (err) {
       this.setState({
         working: false,
-        error: this.props.credentials ?
-          'You do not have sufficient permission to reset access tokens for this user.' :
-          'You must be logged in and have permission to reset access tokens for this user.'
+        error: this.props.credentials
+          ? 'You do not have sufficient permission to reset access tokens for this user.'
+          : 'You must be logged in and have permission to reset access tokens for this user.'
       });
     }
   };
@@ -475,20 +495,23 @@ export default class ClientEditor extends React.PureComponent {
     this.setState({ working: true });
 
     try {
-      const clientId = this.state.client.clientId;
+      const { clientId } = this.state.client;
       const client = await this.props.auth.createClient(clientId, {
         description: this.state.client.description,
         expires: this.state.client.expires,
         scopes: this.state.client.scopes
       });
 
-      this.setState({
-        client,
-        accessToken: client.accessToken,
-        editing: false,
-        working: false,
-        error: null
-      }, () => this.props.navigate(clientId));
+      this.setState(
+        {
+          client,
+          accessToken: client.accessToken,
+          editing: false,
+          working: false,
+          error: null
+        },
+        () => this.props.navigate(clientId)
+      );
     } catch (err) {
       this.setState({
         working: false,
@@ -500,7 +523,7 @@ export default class ClientEditor extends React.PureComponent {
   /** Save current client */
   saveClient = async () => {
     try {
-      const clientId = this.state.client.clientId;
+      const { clientId } = this.state.client;
       const client = await this.props.auth.updateClient(clientId, {
         description: this.state.client.description,
         expires: this.state.client.expires,
@@ -524,7 +547,7 @@ export default class ClientEditor extends React.PureComponent {
   /** Delete current client */
   deleteClient = async () => {
     try {
-      const clientId = this.state.client.clientId;
+      const { clientId } = this.state.client;
 
       await this.props.deleteClient(clientId);
     } catch (err) {
@@ -536,7 +559,7 @@ export default class ClientEditor extends React.PureComponent {
 
   disableClient = async () => {
     try {
-      const clientId = this.state.client.clientId;
+      const { clientId } = this.state.client;
 
       await this.props.auth.disableClient(clientId);
     } catch (err) {
@@ -546,7 +569,7 @@ export default class ClientEditor extends React.PureComponent {
 
   enableClient = async () => {
     try {
-      const clientId = this.state.client.clientId;
+      const { clientId } = this.state.client;
 
       await this.props.auth.enableClient(clientId);
     } catch (err) {

@@ -1,5 +1,13 @@
 import React from 'react';
-import { Grid, Row, Col, ListGroup, ListGroupItem, Button, Glyphicon } from 'react-bootstrap';
+import {
+  Grid,
+  Row,
+  Col,
+  ListGroup,
+  ListGroupItem,
+  Button,
+  Glyphicon
+} from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import VncDisplay from './VncDisplay';
 import Error from '../../components/Error';
@@ -22,7 +30,9 @@ export default class DisplayList extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
@@ -35,7 +45,7 @@ export default class DisplayList extends React.PureComponent {
     }
   }
 
-  load = async (props) => {
+  load = async props => {
     try {
       const response = await fetch(props.displaysUrl);
       const displays = await response.json();
@@ -70,9 +80,11 @@ export default class DisplayList extends React.PureComponent {
     return (
       <div>
         <em>
-          Pick a display to initiate a VNC session with a display server from the container.
+          Pick a display to initiate a VNC session with a display server from
+          the container.
         </em>
-        <br /><br />
+        <br />
+        <br />
         <ListGroup>
           {displays.map(({ display, height, width }, index) => (
             <ListGroupItem
@@ -84,13 +96,14 @@ export default class DisplayList extends React.PureComponent {
                   <Icon name="television" size="4x" />
                 </Col>
                 <Col md={10}>
-                  <h4>Display <code>{display}</code></h4>
-                    Resolution {width} &times; {height}
+                  <h4>
+                    Display <code>{display}</code>
+                  </h4>
+                  Resolution {width} &times; {height}
                 </Col>
               </Row>
             </ListGroupItem>
-            ))
-          }
+          ))}
         </ListGroup>
         <Button bsStyle="success" onClick={() => this.load(this.props)}>
           <Glyphicon glyph="refresh" /> Refresh
@@ -107,7 +120,8 @@ export default class DisplayList extends React.PureComponent {
       return (
         <VncDisplay
           url={`${socketUrl}?display=${display}`}
-          shared={shared === 'true'} />
+          shared={shared === 'true'}
+        />
       );
     }
 

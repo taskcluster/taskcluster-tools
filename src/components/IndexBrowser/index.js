@@ -1,6 +1,15 @@
 import React from 'react';
 import { string, object } from 'prop-types';
-import { Col, Button, Row, Table, Glyphicon, FormGroup, InputGroup, FormControl } from 'react-bootstrap';
+import {
+  Col,
+  Button,
+  Row,
+  Table,
+  Glyphicon,
+  FormGroup,
+  InputGroup,
+  FormControl
+} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
@@ -30,7 +39,9 @@ export default class IndexBrowser extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
@@ -40,8 +51,10 @@ export default class IndexBrowser extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.namespaceToken !== this.state.namespaceToken ||
-      prevState.tasksToken !== this.state.tasksToken) {
+    if (
+      prevState.namespaceToken !== this.state.namespaceToken ||
+      prevState.tasksToken !== this.state.tasksToken
+    ) {
       this.loadTasksAndNamespaces(this.props);
     }
   }
@@ -51,8 +64,12 @@ export default class IndexBrowser extends React.PureComponent {
       this.setState({
         error: null,
         namespaceInput: namespace,
-        tasks: await index.listTasks(namespace, { continuationToken: this.state.tasksToken || undefined }),
-        namespaces: await index.listNamespaces(namespace, { continuationToken: this.state.namespaceToken || undefined })
+        tasks: await index.listTasks(namespace, {
+          continuationToken: this.state.tasksToken || undefined
+        }),
+        namespaces: await index.listNamespaces(namespace, {
+          continuationToken: this.state.namespaceToken || undefined
+        })
       });
     } catch (err) {
       this.setState({
@@ -64,18 +81,23 @@ export default class IndexBrowser extends React.PureComponent {
     }
   }
 
-  nextTasks = () => this.setState({ tasksToken: this.state.tasks.continuationToken });
+  nextTasks = () =>
+    this.setState({ tasksToken: this.state.tasks.continuationToken });
 
-  nextNamespaces = () => this.setState({ namespaceToken: this.state.namespaces.continuationToken });
+  nextNamespaces = () =>
+    this.setState({ namespaceToken: this.state.namespaces.continuationToken });
 
-  handleNamespaceInputChange = e => this.setState({ namespaceInput: e.target.value });
+  handleNamespaceInputChange = e =>
+    this.setState({ namespaceInput: e.target.value });
 
   clearNamespaceToken = () => this.setState({ namespaceToken: null });
 
   clearTasksToken = () => this.setState({ tasksToken: null });
 
   loadNamespaceInput = () => {
-    this.props.history.replace(`${this.props.urlRoot}/${this.state.namespaceInput}`);
+    this.props.history.replace(
+      `${this.props.urlRoot}/${this.state.namespaceInput}`
+    );
   };
 
   renderBreadcrumbs() {
@@ -88,17 +110,15 @@ export default class IndexBrowser extends React.PureComponent {
         <li>
           <Link to={urlRoot}>root</Link>
         </li>
-        {
-          parents.map((parent, index) => {
-            const path = parents.slice(0, index + 1).join('.');
+        {parents.map((parent, index) => {
+          const path = parents.slice(0, index + 1).join('.');
 
-            return (
-              <li key={`index-breadcrumb-${index}`}>
-                <Link to={`${urlRoot}/${path}`}>{parent}</Link>
-              </li>
-            );
-          })
-        }
+          return (
+            <li key={`index-breadcrumb-${index}`}>
+              <Link to={`${urlRoot}/${path}`}>{parent}</Link>
+            </li>
+          );
+        })}
         {name && <li className="active">{name}</li>}
       </ol>
     );
@@ -115,33 +135,36 @@ export default class IndexBrowser extends React.PureComponent {
       <div>
         <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
-            {this.state.namespaces && this.state.namespaces.namespaces.map(({ namespace, name }, index) => (
-              <tr key={`index-namespace-${index}`}>
-                <td style={tableStyle}>
-                  <Link to={`${this.props.urlRoot}/${namespace}`}>{name}</Link>
-                </td>
-              </tr>
-          ))}
+            {this.state.namespaces &&
+              this.state.namespaces.namespaces.map(
+                ({ namespace, name }, index) => (
+                  <tr key={`index-namespace-${index}`}>
+                    <td style={tableStyle}>
+                      <Link to={`${this.props.urlRoot}/${namespace}`}>
+                        {name}
+                      </Link>
+                    </td>
+                  </tr>
+                )
+              )}
           </tbody>
         </Table>
-        {
-          this.state.namespaceToken != null ?
-            (
-              <Button bsStyle="primary" onClick={this.clearNamespaceToken} className="pull-left">
-                <Glyphicon glyph="arrow-left" /> Back to start
-              </Button>
-            ) :
-            null
-        }
-        {
-          this.state.namespaces && this.state.namespaces.continuationToken ?
-            (
-              <Button bsStyle="primary" onClick={this.nextNamespaces} className="pull-right">
-                More namespaces <Glyphicon glyph="arrow-right" />
-              </Button>
-            ) :
-            null
-        }
+        {this.state.namespaceToken != null ? (
+          <Button
+            bsStyle="primary"
+            onClick={this.clearNamespaceToken}
+            className="pull-left">
+            <Glyphicon glyph="arrow-left" /> Back to start
+          </Button>
+        ) : null}
+        {this.state.namespaces && this.state.namespaces.continuationToken ? (
+          <Button
+            bsStyle="primary"
+            onClick={this.nextNamespaces}
+            className="pull-right">
+            More namespaces <Glyphicon glyph="arrow-right" />
+          </Button>
+        ) : null}
       </div>
     );
   }
@@ -159,33 +182,46 @@ export default class IndexBrowser extends React.PureComponent {
       <div>
         <Table condensed={true} hover={true} className="namespace-table">
           <tbody>
-            {this.state.tasks && this.state.tasks.tasks.map((task, index) => {
-              const isCurrent = namespace === task.namespace;
-              const taskNamespace = task.namespace.split('.');
-              const namespaceTaskId = taskNamespace.pop();
+            {this.state.tasks &&
+              this.state.tasks.tasks.map((task, index) => {
+                const isCurrent = namespace === task.namespace;
+                const taskNamespace = task.namespace.split('.');
+                const namespaceTaskId = taskNamespace.pop();
 
-              return (
-                <tr key={`index-task-${index}`}>
-                  <td className={isCurrent ? 'info' : null} style={tableStyle}>
-                    <Link to={`${urlRoot}/${taskNamespace.join('.')}/${namespaceTaskId}`}>
-                      {namespaceTaskId}
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr key={`index-task-${index}`}>
+                    <td
+                      className={isCurrent ? 'info' : null}
+                      style={tableStyle}>
+                      <Link
+                        to={`${urlRoot}/${taskNamespace.join(
+                          '.'
+                        )}/${namespaceTaskId}`}>
+                        {namespaceTaskId}
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </Table>
         {this.state.tasksToken && (
-          <Button bsStyle="primary" onClick={this.clearTasksToken} className="pull-left">
+          <Button
+            bsStyle="primary"
+            onClick={this.clearTasksToken}
+            className="pull-left">
             <Glyphicon glyph="arrow-left" /> Back to start
           </Button>
         )}
-        {this.state.tasks && this.state.tasks.continuationToken && (
-          <Button bsStyle="primary" onClick={this.nextTasks} className="pull-right">
-            More tasks <Glyphicon glyph="arrow-right" />
-          </Button>
-        )}
+        {this.state.tasks &&
+          this.state.tasks.continuationToken && (
+            <Button
+              bsStyle="primary"
+              onClick={this.nextTasks}
+              className="pull-right">
+              More tasks <Glyphicon glyph="arrow-right" />
+            </Button>
+          )}
       </div>
     );
   }
@@ -206,12 +242,15 @@ export default class IndexBrowser extends React.PureComponent {
               <div>
                 <InputGroup>
                   <InputGroup.Button>
-                    <Button bsStyle="primary" type="submit">Browse</Button>
+                    <Button bsStyle="primary" type="submit">
+                      Browse
+                    </Button>
                   </InputGroup.Button>
                   <FormControl
                     type="text"
                     value={this.state.namespaceInput}
-                    onChange={this.handleNamespaceInputChange} />
+                    onChange={this.handleNamespaceInputChange}
+                  />
                 </InputGroup>
               </div>
             </FormGroup>
@@ -219,9 +258,7 @@ export default class IndexBrowser extends React.PureComponent {
           {this.renderTasks()}
           {this.renderNamespaces()}
         </Col>
-        <Col md={6}>
-          {this.props.children}
-        </Col>
+        <Col md={6}>{this.props.children}</Col>
       </Row>
     );
   }

@@ -27,11 +27,16 @@ export default class EntryView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
-    if (nextProps.namespace !== this.props.namespace || nextProps.namespaceTaskId !== this.props.namespaceTaskId) {
+    if (
+      nextProps.namespace !== this.props.namespace ||
+      nextProps.namespaceTaskId !== this.props.namespaceTaskId
+    ) {
       this.loadTask(nextProps);
     }
   }
@@ -43,9 +48,11 @@ export default class EntryView extends React.PureComponent {
 
     try {
       this.setState({
-        task: await props.index.findTask(props.namespaceTaskId ?
-          `${props.namespace}.${props.namespaceTaskId}` :
-          props.namespace),
+        task: await props.index.findTask(
+          props.namespaceTaskId
+            ? `${props.namespace}.${props.namespaceTaskId}`
+            : props.namespace
+        ),
         error: null
       });
     } catch (err) {
@@ -72,8 +79,8 @@ export default class EntryView extends React.PureComponent {
     if (error && error.response.status === 404) {
       return (
         <div className="alert alert-warning" role="alert">
-          <strong>Task not found!</strong>&nbsp;
-          No task is indexed under <code>{this.props.namespace}</code>.
+          <strong>Task not found!</strong>&nbsp; No task is indexed under{' '}
+          <code>{this.props.namespace}</code>.
         </div>
       );
     }
@@ -90,16 +97,22 @@ export default class EntryView extends React.PureComponent {
       <div>
         <dl className="dl-horizontal">
           <dt>Namespace</dt>
-          <dd><code>{this.state.task.namespace}</code></dd>
+          <dd>
+            <code>{this.state.task.namespace}</code>
+          </dd>
 
           <dt>Rank</dt>
           <dd>{this.state.task.rank}</dd>
 
           <dt>Expires</dt>
-          <dd><DateView date={this.state.task.expires} /></dd>
+          <dd>
+            <DateView date={this.state.task.expires} />
+          </dd>
 
           <dt>TaskId</dt>
-          <dd><Link to={`/tasks/${task.taskId}`}>{this.state.task.taskId}</Link></dd>
+          <dd>
+            <Link to={`/tasks/${task.taskId}`}>{this.state.task.taskId}</Link>
+          </dd>
         </dl>
         <dl className="dl-horizontal">
           <dt>Data</dt>

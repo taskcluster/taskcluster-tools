@@ -24,7 +24,8 @@ const View = ({ userSession, match, history, location }) => {
           sectionId={match.params.sectionId}
           subSectionId={match.params.subSectionId}
           artifactId={decodeURIComponent(match.params.artifactId)}
-          runId={match.params.runId ? parseInt(match.params.runId, 10) : null} />
+          runId={match.params.runId ? parseInt(match.params.runId, 10) : null}
+        />
       )}
     </Clients>
   );

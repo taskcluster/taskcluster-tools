@@ -35,22 +35,30 @@ export default class WorkerTypeView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.workerType !== this.props.workerType || nextProps.provisionerId !== this.props.provisionerId) {
+    if (
+      nextProps.workerType !== this.props.workerType ||
+      nextProps.provisionerId !== this.props.provisionerId
+    ) {
       this.loadWorkerType(nextProps);
     }
   }
 
-  async loadWorkerType({ awsProvisioner, queue, workerType, updateSummary, provisionerId }) {
+  async loadWorkerType({
+    awsProvisioner,
+    queue,
+    workerType,
+    updateSummary,
+    provisionerId
+  }) {
     try {
       this.setState({
         error: null,
         pendingTasks: await queue.pendingTasks(provisionerId, workerType),
         workerType: await awsProvisioner.workerType(workerType),
-        awsState: await awsProvisioner.state(workerType)
-          .then((response) => {
-            updateSummary(workerType, response.summary);
-            return response;
-          })
+        awsState: await awsProvisioner.state(workerType).then(response => {
+          updateSummary(workerType, response.summary);
+          return response;
+        })
       });
     } catch (err) {
       this.setState({
@@ -76,19 +84,24 @@ export default class WorkerTypeView extends React.PureComponent {
           awsProvisioner={this.props.awsProvisioner}
           workerType={this.state.workerType.workerType}
           definition={this.state.workerType}
-          updated={this.props.reload} />
+          updated={this.props.reload}
+        />
       );
     }
 
     if (currentTab === 'resources') {
-      return awsState ?
-        <WorkerTypeResources workerType={workerType} awsState={awsState} /> :
-        <Spinner />;
+      return awsState ? (
+        <WorkerTypeResources workerType={workerType} awsState={awsState} />
+      ) : (
+        <Spinner />
+      );
     }
 
-    return awsState ?
-      <WorkerTypeStatus workerType={workerType} awsState={awsState} /> :
-      <Spinner />;
+    return awsState ? (
+      <WorkerTypeStatus workerType={workerType} awsState={awsState} />
+    ) : (
+      <Spinner />
+    );
   }
 
   renderDefinition() {
@@ -97,9 +110,7 @@ export default class WorkerTypeView extends React.PureComponent {
     return (
       <div>
         <br />
-        <Code language="javascript">
-          {JSON.stringify(definition, null, 2)}
-        </Code>
+        <Code language="javascript">{JSON.stringify(definition, null, 2)}</Code>
       </div>
     );
   }
@@ -119,15 +130,21 @@ export default class WorkerTypeView extends React.PureComponent {
     return (
       <div>
         <Nav bsStyle="tabs" activeKey={`${currentTab}`} onSelect={onSelect}>
-          <NavItem eventKey="" key="">Status</NavItem>
-          <NavItem eventKey="view" key="view">View Definition</NavItem>
-          <NavItem eventKey="edit" key="edit">Edit Definition</NavItem>
-          <NavItem eventKey="resources" key="resources">EC2 Resources</NavItem>
+          <NavItem eventKey="" key="">
+            Status
+          </NavItem>
+          <NavItem eventKey="view" key="view">
+            View Definition
+          </NavItem>
+          <NavItem eventKey="edit" key="edit">
+            Edit Definition
+          </NavItem>
+          <NavItem eventKey="resources" key="resources">
+            EC2 Resources
+          </NavItem>
         </Nav>
         <div className="tab-content" style={{ minHeight: 400 }}>
-          <div className="tab-pane active">
-            {this.renderCurrentTab()}
-          </div>
+          <div className="tab-pane active">{this.renderCurrentTab()}</div>
         </div>
       </div>
     );

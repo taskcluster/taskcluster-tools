@@ -31,7 +31,10 @@ export default class WorkerTypeRow extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.provisionerId !== this.props.provisionerId || nextProps.workerType !== this.props.workerType) {
+    if (
+      nextProps.provisionerId !== this.props.provisionerId ||
+      nextProps.workerType !== this.props.workerType
+    ) {
       this.loadPendingTasks(nextProps);
     }
   }
@@ -39,7 +42,10 @@ export default class WorkerTypeRow extends React.Component {
   async loadPendingTasks({ queue, provisionerId, workerType }) {
     try {
       this.setState({
-        pendingTasks: await queue.pendingTasks(provisionerId, workerType.workerType),
+        pendingTasks: await queue.pendingTasks(
+          provisionerId,
+          workerType.workerType
+        ),
         error: null
       });
     } catch (err) {
@@ -56,19 +62,34 @@ export default class WorkerTypeRow extends React.Component {
 
     if (progress.r) {
       progressBars.push(
-        <ProgressBar bsStyle="success" key="running" now={progress.r} label={progress.rc} />
+        <ProgressBar
+          bsStyle="success"
+          key="running"
+          now={progress.r}
+          label={progress.rc}
+        />
       );
     }
 
     if (progress.p) {
       progressBars.push(
-        <ProgressBar bsStyle="warning" key="pending" now={progress.p} label={progress.pc} />
+        <ProgressBar
+          bsStyle="warning"
+          key="pending"
+          now={progress.p}
+          label={progress.pc}
+        />
       );
     }
 
     if (progress.s) {
       progressBars.push(
-        <ProgressBar bsStyle="info" key="spotReq" now={progress.s} label={progress.sc} />
+        <ProgressBar
+          bsStyle="info"
+          key="spotReq"
+          now={progress.s}
+          label={progress.sc}
+        />
       );
     }
 
@@ -92,9 +113,15 @@ export default class WorkerTypeRow extends React.Component {
     // Fuzz the percentages to make sure all bars are visible.  If we have a
     // state with 0%, we don't fuzz at all.  If we have 1-4%, we round to 5%
     // and we don't fuzz above 5%
-    const fuzzedRunning = runningCap ? Math.max(runningCap, smallestCapUnit) : 0;
-    const fuzzedPending = pendingCap ? Math.max(pendingCap, smallestCapUnit) : 0;
-    const fuzzedSpotReq = spotReqCap ? Math.max(spotReqCap, smallestCapUnit) : 0;
+    const fuzzedRunning = runningCap
+      ? Math.max(runningCap, smallestCapUnit)
+      : 0;
+    const fuzzedPending = pendingCap
+      ? Math.max(pendingCap, smallestCapUnit)
+      : 0;
+    const fuzzedSpotReq = spotReqCap
+      ? Math.max(spotReqCap, smallestCapUnit)
+      : 0;
 
     // Determine the number which we should use to figure out our percentages.
     // When we have less than the max configured, we use that setting.  When we
@@ -121,11 +148,11 @@ export default class WorkerTypeRow extends React.Component {
   tooltip() {
     return (
       <Tooltip id={this.props.workerType.workerType}>
-        {this.props.workerType.workerType} has
-        running capacity to handle {this.props.workerType.runningCapacity || '0'} tasks,
-        pending instances to handle {this.props.workerType.pendingCapacity || '0'} tasks, and
-        spot requests for capacity to
-        handle {this.props.workerType.requestedCapacity || '0'} tasks in parallel.
+        {this.props.workerType.workerType} has running capacity to handle{' '}
+        {this.props.workerType.runningCapacity || '0'} tasks, pending instances
+        to handle {this.props.workerType.pendingCapacity || '0'} tasks, and spot
+        requests for capacity to handle{' '}
+        {this.props.workerType.requestedCapacity || '0'} tasks in parallel.
       </Tooltip>
     );
   }
@@ -148,7 +175,9 @@ export default class WorkerTypeRow extends React.Component {
         onClick={this.props.onClick}
         className={this.props.selected ? 'active' : null}
         style={{ cursor: 'pointer' }}>
-        <td><code>{this.props.workerType.workerType}</code></td>
+        <td>
+          <code>{this.props.workerType.workerType}</code>
+        </td>
         <td>
           <OverlayTrigger placement="left" overlay={this.tooltip()}>
             {this.renderCapacityBar()}

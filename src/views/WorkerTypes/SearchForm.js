@@ -1,6 +1,12 @@
 import React, { PureComponent } from 'react';
 import { func } from 'prop-types';
-import { Glyphicon, FormGroup, InputGroup, FormControl, Form } from 'react-bootstrap';
+import {
+  Glyphicon,
+  FormGroup,
+  InputGroup,
+  FormControl,
+  Form
+} from 'react-bootstrap';
 import styles from './styles.css';
 
 export default class SearchForm extends PureComponent {
@@ -30,7 +36,7 @@ export default class SearchForm extends PureComponent {
 
   onSearch = () => this.props.onSearch(this.state.value);
 
-  onSubmit = (e) => {
+  onSubmit = e => {
     e.preventDefault();
 
     this.onSearch();
@@ -43,8 +49,14 @@ export default class SearchForm extends PureComponent {
           <FormGroup>
             <InputGroup bsSize="sm">
               <InputGroup.Addon>WorkerType Containing</InputGroup.Addon>
-              <FormControl onChange={this.onChange} value={this.state.value} type="text" />
-              <InputGroup.Addon onClick={this.onSearch} role="button"><Glyphicon glyph="search" /></InputGroup.Addon>
+              <FormControl
+                onChange={this.onChange}
+                value={this.state.value}
+                type="text"
+              />
+              <InputGroup.Addon onClick={this.onSearch} role="button">
+                <Glyphicon glyph="search" />
+              </InputGroup.Addon>
             </InputGroup>
           </FormGroup>
         </Form>

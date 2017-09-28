@@ -18,9 +18,9 @@ export default class EntryView extends React.PureComponent {
 
     this.state = {
       task: null,
-      fullNamespace: props.namespaceTaskId ?
-        `${props.namespace}.${props.namespaceTaskId}` :
-        props.namespace
+      fullNamespace: props.namespaceTaskId
+        ? `${props.namespace}.${props.namespaceTaskId}`
+        : props.namespace
     };
   }
 
@@ -29,11 +29,16 @@ export default class EntryView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
-    if (nextProps.namespace !== this.props.namespace || nextProps.namespaceTaskId !== this.props.namespaceTaskId) {
+    if (
+      nextProps.namespace !== this.props.namespace ||
+      nextProps.namespaceTaskId !== this.props.namespaceTaskId
+    ) {
       this.loadTask(nextProps);
     }
   }
@@ -43,9 +48,9 @@ export default class EntryView extends React.PureComponent {
       return this.setState({ error: null, task: {}, fullNamespace: null });
     }
 
-    const fullNamespace = props.namespaceTaskId ?
-      `${props.namespace}.${props.namespaceTaskId}` :
-      props.namespace;
+    const fullNamespace = props.namespaceTaskId
+      ? `${props.namespace}.${props.namespaceTaskId}`
+      : props.namespace;
 
     try {
       this.setState({
@@ -69,8 +74,8 @@ export default class EntryView extends React.PureComponent {
       if (error.response.status === 404) {
         return (
           <div className="alert alert-warning" role="alert">
-            <strong>Task not found!</strong>&nbsp;
-            No task is indexed under <code>{fullNamespace}</code>.
+            <strong>Task not found!</strong>&nbsp; No task is indexed under{' '}
+            <code>{fullNamespace}</code>.
           </div>
         );
       }
@@ -92,21 +97,32 @@ export default class EntryView extends React.PureComponent {
       <div>
         <dl className="dl-horizontal">
           <dt>Namespace</dt>
-          <dd><code>{task.namespace}</code></dd>
+          <dd>
+            <code>{task.namespace}</code>
+          </dd>
           <dt>Task ID</dt>
-          <dd><Link to={`/tasks/${task.taskId}`}>{task.taskId}</Link></dd>
+          <dd>
+            <Link to={`/tasks/${task.taskId}`}>{task.taskId}</Link>
+          </dd>
         </dl>
 
         <dl className="dl-horizontal">
           <dt>Latest Artifacts</dt>
           <dd>
-            <ArtifactView taskId={task.taskId} namespace={task.namespace} queue={queue} userSession={userSession} />
+            <ArtifactView
+              taskId={task.taskId}
+              namespace={task.namespace}
+              queue={queue}
+              userSession={userSession}
+            />
             <br />
             <div className="alert alert-info" role="alert">
-              <strong>Latest Artifacts</strong>&nbsp;
-              is the artifacts from the last run of the task.
-              View the task in the <Link to={`/tasks/${task.taskId}`}>Task &amp; Group Inspector</Link> to
-              discover artifacts from other runs.
+              <strong>Latest Artifacts</strong>&nbsp; is the artifacts from the
+              last run of the task. View the task in the{' '}
+              <Link to={`/tasks/${task.taskId}`}>
+                Task &amp; Group Inspector
+              </Link>{' '}
+              to discover artifacts from other runs.
             </div>
           </dd>
         </dl>

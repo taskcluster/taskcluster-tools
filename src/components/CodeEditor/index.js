@@ -42,7 +42,8 @@ export default class CodeEditor extends React.PureComponent {
         options={{
           ...options,
           mode: mode === 'json' ? 'application/json' : mode
-        }} />
+        }}
+      />
     );
   }
 }

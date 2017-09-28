@@ -28,7 +28,9 @@ export default class RunDetails extends React.PureComponent {
 
           <tr>
             <td>Reason Created</td>
-            <td><code>{run.reasonCreated}</code></td>
+            <td>
+              <code>{run.reasonCreated}</code>
+            </td>
           </tr>
 
           <tr>
@@ -48,36 +50,38 @@ export default class RunDetails extends React.PureComponent {
           <tr>
             <td>Started</td>
             <td>
-              {run.started ? <DateView date={run.started} since={run.scheduled} /> : '-'}
+              {run.started ? (
+                <DateView date={run.started} since={run.scheduled} />
+              ) : (
+                '-'
+              )}
             </td>
           </tr>
 
           <tr>
             <td>Resolved</td>
             <td>
-              {run.resolved ? <DateView date={run.resolved} since={run.started} /> : '-'}
+              {run.resolved ? (
+                <DateView date={run.resolved} since={run.started} />
+              ) : (
+                '-'
+              )}
             </td>
           </tr>
 
           <tr>
             <td>WorkerGroup</td>
-            <td>
-              {run.workerGroup ? <code>{run.workerGroup}</code> : '-'}
-            </td>
+            <td>{run.workerGroup ? <code>{run.workerGroup}</code> : '-'}</td>
           </tr>
 
           <tr>
             <td>WorkerId</td>
-            <td>
-              {run.workerId ? <code>{run.workerId}</code> : '-'}
-            </td>
+            <td>{run.workerId ? <code>{run.workerId}</code> : '-'}</td>
           </tr>
 
           <tr>
             <td>TakenUntil</td>
-            <td>
-              {run.takenUntil ? <DateView date={run.takenUntil} /> : '-'}
-            </td>
+            <td>{run.takenUntil ? <DateView date={run.takenUntil} /> : '-'}</td>
           </tr>
         </tbody>
       </Table>

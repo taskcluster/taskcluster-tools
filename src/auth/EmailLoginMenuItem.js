@@ -10,7 +10,7 @@ export default class EmailLoginMenuItem extends Component {
       <Tooltip id="passwordless-signin">
         If you are a Mozillian but do not have an LDAP account, sign in with
         this option, which will require you to verify your email address, using
-        an email on your Mozillians profile.  If you do not have a Mozillians
+        an email on your Mozillians profile. If you do not have a Mozillians
         profile, set one up now. Get vouched to gain access to additional
         scopes.
       </Tooltip>

@@ -6,7 +6,8 @@ import { dial } from 'ws-shell';
 const DECODER = new TextDecoder('utf-8');
 
 const defaultCommand = [
-  'sh', '-c',
+  'sh',
+  '-c',
   [
     'if [ -f "/etc/taskcluster-motd" ]; then cat /etc/taskcluster-motd; fi;',
     'if [ -z "$TERM" ]; then export TERM=xterm; fi;',
@@ -58,7 +59,7 @@ export default class Shell extends React.PureComponent {
         await this.client.execute();
 
         // Wrap client.resize to switch argument ordering
-        const resize = this.client.resize;
+        const { resize } = this.client;
 
         this.client.resize = (c, r) => resize.call(this.client, r, c);
       } else if (this.props.v === '2') {
@@ -66,9 +67,11 @@ export default class Shell extends React.PureComponent {
       }
 
       terminal.installKeyboard();
-      io.writeUTF8(`Connected to remote shell for taskId: ${this.props.taskId}\r\n`);
+      io.writeUTF8(
+        `Connected to remote shell for taskId: ${this.props.taskId}\r\n`
+      );
 
-      this.client.on('exit', (code) => {
+      this.client.on('exit', code => {
         io.writeUTF8(`\r\nRemote shell exited: ${code}\r\n`);
         terminal.uninstallKeyboard();
         terminal.setCursorVisible(false);
@@ -87,13 +90,14 @@ export default class Shell extends React.PureComponent {
     }
   }
 
-  registerChild = ref => this.node = ref;
+  registerChild = ref => (this.node = ref);
 
   render() {
     return (
       <div
         ref={this.registerChild}
-        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 51 }} />
+        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 51 }}
+      />
     );
   }
 }

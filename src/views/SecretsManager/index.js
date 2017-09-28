@@ -9,7 +9,10 @@ const View = ({ userSession, history, match }) => (
         history={history}
         userSession={userSession}
         secrets={secrets}
-        secretId={match.params.secretId ? decodeURIComponent(match.params.secretId) : ''} />
+        secretId={
+          match.params.secretId ? decodeURIComponent(match.params.secretId) : ''
+        }
+      />
     )}
   </Clients>
 );

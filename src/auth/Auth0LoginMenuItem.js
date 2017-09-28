@@ -7,7 +7,8 @@ export default class Auth0LoginMenuItem extends React.PureComponent {
   render() {
     const tooltip = (
       <Tooltip id="auth0-signin">
-        We are testing this login method, which will be live in October.  Please try it and report any issues!
+        We are testing this login method, which will be live in October. Please
+        try it and report any issues!
       </Tooltip>
     );
 

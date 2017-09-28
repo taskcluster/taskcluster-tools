@@ -6,7 +6,7 @@ export default class Login extends React.Component {
   constructor(props) {
     super(props);
 
-    const search = new URLSearchParams(location.search);
+    const search = new URLSearchParams(window.location.search);
 
     this.state = {
       credentials: {

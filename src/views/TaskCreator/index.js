@@ -10,7 +10,8 @@ const View = ({ userSession, history, location, interactive }) => (
         history={history}
         location={location}
         interactive={interactive}
-        userSession={userSession} />
+        userSession={userSession}
+      />
     )}
   </Clients>
 );

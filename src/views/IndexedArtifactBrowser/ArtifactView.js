@@ -25,11 +25,16 @@ export default class ArtifactView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
-    if (nextProps.namespace !== this.props.namespace || nextProps.taskId !== this.props.taskId) {
+    if (
+      nextProps.namespace !== this.props.namespace ||
+      nextProps.taskId !== this.props.taskId
+    ) {
       this.loadArtifacts(nextProps);
     }
   }
@@ -68,7 +73,8 @@ export default class ArtifactView extends React.PureComponent {
         namespace={namespace}
         artifacts={this.state.artifacts}
         taskId={taskId}
-        userSession={userSession} />
+        userSession={userSession}
+      />
     );
   }
 }

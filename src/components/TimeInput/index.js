@@ -15,7 +15,7 @@ export default class TimeInput extends React.PureComponent {
     this.state = { valid: true };
   }
 
-  onChange = (e) => {
+  onChange = e => {
     const parsed = new Date(e.target.value);
     const valid = parsed.toJSON() === e.target.value;
 
@@ -30,11 +30,19 @@ export default class TimeInput extends React.PureComponent {
     const { value, className } = this.props;
     const { valid } = this.state;
     const formatted = value.toJSON();
-    const inputClass = classNames('input-group', valid ? 'has-success' : 'has-error');
+    const inputClass = classNames(
+      'input-group',
+      valid ? 'has-success' : 'has-error'
+    );
 
     return (
       <div className={inputClass}>
-        <input type="text" className={className} defaultValue={formatted} onChange={this.onChange} />
+        <input
+          type="text"
+          className={className}
+          defaultValue={formatted}
+          onChange={this.onChange}
+        />
         <div className="input-group-addon">
           <Glyphicon glyph="calendar" />
         </div>

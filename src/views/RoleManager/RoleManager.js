@@ -1,5 +1,12 @@
 import React from 'react';
-import { Row, Col, ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  ButtonToolbar,
+  Button,
+  Glyphicon,
+  Table
+} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
@@ -21,7 +28,10 @@ export default class RoleManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.error && !equal(nextProps.userSession, this.props.userSession)) {
+    if (
+      this.state.error &&
+      !equal(nextProps.userSession, this.props.userSession)
+    ) {
       this.setState({ error: null });
     }
   }
@@ -40,9 +50,11 @@ export default class RoleManager extends React.PureComponent {
     }
   };
 
-  navigate = (roleId) => {
+  navigate = roleId => {
     this.load();
-    this.props.history.replace(`/auth/roles/${roleId ? encodeURIComponent(roleId) : ''}`);
+    this.props.history.replace(
+      `/auth/roles/${roleId ? encodeURIComponent(roleId) : ''}`
+    );
   };
 
   deleteRole = roleId => this.props.auth.deleteRole(roleId);
@@ -75,9 +87,7 @@ export default class RoleManager extends React.PureComponent {
             <th>RoleId</th>
           </tr>
         </thead>
-        <tbody>
-          {this.state.roles.map(this.renderRoleRow)}
-        </tbody>
+        <tbody>{this.state.roles.map(this.renderRoleRow)}</tbody>
       </Table>
     );
   }
@@ -89,10 +99,16 @@ export default class RoleManager extends React.PureComponent {
         <Col md={5}>
           {this.renderRolesTable()}
           <ButtonToolbar>
-            <Button bsStyle="primary" href={'/auth/roles'} disabled={this.props.roleId === ''}>
+            <Button
+              bsStyle="primary"
+              href={'/auth/roles'}
+              disabled={this.props.roleId === ''}>
               <Glyphicon glyph="plus" /> Add Role
             </Button>
-            <Button bsStyle="success" onClick={this.load} disabled={!this.state.roles}>
+            <Button
+              bsStyle="success"
+              onClick={this.load}
+              disabled={!this.state.roles}>
               <Glyphicon glyph="refresh" /> Refresh
             </Button>
           </ButtonToolbar>
@@ -103,7 +119,8 @@ export default class RoleManager extends React.PureComponent {
             history={this.props.history}
             currentRoleId={this.props.roleId}
             deleteRole={this.deleteRole}
-            navigate={this.navigate} />
+            navigate={this.navigate}
+          />
         </Col>
       </Row>
     );

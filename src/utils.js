@@ -49,42 +49,53 @@ export const MIMETYPE_ICONS = {
 
 // Matching patterns for finding an icon from a mimetype, most specific
 // mimetype are listed first as they are matched top down.
-export const getIconFromMime = (contentType) => {
-  const [icon = 'file-o'] = Object
-    .entries(MIMETYPE_ICONS)
-    .find(([, matches]) => matches
-      .some(pattern => (pattern instanceof RegExp ?
-        pattern.test(contentType) :
-        pattern === contentType)));
+export const getIconFromMime = contentType => {
+  const [icon = 'file-o'] = Object.entries(MIMETYPE_ICONS).find(([, matches]) =>
+    matches.some(
+      pattern =>
+        pattern instanceof RegExp
+          ? pattern.test(contentType)
+          : pattern === contentType
+    )
+  );
 
   return icon;
 };
 
 // Transform task to a loaner task
-export const parameterizeTask = task => merge(omit([
-  'taskGroupId',
-  // 'schedulerId',
-  'routes',
-  'dependencies',
-  'requires',
-  'scopes',
-  'payload'
-], cloneDeep(task)), {
-  retries: 0,
-  deadline: fromNowJSON('12 hours'),
-  created: fromNowJSON(),
-  expires: fromNowJSON('7 days'),
-  scopes: task.scopes.filter(scope => !/^docker-worker:cache:/.test(scope)), // Delete cache scopes
-  payload: merge(omit(['artifacts', 'cache'], task.payload || {}), {
-    maxRunTime: Math.max(task.payload && task.payload.maxRunTime, 3 * 60 * 60),
-    features: {
-      interactive: true
-    },
-    env: {
-      TASKCLUSTER_INTERACTIVE: 'true'
+export const parameterizeTask = task =>
+  merge(
+    omit(
+      [
+        'taskGroupId',
+        'routes',
+        'dependencies',
+        'requires',
+        'scopes',
+        'payload'
+      ],
+      cloneDeep(task)
+    ),
+    {
+      retries: 0,
+      deadline: fromNowJSON('12 hours'),
+      created: fromNowJSON(),
+      expires: fromNowJSON('7 days'),
+      scopes: task.scopes.filter(scope => !/^docker-worker:cache:/.test(scope)), // Delete cache scopes
+      payload: merge(omit(['artifacts', 'cache'], task.payload || {}), {
+        maxRunTime: Math.max(
+          task.payload && task.payload.maxRunTime,
+          3 * 60 * 60
+        ),
+        features: {
+          interactive: true
+        },
+        env: {
+          TASKCLUSTER_INTERACTIVE: 'true'
+        }
+      })
     }
-  })
-});
+  );
 
 export const labels = {
   running: 'primary',
@@ -95,7 +106,8 @@ export const labels = {
   exception: 'warning'
 };
 
-export const loadable = loader => Loadable({
-  loading: Loading,
-  loader
-});
+export const loadable = loader =>
+  Loadable({
+    loading: Loading,
+    loader
+  });

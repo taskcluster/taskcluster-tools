@@ -1,5 +1,13 @@
 import React from 'react';
-import { Table, Label, Popover, OverlayTrigger, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
+import {
+  Table,
+  Label,
+  Popover,
+  OverlayTrigger,
+  ButtonToolbar,
+  DropdownButton,
+  MenuItem
+} from 'react-bootstrap';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { array } from 'prop-types';
@@ -29,10 +37,11 @@ export default class WorkerTable extends React.PureComponent {
       id="popover-trigger-click-root-close"
       title="Description">
       <div>
-        {description ?
-          <Markdown>{description}</Markdown> :
+        {description ? (
+          <Markdown>{description}</Markdown>
+        ) : (
           <Markdown>`-`</Markdown>
-        }
+        )}
       </div>
     </Popover>
   );
@@ -44,21 +53,46 @@ export default class WorkerTable extends React.PureComponent {
 
     return (
       <tr key={`recent-task-${index}`}>
-        <td><Label bsSize="sm" bsStyle={labels[status.state]}>{status.state}</Label></td>
         <td>
-          <a target="_blank" rel="noopener noreferrer" href={task.metadata.source}>
+          <Label bsSize="sm" bsStyle={labels[status.state]}>
+            {status.state}
+          </Label>
+        </td>
+        <td>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={task.metadata.source}>
             {task.metadata.name}
           </a>
           &nbsp;&nbsp;
-          <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={description}>
+          <OverlayTrigger
+            trigger="click"
+            rootClose
+            placement="bottom"
+            overlay={description}>
             <Icon role="button" name="info-circle" />
           </OverlayTrigger>
         </td>
         <td>
-          <Link to={`/groups/${status.taskGroupId}/tasks/${status.taskId}`}>{status.taskId}</Link>
+          <Link to={`/groups/${status.taskGroupId}/tasks/${status.taskId}`}>
+            {status.taskId}
+          </Link>
         </td>
-        <td>{run.started ? <DateView placement="bottom" date={run.started} /> : '-'}</td>
-        <td>{run.resolved ? <DateView placement="bottom" date={run.resolved} /> : '-'}</td>
+        <td>
+          {run.started ? (
+            <DateView placement="bottom" date={run.started} />
+          ) : (
+            '-'
+          )}
+        </td>
+        <td>
+          {run.resolved ? (
+            <DateView placement="bottom" date={run.resolved} />
+          ) : (
+            '-'
+          )}
+        </td>
       </tr>
     );
   };
@@ -73,19 +107,20 @@ export default class WorkerTable extends React.PureComponent {
       return [];
     }
 
-    const sort = tasks => tasks
-      .sort((a, b) => {
+    const sort = tasks =>
+      tasks.sort((a, b) => {
         const runIdA = a.status.runs.length - 1;
         const runIdB = b.status.runs.length - 1;
-        const diff = moment(a.status.runs[runIdA].started).diff(moment(b.status.runs[runIdB].started));
+        const diff = moment(a.status.runs[runIdA].started).diff(
+          moment(b.status.runs[runIdB].started)
+        );
 
         if (diff === 0) {
           return 0;
         }
 
         return diff < 0 ? 1 : -1;
-      }
-    );
+      });
 
     if (filterStatus !== 'all') {
       return sort(tasks.filter(task => task.status.state === filterStatus));
@@ -95,9 +130,9 @@ export default class WorkerTable extends React.PureComponent {
   };
 
   render() {
-    const groups = Object
-      .keys(labels)
-      .filter(label => !label.includes('pending'));
+    const groups = Object.keys(labels).filter(
+      label => !label.includes('pending')
+    );
     const tasksToRender = this.tasksToRender();
     const { filterStatus } = this.state;
 
@@ -118,7 +153,9 @@ export default class WorkerTable extends React.PureComponent {
                     <MenuItem eventKey="all">All</MenuItem>
                     <MenuItem divider />
                     {groups.map(group => (
-                      <MenuItem eventKey={group} key={`group-details-status-dropdown-${group}`}>
+                      <MenuItem
+                        eventKey={group}
+                        key={`group-details-status-dropdown-${group}`}>
                         {titleCase(group)}
                       </MenuItem>
                     ))}
@@ -132,22 +169,19 @@ export default class WorkerTable extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {tasksToRender.length ?
-              tasksToRender.map(this.renderTask) :
-              (
-                <tr colSpan={2}>
-                  <td>
-                    <em>
-                      {
-                        filterStatus !== 'all' ?
-                          `There are no tasks in this worker in the "${filterStatus}" state.` :
-                          'There are no tasks to display for this worker.'
-                      }
-                    </em>
-                  </td>
-                </tr>
-              )
-            }
+            {tasksToRender.length ? (
+              tasksToRender.map(this.renderTask)
+            ) : (
+              <tr colSpan={2}>
+                <td>
+                  <em>
+                    {filterStatus !== 'all'
+                      ? `There are no tasks in this worker in the "${filterStatus}" state.`
+                      : 'There are no tasks to display for this worker.'}
+                  </em>
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </div>

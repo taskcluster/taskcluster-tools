@@ -17,7 +17,12 @@ const View = ({ userSession, match, history, location }) => {
           auth={auth}
           history={history}
           userSession={userSession}
-          clientId={match.params.clientId ? decodeURIComponent(match.params.clientId) : ''} />
+          clientId={
+            match.params.clientId
+              ? decodeURIComponent(match.params.clientId)
+              : ''
+          }
+        />
       )}
     </Clients>
   );

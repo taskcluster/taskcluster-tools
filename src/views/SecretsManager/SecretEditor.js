@@ -36,7 +36,9 @@ export default class SecretEditor extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
@@ -80,11 +82,13 @@ export default class SecretEditor extends React.PureComponent {
     }
   }
 
-  onExpiresChange = date => this.setState({
-    expires: date.toJSON()
-  });
+  onExpiresChange = date =>
+    this.setState({
+      expires: date.toJSON()
+    });
 
-  handleSecretNameChange = e => this.setState({ secretNameValue: e.target.value });
+  handleSecretNameChange = e =>
+    this.setState({ secretNameValue: e.target.value });
 
   handleValueChange = value => this.setState({ secretValue: value });
 
@@ -131,17 +135,23 @@ export default class SecretEditor extends React.PureComponent {
     const { editing, secret, showSecret } = this.state;
 
     if (editing) {
-      return <CodeEditor mode="json" value={JSON.stringify(secret, null, 2)} onChange={this.handleValueChange} />;
+      return (
+        <CodeEditor
+          mode="json"
+          value={JSON.stringify(secret, null, 2)}
+          onChange={this.handleValueChange}
+        />
+      );
     }
 
     if (secret) {
-      return showSecret ?
-        <pre>{JSON.stringify(secret, null, 2)}</pre> :
-        (
-          <Button onClick={this.openSecret} bsStyle="warning">
-            <Icon name="user-secret" style={{ padding: '.15em' }} /> Show secret
-          </Button>
-        );
+      return showSecret ? (
+        <pre>{JSON.stringify(secret, null, 2)}</pre>
+      ) : (
+        <Button onClick={this.openSecret} bsStyle="warning">
+          <Icon name="user-secret" style={{ padding: '.15em' }} /> Show secret
+        </Button>
+      );
     }
 
     return <em>none</em>;
@@ -149,7 +159,14 @@ export default class SecretEditor extends React.PureComponent {
 
   render() {
     const { secretId } = this.props;
-    const { error, secret, expires, editing, working, secretNameValue } = this.state;
+    const {
+      error,
+      secret,
+      expires,
+      editing,
+      working,
+      secretNameValue
+    } = this.state;
 
     if (!secret && !error) {
       return <Spinner />;
@@ -170,89 +187,94 @@ export default class SecretEditor extends React.PureComponent {
           <div className="form-group">
             <label className="control-label col-md-2">Secret Name</label>
             <div className="col-md-10">
-              {
-                isCreating ?
-                  (
-                    <div>
-                      <input
-                        type="text"
-                        className="form-control"
-                        required={true}
-                        value={secretNameValue}
-                        onChange={this.handleSecretNameChange}
-                        placeholder="garbage/<ircnick>/my-secret" />
-                      <br />
-                      <div className="alert alert-warning">
-                        Secrets starting with <code>garbage/</code> are visible to just about
-                        everybody. Use them to experiment, but not for real secrets!
-                      </div>
+              {isCreating ? (
+                <div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    required={true}
+                    value={secretNameValue}
+                    onChange={this.handleSecretNameChange}
+                    placeholder="garbage/<ircnick>/my-secret"
+                  />
+                  <br />
+                  <div className="alert alert-warning">
+                    Secrets starting with <code>garbage/</code> are visible to
+                    just about everybody. Use them to experiment, but not for
+                    real secrets!
+                  </div>
+                </div>
+              ) : (
+                <div className="form-control-static">
+                  {secretId}
+                  {secretId.startsWith('garbage/') && (
+                    <div className="alert alert-warning">
+                      This is a &quot;garbage&quot; secret and is visible to
+                      just about everybody. Do not put any real secrets here!
                     </div>
-                  ) :
-                  (
-                    <div className="form-control-static">
-                      {secretId}
-                      {secretId.startsWith('garbage/') && (
-                        <div className="alert alert-warning">
-                          This is a &quot;garbage&quot; secret and is visible to just about everybody.
-                          Do not put any real secrets here!
-                        </div>
-                      )}
-                    </div>
-                  )
-              }
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">Expires</label>
             <div className="col-md-10">
-              {
-                editing ?
-                  (
-                    <TimeInput
-                      value={new Date(expires)}
-                      onChange={this.onExpiresChange}
-                      className="form-control" />
-                  ) :
-                    <DateView date={expires} />
-              }
+              {editing ? (
+                <TimeInput
+                  value={new Date(expires)}
+                  onChange={this.onExpiresChange}
+                  className="form-control"
+                />
+              ) : (
+                <DateView date={expires} />
+              )}
             </div>
           </div>
           <div className="form-group">
-            <label className="control-label col-md-2">Secret Value (JSON Object)</label>
-            <div className="col-md-10">
-              {this.renderValue()}
-            </div>
+            <label className="control-label col-md-2">
+              Secret Value (JSON Object)
+            </label>
+            <div className="col-md-10">{this.renderValue()}</div>
           </div>
         </div>
-        {
-          editing ?
-            (
-              <ButtonToolbar>
-                <Button bsStyle="success" onClick={this.saveSecret} disabled={working}>
-                  <Glyphicon glyph="ok" /> {isCreating ? 'Create Secret' : 'Save Changes'}
-                </Button>
-                &nbsp;&nbsp;
-                {!isCreating && (
-                  <ModalItem
-                    button={true}
-                    bsStyle="danger"
-                    onSubmit={this.deleteSecret}
-                    onComplete={this.props.reloadSecrets}
-                    disabled={working}
-                    body={<span>Are you sure you want to delete secret <code>{secretId}</code>?</span>}>
-                    <Icon name="trash" /> Delete Secret
-                  </ModalItem>
-                )}
-              </ButtonToolbar>
-            ) :
-            (
-              <ButtonToolbar>
-                <Button bsStyle="success" onClick={this.startEditing} disabled={working}>
-                  <Glyphicon glyph="pencil" /> Edit Secret
-                </Button>
-              </ButtonToolbar>
-            )
-        }
+        {editing ? (
+          <ButtonToolbar>
+            <Button
+              bsStyle="success"
+              onClick={this.saveSecret}
+              disabled={working}>
+              <Glyphicon glyph="ok" />{' '}
+              {isCreating ? 'Create Secret' : 'Save Changes'}
+            </Button>
+            &nbsp;&nbsp;
+            {!isCreating && (
+              <ModalItem
+                button={true}
+                bsStyle="danger"
+                onSubmit={this.deleteSecret}
+                onComplete={this.props.reloadSecrets}
+                disabled={working}
+                body={
+                  <span>
+                    Are you sure you want to delete secret{' '}
+                    <code>{secretId}</code>?
+                  </span>
+                }>
+                <Icon name="trash" /> Delete Secret
+              </ModalItem>
+            )}
+          </ButtonToolbar>
+        ) : (
+          <ButtonToolbar>
+            <Button
+              bsStyle="success"
+              onClick={this.startEditing}
+              disabled={working}>
+              <Glyphicon glyph="pencil" /> Edit Secret
+            </Button>
+          </ButtonToolbar>
+        )}
       </div>
     );
   }

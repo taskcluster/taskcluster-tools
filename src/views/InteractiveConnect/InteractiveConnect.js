@@ -24,7 +24,8 @@ export default class InteractiveConnect extends React.PureComponent {
       shellUrl: null,
       displayUrl: null,
       task: null,
-      notify: 'Notification' in window && localStorage.getItem(notifyKey) === 'true'
+      notify:
+        'Notification' in window && localStorage.getItem(notifyKey) === 'true'
     };
   }
 
@@ -33,7 +34,9 @@ export default class InteractiveConnect extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
@@ -115,8 +118,15 @@ export default class InteractiveConnect extends React.PureComponent {
     const listener = new WebListener();
     const routingKey = { taskId };
 
-    ['taskDefined', 'taskPending', 'taskRunning', 'artifactCreated', 'taskCompleted', 'taskFailed', 'taskException']
-      .map(binding => listener.bind(queueEvents[binding](routingKey)));
+    [
+      'taskDefined',
+      'taskPending',
+      'taskRunning',
+      'artifactCreated',
+      'taskCompleted',
+      'taskFailed',
+      'taskException'
+    ].map(binding => listener.bind(queueEvents[binding](routingKey)));
 
     listener.on('message', this.handleTaskMessage);
     listener.on('reconnect', () => this.load(this.props));
@@ -131,7 +141,9 @@ export default class InteractiveConnect extends React.PureComponent {
     if (exchange === this.props.queueEvents.artifactCreated().exchange) {
       this.setState({
         status: payload.status,
-        ...this.getConnectionUrlState(this.props.queue, this.props.taskId, [payload.artifact])
+        ...this.getConnectionUrlState(this.props.queue, this.props.taskId, [
+          payload.artifact
+        ])
       });
       this.notify();
     } else {
@@ -159,12 +171,18 @@ export default class InteractiveConnect extends React.PureComponent {
   };
 
   openShell = async () => {
-    window.open(await this.props.queue.buildSignedUrl(...this.state.shellUrl), '_blank');
-  }
+    window.open(
+      await this.props.queue.buildSignedUrl(...this.state.shellUrl),
+      '_blank'
+    );
+  };
 
   openDisplay = async () => {
-    window.open(await this.props.queue.buildSignedUrl(...this.state.displayUrl), '_blank');
-  }
+    window.open(
+      await this.props.queue.buildSignedUrl(...this.state.displayUrl),
+      '_blank'
+    );
+  };
 
   notify() {
     if (!this.state.notify) {
@@ -173,7 +191,8 @@ export default class InteractiveConnect extends React.PureComponent {
 
     const notification = new Notification('Taskcluster', {
       icon: iconUrl,
-      body: 'Your interactive task is ready for connecting. Connect while the task is available.'
+      body:
+        'Your interactive task is ready for connecting. Connect while the task is available.'
     });
 
     notification.addEventListener('click', () => {
@@ -201,24 +220,18 @@ export default class InteractiveConnect extends React.PureComponent {
 
           <dt>Status</dt>
           <dd>
-            <Label bsStyle={labels[status.state]}>
-              {status.state}
-            </Label>
+            <Label bsStyle={labels[status.state]}>{status.state}</Label>
           </dd>
 
           <div>
             <dt>Name</dt>
             <dd>
-              <Markdown>
-                {task.metadata.name}
-              </Markdown>
+              <Markdown>{task.metadata.name}</Markdown>
             </dd>
 
             <dt>Description</dt>
             <dd>
-              <Markdown>
-                {task.metadata.description}
-              </Markdown>
+              <Markdown>{task.metadata.description}</Markdown>
             </dd>
           </div>
         </dl>
@@ -227,7 +240,9 @@ export default class InteractiveConnect extends React.PureComponent {
           bsSize="sm"
           bsStyle="primary"
           onClick={this.handleRequestNotify}
-          disabled={!('Notification' in window) || Notification.permission === 'denied'}>
+          disabled={
+            !('Notification' in window) || Notification.permission === 'denied'
+          }>
           <Icon name={notify ? 'check-square-o' : 'square-o'} />
           &nbsp;&nbsp;Notify me when ready
         </Button>
@@ -258,9 +273,14 @@ export default class InteractiveConnect extends React.PureComponent {
     if (['completed', 'failed', 'exception'].includes(status.state)) {
       return (
         <Alert bsStyle="warning">
-          <strong><Link to={`/tasks/${taskId}`} data-tip={true} data-for={taskId}>Task</Link> Resolved!</strong>
-          You can not attach to an interactive task after it has
-          stopped running.
+          <strong>
+            <Link to={`/tasks/${taskId}`} data-tip={true} data-for={taskId}>
+              Task
+            </Link>{' '}
+            Resolved!
+          </strong>
+          You can not attach to an interactive task after it has stopped
+          running.
           <Tooltip id={taskId} type="info" effect="float" place="top">
             {taskId}
           </Tooltip>
@@ -272,7 +292,8 @@ export default class InteractiveConnect extends React.PureComponent {
       return (
         <div>
           <em>Waiting for an interactive session to be ready.</em>
-          <br /><br />
+          <br />
+          <br />
           {this.renderStatus()}
           <Spinner />
         </div>
@@ -283,15 +304,19 @@ export default class InteractiveConnect extends React.PureComponent {
       <div>
         <h5>Interactive Task Ready</h5>
         <em>
-          You have approximately 5 minutes to connect, after that the task
-          will shutdown when all connections are closed.
+          You have approximately 5 minutes to connect, after that the task will
+          shutdown when all connections are closed.
         </em>
-        <br /><br />
+        <br />
+        <br />
         <div className="text-center">
           <strong>Select a session to open in a new tab:</strong>
           <br />
 
-          <div onClick={this.openShell} className={connectLinkButton} style={{ marginRight: 20 }}>
+          <div
+            onClick={this.openShell}
+            className={connectLinkButton}
+            style={{ marginRight: 20 }}>
             <span className="fa-stack fa-5x">
               <i className="fa fa-circle fa-stack-2x" />
               <i className="fa fa-terminal fa-stack-1x fa-inverse" />
@@ -307,11 +332,13 @@ export default class InteractiveConnect extends React.PureComponent {
             <span className={connectLinkText}>Display</span>
           </div>
         </div>
-        <br /><br />
+        <br />
+        <br />
 
         <Alert bsStyle="info">
-          <strong>This is not a development environment!</strong> Interactive tasks can help debug issues,
-          but note that these workers may be spot nodes that can be terminated at any time.
+          <strong>This is not a development environment!</strong> Interactive
+          tasks can help debug issues, but note that these workers may be spot
+          nodes that can be terminated at any time.
         </Alert>
 
         <h5>Task Information</h5>

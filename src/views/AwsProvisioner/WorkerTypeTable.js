@@ -70,11 +70,16 @@ export default class WorkerTypeTable extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
-    if (nextProps.provisionerId !== this.props.provisionerId || nextProps.workerType !== this.props.workerType) {
+    if (
+      nextProps.provisionerId !== this.props.provisionerId ||
+      nextProps.workerType !== this.props.workerType
+    ) {
       this.loadWorkerTypeSummaries();
     }
   }
@@ -93,28 +98,36 @@ export default class WorkerTypeTable extends React.PureComponent {
     }
   }
 
-  setSelected = workerType => this.props.history
-    .replace(`${this.props.routeRoot}/${workerType}/${this.props.currentTab}`);
+  setSelected = workerType =>
+    this.props.history.replace(
+      `${this.props.routeRoot}/${workerType}/${this.props.currentTab}`
+    );
 
-  handleTabChange = tab => this.props.history.replace(`${this.props.routeRoot}/${this.props.workerType}/${tab}`);
+  handleTabChange = tab =>
+    this.props.history.replace(
+      `${this.props.routeRoot}/${this.props.workerType}/${tab}`
+    );
 
-  workerTypeCreated = async (workerType) => {
+  workerTypeCreated = async workerType => {
     await this.loadWorkerTypeSummaries();
 
     this.setSelected(workerType);
   };
 
   // work around https://github.com/taskcluster/aws-provisioner/pull/70
-  updateSummary = (workerType, summary) => this.setState({
-    workerTypeSummaries: this.state.workerTypeSummaries
-      .map(workerType => (workerType.workerType === workerType ?
-        Object.assign(summary, { workerType }) :
-        workerType))
-  });
+  updateSummary = (workerType, summary) =>
+    this.setState({
+      workerTypeSummaries: this.state.workerTypeSummaries.map(
+        workerType =>
+          workerType.workerType === workerType
+            ? Object.assign(summary, { workerType })
+            : workerType
+      )
+    });
 
   setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
 
-  enterWorkerType = (e) => {
+  enterWorkerType = e => {
     if (e.keyCode === 13) {
       e.preventDefault();
       this.setWorkerType(e);
@@ -125,27 +138,38 @@ export default class WorkerTypeTable extends React.PureComponent {
     return (
       <div className="form-group form-group-sm">
         <div className="input-group">
-          <div className="input-group-addon text-sm"><em>WorkerTypes containing</em></div>
+          <div className="input-group-addon text-sm">
+            <em>WorkerTypes containing</em>
+          </div>
           <input
             type="search"
             className="form-control"
             defaultValue={this.state.workerTypeContains}
             onBlur={this.setWorkerType}
-            onKeyUp={this.enterWorkerType} />
-          <div className="input-group-addon"><Glyphicon glyph="search" /></div>
+            onKeyUp={this.enterWorkerType}
+          />
+          <div className="input-group-addon">
+            <Glyphicon glyph="search" />
+          </div>
         </div>
       </div>
     );
   }
 
   renderWorkerTypeView() {
-    if (!this.state.workerTypeSummaries.find(summary => summary.workerType === this.props.workerType)) {
+    if (
+      !this.state.workerTypeSummaries.find(
+        summary => summary.workerType === this.props.workerType
+      )
+    ) {
       return null;
     }
 
     return (
       <div style={{ marginBottom: 40 }}>
-        <h4>Worker Type: <code>{this.props.workerType}</code></h4>
+        <h4>
+          Worker Type: <code>{this.props.workerType}</code>
+        </h4>
         <hr />
         <WorkerTypeView
           queue={this.props.queue}
@@ -155,7 +179,8 @@ export default class WorkerTypeTable extends React.PureComponent {
           provisionerId={this.props.provisionerId}
           workerType={this.props.workerType}
           reload={this.setSelected}
-          updateSummary={this.updateSummary} />
+          updateSummary={this.updateSummary}
+        />
       </div>
     );
   }
@@ -168,7 +193,8 @@ export default class WorkerTypeTable extends React.PureComponent {
         <WorkerTypeEditor
           awsProvisioner={this.props.awsProvisioner}
           definition={defaultWorkerType}
-          updated={this.workerTypeCreated} />
+          updated={this.workerTypeCreated}
+        />
       </div>
     );
   }
@@ -195,20 +221,22 @@ export default class WorkerTypeTable extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {
-            this.state.workerTypeSummaries && this.state.workerTypeSummaries
-              .filter(workerType => workerType.workerType.includes(this.state.workerTypeContains))
-              .map(workerType => (
-                <WorkerTypeRow
-                  queue={this.props.queue}
-                  key={workerType.workerType}
-                  provisionerId={this.props.provisionerId}
-                  workerType={workerType}
-                  selected={this.props.workerType === workerType.workerType}
-                  onClick={() => this.setSelected(workerType.workerType)}
-                  summary={workerType} />
-              ))
-          }
+            {this.state.workerTypeSummaries &&
+              this.state.workerTypeSummaries
+                .filter(workerType =>
+                  workerType.workerType.includes(this.state.workerTypeContains)
+                )
+                .map(workerType => (
+                  <WorkerTypeRow
+                    queue={this.props.queue}
+                    key={workerType.workerType}
+                    provisionerId={this.props.provisionerId}
+                    workerType={workerType}
+                    selected={this.props.workerType === workerType.workerType}
+                    onClick={() => this.setSelected(workerType.workerType)}
+                    summary={workerType}
+                  />
+                ))}
           </tbody>
         </Table>
       </div>
@@ -219,11 +247,9 @@ export default class WorkerTypeTable extends React.PureComponent {
     return (
       <div className={workerTypes}>
         <HelmetTitle title="AWS Provisioner" />
-        {
-          this.props.workerType === 'create:worker-type' ?
-            this.renderWorkerTypeCreator() :
-            this.renderWorkerTypeView()
-        }
+        {this.props.workerType === 'create:worker-type'
+          ? this.renderWorkerTypeCreator()
+          : this.renderWorkerTypeView()}
         <ButtonToolbar className="pull-right">
           <Button
             bsStyle="primary"

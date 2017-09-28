@@ -49,7 +49,7 @@ export default class HookBrowser extends Component {
     }
   }
 
-  registerChild = ref => this.treeView = ref;
+  registerChild = ref => (this.treeView = ref);
 
   handleLabelClick = () => this.treeView && this.treeView.handleClick();
 
@@ -79,9 +79,15 @@ export default class HookBrowser extends Component {
           <div
             key={hookId}
             style={{ cursor: 'pointer' }}
-            className={group === hookGroupId && hookId === this.props.hookId ? 'bg-info' : null}
+            className={
+              group === hookGroupId && hookId === this.props.hookId
+                ? 'bg-info'
+                : null
+            }
             onClick={() => this.props.selectHook(group, hookId)}>
-            <code>{group}/{hookId}</code>
+            <code>
+              {group}/{hookId}
+            </code>
           </div>
         ))}
       </TreeView>

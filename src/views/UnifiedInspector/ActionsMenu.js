@@ -59,10 +59,11 @@ export default class ActionsMenu extends React.PureComponent {
       });
     }
 
-    if (nextProps.actions !== this.props.actions ||
-        nextProps.taskGroupId !== this.props.taskGroupId ||
-        nextProps.taskId !== this.props.taskId ||
-        nextProps.task !== this.props.task
+    if (
+      nextProps.actions !== this.props.actions ||
+      nextProps.taskGroupId !== this.props.taskGroupId ||
+      nextProps.taskId !== this.props.taskId ||
+      nextProps.task !== this.props.task
     ) {
       const actions = nextProps.actions || this.props.actions;
       const task = nextProps.task || this.props.task;
@@ -72,7 +73,7 @@ export default class ActionsMenu extends React.PureComponent {
       const actionData = {};
 
       if (actions && actions.actions) {
-        actions.actions.forEach((action) => {
+        actions.actions.forEach(action => {
           const schema = action.schema || {};
           const validate = this.ajv.compile(schema);
           const form = safeDump(jsonSchemaDefaults(schema) || {});
@@ -85,7 +86,11 @@ export default class ActionsMenu extends React.PureComponent {
 
           if (!action.context.length) {
             groupActions.push(action.name);
-          } else if (task && task.tags && this.taskInContext(action.context, task.tags)) {
+          } else if (
+            task &&
+            task.tags &&
+            this.taskInContext(action.context, task.tags)
+          ) {
             taskActions.push(action.name);
           }
         });
@@ -100,7 +105,7 @@ export default class ActionsMenu extends React.PureComponent {
     }
   }
 
-  handleSelectCaches = (e) => {
+  handleSelectCaches = e => {
     const selectedCaches = new Set([...this.state.selectedCaches]);
 
     if (e.target.checked) {
@@ -112,7 +117,8 @@ export default class ActionsMenu extends React.PureComponent {
     this.setState({ selectedCaches });
   };
 
-  getCachesFromTask = task => Object.keys(pathOr({}, ['payload', 'cache'], task));
+  getCachesFromTask = task =>
+    Object.keys(pathOr({}, ['payload', 'cache'], task));
 
   isValidTask() {
     if (!this.props.task) {
@@ -138,27 +144,36 @@ export default class ActionsMenu extends React.PureComponent {
     const now = Date.now();
     const created = Date.parse(task.created);
 
-    await queue.createTask(taskId, merge(omit(['dependencies'], clone(task)), {
-      retries: 0,
-      deadline: new Date(now + Date.parse(task.deadline) - created).toJSON(),
-      expires: new Date(now + Date.parse(task.expires) - created).toJSON(),
-      created: new Date(now).toJSON(),
-      dependencies: task.dependencies.filter(requiredTask => requiredTask !== taskId)
-    }));
+    await queue.createTask(
+      taskId,
+      merge(omit(['dependencies'], clone(task)), {
+        retries: 0,
+        deadline: new Date(now + Date.parse(task.deadline) - created).toJSON(),
+        expires: new Date(now + Date.parse(task.expires) - created).toJSON(),
+        created: new Date(now).toJSON(),
+        dependencies: task.dependencies.filter(
+          requiredTask => requiredTask !== taskId
+        )
+      })
+    );
 
     return taskId;
   };
 
   // copy fields from the parent task, intentionally excluding some
   // fields which might cause confusion if left unchanged
-  cloneTask = () => omit([
-    'routes',
-    'taskGroupId',
-    'schedulerId',
-    'priority',
-    'dependencies',
-    'requires'
-  ], this.props.task);
+  cloneTask = () =>
+    omit(
+      [
+        'routes',
+        'taskGroupId',
+        'schedulerId',
+        'priority',
+        'dependencies',
+        'requires'
+      ],
+      this.props.task
+    );
 
   scheduleTask = () => this.props.queue.scheduleTask(this.props.taskId);
 
@@ -169,8 +184,12 @@ export default class ActionsMenu extends React.PureComponent {
     const { selectedCaches } = this.state;
     const promises = [];
 
-    selectedCaches.forEach((cacheName) => {
-      promises.push(purgeCache.purgeCache(task.provisionerId, task.workerType, { cacheName }));
+    selectedCaches.forEach(cacheName => {
+      promises.push(
+        purgeCache.purgeCache(task.provisionerId, task.workerType, {
+          cacheName
+        })
+      );
     });
 
     return Promise.all(promises);
@@ -190,9 +209,10 @@ export default class ActionsMenu extends React.PureComponent {
   scheduleTaskModal() {
     return (
       <span>
-        Are you sure you wish to schedule the task? This will <strong>overwrite any scheduling process </strong>
-        taking place. If this task is part of a continuous integration process, scheduling this task may cause
-        your commit to land with failing tests.
+        Are you sure you wish to schedule the task? This will{' '}
+        <strong>overwrite any scheduling process </strong>
+        taking place. If this task is part of a continuous integration process,
+        scheduling this task may cause your commit to land with failing tests.
       </span>
     );
   }
@@ -200,8 +220,10 @@ export default class ActionsMenu extends React.PureComponent {
   retriggerTaskModal() {
     return (
       <span>
-        This will duplicate the task and create it under a different <code>taskId</code>.
-        <br /><br />
+        This will duplicate the task and create it under a different{' '}
+        <code>taskId</code>.
+        <br />
+        <br />
         The new task will be altered to:
         <ul>
           <li>Update deadlines and other timestamps for the current time</li>
@@ -215,9 +237,10 @@ export default class ActionsMenu extends React.PureComponent {
   cancelTaskModal() {
     return (
       <span>
-        Are you sure you wish to cancel this task? Note that another process or person may still be able to
-        schedule a re-run. All existing runs will be aborted and any scheduling process will not be able to
-        schedule the task.
+        Are you sure you wish to cancel this task? Note that another process or
+        person may still be able to schedule a re-run. All existing runs will be
+        aborted and any scheduling process will not be able to schedule the
+        task.
       </span>
     );
   }
@@ -228,7 +251,8 @@ export default class ActionsMenu extends React.PureComponent {
     return (
       <span>
         <p>
-          Are you sure you wish to purge caches used in this task across all workers of this worker type?
+          Are you sure you wish to purge caches used in this task across all
+          workers of this worker type?
         </p>
         <p>Select the caches to purge:</p>
         <ul>
@@ -240,7 +264,8 @@ export default class ActionsMenu extends React.PureComponent {
                   type="checkbox"
                   onChange={this.handleSelectCaches}
                   checked={selectedCaches.has(cache)}
-                  value={cache} />
+                  value={cache}
+                />
                 {cache}
               </label>
             </li>
@@ -254,9 +279,10 @@ export default class ActionsMenu extends React.PureComponent {
     return (
       <span>
         Are you sure that you wish to edit this task?<br />
-        Note that the edited task will not be linked to other tasks nor have the same <code>task.routes</code> as
-        other tasks, so this is not a way to fix a failing task in a larger task group.
-        Note that you may also not have the scopes required to create the resulting task.
+        Note that the edited task will not be linked to other tasks nor have the
+        same <code>task.routes</code> as other tasks, so this is not a way to
+        fix a failing task in a larger task group. Note that you may also not
+        have the scopes required to create the resulting task.
       </span>
     );
   }
@@ -264,15 +290,29 @@ export default class ActionsMenu extends React.PureComponent {
   createInteractiveModal() {
     return (
       <span>
-        This will duplicate the task and create it under a different <code>taskId</code>.
-        <br /><br />
+        This will duplicate the task and create it under a different{' '}
+        <code>taskId</code>.
+        <br />
+        <br />
         The new task will be altered to:
         <ul>
-          <li>Set <code>task.payload.features.interactive = true</code></li>
-          <li>Strip <code>task.payload.caches</code> to avoid poisoning</li>
-          <li>Ensures <code>task.payload.maxRunTime</code> is minimum of 60 minutes</li>
-          <li>Strip <code>task.routes</code> to avoid side-effects</li>
-          <li>Set the environment variable <code>TASKCLUSTER_INTERACTIVE=true</code></li>
+          <li>
+            Set <code>task.payload.features.interactive = true</code>
+          </li>
+          <li>
+            Strip <code>task.payload.caches</code> to avoid poisoning
+          </li>
+          <li>
+            Ensures <code>task.payload.maxRunTime</code> is minimum of 60
+            minutes
+          </li>
+          <li>
+            Strip <code>task.routes</code> to avoid side-effects
+          </li>
+          <li>
+            Set the environment variable{' '}
+            <code>TASKCLUSTER_INTERACTIVE=true</code>
+          </li>
         </ul>
         Note: this may not work with all tasks.
       </span>
@@ -282,13 +322,26 @@ export default class ActionsMenu extends React.PureComponent {
   editInteractiveModal() {
     return (
       <span>
-        This will duplicate and allow you to edit the new task prior to creation. The new task will be altered to:
+        This will duplicate and allow you to edit the new task prior to
+        creation. The new task will be altered to:
         <ul>
-          <li>Set <code>task.payload.features.interactive = true</code></li>
-          <li>Strip <code>task.payload.caches</code> to avoid poisoning</li>
-          <li>Ensures <code>task.payload.maxRunTime</code> is minimum of 60 minutes</li>
-          <li>Strip <code>task.routes</code> to avoid side-effects</li>
-          <li>Set the environment variable <code>TASKCLUSTER_INTERACTIVE=true</code></li>
+          <li>
+            Set <code>task.payload.features.interactive = true</code>
+          </li>
+          <li>
+            Strip <code>task.payload.caches</code> to avoid poisoning
+          </li>
+          <li>
+            Ensures <code>task.payload.maxRunTime</code> is minimum of 60
+            minutes
+          </li>
+          <li>
+            Strip <code>task.routes</code> to avoid side-effects
+          </li>
+          <li>
+            Set the environment variable{' '}
+            <code>TASKCLUSTER_INTERACTIVE=true</code>
+          </li>
         </ul>
         Note: this may not work with all tasks.
       </span>
@@ -297,36 +350,45 @@ export default class ActionsMenu extends React.PureComponent {
 
   taskInContext(tagSetList, taskTags) {
     return tagSetList.some(tagSet =>
-      Object.keys(tagSet).every(tag => (
-        taskTags[tag] && taskTags[tag] === tagSet[tag]
-      ))
+      Object.keys(tagSet).every(
+        tag => taskTags[tag] && taskTags[tag] === tagSet[tag]
+      )
     );
   }
 
-  handleFormChange = (value, name) => this.setState({
-    actionInputs: {
-      ...this.state.actionInputs,
-      [name]: value
-    }
-  });
+  handleFormChange = (value, name) =>
+    this.setState({
+      actionInputs: {
+        ...this.state.actionInputs,
+        [name]: value
+      }
+    });
 
-  actionTaskModal = (name) => {
+  actionTaskModal = name => {
     const { actionInputs, actionData } = this.state;
     const { action } = actionData[name];
     const form = actionInputs[name];
 
     return (
       <div>
-        <Markdown>{action.description}</Markdown><br />
+        <Markdown>{action.description}</Markdown>
+        <br />
         {action.schema && (
           <Row>
             <Col lg={6} md={6} sm={12}>
               <h4>Action</h4>
-              <CodeEditor mode="yaml" lint={true} value={form} onChange={value => this.handleFormChange(value, name)} />
+              <CodeEditor
+                mode="yaml"
+                lint={true}
+                value={form}
+                onChange={value => this.handleFormChange(value, name)}
+              />
             </Col>
             <Col lg={6} md={6} sm={12}>
               <h4>Schema</h4>
-              <Code language="yaml" style={{ maxHeight: 250, overflow: 'scroll' }}>
+              <Code
+                language="yaml"
+                style={{ maxHeight: 250, overflow: 'scroll' }}>
                 {safeDump(action.schema || {})}
               </Code>
             </Col>
@@ -334,7 +396,7 @@ export default class ActionsMenu extends React.PureComponent {
         )}
       </div>
     );
-  }
+  };
 
   actionTaskSubmit = name => async () => {
     const { task, taskId, taskGroupId, actions } = this.props;
@@ -349,16 +411,22 @@ export default class ActionsMenu extends React.PureComponent {
     }
 
     const ownTaskId = nice();
-    const newTask = jsone(action.task, merge({
-      taskGroupId,
-      taskId,
-      task,
-      input,
-      ownTaskId
-    }, actions.variables));
+    const newTask = jsone(
+      action.task,
+      merge(
+        {
+          taskGroupId,
+          taskId,
+          task,
+          input,
+          ownTaskId
+        },
+        actions.variables
+      )
+    );
 
     if (!this.props.decision) {
-      throw new Error('no action task found');  // .. how did we find an action, then?
+      throw new Error('no action task found'); // .. how did we find an action, then?
     }
 
     // call the queue with the decision task's scopes, as directed by the action spec
@@ -369,7 +437,7 @@ export default class ActionsMenu extends React.PureComponent {
     await actionsQueue.createTask(ownTaskId, newTask);
 
     return ownTaskId;
-  }
+  };
 
   render() {
     const { caches, actionData, taskActions, groupActions } = this.state;
@@ -384,7 +452,9 @@ export default class ActionsMenu extends React.PureComponent {
       onEditInteractive,
       onActionTask
     } = this.props;
-    const isResolved = status ? ['completed', 'failed', 'exception'].includes(status.state) : false;
+    const isResolved = status
+      ? ['completed', 'failed', 'exception'].includes(status.state)
+      : false;
 
     return (
       <NavDropdown title="Actions" id="task-view-actions">
@@ -446,31 +516,37 @@ export default class ActionsMenu extends React.PureComponent {
 
         <MenuItem divider />
         <MenuItem header>Task Actions</MenuItem>
-        {taskActions && taskActions.map(action => (
-          <ModalItem
-            modalSize={actionData[action].action.schema ? 'large' : null}
-            body={this.actionTaskModal(action)}
-            onSubmit={this.actionTaskSubmit(action)}
-            onComplete={onActionTask(action)}
-            key={`taskaction-modal-item-${action}`}>
-            <Icon name="keyboard-o" /> {actionData[action].action.title}
-          </ModalItem>
-        ))}
-        {taskActions === null && <MenuItem disabled={true}>Loading...</MenuItem>}
+        {taskActions &&
+          taskActions.map(action => (
+            <ModalItem
+              modalSize={actionData[action].action.schema ? 'large' : null}
+              body={this.actionTaskModal(action)}
+              onSubmit={this.actionTaskSubmit(action)}
+              onComplete={onActionTask(action)}
+              key={`taskaction-modal-item-${action}`}>
+              <Icon name="keyboard-o" /> {actionData[action].action.title}
+            </ModalItem>
+          ))}
+        {taskActions === null && (
+          <MenuItem disabled={true}>Loading...</MenuItem>
+        )}
 
         <MenuItem divider />
         <MenuItem header>Group Actions</MenuItem>
-        {groupActions && groupActions.map(action => (
-          <ModalItem
-            modalSize={actionData[action].action.schema ? 'large' : null}
-            body={this.actionTaskModal(action)}
-            onSubmit={this.actionTaskSubmit(action)}
-            onComplete={onActionTask(action)}
-            key={`groupaction-modal-item-${action}`}>
-            <Icon name="keyboard-o" /> {actionData[action].action.title}
-          </ModalItem>
-        ))}
-        {groupActions === null && <MenuItem disabled={true}>Loading...</MenuItem>}
+        {groupActions &&
+          groupActions.map(action => (
+            <ModalItem
+              modalSize={actionData[action].action.schema ? 'large' : null}
+              body={this.actionTaskModal(action)}
+              onSubmit={this.actionTaskSubmit(action)}
+              onComplete={onActionTask(action)}
+              key={`groupaction-modal-item-${action}`}>
+              <Icon name="keyboard-o" /> {actionData[action].action.title}
+            </ModalItem>
+          ))}
+        {groupActions === null && (
+          <MenuItem disabled={true}>Loading...</MenuItem>
+        )}
       </NavDropdown>
     );
   }

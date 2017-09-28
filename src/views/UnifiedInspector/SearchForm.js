@@ -1,6 +1,15 @@
 import React from 'react';
 import { array, func, string } from 'prop-types';
-import { Col, Form, FormGroup, InputGroup, FormControl, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import {
+  Col,
+  Form,
+  FormGroup,
+  InputGroup,
+  FormControl,
+  ButtonGroup,
+  DropdownButton,
+  MenuItem
+} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Icon from 'react-fontawesome';
 import { VALID_TASK } from '../../utils';
@@ -28,7 +37,10 @@ export default class SearchForm extends React.PureComponent {
   }
 
   componentWillReceiveProps({ taskGroupId, taskId }) {
-    if (taskGroupId !== this.props.taskGroupId && taskId !== this.props.taskId) {
+    if (
+      taskGroupId !== this.props.taskGroupId &&
+      taskId !== this.props.taskId
+    ) {
       this.setState({
         taskGroupIdInput: taskGroupId || '',
         taskIdInput: taskId || ''
@@ -40,15 +52,15 @@ export default class SearchForm extends React.PureComponent {
     }
   }
 
-  handleTaskGroupIdInputChange = (e) => {
+  handleTaskGroupIdInputChange = e => {
     this.setState({ taskGroupIdInput: e.target.value.trim() });
   };
 
-  handleTaskIdInputChange = (e) => {
+  handleTaskIdInputChange = e => {
     this.setState({ taskIdInput: e.target.value.trim() });
   };
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
 
     const isValid = this.validate().form;
@@ -67,13 +79,17 @@ export default class SearchForm extends React.PureComponent {
     const { taskGroupId, taskId } = this.props;
     const { taskGroupIdInput, taskIdInput } = this.state;
 
-    const validTaskGroupId = VALID_TASK.test(taskGroupIdInput) || taskGroupIdInput === '';
+    const validTaskGroupId =
+      VALID_TASK.test(taskGroupIdInput) || taskGroupIdInput === '';
     const validTaskId = VALID_TASK.test(taskIdInput) || taskIdInput === '';
 
     return {
       taskGroupId: validTaskGroupId,
       taskId: validTaskId,
-      form: (taskGroupId !== taskGroupIdInput || taskId !== taskIdInput) && validTaskGroupId && validTaskId
+      form:
+        (taskGroupId !== taskGroupIdInput || taskId !== taskIdInput) &&
+        validTaskGroupId &&
+        validTaskId
     };
   }
 
@@ -85,27 +101,37 @@ export default class SearchForm extends React.PureComponent {
     return (
       <Form onSubmit={this.handleSubmit} horizontal>
         <Col lg={5} md={5} sm={4}>
-          <FormGroup validationState={valid.taskGroupId ? null : 'error'} style={{ marginRight: 0 }}>
+          <FormGroup
+            validationState={valid.taskGroupId ? null : 'error'}
+            style={{ marginRight: 0 }}>
             <InputGroup>
-              <InputGroup.Addon style={{ textAlign: 'left' }}>Task Group ID</InputGroup.Addon>
+              <InputGroup.Addon style={{ textAlign: 'left' }}>
+                Task Group ID
+              </InputGroup.Addon>
               <FormControl
                 type="text"
                 placeholder="Enter a task group ID"
                 value={taskGroupIdInput}
-                onChange={this.handleTaskGroupIdInputChange} />
+                onChange={this.handleTaskGroupIdInputChange}
+              />
             </InputGroup>
           </FormGroup>
         </Col>
 
         <Col lg={5} md={5} sm={4}>
-          <FormGroup validationState={valid.taskId ? null : 'error'} style={{ marginRight: 0 }}>
+          <FormGroup
+            validationState={valid.taskId ? null : 'error'}
+            style={{ marginRight: 0 }}>
             <InputGroup>
-              <InputGroup.Addon style={{ textAlign: 'left' }}>Task ID</InputGroup.Addon>
+              <InputGroup.Addon style={{ textAlign: 'left' }}>
+                Task ID
+              </InputGroup.Addon>
               <FormControl
                 type="text"
                 placeholder="Enter a task ID or choose one from Tasks"
                 value={taskIdInput}
-                onChange={this.handleTaskIdInputChange} />
+                onChange={this.handleTaskIdInputChange}
+              />
             </InputGroup>
           </FormGroup>
         </Col>
@@ -123,29 +149,27 @@ export default class SearchForm extends React.PureComponent {
               disabled={!taskGroupHistory.length && !taskHistory.length}
               pullRight>
               <MenuItem header>Task Groups</MenuItem>
-              {taskGroupHistory.length ?
-                (
-                  taskGroupHistory.map((taskGroupId, index) => (
-                    <LinkContainer to={`/groups/${taskGroupId}`} key={`group-history-${index}`}>
+              {taskGroupHistory.length
+                ? taskGroupHistory.map((taskGroupId, index) => (
+                    <LinkContainer
+                      to={`/groups/${taskGroupId}`}
+                      key={`group-history-${index}`}>
                       <MenuItem>{taskGroupId}</MenuItem>
                     </LinkContainer>
                   ))
-                ) :
-                null
-              }
+                : null}
 
               <MenuItem divider />
               <MenuItem header>Tasks</MenuItem>
-              {taskHistory.length ?
-                (
-                  taskHistory.map((taskId, index) => (
-                    <LinkContainer to={`/tasks/${taskId}`} key={`task-history-${index}`}>
+              {taskHistory.length
+                ? taskHistory.map((taskId, index) => (
+                    <LinkContainer
+                      to={`/tasks/${taskId}`}
+                      key={`task-history-${index}`}>
                       <MenuItem>{taskId}</MenuItem>
                     </LinkContainer>
                   ))
-                ) :
-                null
-              }
+                : null}
             </DropdownButton>
           </ButtonGroup>
         </Col>

@@ -1,7 +1,14 @@
 import React from 'react';
-import { Modal, FormGroup, ControlLabel, FormControl, Button, Glyphicon } from 'react-bootstrap';
+import {
+  Modal,
+  FormGroup,
+  ControlLabel,
+  FormControl,
+  Button,
+  Glyphicon
+} from 'react-bootstrap';
 
-const certificateIsValid = (certificate) => {
+const certificateIsValid = certificate => {
   if (certificate === '') {
     return true;
   }
@@ -28,7 +35,7 @@ export default class ManualModal extends React.PureComponent {
     const { onSubmit, onClose } = this.props;
     const { clientId, accessToken, certificate } = this.state;
     const isValid = clientId && accessToken && certificateIsValid(certificate);
-    const onClick = (e) => {
+    const onClick = e => {
       e.preventDefault();
       onClose && onClose({ clientId, accessToken, certificate });
     };
@@ -49,7 +56,8 @@ export default class ManualModal extends React.PureComponent {
                 name="clientId"
                 type="text"
                 placeholder="clientId"
-                onChange={e => this.setState({ clientId: e.target.value })} />
+                onChange={e => this.setState({ clientId: e.target.value })}
+              />
             </FormGroup>
 
             <FormGroup controlId="accessToken">
@@ -60,7 +68,8 @@ export default class ManualModal extends React.PureComponent {
                 name="accessToken"
                 type="password"
                 placeholder="accessToken"
-                onChange={e => this.setState({ accessToken: e.target.value })} />
+                onChange={e => this.setState({ accessToken: e.target.value })}
+              />
             </FormGroup>
 
             <FormGroup controlId="certificate">
@@ -71,13 +80,18 @@ export default class ManualModal extends React.PureComponent {
                 name="certificate"
                 rows={8}
                 placeholder="JSON certificate (if required)"
-                onChange={e => this.setState({ certificate: e.target.value })} />
+                onChange={e => this.setState({ certificate: e.target.value })}
+              />
             </FormGroup>
-            <p className="text-muted">Note that the credentials are not checked for validity.</p>
+            <p className="text-muted">
+              Note that the credentials are not checked for validity.
+            </p>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button bsStyle="default" onClick={onClick}>Cancel</Button>
+            <Button bsStyle="default" onClick={onClick}>
+              Cancel
+            </Button>
             <Button type="submit" bsStyle="primary" disabled={!isValid}>
               <Glyphicon glyph="paste" /> Sign In
             </Button>

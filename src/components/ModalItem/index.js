@@ -66,7 +66,15 @@ export default class ModalItem extends React.PureComponent {
   }
 
   render() {
-    const { disabled, body, children, button, bsStyle, bsSize, modalSize } = this.props;
+    const {
+      disabled,
+      body,
+      children,
+      button,
+      bsStyle,
+      bsSize,
+      modalSize
+    } = this.props;
     const { show, executing, error } = this.state;
     const modal = (
       <Modal show={show} onHide={this.handleClose} bsSize={modalSize}>
@@ -79,25 +87,30 @@ export default class ModalItem extends React.PureComponent {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.handleClose}>Cancel</Button>
-          <Button onClick={this.handleSubmit} disabled={executing} bsStyle={bsStyle}>
+          <Button
+            onClick={this.handleSubmit}
+            disabled={executing}
+            bsStyle={bsStyle}>
             {executing ? <Icon name="spinner" pulse /> : children}
           </Button>
         </Modal.Footer>
       </Modal>
     );
 
-    return button ?
-      (
-        <Button onClick={this.handleOpen} disabled={disabled} bsStyle={bsStyle} bsSize={bsSize}>
-          {children}
-          {modal}
-        </Button>
-      ) :
-      (
-        <MenuItem onSelect={this.handleOpen} disabled={disabled}>
-          {children}
-          {modal}
-        </MenuItem>
-      );
+    return button ? (
+      <Button
+        onClick={this.handleOpen}
+        disabled={disabled}
+        bsStyle={bsStyle}
+        bsSize={bsSize}>
+        {children}
+        {modal}
+      </Button>
+    ) : (
+      <MenuItem onSelect={this.handleOpen} disabled={disabled}>
+        {children}
+        {modal}
+      </MenuItem>
+    );
   }
 }

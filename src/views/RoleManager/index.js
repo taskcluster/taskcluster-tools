@@ -4,7 +4,7 @@ import Clients from '../../components/Clients';
 import RoleManager from './RoleManager';
 
 const View = ({ userSession, history, match }) => {
-  const roleId = location.hash.slice(1);
+  const roleId = window.location.hash.slice(1);
 
   if (roleId) {
     return <Redirect to={`/auth/roles/${roleId}`} />;
@@ -17,7 +17,10 @@ const View = ({ userSession, history, match }) => {
           auth={auth}
           history={history}
           userSession={userSession}
-          roleId={match.params.roleId ? decodeURIComponent(match.params.roleId) : ''} />
+          roleId={
+            match.params.roleId ? decodeURIComponent(match.params.roleId) : ''
+          }
+        />
       )}
     </Clients>
   );

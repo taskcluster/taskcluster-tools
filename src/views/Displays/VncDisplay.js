@@ -15,8 +15,9 @@ export default class VncDisplay extends React.PureComponent {
   };
 
   // This shouldn't be necessary, so we just have this sketchy implementation
-  // eslint-disable-next-line no-alert
-  onPasswordRequired = rfb => rfb.sendPassword(prompt('VNC server wants a password:'));
+  onPasswordRequired = rfb =>
+    // eslint-disable-next-line no-alert
+    rfb.sendPassword(prompt('VNC server wants a password:'));
 
   render() {
     return (
@@ -24,7 +25,8 @@ export default class VncDisplay extends React.PureComponent {
         <Vnc
           url={this.props.url}
           view_only={this.props.viewOnly}
-          shared={this.props.shared} />
+          shared={this.props.shared}
+        />
       </div>
     );
   }

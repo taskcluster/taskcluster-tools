@@ -18,13 +18,15 @@ export default [
     title: 'GitHub Quick-Start',
     link: '/quickstart',
     icon: 'github',
-    description: 'Create a `.taskcluster.yml` configuration file and plug Taskcluster into your repository.'
+    description:
+      'Create a `.taskcluster.yml` configuration file and plug Taskcluster into your repository.'
   },
   {
     title: 'AWS Provisioner',
     link: '/aws-provisioner',
     icon: 'server',
-    description: 'Manage worker types known to the AWS Provisioner and check on the status of AWS nodes.'
+    description:
+      'Manage worker types known to the AWS Provisioner and check on the status of AWS nodes.'
   },
   {
     title: 'Client Manager',
@@ -58,7 +60,8 @@ export default [
     title: 'Cache Purge Inspector',
     link: '/purge-caches',
     icon: 'bolt',
-    description: 'View currently active cache purges and schedule a new one if needed.'
+    description:
+      'View currently active cache purges and schedule a new one if needed.'
   },
   {
     title: 'Index Browser',
@@ -78,19 +81,22 @@ export default [
     title: 'Hooks Manager',
     link: '/hooks',
     icon: 'repeat',
-    description: 'Manage hooks: tasks that are created in response to events within Taskcluster.'
+    description:
+      'Manage hooks: tasks that are created in response to events within Taskcluster.'
   },
   {
     title: 'Secrets Manager',
     link: '/secrets',
     icon: 'user-secret',
-    description: 'Manage secrets: values that can only be retrieved with the appropriate scopes.'
+    description:
+      'Manage secrets: values that can only be retrieved with the appropriate scopes.'
   },
   {
     title: 'Documentation',
     link: 'https://docs.taskcluster.net',
     icon: 'book',
-    description: 'Visit the documentation site with documentation for all Taskcluster APIs and Pulse exchanges.'
+    description:
+      'Visit the documentation site with documentation for all Taskcluster APIs and Pulse exchanges.'
   },
   {
     title: 'GitHub Repository',
@@ -101,7 +107,8 @@ export default [
   },
   {
     title: 'Bugzilla Product',
-    link: 'https://bugzilla.mozilla.org/buglist.cgi?product=Taskcluster&bug_status=__open__',
+    link:
+      'https://bugzilla.mozilla.org/buglist.cgi?product=Taskcluster&bug_status=__open__',
     icon: 'bug',
     description: `Visit the Taskcluster Bugzilla product to view open bugs, participate in
       discussions or report new bugs in Taskcluster.`

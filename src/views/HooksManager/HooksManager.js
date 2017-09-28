@@ -29,11 +29,14 @@ export default class HooksManager extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ error: null });
     }
 
-    const needsUpdate = nextProps.currentHookGroupId !== this.props.currentHookGroupId ||
+    const needsUpdate =
+      nextProps.currentHookGroupId !== this.props.currentHookGroupId ||
       nextProps.currentHookId !== this.props.currentHookId;
 
     if (needsUpdate) {
@@ -94,7 +97,8 @@ export default class HooksManager extends React.PureComponent {
             group={group}
             selectHook={this.selectHook}
             hookGroupId={hookGroupId}
-            hookId={hookId} />
+            hookId={hookId}
+          />
         ))}
       </div>
     );
@@ -130,7 +134,8 @@ export default class HooksManager extends React.PureComponent {
             hookGroupId={hookGroupId}
             hookId={hookId}
             refreshHookList={this.loadGroups}
-            selectHook={this.selectHook} />
+            selectHook={this.selectHook}
+          />
         </Col>
       </Row>
     );

@@ -29,9 +29,10 @@ export default class Home extends React.PureComponent {
         <Row className={description}>
           <Col sm={12}>
             <p>
-              A collection of tools for Taskcluster components and elements in the Taskcluster
-              ecosystem. Here you will find tools to manage Taskcluster, as well as run, debug, inspect
-              and view tasks, task-graphs, and other Taskcluster related entities.
+              A collection of tools for Taskcluster components and elements in
+              the Taskcluster ecosystem. Here you will find tools to manage
+              Taskcluster, as well as run, debug, inspect and view tasks,
+              task-graphs, and other Taskcluster related entities.
             </p>
           </Col>
         </Row>
@@ -40,20 +41,25 @@ export default class Home extends React.PureComponent {
           <Row key={`home-tiles-${index}`}>
             {tiles.map(({ title, link, icon, description }) => (
               <Col sm={3} key={`home-tile-${link}`}>
-                {link.startsWith('/') ?
-                  (
-                    <Link to={link} className={`${entry} thumbnail`}>
-                      <h4><Icon name={icon} /> {title}</h4>
-                      <Markdown>{description}</Markdown>
-                    </Link>
-                  ) :
-                  (
-                    <a href={link} className={`${entry} thumbnail`} target="_blank" rel="noopener noreferrer">
-                      <h4><Icon name={icon} /> {title}</h4>
-                      <Markdown>{description}</Markdown>
-                    </a>
-                  )
-                }
+                {link.startsWith('/') ? (
+                  <Link to={link} className={`${entry} thumbnail`}>
+                    <h4>
+                      <Icon name={icon} /> {title}
+                    </h4>
+                    <Markdown>{description}</Markdown>
+                  </Link>
+                ) : (
+                  <a
+                    href={link}
+                    className={`${entry} thumbnail`}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <h4>
+                      <Icon name={icon} /> {title}
+                    </h4>
+                    <Markdown>{description}</Markdown>
+                  </a>
+                )}
               </Col>
             ))}
           </Row>

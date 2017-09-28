@@ -1,6 +1,15 @@
 import React from 'react';
 import {
-  Row, Col, ButtonToolbar, Button, Glyphicon, Table, Alert, FormGroup, FormControl, ControlLabel
+  Row,
+  Col,
+  ButtonToolbar,
+  Button,
+  Glyphicon,
+  Table,
+  Alert,
+  FormGroup,
+  FormControl,
+  ControlLabel
 } from 'react-bootstrap';
 import { WebListener } from 'taskcluster-client-web';
 import { nice } from 'slugid';
@@ -59,9 +68,7 @@ export default class PulseInspector extends React.PureComponent {
   getBindingsFromProps(props) {
     const query = parse(props.location.search.slice(1));
 
-    return query.bindings ?
-      Object.values(query.bindings) :
-      [];
+    return query.bindings ? Object.values(query.bindings) : [];
   }
 
   createListener(bindings) {
@@ -88,12 +95,18 @@ export default class PulseInspector extends React.PureComponent {
     }
   }
 
-  handleListenerMessage = (message) => {
+  handleListenerMessage = message => {
     const messages = [
       { ...message, _idForInspector: nice() },
       ...this.state.messages
     ];
-    const params = btoa(JSON.stringify(messages.map(pick(['exchange', 'routingKey', 'payload'])), null, 2));
+    const params = btoa(
+      JSON.stringify(
+        messages.map(pick(['exchange', 'routingKey', 'payload'])),
+        null,
+        2
+      )
+    );
 
     this.setState({
       messages,
@@ -107,14 +120,17 @@ export default class PulseInspector extends React.PureComponent {
 
   updateExchangeValue = e => this.setState({ exchangeValue: e.target.value });
 
-  updateRoutingKeyPatternValue = e => this.setState({ routingKeyPatternValue: e.target.value });
+  updateRoutingKeyPatternValue = e =>
+    this.setState({ routingKeyPatternValue: e.target.value });
 
   addBinding = () => {
     const { exchangeValue, routingKeyPatternValue } = this.state;
-    const bindings = this.state.bindings.concat([{
-      exchange: exchangeValue,
-      routingKeyPattern: routingKeyPatternValue
-    }]);
+    const bindings = this.state.bindings.concat([
+      {
+        exchange: exchangeValue,
+        routingKeyPattern: routingKeyPatternValue
+      }
+    ]);
 
     this.props.history.replace(`/pulse-inspector?${stringify({ bindings })}`);
   };
@@ -130,20 +146,26 @@ export default class PulseInspector extends React.PureComponent {
   };
 
   /** Set expanded message, note we rely on object reference comparison here */
-  expandMessage = idForInspector => this.setState({ expandedMessage: idForInspector });
+  expandMessage = idForInspector =>
+    this.setState({ expandedMessage: idForInspector });
 
   dismissListeningError = () => this.setState({ listeningError: null });
 
   renderBindings() {
     if (!this.state.bindings.length) {
-      return <p><em>Please create some bindings...</em></p>;
+      return (
+        <p>
+          <em>Please create some bindings...</em>
+        </p>
+      );
     }
 
     return (
       <ul>
         {this.state.bindings.map((binding, index) => (
           <li key={index}>
-            <code>{binding.exchange}</code> with <code>{binding.routingKeyPattern}</code>
+            <code>{binding.exchange}</code> with{' '}
+            <code>{binding.routingKeyPattern}</code>
           </li>
         ))}
       </ul>
@@ -162,7 +184,8 @@ export default class PulseInspector extends React.PureComponent {
               value={exchangeValue}
               onChange={this.updateExchangeValue}
               type="text"
-              placeholder="exchange/<username>/some-exchange-name" />
+              placeholder="exchange/<username>/some-exchange-name"
+            />
           </div>
         </FormGroup>
         <FormGroup>
@@ -172,7 +195,8 @@ export default class PulseInspector extends React.PureComponent {
               value={routingKeyPatternValue}
               onChange={this.updateRoutingKeyPatternValue}
               type="text"
-              placeholder="#.some-interesting-key.#" />
+              placeholder="#.some-interesting-key.#"
+            />
           </div>
         </FormGroup>
         <div className="form-group">
@@ -223,7 +247,7 @@ export default class PulseInspector extends React.PureComponent {
           </tr>
         </thead>
         <tbody>
-          {this.state.messages.map((message) => {
+          {this.state.messages.map(message => {
             const msgId = message._idForInspector; // eslint-disable-line no-underscore-dangle
             const expanded = msgId === expandedMsgId;
 
@@ -232,7 +256,8 @@ export default class PulseInspector extends React.PureComponent {
                 key={msgId}
                 expanded={expanded}
                 message={message}
-                onClick={() => this.expandMessage(msgId)} />
+                onClick={() => this.expandMessage(msgId)}
+              />
             );
           })}
         </tbody>
@@ -255,7 +280,8 @@ export default class PulseInspector extends React.PureComponent {
             <a href="https://wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges">
               wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
             </a>. Notice that all exchanges from Taskcluster is formally
-            documented on <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
+            documented on{' '}
+            <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
           </p>
           <hr />
           {this.renderForm()}

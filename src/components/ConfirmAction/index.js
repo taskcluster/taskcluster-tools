@@ -45,7 +45,16 @@ export default class ConfirmAction extends React.PureComponent {
   }
 
   render() {
-    const { buttonSize, buttonStyle, children, menu, disabled, glyph, title, success } = this.props;
+    const {
+      buttonSize,
+      buttonStyle,
+      children,
+      menu,
+      disabled,
+      glyph,
+      title,
+      success
+    } = this.props;
     const { error, executing, result } = this.state;
     const Wrapper = menu ? MenuItem : Button;
     const props = {
@@ -60,15 +69,15 @@ export default class ConfirmAction extends React.PureComponent {
 
     return (
       <Wrapper {...props}>
-        <Modal bsStyle="primary" show={this.state.show} onHide={this.handleHide}>
+        <Modal
+          bsStyle="primary"
+          show={this.state.show}
+          onHide={this.handleHide}>
           <Modal.Header closeButton={true}>
-            <Modal.Title>
-              {title}
-            </Modal.Title>
+            <Modal.Title>{title}</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
-
             <span>{children}</span>
             {executing && (
               <div>
@@ -83,7 +92,10 @@ export default class ConfirmAction extends React.PureComponent {
           </Modal.Body>
           <Modal.Footer>
             {!(executing || result) && (
-              <Button bsStyle={buttonStyle} hidden={result} onClick={this.executeAction}>
+              <Button
+                bsStyle={buttonStyle}
+                hidden={result}
+                onClick={this.executeAction}>
                 <Glyphicon glyph={glyph} /> <span>{title}</span>
               </Button>
             )}

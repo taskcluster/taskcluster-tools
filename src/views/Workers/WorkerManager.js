@@ -1,6 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Breadcrumb, Button, ButtonGroup, Glyphicon, DropdownButton, MenuItem, Label } from 'react-bootstrap';
+import {
+  Table,
+  Breadcrumb,
+  Button,
+  ButtonGroup,
+  Glyphicon,
+  DropdownButton,
+  MenuItem,
+  Label
+} from 'react-bootstrap';
 import HelmetTitle from '../../components/HelmetTitle';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -28,14 +37,17 @@ export default class WorkerManager extends React.PureComponent {
     const filterChanged = filter !== this.state.filter;
 
     if (workerToken !== this.state.workerToken || filterChanged) {
-      this.setState({
-        loading: true,
-        ...(filterChanged ? { workers: null } : {})
-      }, () => this.loadWorkers(this.props));
+      this.setState(
+        {
+          loading: true,
+          ...(filterChanged ? { workers: null } : {})
+        },
+        () => this.loadWorkers(this.props)
+      );
     }
   }
 
-  loadStatus = async (taskId) => {
+  loadStatus = async taskId => {
     if (!taskId) {
       return {};
     }
@@ -52,14 +64,23 @@ export default class WorkerManager extends React.PureComponent {
 
   async loadWorkers({ provisionerId, workerType }) {
     try {
-      const workers = await this.props.queue.listWorkers(provisionerId, workerType, {
-        ...(this.state.workerToken ? { continuationToken: this.state.workerToken } : {}),
-        ...{ limit: 15 },
-        ...(this.state.filter.includes('disabled') ? { disabled: true } : {})
-      });
+      const workers = await this.props.queue.listWorkers(
+        provisionerId,
+        workerType,
+        {
+          ...(this.state.workerToken
+            ? { continuationToken: this.state.workerToken }
+            : {}),
+          ...{ limit: 15 },
+          ...(this.state.filter.includes('disabled') ? { disabled: true } : {})
+        }
+      );
 
       workers.workers = await Promise.all(
-        workers.workers.map(async worker => ({ ...worker, ...(await this.loadStatus(worker.latestTask)) }))
+        workers.workers.map(async worker => ({
+          ...worker,
+          ...(await this.loadStatus(worker.latestTask))
+        }))
       );
 
       this.setState({ workers, loading: false, error: null });
@@ -68,11 +89,17 @@ export default class WorkerManager extends React.PureComponent {
     }
   }
 
-  clearWorkerToken = () => !this.state.loading && this.setState({ workerToken: null });
+  clearWorkerToken = () =>
+    !this.state.loading && this.setState({ workerToken: null });
 
-  nextWorkers = () => !this.state.loading && this.setState({ workerToken: this.state.workers.continuationToken });
+  nextWorkers = () =>
+    !this.state.loading &&
+    this.setState({ workerToken: this.state.workers.continuationToken });
 
-  onFilterSelect = filter => this.setState({ filter: filter.includes('disabled') ? 'disabled' : filter });
+  onFilterSelect = filter =>
+    this.setState({
+      filter: filter.includes('disabled') ? 'disabled' : filter
+    });
 
   render() {
     const { filter, workers, workerToken, loading, error } = this.state;
@@ -85,12 +112,11 @@ export default class WorkerManager extends React.PureComponent {
         </div>
         <div>
           <Breadcrumb>
-            <Breadcrumb.Item href={`/workers/provisioners/${this.props.provisionerId}`}>
+            <Breadcrumb.Item
+              href={`/workers/provisioners/${this.props.provisionerId}`}>
               {this.props.provisionerId}
             </Breadcrumb.Item>
-            <Breadcrumb.Item active>
-              {this.props.workerType}
-            </Breadcrumb.Item>
+            <Breadcrumb.Item active>{this.props.workerType}</Breadcrumb.Item>
           </Breadcrumb>
         </div>
         <div className={styles.filters}>
@@ -110,7 +136,11 @@ export default class WorkerManager extends React.PureComponent {
         </div>
         {error && <Error error={error} />}
         {loading && <Spinner />}
-        <Table className={styles.workersTable} responsive condensed={true} hover={true}>
+        <Table
+          className={styles.workersTable}
+          responsive
+          condensed={true}
+          hover={true}>
           <thead>
             <tr>
               <th>Worker Group</th>
@@ -124,42 +154,86 @@ export default class WorkerManager extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {!loading && workers && (
+            {!loading &&
+              workers &&
               workers.workers.map((worker, index) => (
                 <tr key={`worker-${index}`}>
                   <td>{worker.workerGroup}</td>
                   <td>
                     <Link
-                      to={`/workers/provisioners/${this.props.provisionerId}/worker-types/${this.props.workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
+                      to={`/workers/provisioners/${this.props
+                        .provisionerId}/worker-types/${this.props
+                        .workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
                       {worker.workerId}
                     </Link>
                   </td>
-                  <td>{worker.latestTask ? <Link to={`/tasks/${worker.latestTask}`}>{worker.latestTask}</Link> : '-'}</td>
-                  <td><Label bsSize="sm" bsStyle={labels[worker.state]}>{worker.state}</Label></td>
-                  <td>{worker.lastClaimStarted ? <DateView date={worker.lastClaimStarted} /> : '-'}</td>
-                  <td>{worker.lastClaimResolved ? <DateView date={worker.lastClaimResolved} since={worker.lastClaimStarted} /> : '-'}</td>
-                  <td>{worker.firstClaim ? <DateView date={worker.firstClaim} /> : '-'}</td>
                   <td>
-                    <Label bsSize="sm" bsStyle={worker.disabled ? 'danger' : 'success'}>{worker.disabled ? 'disabled' : 'enabled'}</Label>
+                    {worker.latestTask ? (
+                      <Link to={`/tasks/${worker.latestTask}`}>
+                        {worker.latestTask}
+                      </Link>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    <Label bsSize="sm" bsStyle={labels[worker.state]}>
+                      {worker.state}
+                    </Label>
+                  </td>
+                  <td>
+                    {worker.lastClaimStarted ? (
+                      <DateView date={worker.lastClaimStarted} />
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    {worker.lastClaimResolved ? (
+                      <DateView
+                        date={worker.lastClaimResolved}
+                        since={worker.lastClaimStarted}
+                      />
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    {worker.firstClaim ? (
+                      <DateView date={worker.firstClaim} />
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    <Label
+                      bsSize="sm"
+                      bsStyle={worker.disabled ? 'danger' : 'success'}>
+                      {worker.disabled ? 'disabled' : 'enabled'}
+                    </Label>
                   </td>
                 </tr>
-              ))
-            )}
+              ))}
           </tbody>
         </Table>
-        {workers && !workers.workers.length && !loading && (
-          <div>There are no {filter !== 'None' ? filter : ''} workers in <code>{`${this.props.provisionerId}/${this.props.workerType}`}</code></div>
-        )}
+        {workers &&
+          !workers.workers.length &&
+          !loading && (
+            <div>
+              There are no {filter !== 'None' ? filter : ''} workers in{' '}
+              <code>{`${this.props.provisionerId}/${this.props
+                .workerType}`}</code>
+            </div>
+          )}
         <div className={styles.pagination}>
           <ButtonGroup>
-            <Button
-              disabled={!workerToken}
-              onClick={this.clearWorkerToken}>
+            <Button disabled={!workerToken} onClick={this.clearWorkerToken}>
               <Glyphicon glyph="arrow-left" />&nbsp;&nbsp;Back to start
             </Button>
             <Button
               disabled={workers && !workers.continuationToken}
-              onClick={this.nextWorkers}>More workers&nbsp;&nbsp;<Glyphicon glyph="arrow-right" />
+              onClick={this.nextWorkers}>
+              More workers&nbsp;&nbsp;<Glyphicon glyph="arrow-right" />
             </Button>
           </ButtonGroup>
         </div>

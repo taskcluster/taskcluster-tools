@@ -7,9 +7,10 @@ export default class OktaLoginMenuItem extends React.PureComponent {
   render() {
     const tooltip = (
       <Tooltip id="okta-signin">
-        If you have a <strong>Mozilla LDAP Account</strong>, sign in with Okta to maximize your
-        permissions. You can use this option even if you are not an employee! If you also have a
-        Mozillians account, make sure your LDAP email is included in your Mozillians profile.
+        If you have a <strong>Mozilla LDAP Account</strong>, sign in with Okta
+        to maximize your permissions. You can use this option even if you are
+        not an employee! If you also have a Mozillians account, make sure your
+        LDAP email is included in your Mozillians profile.
       </Tooltip>
     );
 

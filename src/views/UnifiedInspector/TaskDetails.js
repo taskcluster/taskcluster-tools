@@ -29,17 +29,23 @@ export default class TaskDetails extends React.PureComponent {
           <tbody>
             <tr>
               <td style={{ borderTop: 'none' }}>Name</td>
-              <td style={{ borderTop: 'none' }}><Markdown>{metadata.name}</Markdown></td>
+              <td style={{ borderTop: 'none' }}>
+                <Markdown>{metadata.name}</Markdown>
+              </td>
             </tr>
 
             <tr>
               <td>Description</td>
-              <td><Markdown>{metadata.description}</Markdown></td>
+              <td>
+                <Markdown>{metadata.description}</Markdown>
+              </td>
             </tr>
 
             <tr>
               <td>Owner</td>
-              <td><code>{metadata.owner}</code></td>
+              <td>
+                <code>{metadata.owner}</code>
+              </td>
             </tr>
 
             <tr>
@@ -47,7 +53,9 @@ export default class TaskDetails extends React.PureComponent {
               <td>
                 <a href={metadata.source}>
                   <span>
-                    {metadata.source.length > 90 ? `...${metadata.source.substr(8 - 90)}` : metadata.source}
+                    {metadata.source.length > 90
+                      ? `...${metadata.source.substr(8 - 90)}`
+                      : metadata.source}
                   </span>
                 </a>
               </td>
@@ -56,59 +64,69 @@ export default class TaskDetails extends React.PureComponent {
             <tr>
               <td>State</td>
               <td>
-                <Label bsStyle={labels[status.state]}>
-                  {status.state}
-                </Label>
+                <Label bsStyle={labels[status.state]}>{status.state}</Label>
               </td>
             </tr>
 
             <tr>
               <td>Retries Left</td>
-              <td>{status.retriesLeft} of {task.retries}</td>
+              <td>
+                {status.retriesLeft} of {task.retries}
+              </td>
             </tr>
 
             <tr>
               <td>Created</td>
-              <td><DateView date={task.created} /></td>
+              <td>
+                <DateView date={task.created} />
+              </td>
             </tr>
 
             <tr>
               <td>Deadline</td>
-              <td><DateView date={task.deadline} since={task.created} /></td>
+              <td>
+                <DateView date={task.deadline} since={task.created} />
+              </td>
             </tr>
 
             <tr>
               <td>Priority</td>
-              <td><code>{task.priority}</code></td>
+              <td>
+                <code>{task.priority}</code>
+              </td>
             </tr>
 
             <tr>
               <td>Provisioner</td>
-              <td><code>{task.provisionerId}</code></td>
+              <td>
+                <code>{task.provisionerId}</code>
+              </td>
             </tr>
 
             <tr>
               <td>WorkerType</td>
-              <td><code>{task.workerType}</code></td>
+              <td>
+                <code>{task.workerType}</code>
+              </td>
             </tr>
 
             <tr>
               <td>SchedulerId</td>
-              <td><code>{task.schedulerId}</code></td>
+              <td>
+                <code>{task.schedulerId}</code>
+              </td>
             </tr>
 
             <tr>
               <td>Dependencies</td>
               <td>
-                {
-                  task.dependencies.length ?
-                    task.dependencies.map((dependency, key) => (
+                {task.dependencies.length
+                  ? task.dependencies.map((dependency, key) => (
                       <div key={`task-dependency-${key}`}>
                         <Link to={`/tasks/${dependency}`}>{dependency}</Link>
                       </div>
-                    )) :
-                    '-'
-                }
+                    ))
+                  : '-'}
               </td>
             </tr>
 
@@ -127,7 +145,11 @@ export default class TaskDetails extends React.PureComponent {
                       <tbody>
                         {entries.map(([key, value]) => (
                           <tr key={`task-tag-${key}`}>
-                            <td><strong><em>{key}</em></strong>&nbsp;&nbsp;&nbsp;</td>
+                            <td>
+                              <strong>
+                                <em>{key}</em>
+                              </strong>&nbsp;&nbsp;&nbsp;
+                            </td>
                             <td>{value}</td>
                           </tr>
                         ))}
@@ -142,41 +164,43 @@ export default class TaskDetails extends React.PureComponent {
               <td>Requires</td>
               <td>
                 This task will be scheduled when <em>dependencies</em> are
-                {
-                  task.requires === 'all-completed' ?
-                    <span> <code>all-completed</code> successfully.</span> :
-                    <span> <code>all-resolved</code> with any resolution.</span>
-                }
+                {task.requires === 'all-completed' ? (
+                  <span>
+                    {' '}
+                    <code>all-completed</code> successfully.
+                  </span>
+                ) : (
+                  <span>
+                    {' '}
+                    <code>all-resolved</code> with any resolution.
+                  </span>
+                )}
               </td>
             </tr>
 
             <tr>
               <td>Scopes</td>
               <td>
-                {
-                  task.scopes.length ?
-                    task.scopes.map((scope, key) => (
+                {task.scopes.length
+                  ? task.scopes.map((scope, key) => (
                       <div key={`task-scopes-${key}`}>
                         <code>{scope}</code>
                       </div>
-                    )) :
-                    '-'
-                }
+                    ))
+                  : '-'}
               </td>
             </tr>
 
             <tr>
               <td>Routes</td>
               <td>
-                {
-                  task.routes.length ?
-                    task.routes.map((route, key) => (
+                {task.routes.length
+                  ? task.routes.map((route, key) => (
                       <div key={`task-routes-${key}`}>
                         <code>{route}</code>
                       </div>
-                    )) :
-                    '-'
-                }
+                    ))
+                  : '-'}
               </td>
             </tr>
 
@@ -201,19 +225,16 @@ export default class TaskDetails extends React.PureComponent {
               </td>
             </tr>
 
-            {Object.keys(task.extra).length ?
-              (
-                <tr>
-                  <td>Extra</td>
-                  <td>
-                    <Code language="json">
-                      {JSON.stringify(task.extra, null, 2)}
-                    </Code>
-                  </td>
-                </tr>
-              ) :
-              null
-            }
+            {Object.keys(task.extra).length ? (
+              <tr>
+                <td>Extra</td>
+                <td>
+                  <Code language="json">
+                    {JSON.stringify(task.extra, null, 2)}
+                  </Code>
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </Table>
       </div>

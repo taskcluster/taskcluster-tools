@@ -1,6 +1,15 @@
 import React from 'react';
 import {
-  Row, Col, ButtonToolbar, Glyphicon, Table, Button, FormGroup, ControlLabel, FormControl, Alert
+  Row,
+  Col,
+  ButtonToolbar,
+  Glyphicon,
+  Table,
+  Button,
+  FormGroup,
+  ControlLabel,
+  FormControl,
+  Alert
 } from 'react-bootstrap';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
@@ -26,7 +35,9 @@ export default class CachePurgeInspector extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (UserSession.userChanged(this.props.userSession, nextProps.userSession)) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
       this.setState({ cachesError: null });
     }
   }
@@ -47,17 +58,24 @@ export default class CachePurgeInspector extends React.PureComponent {
     }
   };
 
-  provisionerIdChange = event => this.setState({ formProvisionerId: event.target.value });
+  provisionerIdChange = event =>
+    this.setState({ formProvisionerId: event.target.value });
 
-  workerTypeChange = event => this.setState({ formWorkerType: event.target.value });
+  workerTypeChange = event =>
+    this.setState({ formWorkerType: event.target.value });
 
-  cacheNameChange = event => this.setState({ formCacheName: event.target.value });
+  cacheNameChange = event =>
+    this.setState({ formCacheName: event.target.value });
 
   sendRequest = async () => {
     const { formProvisionerId, formWorkerType, formCacheName } = this.state;
 
     try {
-      await this.props.purgeCache.purgeCache(formProvisionerId, formWorkerType, { cacheName: formCacheName });
+      await this.props.purgeCache.purgeCache(
+        formProvisionerId,
+        formWorkerType,
+        { cacheName: formCacheName }
+      );
 
       this.setState({
         formProvisionerId: '',
@@ -99,11 +117,9 @@ export default class CachePurgeInspector extends React.PureComponent {
           </tr>
         </thead>
         <tbody>
-          {
-            this.state.caches.length ?
-              this.state.caches.map(this.renderCacheRow) :
-              null
-          }
+          {this.state.caches.length
+            ? this.state.caches.map(this.renderCacheRow)
+            : null}
         </tbody>
       </Table>
     );
@@ -111,18 +127,27 @@ export default class CachePurgeInspector extends React.PureComponent {
 
   renderCacheRow = (cache, index) => (
     <tr key={`cache-row-${index}`}>
-      <td><code>{cache.provisionerId}</code></td>
-      <td><code>{cache.workerType}</code></td>
-      <td><code>{cache.cacheName}</code></td>
-      <td><DateView date={cache.before} /></td>
+      <td>
+        <code>{cache.provisionerId}</code>
+      </td>
+      <td>
+        <code>{cache.workerType}</code>
+      </td>
+      <td>
+        <code>{cache.cacheName}</code>
+      </td>
+      <td>
+        <DateView date={cache.before} />
+      </td>
     </tr>
-    );
+  );
 
   renderForm() {
     if (this.state.formError) {
       return (
         <Alert bsStyle="danger" onDismiss={this.dismissError}>
-          <strong>Error executing operation: </strong> {`${this.state.formError}`}
+          <strong>Error executing operation: </strong>{' '}
+          {`${this.state.formError}`}
         </Alert>
       );
     }
@@ -139,7 +164,8 @@ export default class CachePurgeInspector extends React.PureComponent {
               type="text"
               placeholder="Provisioner ID"
               value={this.state.formProvisionerId}
-              onChange={this.provisionerIdChange} />
+              onChange={this.provisionerIdChange}
+            />
           </Col>
         </FormGroup>
 
@@ -150,7 +176,8 @@ export default class CachePurgeInspector extends React.PureComponent {
               type="text"
               placeholder="Worker type"
               value={this.state.formWorkerType}
-              onChange={this.workerTypeChange} />
+              onChange={this.workerTypeChange}
+            />
           </Col>
         </FormGroup>
 
@@ -161,11 +188,15 @@ export default class CachePurgeInspector extends React.PureComponent {
               type="text"
               placeholder="Cache name"
               value={this.state.formCacheName}
-              onChange={this.cacheNameChange} />
+              onChange={this.cacheNameChange}
+            />
           </Col>
         </FormGroup>
 
-        <p>Please note: The <code>before</code> date-time will be set to current date-time.</p>
+        <p>
+          Please note: The <code>before</code> date-time will be set to current
+          date-time.
+        </p>
 
         <ButtonToolbar>
           <Button bsStyle="primary" onClick={this.sendRequest}>
@@ -183,10 +214,10 @@ export default class CachePurgeInspector extends React.PureComponent {
         <Col md={12}>
           <h4>Cache Purge Inspector</h4>
           <p>
-            All currently active cache purges are displayed below.
-            24 hours after creation, requests expire and are no longer displayed here.
-            The <strong>before</strong> column is the time at which any caches that match the
-            previous three classifiers are considered invalid.
+            All currently active cache purges are displayed below. 24 hours
+            after creation, requests expire and are no longer displayed here.
+            The <strong>before</strong> column is the time at which any caches
+            that match the previous three classifiers are considered invalid.
             Any caches created after that time are fine.
           </p>
           <hr />
@@ -203,16 +234,16 @@ export default class CachePurgeInspector extends React.PureComponent {
           </ButtonToolbar>
         </Col>
         <Col md={7}>
-          <br /><br />
-          {
-            this.state.cachesError ?
-              (
-                <Alert bsStyle="danger" onDismiss={this.dismissError}>
-                  <strong>Error executing operation: </strong> {`${this.state.cachesError}`}
-                </Alert>
-              ) :
-              this.renderCachesTable()
-          }
+          <br />
+          <br />
+          {this.state.cachesError ? (
+            <Alert bsStyle="danger" onDismiss={this.dismissError}>
+              <strong>Error executing operation: </strong>{' '}
+              {`${this.state.cachesError}`}
+            </Alert>
+          ) : (
+            this.renderCachesTable()
+          )}
         </Col>
         <Col md={5}>
           <br />
@@ -222,4 +253,3 @@ export default class CachePurgeInspector extends React.PureComponent {
     );
   }
 }
-

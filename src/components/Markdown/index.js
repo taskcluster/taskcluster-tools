@@ -10,7 +10,8 @@ export default class Markdown extends React.PureComponent {
         className={container}
         dangerouslySetInnerHTML={{
           __html: markdown().render(this.props.children)
-        }} />
+        }}
+      />
     );
   }
 }

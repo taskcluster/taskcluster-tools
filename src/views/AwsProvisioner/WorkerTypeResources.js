@@ -23,7 +23,9 @@ export default class WorkerTypeResources extends React.PureComponent {
         return sum;
       }
 
-      const type = instanceTypes.find(({ instanceType }) => instanceType === instance.type);
+      const type = instanceTypes.find(
+        ({ instanceType }) => instanceType === instance.type
+      );
 
       if (!type) {
         return sum;
@@ -47,14 +49,16 @@ export default class WorkerTypeResources extends React.PureComponent {
 
   renderInstanceRow = (instance, index) => (
     <tr key={index}>
-      <td>
-        {this.renderInstanceIdLink(instance.id, instance.region)}
-      </td>
+      <td>{this.renderInstanceIdLink(instance.id, instance.region)}</td>
       <td>
         {this.renderSpotRequestLink(instance.srId, instance.region, true)}
       </td>
-      <td><code>{instance.type}</code></td>
-      <td><code>{instance.zone}</code></td>
+      <td>
+        <code>{instance.type}</code>
+      </td>
+      <td>
+        <code>{instance.zone}</code>
+      </td>
       <td>{this.renderImageIdLink(instance.ami, instance.region)}</td>
       <td>
         <DateView date={new Date(instance.launch)} />
@@ -65,16 +69,22 @@ export default class WorkerTypeResources extends React.PureComponent {
   renderSpotRow = (spotReq, index) => (
     <tr key={index}>
       <td>
-        {this.renderSpotRequestLink(spotReq.id, spotReq.region, spotReq.visibleToEC2Api)}
+        {this.renderSpotRequestLink(
+          spotReq.id,
+          spotReq.region,
+          spotReq.visibleToEC2Api
+        )}
       </td>
-      <td><code>{spotReq.type}</code></td>
+      <td>
+        <code>{spotReq.type}</code>
+      </td>
       <td>
         <code>{spotReq.zone}</code>
       </td>
-      <td><code>{spotReq.ami}</code></td>
       <td>
-        {this.renderImageIdLink(spotReq.ami, spotReq.region)}
+        <code>{spotReq.ami}</code>
       </td>
+      <td>{this.renderImageIdLink(spotReq.ami, spotReq.region)}</td>
       <td>
         <DateView date={new Date(spotReq.time)} />
       </td>
@@ -104,7 +114,8 @@ export default class WorkerTypeResources extends React.PureComponent {
     // both internally tracked and api tracked requests
     return (
       <a href={`${awsUrl}${qs}`} target="_blank" rel="noopener noreferrer">
-        <code>{spotReqId}</code>{!visibleToEC2 ? ' (Internally tracked)' : ''}
+        <code>{spotReqId}</code>
+        {!visibleToEC2 ? ' (Internally tracked)' : ''}
         <Icon name="external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
@@ -139,7 +150,9 @@ export default class WorkerTypeResources extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {this.props.awsState.instances.filter(x => x.state === 'running').map(this.renderInstanceRow)}
+            {this.props.awsState.instances
+              .filter(x => x.state === 'running')
+              .map(this.renderInstanceRow)}
           </tbody>
         </Table>
         <h3>Pending Instances</h3>
@@ -158,12 +171,15 @@ export default class WorkerTypeResources extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {this.props.awsState.instances.filter(x => x.state === 'pending').map(this.renderInstanceRow)}
+            {this.props.awsState.instances
+              .filter(x => x.state === 'pending')
+              .map(this.renderInstanceRow)}
           </tbody>
         </Table>
         <h3>Spot Requests</h3>
-        We have unfilled spot requests for a capacity of {this.spotReqCapacity()}.
-        Amazon is yet to decide on the bid, or they have not told us the outcome yet.
+        We have unfilled spot requests for a capacity of{' '}
+        {this.spotReqCapacity()}. Amazon is yet to decide on the bid, or they
+        have not told us the outcome yet.
         <Table>
           <thead>
             <tr>
@@ -174,9 +190,7 @@ export default class WorkerTypeResources extends React.PureComponent {
               <th>Created</th>
             </tr>
           </thead>
-          <tbody>
-            {this.props.awsState.requests.map(this.renderSpotRow)}
-          </tbody>
+          <tbody>{this.props.awsState.requests.map(this.renderSpotRow)}</tbody>
         </Table>
       </span>
     );

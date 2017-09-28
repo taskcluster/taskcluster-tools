@@ -6,7 +6,7 @@ import 'codemirror/addon/lint/lint';
   Override 'codemirror/addon/lint/yaml-lint' registerHelper so that it doesn't use window.jsyaml
   https://github.com/codemirror/CodeMirror/blob/master/addon/lint/yaml-lint.js
  */
-CodeMirror.registerHelper('lint', 'yaml', (text) => {
+CodeMirror.registerHelper('lint', 'yaml', text => {
   const found = [];
 
   try {

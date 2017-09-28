@@ -30,7 +30,10 @@ export default class Error extends React.PureComponent {
     if (error.response && error.response.status === 403) {
       return (
         <Alert bsStyle="danger">
-          <p>You are not authorized to perform the requested action. Please sign in and try again.</p>
+          <p>
+            You are not authorized to perform the requested action. Please sign
+            in and try again.
+          </p>
         </Alert>
       );
     }
@@ -38,22 +41,19 @@ export default class Error extends React.PureComponent {
     return (
       <Alert bsStyle="danger">
         <strong>{this.getTitle()}</strong>
-        <Markdown>
-          {error.message}
-        </Markdown>
+        <Markdown>{error.message}</Markdown>
         {process.env.NODE_ENV === 'development' && <pre>{error.stack}</pre>}
-        {error.body && error.body.requestInfo && (
-          <div>
-            <Button
-              bsSize="xsmall"
-              onClick={this.handleOpen}>
-              Additional details...
-            </Button>
-            <Collapse in={this.state.open}>
-              <pre>{JSON.stringify(error.body.requestInfo, null, 2)}</pre>
-            </Collapse>
-          </div>
-        )}
+        {error.body &&
+          error.body.requestInfo && (
+            <div>
+              <Button bsSize="xsmall" onClick={this.handleOpen}>
+                Additional details...
+              </Button>
+              <Collapse in={this.state.open}>
+                <pre>{JSON.stringify(error.body.requestInfo, null, 2)}</pre>
+              </Collapse>
+            </div>
+          )}
       </Alert>
     );
   }

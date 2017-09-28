@@ -30,7 +30,10 @@ export default class HookEditView extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.hookGroupId !== this.props.hookGroupId || nextProps.hookId !== this.props.hookId) {
+    if (
+      nextProps.hookGroupId !== this.props.hookGroupId ||
+      nextProps.hookId !== this.props.hookId
+    ) {
       this.loadHook(nextProps);
     }
   }
@@ -90,7 +93,10 @@ export default class HookEditView extends React.PureComponent {
     this.setState({ hookStatus: null });
 
     this.setState({
-      hookStatus: await this.props.hooks.getHookStatus(this.props.hookGroupId, this.props.hookId)
+      hookStatus: await this.props.hooks.getHookStatus(
+        this.props.hookGroupId,
+        this.props.hookId
+      )
     });
   };
 
@@ -98,7 +104,11 @@ export default class HookEditView extends React.PureComponent {
     // add hookId and hookGroupId to the hook, since they are required by the schema
 
     try {
-      const createdHook = await this.props.hooks.createHook(hookGroupId, hookId, hook);
+      const createdHook = await this.props.hooks.createHook(
+        hookGroupId,
+        hookId,
+        hook
+      );
 
       this.props.selectHook(createdHook.hookGroupId, createdHook.hookId);
     } catch (err) {
@@ -108,9 +118,13 @@ export default class HookEditView extends React.PureComponent {
     }
   };
 
-  updateHook = async (hook) => {
+  updateHook = async hook => {
     try {
-      await this.props.hooks.updateHook(this.props.hookGroupId, this.props.hookId, hook);
+      await this.props.hooks.updateHook(
+        this.props.hookGroupId,
+        this.props.hookId,
+        hook
+      );
 
       this.setState({
         hook: omit(['hookGroupId', 'hookId'], hook),
@@ -123,7 +137,10 @@ export default class HookEditView extends React.PureComponent {
   };
 
   deleteHook = async () => {
-    await this.props.hooks.removeHook(this.props.hookGroupId, this.props.hookId);
+    await this.props.hooks.removeHook(
+      this.props.hookGroupId,
+      this.props.hookId
+    );
     this.props.selectHook();
   };
 
@@ -158,7 +175,8 @@ export default class HookEditView extends React.PureComponent {
           isCreating={isCreating}
           createHook={this.createHook}
           updateHook={this.updateHook}
-          deleteHook={this.deleteHook} />
+          deleteHook={this.deleteHook}
+        />
       );
     }
 
@@ -170,7 +188,8 @@ export default class HookEditView extends React.PureComponent {
         hookGroupId={hookGroupId}
         startEditing={this.startEditing}
         triggerHook={this.triggerHook}
-        refreshHookStatus={this.refreshHookStatus} />
+        refreshHookStatus={this.refreshHookStatus}
+      />
     );
   }
 }

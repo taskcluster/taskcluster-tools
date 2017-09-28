@@ -3,7 +3,15 @@ import { Redirect } from 'react-router-dom';
 import Clients from '../../components/Clients';
 import WorkerTypeTable from './WorkerTypeTable';
 
-const View = ({ userSession, match, history, location, baseUrl, provisionerId, routeRoot }) => {
+const View = ({
+  userSession,
+  match,
+  history,
+  location,
+  baseUrl,
+  provisionerId,
+  routeRoot
+}) => {
   const [worker, tab] = location.hash.slice(1).split('/');
 
   if (worker && tab) {
@@ -22,7 +30,8 @@ const View = ({ userSession, match, history, location, baseUrl, provisionerId, r
           routeRoot={routeRoot}
           provisionerId={provisionerId}
           workerType={match.params.workerType}
-          currentTab={match.params.currentTab} />
+          currentTab={match.params.currentTab}
+        />
       )}
     </Clients>
   );

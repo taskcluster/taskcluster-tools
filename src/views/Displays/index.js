@@ -4,8 +4,17 @@ import HelmetTitle from '../../components/HelmetTitle';
 
 const View = ({ location, userSession }) => {
   const search = new URLSearchParams(location.search);
-  const props = ['displaysUrl', 'socketUrl', 'v', 'shared', 'taskId', 'runId']
-    .reduce((props, key) => ({ ...props, [key]: decodeURIComponent(search.get(key)) }), {});
+  const props = [
+    'displaysUrl',
+    'socketUrl',
+    'v',
+    'shared',
+    'taskId',
+    'runId'
+  ].reduce(
+    (props, key) => ({ ...props, [key]: decodeURIComponent(search.get(key)) }),
+    {}
+  );
 
   return (
     <div>

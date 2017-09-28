@@ -14,21 +14,35 @@ export default class HookDisplay extends React.PureComponent {
   };
 
   render() {
-    const { hook, hookGroupId, hookId, hookStatus, refreshHookStatus, startEditing, triggerHook } = this.props;
+    const {
+      hook,
+      hookGroupId,
+      hookId,
+      hookStatus,
+      refreshHookStatus,
+      startEditing,
+      triggerHook
+    } = this.props;
 
     return (
       <div>
         <dl className="dl-horizontal">
           <dt>HookGroupId</dt>
-          <dd><code>{hookGroupId}</code></dd>
+          <dd>
+            <code>{hookGroupId}</code>
+          </dd>
           <dt>HookId</dt>
-          <dd><code>{hookId}</code></dd>
+          <dd>
+            <code>{hookId}</code>
+          </dd>
         </dl>
         <dl className="dl-horizontal">
           <dt>Name</dt>
           <dd>{hook.metadata.name}</dd>
           <dt>Description</dt>
-          <dd><Markdown>{hook.metadata.description}</Markdown></dd>
+          <dd>
+            <Markdown>{hook.metadata.description}</Markdown>
+          </dd>
           <dt>Owner</dt>
           <dd>{hook.metadata.owner}</dd>
           <dt>Email On Error?</dt>
@@ -37,17 +51,15 @@ export default class HookDisplay extends React.PureComponent {
         <dl className="dl-horizontal">
           <dt>Schedule</dt>
           <dd>
-            {
-              hook.schedule.length ?
-                (
-                  <ul className="hookSchedule" style={{ marginBottom: 0 }}>
-                    {hook.schedule.map((schedule, key) => (
-                      <li key={`hook-schedule-${key}`}>{schedule}</li>
-                    ))}
-                  </ul>
-                ) :
-                  <span>(no schedule)</span>
-            }
+            {hook.schedule.length ? (
+              <ul className="hookSchedule" style={{ marginBottom: 0 }}>
+                {hook.schedule.map((schedule, key) => (
+                  <li key={`hook-schedule-${key}`}>{schedule}</li>
+                ))}
+              </ul>
+            ) : (
+              <span>(no schedule)</span>
+            )}
           </dd>
         </dl>
         <dl className="dl-horizontal">
@@ -60,14 +72,13 @@ export default class HookDisplay extends React.PureComponent {
           hookGroupId={hookGroupId}
           hookId={hookId}
           hookStatus={hookStatus}
-          refreshHookStatus={refreshHookStatus} />
+          refreshHookStatus={refreshHookStatus}
+        />
         <dl className="dl-horizontal">
           <dt>Task Definition</dt>
           <dd />
         </dl>
-        <Code language="json">
-          {JSON.stringify(hook.task, null, 2)}
-        </Code>
+        <Code language="json">{JSON.stringify(hook.task, null, 2)}</Code>
         <ButtonToolbar>
           <Button bsStyle="success" onClick={startEditing}>
             <Glyphicon glyph="pencil" /> Edit Hook

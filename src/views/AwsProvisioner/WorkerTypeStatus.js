@@ -13,23 +13,23 @@ export default class WorkerTypeStatus extends React.Component {
 
   renderRow(instTypeDef, availabilityZone) {
     // Find number of running, pending and spotRequests
-    const running = this.props.awsState.instances
-      .filter(inst => inst.type === instTypeDef.instanceType &&
+    const running = this.props.awsState.instances.filter(
+      inst =>
+        inst.type === instTypeDef.instanceType &&
         inst.state === 'running' &&
         inst.zone === availabilityZone
-      )
-      .length;
-    const pending = this.props.awsState.instances
-      .filter(inst => inst.type === instTypeDef.instanceType &&
+    ).length;
+    const pending = this.props.awsState.instances.filter(
+      inst =>
+        inst.type === instTypeDef.instanceType &&
         inst.state === 'pending' &&
         inst.zone === availabilityZone
-      )
-      .length;
-    const spotReq = this.props.awsState.requests
-      .filter(spotReq => spotReq.type === instTypeDef.instanceType &&
+    ).length;
+    const spotReq = this.props.awsState.requests.filter(
+      spotReq =>
+        spotReq.type === instTypeDef.instanceType &&
         spotReq.zone === availabilityZone
-      )
-      .length;
+    ).length;
 
     if (running + pending + spotReq === 0) {
       return;
@@ -37,8 +37,12 @@ export default class WorkerTypeStatus extends React.Component {
 
     return (
       <tr key={`${instTypeDef.instanceType}:${availabilityZone}`}>
-        <td><code>{instTypeDef.instanceType}</code></td>
-        <td><code>{availabilityZone}</code></td>
+        <td>
+          <code>{instTypeDef.instanceType}</code>
+        </td>
+        <td>
+          <code>{availabilityZone}</code>
+        </td>
         <td>
           {running * instTypeDef.capacity} ({running} instances)
         </td>
@@ -53,10 +57,12 @@ export default class WorkerTypeStatus extends React.Component {
   }
 
   render() {
-    const availabilityZones = [...new Set([
-      ...this.props.awsState.instances.map(({ zone }) => zone),
-      ...this.props.awsState.requests.map(({ zone }) => zone)
-    ])];
+    const availabilityZones = [
+      ...new Set([
+        ...this.props.awsState.instances.map(({ zone }) => zone),
+        ...this.props.awsState.requests.map(({ zone }) => zone)
+      ])
+    ];
 
     return (
       <Table>
@@ -70,9 +76,13 @@ export default class WorkerTypeStatus extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.props.workerType.instanceTypes
-          .reduce((reduction, typeDef) => reduction
-            .concat(availabilityZones.map(zone => this.renderRow(typeDef, zone))), [])}
+          {this.props.workerType.instanceTypes.reduce(
+            (reduction, typeDef) =>
+              reduction.concat(
+                availabilityZones.map(zone => this.renderRow(typeDef, zone))
+              ),
+            []
+          )}
         </tbody>
       </Table>
     );

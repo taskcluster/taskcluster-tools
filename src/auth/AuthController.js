@@ -65,9 +65,9 @@ export default class AuthController {
    */
   loadUserSession() {
     const storedUserSession = localStorage.getItem('userSession');
-    const userSession = storedUserSession ?
-      UserSession.deserialize(storedUserSession) :
-      null;
+    const userSession = storedUserSession
+      ? UserSession.deserialize(storedUserSession)
+      : null;
 
     this.resetRenewalTimer(userSession);
     this.userSessionChangedCallbacks.forEach(cb => cb(userSession));
