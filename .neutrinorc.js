@@ -112,7 +112,6 @@ module.exports = {
       neutrino.config
         .entry('vendor')
         .merge([
-          'babel-polyfill',
           'deepmerge',
           'lodash.chunk',
           'lodash.clonedeep',
@@ -132,11 +131,8 @@ module.exports = {
           'react-dom',
           'react-helmet',
           'react-router-dom',
-          'taskcluster-client-web',
+          'taskcluster-client-web'
         ]);
-
-      // HOTFIX
-      neutrino.config.plugins.delete('module-concat');
     }
   ],
   env: {
