@@ -45,6 +45,15 @@ export default class WorkerManager extends React.PureComponent {
         () => this.loadWorkers(this.props)
       );
     }
+
+    // Edge case with azure not returning a list but has a continuationToken
+    if (
+      this.state.workers &&
+      !this.state.workers.workers.length &&
+      this.state.workers.continuationToken
+    ) {
+      this.nextWorkers();
+    }
   }
 
   loadStatus = async taskId => {
