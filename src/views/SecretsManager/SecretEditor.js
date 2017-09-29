@@ -4,6 +4,7 @@ import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client-web';
 import Icon from 'react-fontawesome';
 import Spinner from '../../components/Spinner';
+import Error from '../../components/Error';
 import TimeInput from '../../components/TimeInput';
 import DateView from '../../components/DateView';
 import CodeEditor from '../../components/CodeEditor';
@@ -26,6 +27,7 @@ export default class SecretEditor extends React.PureComponent {
       expires: null,
       editing: true,
       working: false,
+      loading: false,
       error: null,
       showSecret: false
     };
@@ -56,9 +58,16 @@ export default class SecretEditor extends React.PureComponent {
         expires: fromNow('1000 years'),
         editing: true,
         working: false,
+        loading: false,
         error: null
       });
     }
+
+    // indicate loading while the async secret fetch occurs
+    this.setState({
+      loading: true,
+      error: null
+    });
 
     try {
       const { secret, expires } = await props.secrets.get(props.secretId);
@@ -69,6 +78,7 @@ export default class SecretEditor extends React.PureComponent {
         expires,
         editing: false,
         working: false,
+        loading: false,
         error: null,
         showSecret: false
       });
@@ -77,6 +87,8 @@ export default class SecretEditor extends React.PureComponent {
         error: err,
         secret: null,
         secretValue: null,
+        working: false,
+        loading: false,
         expires: null
       });
     }
@@ -161,14 +173,18 @@ export default class SecretEditor extends React.PureComponent {
     const { secretId } = this.props;
     const {
       error,
-      secret,
       expires,
       editing,
       working,
+      loading,
       secretNameValue
     } = this.state;
 
-    if (!secret && !error) {
+    if (error) {
+      return <Error error={error} />;
+    }
+
+    if (loading) {
       return <Spinner />;
     }
 
