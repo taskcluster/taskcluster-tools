@@ -5,7 +5,7 @@ const envs = {
   AUTH0_DOMAIN: 'auth.mozilla.auth0.com',
   AUTH0_CLIENT_ID: 'TBD',
   AUTH0_AUDIENCE: 'login.taskcluster.net',
-  SIGN_IN_METHODS: process.env.NODE_ENV === 'development' ? 'development' : 'okta email manual'
+  SIGN_IN_METHODS: process.env.NODE_ENV === 'development' ? 'development' : 'auth0 manual'
 };
 
 // Set environment variables to their default values if not defined
