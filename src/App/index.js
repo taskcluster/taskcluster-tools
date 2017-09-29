@@ -81,9 +81,6 @@ const Shell = loadable(() =>
 const InteractiveConnect = loadable(() =>
   import(/* webpackChunkName: 'InteractiveConnect' */ '../views/InteractiveConnect')
 );
-const Login = loadable(() =>
-  import(/* webpackChunkName: 'Login' */ '../views/Login')
-);
 const Auth0Login = loadable(() =>
   import(/* webpackChunkName: 'Auth0Login' */ '../views/Auth0Login')
 );
@@ -315,14 +312,6 @@ export default class App extends React.Component {
                   <PropsRoute
                     path="/login/manual"
                     component={ManualLogin}
-                    setUserSession={authController.setUserSession}
-                  />
-                )}
-                {(authController.canSignInUsing('okta') ||
-                  authController.canSignInUsing('email')) && (
-                  <PropsRoute
-                    path="/login"
-                    component={Login}
                     setUserSession={authController.setUserSession}
                   />
                 )}
