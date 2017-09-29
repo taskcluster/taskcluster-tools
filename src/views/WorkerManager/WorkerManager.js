@@ -37,16 +37,10 @@ export default class WorkerManager extends React.PureComponent {
     }
 
     if (provisionerId) {
-      this.loadWorkerTypes(this.props);
+      this.loadWorkerTypes(provisionerId);
     }
 
     this.loadProvisioners();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.provisionerId !== nextProps.provisionerId) {
-      this.setState({ workerTypes: [] }, () => this.loadWorkerTypes(nextProps));
-    }
   }
 
   async loadProvisioners(token) {
@@ -75,7 +69,7 @@ export default class WorkerManager extends React.PureComponent {
     }
   }
 
-  async loadWorkerTypes({ provisionerId }, token) {
+  loadWorkerTypes = async (provisionerId, token) => {
     try {
       const {
         workerTypes,
@@ -86,13 +80,14 @@ export default class WorkerManager extends React.PureComponent {
       );
 
       this.setState({
-        workerTypes: this.state.workerTypes
-          ? this.state.workerTypes.concat(workerTypes)
-          : workerTypes
+        workerTypes:
+          this.state.workerTypes && this.props.provisionerId === provisionerId
+            ? this.state.workerTypes.concat(workerTypes)
+            : workerTypes
       });
 
       if (continuationToken) {
-        this.loadProvisioners({ provisionerId }, continuationToken);
+        this.loadWorkerTypes(provisionerId, continuationToken);
       }
     } catch (error) {
       this.setState({
@@ -100,7 +95,7 @@ export default class WorkerManager extends React.PureComponent {
         error
       });
     }
-  }
+  };
 
   loadWorker = async (provisionerId, workerType, workerGroup, workerId) => {
     this.setState({ worker: null, loading: true, error: null }, async () => {
@@ -132,13 +127,10 @@ export default class WorkerManager extends React.PureComponent {
       })
     );
 
-  updateURI = (provisionerId, workerType, workerGroup, workerId, push) => {
-    const url = [provisionerId, workerType, workerGroup, workerId].reduce(
-      (uri, param) => uri.concat(param ? `/${param}` : ''),
-      '/workers'
-    );
+  updateURI = (provisionerId, workerType, workerGroup, workerId) => {
+    const url = `/workers/provisioners/${provisionerId}/worker-types/${workerType}/workers/${workerGroup}/${workerId}`;
 
-    this.props.history[push ? 'push' : 'replace'](url);
+    this.props.history.push(url);
   };
 
   toggleWorkerStatus = async () => {
@@ -214,6 +206,7 @@ export default class WorkerManager extends React.PureComponent {
           workerId={this.props.workerId}
           updateURI={this.updateURI}
           loadWorker={this.loadWorker}
+          loadWorkerTypes={this.loadWorkerTypes}
         />
         {error && <Error key="error" error={error} />}
         {loading && <Spinner key="spinner" />}

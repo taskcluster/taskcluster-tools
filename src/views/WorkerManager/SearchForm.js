@@ -26,38 +26,76 @@ export default class SearchForm extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      provisionerIdInput: this.props.provisionerId,
+      workerTypeInput: this.props.workerType,
       workerGroupInput: this.props.workerGroup,
       workerIdInput: this.props.workerId
     };
   }
 
-  onSubmit = e => {
-    const { provisionerId, workerType } = this.props;
+  componentWillUpdate(nextProps, { provisionerIdInput }) {
+    if (this.state.provisionerIdInput !== provisionerIdInput) {
+      this.props.loadWorkerTypes(provisionerIdInput);
+    }
+  }
 
+  onSubmit = e => {
     e.preventDefault();
 
+    const {
+      provisionerIdInput,
+      workerTypeInput,
+      workerGroupInput,
+      workerIdInput
+    } = this.state;
+
+    // Clicking enter on the worker-type drop-down while having the workerGroup and workerId input fields filled
+    // should not update
+    if (
+      this.props.workerGroup === this.state.workerGroupInput &&
+      this.props.workerId === this.state.workerIdInput &&
+      this.props.provisionerId === this.state.provisionerIdInput
+    ) {
+      return;
+    }
+
     this.props.updateURI(
-      provisionerId,
-      workerType,
-      this.state.workerGroupInput,
-      this.state.workerIdInput,
-      true
+      provisionerIdInput,
+      workerTypeInput,
+      workerGroupInput,
+      workerIdInput
     );
     this.props.loadWorker(
-      provisionerId,
-      workerType,
-      this.state.workerGroupInput,
-      this.state.workerIdInput
+      provisionerIdInput,
+      workerTypeInput,
+      workerGroupInput,
+      workerIdInput
     );
   };
 
   onProvisionerSelect = provisionerId => {
-    this.props.updateURI(provisionerId);
-    this.setState({ workerGroupInput: '', workerIdInput: '' });
+    if (provisionerId === this.state.provisionerIdInput) {
+      return;
+    }
+
+    this.setState({
+      provisionerIdInput: provisionerId,
+      workerTypeInput: '',
+      workerGroupInput: '',
+      workerIdInput: ''
+    });
   };
 
   onWorkerTypeSelect = workerType => {
-    this.props.updateURI(this.props.provisionerId, workerType);
+    if (workerType === this.props.workerType) {
+      return;
+    }
+
+    this.setState({
+      workerTypeInput: workerType,
+      workerGroupInput: '',
+      workerIdInput: ''
+    });
   };
 
   renderWorkerTypeDropdown = () => {
@@ -69,7 +107,7 @@ export default class SearchForm extends PureComponent {
     return (
       <div>
         <Combobox
-          value={this.props.workerType}
+          value={this.state.workerTypeInput}
           options={options}
           onSelect={this.onWorkerTypeSelect}>
           {props => (
@@ -93,12 +131,18 @@ export default class SearchForm extends PureComponent {
     this.setState({ workerIdInput: e.target.value.trim() });
 
   render() {
-    const { provisionerId, workerType } = this.props;
+    const {
+      provisionerIdInput,
+      workerTypeInput,
+      workerGroupInput,
+      workerIdInput
+    } = this.state;
+
     const valid =
-      provisionerId &&
-      workerType &&
-      this.state.workerGroupInput &&
-      this.state.workerIdInput;
+      provisionerIdInput &&
+      workerTypeInput &&
+      workerGroupInput &&
+      workerIdInput;
 
     return (
       <div>
@@ -106,7 +150,7 @@ export default class SearchForm extends PureComponent {
           <DropdownButton
             id="provisioner-dropdown"
             bsSize="small"
-            title={`Provisioner: ${this.props.provisionerId || 'None'}`}
+            title={`Provisioner: ${provisionerIdInput || 'None'}`}
             onSelect={this.onProvisionerSelect}>
             {this.props.provisioners.map(({ provisionerId }, key) => (
               <MenuItem
@@ -123,8 +167,8 @@ export default class SearchForm extends PureComponent {
             <InputGroup bsSize="sm">
               <InputGroup.Addon>Worker Group</InputGroup.Addon>
               <FormControl
-                disabled={!workerType}
-                value={this.state.workerGroupInput}
+                disabled={!workerTypeInput}
+                value={workerGroupInput}
                 onChange={this.workerGroupOnChange}
                 type="text"
               />
@@ -134,8 +178,8 @@ export default class SearchForm extends PureComponent {
             <InputGroup bsSize="sm">
               <InputGroup.Addon>Worker ID</InputGroup.Addon>
               <FormControl
-                disabled={!workerType}
-                value={this.state.workerIdInput}
+                disabled={!workerTypeInput}
+                value={workerIdInput}
                 onChange={this.workerIdOnChange}
                 type="text"
               />
