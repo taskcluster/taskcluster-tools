@@ -147,7 +147,6 @@ export default class ClientEditor extends React.PureComponent {
             <OverlayTrigger
               placement="bottom"
               trigger="focus"
-              defaultOverlayShown={clientId !== ''}
               overlay={tooltip}>
               <FormGroup
                 validationState={this.validClientId() ? 'success' : 'error'}>
