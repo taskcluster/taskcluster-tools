@@ -90,6 +90,13 @@ export default class TaskDetails extends React.PureComponent {
             </tr>
 
             <tr>
+              <td>Expires</td>
+              <td>
+                <DateView date={task.expires} />
+              </td>
+            </tr>
+
+            <tr>
               <td>Priority</td>
               <td>
                 <code>{task.priority}</code>
