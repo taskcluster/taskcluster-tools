@@ -669,6 +669,7 @@ export default class Inspector extends React.PureComponent {
             <PropsRoute
               path={PATHS.RUN_DETAILS}
               component={RunDetails}
+              task={task}
               run={status ? status.runs[runId] : null}
             />
             <PropsRoute
