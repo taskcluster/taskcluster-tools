@@ -17,13 +17,8 @@ import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
 import Error from '../../components/Error';
+import { stabilityColors } from '../../utils';
 import styles from './styles.css';
-
-const stabilityColors = {
-  experimental: 'default',
-  stable: 'success',
-  deprecated: 'danger'
-};
 
 export default class WorkerTypeTable extends React.PureComponent {
   static propTypes = {

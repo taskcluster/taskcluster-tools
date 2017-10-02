@@ -39,6 +39,9 @@ const WorkerManager = loadable(() =>
 const Workers = loadable(() =>
   import(/* webpackChunkName: 'Workers' */ '../views/Workers')
 );
+const ProvisionersDocs = loadable(() =>
+  import(/* webpackChunkName: 'ProvisionersDocs' */ '../views/ProvisionersDocs')
+);
 const ClientManager = loadable(() =>
   import(/* webpackChunkName: 'ClientManager' */ '../views/ClientManager')
 );
@@ -213,6 +216,10 @@ export default class App extends React.Component {
                   baseUrl="https://provisioner-staging.herokuapp.com/v1"
                   provisionerId="staging-aws"
                   routeRoot="/aws-provisioner-staging"
+                />
+                <PropsRoute
+                  path="/workers/provisioners/docs/:provisionerId?"
+                  component={ProvisionersDocs}
                 />
                 <PropsRoute
                   path="/workers/provisioners/:provisionerId?/worker-types/:workerType/workers/:workerGroup?/:workerId?"
