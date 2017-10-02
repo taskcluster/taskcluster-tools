@@ -121,9 +121,12 @@ export default class WorkerManager extends React.PureComponent {
         </div>
         <div>
           <Breadcrumb>
-            <Breadcrumb.Item
-              href={`/workers/provisioners/${this.props.provisionerId}`}>
+            <Breadcrumb.Item href={`/provisioners/${this.props.provisionerId}`}>
               {this.props.provisionerId}
+            </Breadcrumb.Item>
+            <Breadcrumb.Item
+              href={`/provisioners/${this.props.provisionerId}/worker-types`}>
+              worker-types
             </Breadcrumb.Item>
             <Breadcrumb.Item active>{this.props.workerType}</Breadcrumb.Item>
           </Breadcrumb>
@@ -170,7 +173,7 @@ export default class WorkerManager extends React.PureComponent {
                   <td>{worker.workerGroup}</td>
                   <td>
                     <Link
-                      to={`/workers/provisioners/${this.props
+                      to={`/provisioners/${this.props
                         .provisionerId}/worker-types/${this.props
                         .workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
                       {worker.workerId}

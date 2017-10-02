@@ -128,7 +128,7 @@ export default class WorkerManager extends React.PureComponent {
     );
 
   updateURI = (provisionerId, workerType, workerGroup, workerId) => {
-    const url = `/workers/provisioners/${provisionerId}/worker-types/${workerType}/workers/${workerGroup}/${workerId}`;
+    const url = `/provisioners/${provisionerId}/worker-types/${workerType}/workers/${workerGroup}/${workerId}`;
 
     this.props.history.push(url);
   };
@@ -184,13 +184,16 @@ export default class WorkerManager extends React.PureComponent {
           <h4>Worker Explorer</h4>
         </div>
         <Breadcrumb>
-          <Breadcrumb.Item
-            href={`/workers/provisioners/${this.props.provisionerId}`}>
+          <Breadcrumb.Item href={`/provisioners/${this.props.provisionerId}`}>
             {this.props.provisionerId}
           </Breadcrumb.Item>
           <Breadcrumb.Item
-            href={`/workers/provisioners/${this.props
-              .provisionerId}/worker-types/${this.props.workerType}`}>
+            href={`/provisioners/${this.props.provisionerId}/worker-types`}>
+            worker-types
+          </Breadcrumb.Item>
+          <Breadcrumb.Item
+            href={`/provisioners/${this.props.provisionerId}/worker-types/${this
+              .props.workerType}`}>
             {this.props.workerType}
           </Breadcrumb.Item>
           <Breadcrumb.Item active>{this.props.workerGroup}</Breadcrumb.Item>

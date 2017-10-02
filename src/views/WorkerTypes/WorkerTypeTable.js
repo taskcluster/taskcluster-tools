@@ -157,7 +157,7 @@ export default class WorkerTypeTable extends React.PureComponent {
         </OverlayTrigger>
         <span>
           <Link
-            to={`/workers/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
+            to={`/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
             {workerType.workerType}
           </Link>
         </span>
@@ -226,7 +226,7 @@ export default class WorkerTypeTable extends React.PureComponent {
             <tr key={`worker-type-tabular-${key}`}>
               <td>
                 <Link
-                  to={`/workers/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
+                  to={`/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
                   {workerType.workerType}
                 </Link>
                 &nbsp;&nbsp;&nbsp;

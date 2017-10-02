@@ -1,15 +1,13 @@
 import React from 'react';
 import Clients from '../../components/Clients';
-import ProvisionersDocs from './ProvisionersDocs';
+import Provisioners from './Provisioners';
 
 const View = ({ match }) => (
   <Clients Queue>
     {clients => (
-      <ProvisionersDocs
+      <Provisioners
         {...clients}
-        provisionerId={
-          match.params.provisionerId ? match.params.provisionerId : ''
-        }
+        provisionerId={match.params.provisionerId || ''}
       />
     )}
   </Clients>

@@ -8,6 +8,8 @@ import {
   ControlLabel,
   Panel
 } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import Icon from 'react-fontawesome';
 import { LinkContainer } from 'react-router-bootstrap';
 import Markdown from '../../components/Markdown';
 import DateView from '../../components/DateView';
@@ -17,7 +19,7 @@ import HelmetTitle from '../../components/HelmetTitle';
 import Error from '../../components/Error';
 import styles from './styles.css';
 
-export default class ProvisionersDocs extends React.PureComponent {
+export default class Provisioners extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -81,7 +83,7 @@ export default class ProvisionersDocs extends React.PureComponent {
       <div>
         <div>
           <HelmetTitle title="Worker Types Explorer" />
-          <h4>Provisioners Documentation</h4>
+          <h4>Provisioners</h4>
         </div>
         {this.state.error && <Error error={this.state.error} />}
         <Row>
@@ -94,10 +96,8 @@ export default class ProvisionersDocs extends React.PureComponent {
                     backgroundColor: '#f5f5f5',
                     border: '1px solid #ddd'
                   }}
-                  isActive={() =>
-                    this.props.provisionerId === provisioner.provisionerId}
                   key={`provisioner-${key}`}
-                  to={`/workers/provisioners/docs/${provisioner.provisionerId}`}>
+                  to={`/provisioners/${provisioner.provisionerId}`}>
                   <ListGroupItem onClick={this.onProvisionerClick}>
                     {provisioner.provisionerId}
                   </ListGroupItem>
@@ -113,7 +113,13 @@ export default class ProvisionersDocs extends React.PureComponent {
                   <div>
                     <ControlLabel>Provisioner</ControlLabel>
                   </div>
-                  <div>{this.state.provisioner.provisionerId}</div>
+                  <div>
+                    <Link
+                      to={`/provisioners/${this.state.provisioner
+                        .provisionerId}/worker-types`}>
+                      {this.state.provisioner.provisionerId}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
+                    </Link>
+                  </div>
                 </div>
                 <div className={styles.dataContainer}>
                   <div>

@@ -39,8 +39,8 @@ const WorkerManager = loadable(() =>
 const Workers = loadable(() =>
   import(/* webpackChunkName: 'Workers' */ '../views/Workers')
 );
-const ProvisionersDocs = loadable(() =>
-  import(/* webpackChunkName: 'ProvisionersDocs' */ '../views/ProvisionersDocs')
+const Provisioners = loadable(() =>
+  import(/* webpackChunkName: 'Provisioners' */ '../views/Provisioners')
 );
 const ClientManager = loadable(() =>
   import(/* webpackChunkName: 'ClientManager' */ '../views/ClientManager')
@@ -218,23 +218,23 @@ export default class App extends React.Component {
                   routeRoot="/aws-provisioner-staging"
                 />
                 <PropsRoute
-                  path="/workers/provisioners/docs/:provisionerId?"
-                  component={ProvisionersDocs}
-                />
-                <PropsRoute
-                  path="/workers/provisioners/:provisionerId?/worker-types/:workerType/workers/:workerGroup?/:workerId?"
+                  path="/provisioners/:provisionerId/worker-types/:workerType/workers/:workerGroup?/:workerId?"
                   component={WorkerManager}
                   userSession={userSession}
                 />
                 <PropsRoute
-                  path="/workers/:provisionerId?/:provisionerId/worker-types/:workerType"
+                  path="/provisioners/:provisionerId/worker-types/:workerType"
                   component={Workers}
                   userSession={userSession}
                 />
                 <PropsRoute
-                  path="/workers/provisioners/:provisionerId?"
+                  path="/provisioners/:provisionerId/worker-types"
                   component={WorkerTypes}
                   userSession={userSession}
+                />
+                <PropsRoute
+                  path="/provisioners/:provisionerId?"
+                  component={Provisioners}
                 />
                 <PropsRoute
                   path="/auth/clients/:clientId?"

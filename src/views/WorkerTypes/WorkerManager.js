@@ -7,6 +7,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Tooltip,
+  Breadcrumb,
   OverlayTrigger
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
@@ -67,8 +68,7 @@ export default class WorkerManager extends React.PureComponent {
   onProvisionerSelect = ({ provisionerId }) => {
     this.setQuery({ orderBy: 'None' });
     this.props.history.replace(
-      `/workers/provisioners/${provisionerId || ''}${this.props.location
-        .search}`
+      `/provisioners/${provisionerId || ''}${this.props.location.search}`
     );
   };
 
@@ -140,6 +140,16 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Worker Types Explorer</h4>
         </div>
+        <Breadcrumb>
+          <Breadcrumb.Item href={`/provisioners/${this.props.provisionerId}`}>
+            {this.props.provisionerId}
+          </Breadcrumb.Item>
+          <Breadcrumb.Item
+            active
+            href={`/provisioners/${this.props.provisionerId}/worker-types`}>
+            worker-types
+          </Breadcrumb.Item>
+        </Breadcrumb>
         <DropdownButton
           id="provisioner-dropdown"
           bsSize="small"
