@@ -56,18 +56,18 @@ export default class WorkerManager extends React.PureComponent {
     }
   }
 
-  loadStatus = async taskId => {
-    if (!taskId) {
+  loadStatus = async latestTask => {
+    if (!latestTask) {
       return {};
     }
 
-    const { status } = await this.props.queue.status(taskId);
-    const runs = status.runs.length - 1;
+    const { status } = await this.props.queue.status(latestTask.taskId);
 
     return {
       state: status.state,
-      lastClaimStarted: status.runs[runs].started,
-      lastClaimResolved: status.runs[runs].resolved
+      taskGroupId: status.taskGroupId,
+      lastClaimStarted: status.runs[latestTask.runId].started,
+      lastClaimResolved: status.runs[latestTask.runId].resolved
     };
   };
 
@@ -181,8 +181,10 @@ export default class WorkerManager extends React.PureComponent {
                   </td>
                   <td>
                     {worker.latestTask ? (
-                      <Link to={`/tasks/${worker.latestTask}`}>
-                        {worker.latestTask}
+                      <Link
+                        to={`/groups/${worker.taskGroupId}/tasks/${worker
+                          .latestTask.taskId}/runs/${worker.latestTask.runId}`}>
+                        {worker.latestTask.taskId}
                       </Link>
                     ) : (
                       '-'
