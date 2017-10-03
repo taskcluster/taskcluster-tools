@@ -62,12 +62,13 @@ export default class WorkerManager extends React.PureComponent {
     }
 
     const { status } = await this.props.queue.status(latestTask.taskId);
+    const { state, started, resolved } = status.runs[latestTask.runId];
 
     return {
-      state: status.state,
+      state,
       taskGroupId: status.taskGroupId,
-      lastClaimStarted: status.runs[latestTask.runId].started,
-      lastClaimResolved: status.runs[latestTask.runId].resolved
+      lastClaimStarted: started,
+      lastClaimResolved: resolved
     };
   };
 
