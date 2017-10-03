@@ -10,4 +10,7 @@ before_install:
 - curl -sSfL https://yarnpkg.com/install.sh | bash
 - export PATH=$HOME/.yarn/bin:$PATH
 script:
-- yarn test
+- yarn lint
+- yarn build -- --inspect || exit 0
+- yarn build
+- cat build/CredentialsManager.*.js

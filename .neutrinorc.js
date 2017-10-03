@@ -1,5 +1,10 @@
 const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
+const { basename, extname } = require('path');
+
+// Increment the version whenever you need a full invalidation
+// but hashes could remain the same
+const CACHE_VERSION = 'v1';
 
 const envs = {
   AUTH0_DOMAIN: 'auth.mozilla.auth0.com',
@@ -133,14 +138,34 @@ module.exports = {
           'react-router-dom',
           'taskcluster-client-web'
         ]);
+
+      neutrino.config.when(neutrino.options.command === 'build', (config) => {
+        config
+          .output
+            .filename(`[name].[chunkhash].${CACHE_VERSION}.js`)
+            .chunkFilename(`[name].[chunkhash].${CACHE_VERSION}.js`)
+            .sourceMapFilename(`[file].${CACHE_VERSION}.map`)
+            .end()
+          .plugin('named-chunks')
+            .tap(([fn]) => [
+              chunk => {
+                if (chunk.name) {
+                  return chunk.name;
+                }
+
+                const filename = fn(chunk);
+                const ext = extname(filename);
+
+                return `${basename(filename, ext)}.${CACHE_VERSION}${ext}`;
+              }
+            ]);
+      })
     }
   ],
   env: {
     NODE_ENV: {
-      development: ({ config }) => config.devtool('eval'),
-      production: ({ config }) => config.when(process.env.CI === 'true',
-        (config) => config.devtool(false),
-        (config) => config.devtool('source-map'))
+      development: ({ config }) => config.devtool('eval-source-map'),
+      production: ({ config }) => config.devtool('source-map')
     }
   }
 };
