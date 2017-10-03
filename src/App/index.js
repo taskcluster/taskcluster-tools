@@ -122,6 +122,7 @@ export default class App extends React.Component {
       !userSession ||
       !userSession.renewAfter ||
       new Date(userSession.renewAfter) > new Date();
+
     this.setState({ userSession, authReady });
   };
 

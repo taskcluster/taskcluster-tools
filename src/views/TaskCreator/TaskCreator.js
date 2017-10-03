@@ -92,7 +92,6 @@ export default class TaskCreator extends React.PureComponent {
   parameterizeTask(task) {
     const offset = moment().diff(moment(task.created));
     const jsonDate = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
-
     // Increment all timestamps in the task by offset
     const iter = obj => {
       if (!obj) {

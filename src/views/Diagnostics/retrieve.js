@@ -9,12 +9,10 @@ import $ from 'jquery';
 
 const parser = new Parser();
 const BASE_URL = 'https://taskcluster-diagnostic-logs.s3.amazonaws.com';
-
 const parsePromise = xml =>
   new Promise((resolve, reject) =>
     parser.parseString(xml, (err, res) => (err ? reject(err) : resolve(res)))
   );
-
 const requestGet = url =>
   new Promise(resolve =>
     $.ajax({
@@ -24,7 +22,6 @@ const requestGet = url =>
       success: resolve
     })
   );
-
 const getLatestLog = async (env, logType) => {
   assert(
     logType === 'JSON' || logType === 'RAW',

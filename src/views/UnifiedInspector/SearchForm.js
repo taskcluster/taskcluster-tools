@@ -78,7 +78,6 @@ export default class SearchForm extends React.PureComponent {
   validate() {
     const { taskGroupId, taskId } = this.props;
     const { taskGroupIdInput, taskIdInput } = this.state;
-
     const validTaskGroupId =
       VALID_TASK.test(taskGroupIdInput) || taskGroupIdInput === '';
     const validTaskId = VALID_TASK.test(taskIdInput) || taskIdInput === '';

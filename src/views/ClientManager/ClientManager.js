@@ -47,6 +47,7 @@ export default class ClientManager extends Component {
 
     if (!this.props.userSession) {
       this.setState({ clientPrefixLoaded: true, clientPrefix: '' });
+
       return;
     }
 

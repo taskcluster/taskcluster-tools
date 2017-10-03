@@ -4,7 +4,6 @@ import { DockerExecClient } from 'docker-exec-websocket-server';
 import { dial } from 'ws-shell';
 
 const DECODER = new TextDecoder('utf-8');
-
 const defaultCommand = [
   'sh',
   '-c',

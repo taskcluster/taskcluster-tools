@@ -335,6 +335,7 @@ export default class Inspector extends React.PureComponent {
     // just change the notification state to the new value
     if (!notify || Notification.permission === 'granted') {
       localStorage.setItem(notifyKey, notify);
+
       return this.setState({ notify });
     }
 
@@ -574,7 +575,6 @@ export default class Inspector extends React.PureComponent {
       artifacts,
       decision
     } = this.state;
-
     const trackedTaskId = taskId || selectedTaskId;
     const runNumber = this.getRunNumber(
       runId,
@@ -695,7 +695,6 @@ export default class Inspector extends React.PureComponent {
   render() {
     const { taskGroupId, taskId } = this.props;
     const { task, error, selectedTaskId, notify } = this.state;
-
     const trackedTaskId = taskId || selectedTaskId;
 
     return (

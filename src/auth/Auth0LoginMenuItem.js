@@ -24,6 +24,7 @@ export default class Auth0LoginMenuItem extends React.PureComponent {
   onSelect() {
     // open the login view in a new tab/window
     const loginView = new URL('/login/auth0', window.location);
+
     window.open(loginView, '_blank');
   }
 }

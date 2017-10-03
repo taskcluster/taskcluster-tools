@@ -90,21 +90,18 @@ export default class WorkerTypeTable extends React.PureComponent {
       const awsWorkerTypes =
         provisionerId === 'aws-provisioner-v1' &&
         (await this.props.awsProvisioner.listWorkerTypeSummaries());
-
       const workerTypesNormalized = this.state.workerTypes.map(workerType => ({
         ...workerType,
         ...(awsWorkerTypes
           ? find(propEq('workerType', workerType.workerType))(awsWorkerTypes)
           : {})
       }));
-
       const workerTypeSummaries = await Promise.all(
         workerTypesNormalized.map(async workerType => {
           const pendingTasks = await this.getPendingTasks(
             provisionerId,
             workerType.workerType
           );
-
           const stable = {
             provisionerId: workerType.provisionerId,
             workerType: workerType.workerType,
@@ -112,7 +109,6 @@ export default class WorkerTypeTable extends React.PureComponent {
             stability: workerType.stability,
             lastDateActive: workerType.lastDateActive
           };
-
           const dynamic =
             provisionerId === 'aws-provisioner-v1'
               ? {

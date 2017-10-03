@@ -43,14 +43,12 @@ const initialYaml = {
     }
   ]
 };
-
 const baseCmd = [
   'git clone {{event.head.repo.url}} repo',
   'cd repo',
   'git config advice.detachedHead false',
   'git checkout {{event.head.sha}}'
 ];
-
 const cmdDirectory = (type, org = '<YOUR_ORG>', repo = '<YOUR_REPO>') =>
   ({
     node: [
@@ -87,7 +85,6 @@ const cmdDirectory = (type, org = '<YOUR_ORG>', repo = '<YOUR_REPO>') =>
       ].join(' && ')
     ]
   }[type]);
-
 const githubClient = new Github({});
 
 export default class YamlCreator extends React.Component {
@@ -141,6 +138,7 @@ export default class YamlCreator extends React.Component {
       this.state.owner,
       this.state.repo
     );
+
     this.setState({
       image: event.target.value,
       currentCmd,

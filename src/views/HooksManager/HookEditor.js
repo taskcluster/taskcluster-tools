@@ -92,6 +92,7 @@ export default class HookEditor extends React.PureComponent {
     // TODO: parse against schema and show errors
     try {
       JSON.parse(JSON.stringify(hook.task));
+
       return true;
     } catch (err) {
       return false;
