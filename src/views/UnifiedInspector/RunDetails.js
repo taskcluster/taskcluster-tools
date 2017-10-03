@@ -1,16 +1,18 @@
 import React from 'react';
 import { object } from 'prop-types';
 import { Table, Label } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import DateView from '../../components/DateView';
 import { labels } from '../../utils';
 
 export default class RunDetails extends React.PureComponent {
   static propTypes = {
-    run: object
+    run: object,
+    task: object
   };
 
   render() {
-    const { run } = this.props;
+    const { run, task } = this.props;
 
     if (!run) {
       return null;
@@ -76,7 +78,16 @@ export default class RunDetails extends React.PureComponent {
 
           <tr>
             <td>WorkerId</td>
-            <td>{run.workerId ? <code>{run.workerId}</code> : '-'}</td>
+            <td>
+              {run.workerId ? (
+                <Link
+                  to={`/workers/provisioners/${task.provisionerId}/worker-types/${task.workerType}/workers/${run.workerGroup}/${run.workerId}`}>
+                  {run.workerId}
+                </Link>
+              ) : (
+                '-'
+              )}
+            </td>
           </tr>
 
           <tr>
