@@ -112,6 +112,7 @@ export default class WorkerManager extends React.PureComponent {
 
   render() {
     const { filter, workers, workerToken, loading, error } = this.state;
+    const { provisionerId, workerType } = this.props;
 
     return (
       <div>
@@ -121,14 +122,14 @@ export default class WorkerManager extends React.PureComponent {
         </div>
         <div>
           <Breadcrumb>
-            <Breadcrumb.Item href={`/provisioners/${this.props.provisionerId}`}>
-              {this.props.provisionerId}
+            <Breadcrumb.Item href={`/provisioners/${provisionerId}`}>
+              {provisionerId}
             </Breadcrumb.Item>
             <Breadcrumb.Item
-              href={`/provisioners/${this.props.provisionerId}/worker-types`}>
+              href={`/provisioners/${provisionerId}/worker-types`}>
               worker-types
             </Breadcrumb.Item>
-            <Breadcrumb.Item active>{this.props.workerType}</Breadcrumb.Item>
+            <Breadcrumb.Item active>{workerType}</Breadcrumb.Item>
           </Breadcrumb>
         </div>
         <div className={styles.filters}>
@@ -173,9 +174,7 @@ export default class WorkerManager extends React.PureComponent {
                   <td>{worker.workerGroup}</td>
                   <td>
                     <Link
-                      to={`/provisioners/${this.props
-                        .provisionerId}/worker-types/${this.props
-                        .workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
+                      to={`/provisioners/${provisionerId}/worker-types/${workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
                       {worker.workerId}
                     </Link>
                   </td>
@@ -235,8 +234,7 @@ export default class WorkerManager extends React.PureComponent {
           !loading && (
             <div>
               There are no {filter !== 'None' ? filter : ''} workers in{' '}
-              <code>{`${this.props.provisionerId}/${this.props
-                .workerType}`}</code>
+              <code>{`${provisionerId}/${workerType}`}</code>
             </div>
           )}
         <div className={styles.pagination}>

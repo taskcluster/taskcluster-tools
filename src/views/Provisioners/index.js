@@ -4,9 +4,9 @@ import Provisioners from './Provisioners';
 
 const View = ({ match }) => (
   <Clients Queue>
-    {clients => (
+    {({ queue }) => (
       <Provisioners
-        {...clients}
+        queue={queue}
         provisionerId={match.params.provisionerId || ''}
       />
     )}

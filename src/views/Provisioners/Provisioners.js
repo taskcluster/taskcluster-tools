@@ -76,20 +76,23 @@ export default class Provisioners extends React.PureComponent {
     }
   }
 
-  onProvisionerClick = ({ target }) => this.loadProvisioner(target.innerText);
+  handleProvisionerClick = ({ target }) =>
+    this.loadProvisioner(target.innerText);
 
   render() {
+    const { provisioners, provisioner, loading, error } = this.state;
+
     return (
       <div>
         <div>
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Provisioners</h4>
         </div>
-        {this.state.error && <Error error={this.state.error} />}
+        {error && <Error error={error} />}
         <Row>
           <Col md={6}>
             <ListGroup>
-              {this.state.provisioners.map((provisioner, key) => (
+              {provisioners.map(({ provisionerId }, key) => (
                 <LinkContainer
                   activeStyle={{
                     color: '#555',
@@ -97,17 +100,17 @@ export default class Provisioners extends React.PureComponent {
                     border: '1px solid #ddd'
                   }}
                   key={`provisioner-${key}`}
-                  to={`/provisioners/${provisioner.provisionerId}`}>
-                  <ListGroupItem onClick={this.onProvisionerClick}>
-                    {provisioner.provisionerId}
+                  to={`/provisioners/${provisionerId}`}>
+                  <ListGroupItem onClick={this.handleProvisionerClick}>
+                    {provisionerId}
                   </ListGroupItem>
                 </LinkContainer>
               ))}
             </ListGroup>
           </Col>
           <Col md={6}>
-            {this.state.loading && <Spinner />}
-            {this.state.provisioner && (
+            {loading && <Spinner />}
+            {provisioner && (
               <div>
                 <div className={styles.dataContainer}>
                   <div>
@@ -115,9 +118,8 @@ export default class Provisioners extends React.PureComponent {
                   </div>
                   <div>
                     <Link
-                      to={`/provisioners/${this.state.provisioner
-                        .provisionerId}/worker-types`}>
-                      {this.state.provisioner.provisionerId}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
+                      to={`/provisioners/${provisioner.provisionerId}/worker-types`}>
+                      {provisioner.provisionerId}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
                     </Link>
                   </div>
                 </div>
@@ -126,7 +128,7 @@ export default class Provisioners extends React.PureComponent {
                     <ControlLabel>Expires</ControlLabel>
                   </div>
                   <div>
-                    <DateView date={this.state.provisioner.expires} />
+                    <DateView date={provisioner.expires} />
                   </div>
                 </div>
                 <div className={styles.dataContainer}>
@@ -136,18 +138,14 @@ export default class Provisioners extends React.PureComponent {
                   <div>
                     <Label
                       bsSize="sm"
-                      bsStyle={
-                        stabilityColors[this.state.provisioner.stability]
-                      }>
-                      {this.state.provisioner.stability}
+                      bsStyle={stabilityColors[provisioner.stability]}>
+                      {provisioner.stability}
                     </Label>
                   </div>
                 </div>
                 <div>
                   <Panel collapsible defaultExpanded header="Description">
-                    <Markdown>
-                      {this.state.provisioner.description || '`-`'}
-                    </Markdown>
+                    <Markdown>{provisioner.description || '`-`'}</Markdown>
                   </Panel>
                 </div>
               </div>

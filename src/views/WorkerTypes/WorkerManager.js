@@ -128,6 +128,7 @@ export default class WorkerManager extends React.PureComponent {
   };
 
   render() {
+    const { provisionerId, awsProvisioner, queue } = this.props;
     const tooltip = (
       <Tooltip id="last-active">
         Last active may be off by up-to 6 hours.
@@ -141,19 +142,19 @@ export default class WorkerManager extends React.PureComponent {
           <h4>Worker Types Explorer</h4>
         </div>
         <Breadcrumb>
-          <Breadcrumb.Item href={`/provisioners/${this.props.provisionerId}`}>
-            {this.props.provisionerId}
+          <Breadcrumb.Item href={`/provisioners/${provisionerId}`}>
+            {provisionerId}
           </Breadcrumb.Item>
           <Breadcrumb.Item
             active
-            href={`/provisioners/${this.props.provisionerId}/worker-types`}>
+            href={`/provisioners/${provisionerId}/worker-types`}>
             worker-types
           </Breadcrumb.Item>
         </Breadcrumb>
         <DropdownButton
           id="provisioner-dropdown"
           bsSize="small"
-          title={`Provisioner: ${this.props.provisionerId || 'None'}`}
+          title={`Provisioner: ${provisionerId || 'None'}`}
           onSelect={this.onProvisionerSelect}>
           {this.state.provisioners.map((provisioner, key) => (
             <MenuItem
@@ -164,14 +165,14 @@ export default class WorkerManager extends React.PureComponent {
           ))}
         </DropdownButton>
         {this.state.error && <Error error={this.state.error} />}
-        {this.props.provisionerId && (
+        {provisionerId && (
           <SearchForm
             default={this.state.search}
-            provisionerId={this.props.provisionerId}
+            provisionerId={provisionerId}
             onSearch={this.setWorkerType}
           />
         )}
-        {this.props.provisionerId && (
+        {provisionerId && (
           <div>
             <ButtonToolbar className={styles.optionsToolbar}>
               <div>
@@ -207,11 +208,11 @@ export default class WorkerManager extends React.PureComponent {
             </ButtonToolbar>
           </div>
         )}
-        {this.props.provisionerId && (
+        {provisionerId && (
           <WorkerTypeTable
-            queue={this.props.queue}
-            awsProvisioner={this.props.awsProvisioner}
-            provisionerId={this.props.provisionerId}
+            queue={queue}
+            awsProvisioner={awsProvisioner}
+            provisionerId={provisionerId}
             lastActive={this.state.lastActive}
             setOrderableProperties={this.setOrderableProperties}
             orderBy={this.state.orderBy}
