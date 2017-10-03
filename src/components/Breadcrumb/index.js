@@ -3,10 +3,15 @@ import { Breadcrumb as Nav } from 'react-bootstrap';
 import { arrayOf, string, object, oneOfType } from 'prop-types';
 
 export default class Breadcrumb extends React.PureComponent {
-  isActive = title =>
-    typeof this.props.active === 'string'
+  isActive = title => {
+    if (!this.props.active) {
+      return this.props.navList.slice(-1) === title;
+    }
+
+    return typeof this.props.active === 'string'
       ? this.props.active === title
       : this.props.active.includes(title);
+  };
 
   render() {
     return (
@@ -25,6 +30,6 @@ export default class Breadcrumb extends React.PureComponent {
 }
 
 Breadcrumb.propTypes = {
-  active: oneOfType([string, arrayOf(string)]).isRequired,
+  active: oneOfType([string, arrayOf(string)]),
   navList: arrayOf(object).isRequired
 };
