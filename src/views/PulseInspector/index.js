@@ -89,6 +89,7 @@ export default class PulseInspector extends React.PureComponent {
       listener.on('message', this.handleListenerMessage);
 
       this.listener = listener;
+
       return listener;
     } catch (err) {
       this.setState({ listeningError: err });

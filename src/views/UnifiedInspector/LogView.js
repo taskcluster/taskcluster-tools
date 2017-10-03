@@ -8,7 +8,6 @@ import { isNil } from 'ramda';
 import fscreen from 'fscreen';
 
 const VIEWER_HEIGHT_MIN = 400;
-
 const buttonStyle = {
   margin: '10px 0 10px 10px'
 };

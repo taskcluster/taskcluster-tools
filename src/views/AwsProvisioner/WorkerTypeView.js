@@ -57,6 +57,7 @@ export default class WorkerTypeView extends React.PureComponent {
         workerType: await awsProvisioner.workerType(workerType),
         awsState: await awsProvisioner.state(workerType).then(response => {
           updateSummary(workerType, response.summary);
+
           return response;
         })
       });

@@ -137,7 +137,6 @@ export default class SearchForm extends PureComponent {
       workerGroupInput,
       workerIdInput
     } = this.state;
-
     const valid =
       provisionerIdInput &&
       workerTypeInput &&

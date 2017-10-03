@@ -15,6 +15,7 @@ const certificateIsValid = certificate => {
 
   try {
     JSON.parse(certificate);
+
     return true;
   } catch (err) {
     return false;

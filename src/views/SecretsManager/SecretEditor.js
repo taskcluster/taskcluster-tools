@@ -118,7 +118,6 @@ export default class SecretEditor extends React.PureComponent {
 
     try {
       const { expires, secretValue } = this.state;
-
       const secret = JSON.parse(secretValue);
 
       await this.props.secrets.set(secretId, { secret, expires });

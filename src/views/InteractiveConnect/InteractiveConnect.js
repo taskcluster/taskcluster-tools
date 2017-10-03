@@ -160,6 +160,7 @@ export default class InteractiveConnect extends React.PureComponent {
     // just change the notification state to the new value
     if (!notify || Notification.permission === 'granted') {
       localStorage.setItem(notifyKey, notify);
+
       return this.setState({ notify });
     }
 

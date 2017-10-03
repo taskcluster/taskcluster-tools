@@ -5,6 +5,7 @@ import ManualModal from '../../components/ManualModal';
 export default class Login extends React.PureComponent {
   handleSubmit = credentials => {
     const userSession = UserSession.fromCredentials(credentials);
+
     this.props.setUserSession(userSession);
     this.close();
   };

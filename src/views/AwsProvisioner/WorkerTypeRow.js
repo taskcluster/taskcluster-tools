@@ -106,10 +106,8 @@ export default class WorkerTypeRow extends React.Component {
     const pendingCap = this.props.workerType.pendingCapacity;
     const spotReqCap = this.props.workerType.requestedCapacity;
     const maxCap = this.props.workerType.maxCapacity;
-
     // We want to make sure that if a bar is there that it's visible
     const smallestCapUnit = maxCap * 0.05;
-
     // Fuzz the percentages to make sure all bars are visible.  If we have a
     // state with 0%, we don't fuzz at all.  If we have 1-4%, we round to 5%
     // and we don't fuzz above 5%
@@ -122,13 +120,11 @@ export default class WorkerTypeRow extends React.Component {
     const fuzzedSpotReq = spotReqCap
       ? Math.max(spotReqCap, smallestCapUnit)
       : 0;
-
     // Determine the number which we should use to figure out our percentages.
     // When we have less than the max configured, we use that setting.  When we
     // exceed that amount, we want to sum up all the capacity units
     const count = fuzzedRunning + fuzzedPending + fuzzedSpotReq;
     const divideBy = Math.max(maxCap, count);
-
     // Calculate the percentages to use for the bars.  These numbers are
     // invalid for other purposes
     const runPer = fuzzedRunning / divideBy;

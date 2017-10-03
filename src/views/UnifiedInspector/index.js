@@ -3,7 +3,6 @@ import Clients from '../../components/Clients';
 import Inspector from './Inspector';
 
 const testForLineNumbers = /L(\d+)-?(\d+)?/;
-
 const View = ({ userSession, match, history, location }) => {
   const hasHighlight = testForLineNumbers.exec(location.hash);
   const start = hasHighlight && parseInt(hasHighlight[1], 10);

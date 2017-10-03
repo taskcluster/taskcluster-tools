@@ -16,6 +16,7 @@ export default class Auth0Login extends React.PureComponent {
     // a postMessage back, and that's it.
     if (window !== window.top) {
       window.parent.postMessage(window.location.hash, window.origin);
+
       return;
     }
 
