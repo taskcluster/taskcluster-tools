@@ -15,6 +15,7 @@ import { find, propEq } from 'ramda';
 import Icon from 'react-fontawesome';
 import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
+import BarSpinner from '../../components/BarSpinner';
 import Markdown from '../../components/Markdown';
 import Error from '../../components/Error';
 import { stabilityColors } from '../../utils';
@@ -62,6 +63,15 @@ export default class WorkerTypeTable extends React.PureComponent {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      !prevState.workerTypeSummaries.length &&
+      this.state.workerTypeSummaries.length
+    ) {
+      this.loadPendingTasks();
+    }
+  }
+
   async loadWorkerTypes({ provisionerId }, token) {
     try {
       const {
@@ -93,14 +103,9 @@ export default class WorkerTypeTable extends React.PureComponent {
       }));
       const workerTypeSummaries = await Promise.all(
         workerTypesNormalized.map(async workerType => {
-          const pendingTasks = await this.getPendingTasks(
-            provisionerId,
-            workerType.workerType
-          );
           const stable = {
             provisionerId: workerType.provisionerId,
             workerType: workerType.workerType,
-            pendingTasks,
             stability: workerType.stability,
             lastDateActive: workerType.lastDateActive
           };
@@ -123,14 +128,24 @@ export default class WorkerTypeTable extends React.PureComponent {
     }
   }
 
-  async getPendingTasks(provisionerId, workerType) {
-    const { pendingTasks } = await this.props.queue.pendingTasks(
-      provisionerId,
-      workerType
+  loadPendingTasks = async () => {
+    const workerTypeSummaries = await Promise.all(
+      this.state.workerTypeSummaries.map(async workerType => {
+        const pendingTasks = await this.props.queue.pendingTasks(
+          workerType.provisionerId,
+          workerType.workerType
+        );
+
+        return {
+          ...workerType,
+          ...pendingTasks
+        };
+      })
     );
 
-    return pendingTasks;
-  }
+    this.setState({ workerTypeSummaries });
+    this.props.setOrderableProperties(workerTypeSummaries[0]);
+  };
 
   renderDescription = ({ description }) => (
     <Popover id="popover-trigger-click-root-close" title="Description">
@@ -179,9 +194,7 @@ export default class WorkerTypeTable extends React.PureComponent {
               ))}
             <tr>
               <td>Pending tasks</td>
-              <td>
-                <Badge>{workerType.pendingTasks}</Badge>
-              </td>
+              <td>{this.renderPendingTasks(workerType)}</td>
             </tr>
             <tr>
               <td>Stability</td>
@@ -244,9 +257,7 @@ export default class WorkerTypeTable extends React.PureComponent {
               <td>
                 <DateView date={workerType.lastDateActive} />
               </td>
-              <td>
-                <Badge>{workerType.pendingTasks}</Badge>
-              </td>
+              <td>{this.renderPendingTasks(workerType)}</td>
               {this.props.provisionerId === 'aws-provisioner-v1' &&
                 ['runningCapacity', 'pendingCapacity'].map((property, key) => (
                   <td key={`tabular-dynamic-row-${key}`}>
@@ -259,6 +270,13 @@ export default class WorkerTypeTable extends React.PureComponent {
       </Table>
     </div>
   );
+
+  renderPendingTasks = workerType =>
+    'pendingTasks' in workerType ? (
+      <Badge>{workerType.pendingTasks}</Badge>
+    ) : (
+      <BarSpinner />
+    );
 
   renderWorkerType = workerTypes =>
     this.props.layout === 'grid'
