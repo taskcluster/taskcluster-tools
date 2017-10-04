@@ -13,8 +13,7 @@ export default class ArtifactList extends React.PureComponent {
     menu: bool,
     queue: object.isRequired,
     userSession: object,
-    style: object,
-    error: null
+    style: object
   };
 
   static defaultProps = {
