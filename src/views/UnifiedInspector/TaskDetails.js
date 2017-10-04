@@ -113,7 +113,10 @@ export default class TaskDetails extends React.PureComponent {
             <tr>
               <td>WorkerType</td>
               <td>
-                <code>{task.workerType}</code>
+                <Link
+                  to={`/provisioners/${task.provisionerId}/worker-types/${task.workerType}`}>
+                  {task.workerType}
+                </Link>
               </td>
             </tr>
 
