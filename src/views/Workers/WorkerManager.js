@@ -56,18 +56,19 @@ export default class WorkerManager extends React.PureComponent {
     }
   }
 
-  loadStatus = async taskId => {
-    if (!taskId) {
+  loadStatus = async latestTask => {
+    if (!latestTask) {
       return {};
     }
 
-    const { status } = await this.props.queue.status(taskId);
-    const runs = status.runs.length - 1;
+    const { status } = await this.props.queue.status(latestTask.taskId);
+    const { state, started, resolved } = status.runs[latestTask.runId];
 
     return {
-      state: status.state,
-      lastClaimStarted: status.runs[runs].started,
-      lastClaimResolved: status.runs[runs].resolved
+      state,
+      taskGroupId: status.taskGroupId,
+      lastClaimStarted: started,
+      lastClaimResolved: resolved
     };
   };
 
@@ -112,6 +113,7 @@ export default class WorkerManager extends React.PureComponent {
 
   render() {
     const { filter, workers, workerToken, loading, error } = this.state;
+    const { provisionerId, workerType } = this.props;
 
     return (
       <div>
@@ -121,11 +123,14 @@ export default class WorkerManager extends React.PureComponent {
         </div>
         <div>
           <Breadcrumb>
-            <Breadcrumb.Item
-              href={`/workers/provisioners/${this.props.provisionerId}`}>
-              {this.props.provisionerId}
+            <Breadcrumb.Item href={`/provisioners/${provisionerId}`}>
+              {provisionerId}
             </Breadcrumb.Item>
-            <Breadcrumb.Item active>{this.props.workerType}</Breadcrumb.Item>
+            <Breadcrumb.Item
+              href={`/provisioners/${provisionerId}/worker-types`}>
+              worker-types
+            </Breadcrumb.Item>
+            <Breadcrumb.Item active>{workerType}</Breadcrumb.Item>
           </Breadcrumb>
         </div>
         <div className={styles.filters}>
@@ -170,16 +175,16 @@ export default class WorkerManager extends React.PureComponent {
                   <td>{worker.workerGroup}</td>
                   <td>
                     <Link
-                      to={`/workers/provisioners/${this.props
-                        .provisionerId}/worker-types/${this.props
-                        .workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
+                      to={`/provisioners/${provisionerId}/worker-types/${workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
                       {worker.workerId}
                     </Link>
                   </td>
                   <td>
                     {worker.latestTask ? (
-                      <Link to={`/tasks/${worker.latestTask}`}>
-                        {worker.latestTask}
+                      <Link
+                        to={`/groups/${worker.taskGroupId}/tasks/${worker
+                          .latestTask.taskId}/runs/${worker.latestTask.runId}`}>
+                        {worker.latestTask.taskId}
                       </Link>
                     ) : (
                       '-'
@@ -230,8 +235,7 @@ export default class WorkerManager extends React.PureComponent {
           !loading && (
             <div>
               There are no {filter !== 'None' ? filter : ''} workers in{' '}
-              <code>{`${this.props.provisionerId}/${this.props
-                .workerType}`}</code>
+              <code>{`${provisionerId}/${workerType}`}</code>
             </div>
           )}
         <div className={styles.pagination}>

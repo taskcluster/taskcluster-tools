@@ -17,13 +17,8 @@ import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
 import Error from '../../components/Error';
+import { stabilityColors } from '../../utils';
 import styles from './styles.css';
-
-const stabilityColors = {
-  experimental: 'default',
-  stable: 'success',
-  deprecated: 'danger'
-};
 
 export default class WorkerTypeTable extends React.PureComponent {
   static propTypes = {
@@ -158,7 +153,7 @@ export default class WorkerTypeTable extends React.PureComponent {
         </OverlayTrigger>
         <span>
           <Link
-            to={`/workers/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
+            to={`/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
             {workerType.workerType}
           </Link>
         </span>
@@ -227,7 +222,7 @@ export default class WorkerTypeTable extends React.PureComponent {
             <tr key={`worker-type-tabular-${key}`}>
               <td>
                 <Link
-                  to={`/workers/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
+                  to={`/provisioners/${workerType.provisionerId}/worker-types/${workerType.workerType}`}>
                   {workerType.workerType}
                 </Link>
                 &nbsp;&nbsp;&nbsp;

@@ -115,9 +115,9 @@ export default class WorkerManager extends React.PureComponent {
     });
   };
 
-  loadRecentTasks = taskIds =>
+  loadRecentTasks = recentTasks =>
     Promise.all(
-      taskIds.map(async taskId => {
+      recentTasks.map(async ({ taskId }) => {
         const [task, { status }] = await Promise.all([
           this.props.queue.task(taskId),
           this.props.queue.status(taskId)
@@ -128,7 +128,7 @@ export default class WorkerManager extends React.PureComponent {
     );
 
   updateURI = (provisionerId, workerType, workerGroup, workerId) => {
-    const url = `/workers/provisioners/${provisionerId}/worker-types/${workerType}/workers/${workerGroup}/${workerId}`;
+    const url = `/provisioners/${provisionerId}/worker-types/${workerType}/workers/${workerGroup}/${workerId}`;
 
     this.props.history.push(url);
   };
@@ -168,6 +168,7 @@ export default class WorkerManager extends React.PureComponent {
       loading,
       error
     } = this.state;
+    const { provisionerId, workerType, workerGroup, workerId } = this.props;
     const disableTooltip = (
       <Tooltip id="tooltip">
         {worker && worker.disabled
@@ -184,26 +185,27 @@ export default class WorkerManager extends React.PureComponent {
           <h4>Worker Explorer</h4>
         </div>
         <Breadcrumb>
-          <Breadcrumb.Item
-            href={`/workers/provisioners/${this.props.provisionerId}`}>
-            {this.props.provisionerId}
+          <Breadcrumb.Item href={`/provisioners/${provisionerId}`}>
+            {provisionerId}
+          </Breadcrumb.Item>
+          <Breadcrumb.Item href={`/provisioners/${provisionerId}/worker-types`}>
+            worker-types
           </Breadcrumb.Item>
           <Breadcrumb.Item
-            href={`/workers/provisioners/${this.props
-              .provisionerId}/worker-types/${this.props.workerType}`}>
-            {this.props.workerType}
+            href={`/provisioners/${provisionerId}/worker-types/${workerType}`}>
+            {workerType}
           </Breadcrumb.Item>
-          <Breadcrumb.Item active>{this.props.workerGroup}</Breadcrumb.Item>
-          <Breadcrumb.Item active>{this.props.workerId}</Breadcrumb.Item>
+          <Breadcrumb.Item active>{workerGroup}</Breadcrumb.Item>
+          <Breadcrumb.Item active>{workerId}</Breadcrumb.Item>
         </Breadcrumb>
         <SearchForm
           key="input-form"
           provisioners={provisioners}
           workerTypes={workerTypes}
-          provisionerId={this.props.provisionerId}
-          workerType={this.props.workerType}
-          workerGroup={this.props.workerGroup}
-          workerId={this.props.workerId}
+          provisionerId={provisionerId}
+          workerType={workerType}
+          workerGroup={workerGroup}
+          workerId={workerId}
           updateURI={this.updateURI}
           loadWorker={this.loadWorker}
           loadWorkerTypes={this.loadWorkerTypes}

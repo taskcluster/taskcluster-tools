@@ -106,6 +106,12 @@ export const labels = {
   exception: 'warning'
 };
 
+export const stabilityColors = {
+  experimental: 'default',
+  stable: 'success',
+  deprecated: 'danger'
+};
+
 export const loadable = loader =>
   Loadable({
     loading: Loading,

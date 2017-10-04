@@ -1,0 +1,8 @@
+.dataContainer {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dataContainer > div {
+  margin: 0 10px 10px 0;
+}
