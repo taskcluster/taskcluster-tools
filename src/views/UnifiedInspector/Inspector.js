@@ -3,7 +3,7 @@ import { Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { WebListener } from 'taskcluster-client-web';
+import { WebListener, request } from 'taskcluster-client-web';
 import { isNil } from 'ramda';
 import PropsRoute from '../../components/PropsRoute';
 import Error from '../../components/Error';
@@ -146,23 +146,24 @@ export default class Inspector extends React.PureComponent {
     }
 
     try {
-      const url = queue.buildUrl(
-        queue.getLatestArtifact,
-        taskGroupId,
-        'public/actions.json'
-      );
       const [decision, actions] = await Promise.all([
         queue.task(taskGroupId),
-        fetch(url).then(response => response.json())
+        request(
+          queue.buildUrl(
+            queue.getLatestArtifact,
+            taskGroupId,
+            'public/actions.json'
+          )
+        )
       ]);
 
       return { decision, actions };
     } catch (err) {
-      if (err.statusCode !== 404) {
+      if (err.response && err.response.status !== 404) {
         throw err;
       }
 
-      return Promise.resolve({ decision: null, actions: null });
+      return { decision: null, actions: null };
     }
   }
 
