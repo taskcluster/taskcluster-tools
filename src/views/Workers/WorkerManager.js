@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Table,
-  Breadcrumb,
   Button,
   ButtonGroup,
   Glyphicon,
@@ -11,6 +10,7 @@ import {
   Label
 } from 'react-bootstrap';
 import HelmetTitle from '../../components/HelmetTitle';
+import Breadcrumb from '../../components/Breadcrumb';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
@@ -114,6 +114,19 @@ export default class WorkerManager extends React.PureComponent {
   render() {
     const { filter, workers, workerToken, loading, error } = this.state;
     const { provisionerId, workerType } = this.props;
+    const navList = [
+      {
+        title: provisionerId,
+        href: `/provisioners/${provisionerId}`
+      },
+      {
+        title: 'worker-types',
+        href: `/provisioners/${provisionerId}/worker-types`
+      },
+      {
+        title: workerType
+      }
+    ];
 
     return (
       <div>
@@ -121,18 +134,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Workers" />
           <h4>Workers Explorer</h4>
         </div>
-        <div>
-          <Breadcrumb>
-            <Breadcrumb.Item href={`/provisioners/${provisionerId}`}>
-              {provisionerId}
-            </Breadcrumb.Item>
-            <Breadcrumb.Item
-              href={`/provisioners/${provisionerId}/worker-types`}>
-              worker-types
-            </Breadcrumb.Item>
-            <Breadcrumb.Item active>{workerType}</Breadcrumb.Item>
-          </Breadcrumb>
-        </div>
+        <Breadcrumb navList={navList} active={workerType} />
         <div className={styles.filters}>
           <DropdownButton
             id="workers-dropdown"
