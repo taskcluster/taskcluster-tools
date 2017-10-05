@@ -81,7 +81,7 @@ export default class RunDetails extends React.PureComponent {
             <td>
               {run.workerId ? (
                 <Link
-                  to={`/workers/provisioners/${task.provisionerId}/worker-types/${task.workerType}/workers/${run.workerGroup}/${run.workerId}`}>
+                  to={`/provisioners/${task.provisionerId}/worker-types/${task.workerType}/workers/${run.workerGroup}/${run.workerId}`}>
                   {run.workerId}
                 </Link>
               ) : (
