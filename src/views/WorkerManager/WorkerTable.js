@@ -46,16 +46,15 @@ export default class WorkerTable extends React.PureComponent {
     </Popover>
   );
 
-  renderTask = ({ task, status }, index) => {
-    const runId = status.runs.length - 1;
+  renderTask = ({ task, status, runId }, index) => {
     const run = status.runs[runId];
     const description = this.renderTaskDescription(task.metadata.description);
 
     return (
       <tr key={`recent-task-${index}`}>
         <td>
-          <Label bsSize="sm" bsStyle={labels[status.state]}>
-            {status.state}
+          <Label bsSize="sm" bsStyle={labels[run.state]}>
+            {run.state}
           </Label>
         </td>
         <td>
@@ -75,7 +74,8 @@ export default class WorkerTable extends React.PureComponent {
           </OverlayTrigger>
         </td>
         <td>
-          <Link to={`/groups/${status.taskGroupId}/tasks/${status.taskId}`}>
+          <Link
+            to={`/groups/${status.taskGroupId}/tasks/${status.taskId}/runs/${runId}`}>
             {status.taskId}
           </Link>
         </td>
@@ -109,10 +109,8 @@ export default class WorkerTable extends React.PureComponent {
 
     const sort = tasks =>
       tasks.sort((a, b) => {
-        const runIdA = a.status.runs.length - 1;
-        const runIdB = b.status.runs.length - 1;
-        const diff = moment(a.status.runs[runIdA].started).diff(
-          moment(b.status.runs[runIdB].started)
+        const diff = moment(a.status.runs[a.runId].started).diff(
+          moment(b.status.runs[b.runId].started)
         );
 
         if (diff === 0) {
@@ -123,7 +121,11 @@ export default class WorkerTable extends React.PureComponent {
       });
 
     if (filterStatus !== 'all') {
-      return sort(tasks.filter(task => task.status.state === filterStatus));
+      return sort(
+        tasks.filter(
+          task => task.status.runs[task.runId].state === filterStatus
+        )
+      );
     }
 
     return sort(tasks);
