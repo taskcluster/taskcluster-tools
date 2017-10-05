@@ -117,13 +117,13 @@ export default class WorkerManager extends React.PureComponent {
 
   loadRecentTasks = recentTasks =>
     Promise.all(
-      recentTasks.map(async ({ taskId }) => {
+      recentTasks.map(async ({ taskId, runId }) => {
         const [task, { status }] = await Promise.all([
           this.props.queue.task(taskId),
           this.props.queue.status(taskId)
         ]);
 
-        return { task, status };
+        return { task, status, runId };
       })
     );
 
