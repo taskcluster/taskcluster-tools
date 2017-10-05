@@ -5,10 +5,10 @@ import {
   Button,
   ButtonToolbar,
   OverlayTrigger,
-  Tooltip,
-  Breadcrumb
+  Tooltip
 } from 'react-bootstrap';
 import HelmetTitle from '../../components/HelmetTitle';
+import Breadcrumb from '../../components/Breadcrumb';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import SearchForm from './SearchForm';
@@ -177,6 +177,26 @@ export default class WorkerManager extends React.PureComponent {
       </Tooltip>
     );
     const firstClaim = worker && moment(worker.firstClaim);
+    const navList = [
+      {
+        title: provisionerId,
+        href: `/provisioners/${provisionerId}`
+      },
+      {
+        title: 'worker-types',
+        href: `/provisioners/${provisionerId}/worker-types`
+      },
+      {
+        title: workerType,
+        href: `/provisioners/${provisionerId}/worker-types/${workerType}`
+      },
+      {
+        title: workerGroup
+      },
+      {
+        title: workerId
+      }
+    ];
 
     return (
       <div>
@@ -184,20 +204,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
-        <Breadcrumb>
-          <Breadcrumb.Item href={`/provisioners/${provisionerId}`}>
-            {provisionerId}
-          </Breadcrumb.Item>
-          <Breadcrumb.Item href={`/provisioners/${provisionerId}/worker-types`}>
-            worker-types
-          </Breadcrumb.Item>
-          <Breadcrumb.Item
-            href={`/provisioners/${provisionerId}/worker-types/${workerType}`}>
-            {workerType}
-          </Breadcrumb.Item>
-          <Breadcrumb.Item active>{workerGroup}</Breadcrumb.Item>
-          <Breadcrumb.Item active>{workerId}</Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb navList={navList} active={[workerGroup, workerId]} />
         <SearchForm
           key="input-form"
           provisioners={provisioners}

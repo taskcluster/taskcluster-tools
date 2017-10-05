@@ -7,13 +7,13 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Tooltip,
-  Breadcrumb,
   OverlayTrigger
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { parse, stringify } from 'qs';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
+import Breadcrumb from '../../components/Breadcrumb';
 import SearchForm from './SearchForm';
 import WorkerTypeTable from './WorkerTypeTable';
 import OrderByDropdown from './OrderByDropdown';
@@ -134,6 +134,16 @@ export default class WorkerManager extends React.PureComponent {
         Last active may be off by up-to 6 hours.
       </Tooltip>
     );
+    const navList = [
+      {
+        title: provisionerId,
+        href: `/provisioners/${provisionerId}`
+      },
+      {
+        title: 'worker-types',
+        href: `/provisioners/${provisionerId}/worker-types`
+      }
+    ];
 
     return (
       <div>
@@ -141,16 +151,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Worker Types Explorer</h4>
         </div>
-        <Breadcrumb>
-          <Breadcrumb.Item href={`/provisioners/${provisionerId}`}>
-            {provisionerId}
-          </Breadcrumb.Item>
-          <Breadcrumb.Item
-            active
-            href={`/provisioners/${provisionerId}/worker-types`}>
-            worker-types
-          </Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb navList={navList} active="worker-types" />
         <DropdownButton
           id="provisioner-dropdown"
           bsSize="small"
