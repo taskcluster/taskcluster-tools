@@ -26,7 +26,9 @@ export default class Provisioners extends React.PureComponent {
     this.state = {
       provisioners: [],
       provisioner: null,
-      error: null
+      error: null,
+      provisionerLoading: false,
+      provisionersLoading: true
     };
   }
 
@@ -39,15 +41,15 @@ export default class Provisioners extends React.PureComponent {
   }
 
   loadProvisioner(provisioner) {
-    this.setState({ loading: true, provisioner: null }, async () => {
+    this.setState({ provisionerLoading: true, provisioner: null }, async () => {
       try {
         this.setState({
           provisioner: await this.props.queue.getProvisioner(provisioner),
-          loading: false,
+          provisionerLoading: false,
           error: null
         });
       } catch (error) {
-        this.setState({ provisioner: null, loading: false, error });
+        this.setState({ provisioner: null, provisionerLoading: false, error });
       }
     });
   }
@@ -61,13 +63,17 @@ export default class Provisioners extends React.PureComponent {
         token ? { continuationToken: token, limit: 100 } : { limit: 100 }
       );
 
-      this.setState({
-        provisioners: this.state.provisioners.concat(provisioners)
-      });
-
       if (continuationToken) {
+        this.setState({
+          provisioners: this.state.provisioners.concat(provisioners)
+        });
         this.loadProvisioners(continuationToken);
       }
+
+      this.setState({
+        provisioners: this.state.provisioners.concat(provisioners),
+        provisionersLoading: false
+      });
     } catch (error) {
       this.setState({
         provisioners: null,
@@ -80,7 +86,13 @@ export default class Provisioners extends React.PureComponent {
     this.loadProvisioner(target.innerText);
 
   render() {
-    const { provisioners, provisioner, loading, error } = this.state;
+    const {
+      provisioners,
+      provisioner,
+      provisionerLoading,
+      provisionersLoading,
+      error
+    } = this.state;
 
     return (
       <div>
@@ -91,6 +103,7 @@ export default class Provisioners extends React.PureComponent {
         {error && <Error error={error} />}
         <Row>
           <Col md={6}>
+            {provisionersLoading && <Spinner />}
             <ListGroup>
               {provisioners.map(({ provisionerId }, key) => (
                 <LinkContainer
@@ -109,7 +122,7 @@ export default class Provisioners extends React.PureComponent {
             </ListGroup>
           </Col>
           <Col md={6}>
-            {loading && <Spinner />}
+            {provisionerLoading && <Spinner />}
             {provisioner && (
               <div>
                 <div className={styles.dataContainer}>
