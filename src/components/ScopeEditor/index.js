@@ -2,6 +2,7 @@ import React from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
 import clone from 'lodash.clonedeep';
 import equal from 'deep-equal';
+import { Link } from 'react-router-dom';
 
 export default class ScopeEditor extends React.Component {
   static propTypes = {
@@ -75,7 +76,9 @@ export default class ScopeEditor extends React.Component {
       <ul className="form-control-static" style={{ paddingLeft: 20 }}>
         {scopes.map(scope => (
           <li key={`scope-editor-${scope}`}>
-            <code>{scope}</code>
+            <Link to={`/auth/scopes/${encodeURIComponent(scope)}`}>
+              <code>{scope}</code>
+            </Link>
           </li>
         ))}
       </ul>
