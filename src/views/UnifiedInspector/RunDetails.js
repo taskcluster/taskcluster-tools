@@ -4,6 +4,7 @@ import { Table, Label } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import DateView from '../../components/DateView';
 import { labels } from '../../utils';
+import Markdown from '../../components/Markdown';
 
 export default class RunDetails extends React.PureComponent {
   static propTypes = {
@@ -13,6 +14,7 @@ export default class RunDetails extends React.PureComponent {
 
   render() {
     const { run, task } = this.props;
+    const { metadata } = task;
 
     if (!run) {
       return null;
@@ -22,8 +24,29 @@ export default class RunDetails extends React.PureComponent {
       <Table>
         <tbody>
           <tr>
-            <td style={{ borderTop: 'none' }}>State</td>
+            <td style={{ borderTop: 'none' }}>Name</td>
             <td style={{ borderTop: 'none' }}>
+              <Markdown>{metadata.name}</Markdown>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Description</td>
+            <td>
+              <Markdown>{metadata.description}</Markdown>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Owner</td>
+            <td>
+              <code>{metadata.owner}</code>
+            </td>
+          </tr>
+
+          <tr>
+            <td>State</td>
+            <td>
               <Label bsStyle={labels[run.state]}>{run.state}</Label>
             </td>
           </tr>
