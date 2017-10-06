@@ -3,9 +3,9 @@ export default [
     title: 'Provisioner Explorer',
     link: '/provisioners',
     icon: 'wpexplorer',
-    description: `List worker-types for a provisioners and see relevant information.
+    description: `List worker-types for provisioners and see relevant information.
       List workers for a worker-type and see relevant information. Drill down into a
-      specific worker and perform actions against it or see the last 20 tasks it has claimed.`
+      specific worker and perform actions against it or see recent tasks it has claimed.`
   },
   {
     title: 'Task & Group Inspector',
