@@ -45,9 +45,13 @@ export default class GroupDetails extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    const taskCountHasChanged =
+      (this.props.tasks && this.props.tasks.length) !==
+      (nextProps.tasks && nextProps.tasks.length);
+
     if (
       nextProps.taskGroupId !== this.props.taskGroupId ||
-      nextProps.tasks.length !== this.props.tasks.length ||
+      taskCountHasChanged ||
       nextProps.filterStatus !== this.props.filterStatus
     ) {
       this.setState({
