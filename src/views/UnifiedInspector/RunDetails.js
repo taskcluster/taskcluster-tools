@@ -14,11 +14,12 @@ export default class RunDetails extends React.PureComponent {
 
   render() {
     const { run, task } = this.props;
-    const { metadata } = task;
 
-    if (!run) {
+    if (!run || !task) {
       return null;
     }
+
+    const { metadata } = task;
 
     return (
       <Table>
