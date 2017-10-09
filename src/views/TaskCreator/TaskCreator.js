@@ -146,7 +146,10 @@ export default class TaskCreator extends React.PureComponent {
   };
 
   handleUpdateTimestamps = () =>
-    this.setState({ task: this.parameterizeTask(safeLoad(this.state.task)) });
+    this.setState({
+      createdTaskError: null,
+      task: this.parameterizeTask(safeLoad(this.state.task))
+    });
 
   handleResetEditor = () =>
     this.setState({ task: this.parameterizeTask(defaultTask) });
