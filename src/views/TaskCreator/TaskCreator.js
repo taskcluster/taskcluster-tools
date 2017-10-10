@@ -152,7 +152,10 @@ export default class TaskCreator extends React.PureComponent {
     });
 
   handleResetEditor = () =>
-    this.setState({ task: this.parameterizeTask(defaultTask) });
+    this.setState({
+      createdTaskError: null,
+      task: this.parameterizeTask(defaultTask)
+    });
 
   renderState() {
     const { task, error } = this.state;
