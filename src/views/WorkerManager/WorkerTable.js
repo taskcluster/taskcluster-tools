@@ -70,7 +70,7 @@ export default class WorkerTable extends React.PureComponent {
             rootClose
             placement="bottom"
             overlay={description}>
-            <Icon role="button" name="info-circle" />
+            <Icon role="button" name="info" />
           </OverlayTrigger>
         </td>
         <td>
