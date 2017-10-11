@@ -39,7 +39,7 @@ export default class WorkerTable extends React.PureComponent {
         <div>
           Description&nbsp;&nbsp;
           <a target="_blank" rel="noopener noreferrer" href={source}>
-            (source)
+            (Source)
           </a>
         </div>
       }>
