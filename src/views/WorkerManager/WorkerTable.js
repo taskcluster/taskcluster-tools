@@ -31,11 +31,18 @@ export default class WorkerTable extends React.PureComponent {
     };
   }
 
-  renderTaskDescription = description => (
+  renderTaskDescription = ({ description, source }) => (
     <Popover
       className={styles.taskPopover}
       id="popover-trigger-click-root-close"
-      title="Description">
+      title={
+        <div>
+          Description&nbsp;&nbsp;
+          <a target="_blank" rel="noopener noreferrer" href={source}>
+            (source)
+          </a>
+        </div>
+      }>
       <div>
         {description ? (
           <Markdown>{description}</Markdown>
@@ -48,7 +55,7 @@ export default class WorkerTable extends React.PureComponent {
 
   renderTask = ({ task, status, runId }, index) => {
     const run = status.runs[runId];
-    const description = this.renderTaskDescription(task.metadata.description);
+    const description = this.renderTaskDescription(task.metadata);
 
     return (
       <tr key={`recent-task-${index}`}>
