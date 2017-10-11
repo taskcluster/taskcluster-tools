@@ -24,7 +24,13 @@
 }
 
 .taskPopover {
-  max-width: 600px;
+  max-width: 400px;
+}
+
+.sourcePopover {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .tasksTable > div {

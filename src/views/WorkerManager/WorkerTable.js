@@ -35,20 +35,20 @@ export default class WorkerTable extends React.PureComponent {
     <Popover
       className={styles.taskPopover}
       id="popover-trigger-click-root-close"
-      title={
-        <div>
-          Description&nbsp;&nbsp;
-          <a target="_blank" rel="noopener noreferrer" href={source}>
-            (Source)
-          </a>
-        </div>
-      }>
+      title="Description">
       <div>
         {description ? (
           <Markdown>{description}</Markdown>
         ) : (
           <Markdown>`-`</Markdown>
         )}
+        <hr />
+        <div className={styles.sourcePopover}>
+          <strong>Source: </strong>
+          <a target="_blank" rel="noopener noreferrer" href={source}>
+            {source}
+          </a>
+        </div>
       </div>
     </Popover>
   );
