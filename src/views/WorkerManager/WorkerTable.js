@@ -31,7 +31,7 @@ export default class WorkerTable extends React.PureComponent {
     };
   }
 
-  renderTaskDescription = description => (
+  renderTaskDescription = ({ description, source }) => (
     <Popover
       className={styles.taskPopover}
       id="popover-trigger-click-root-close"
@@ -42,13 +42,20 @@ export default class WorkerTable extends React.PureComponent {
         ) : (
           <Markdown>`-`</Markdown>
         )}
+        <hr />
+        <div className={styles.sourcePopover}>
+          <strong>Source: </strong>
+          <a target="_blank" rel="noopener noreferrer" href={source}>
+            {source}
+          </a>
+        </div>
       </div>
     </Popover>
   );
 
   renderTask = ({ task, status, runId }, index) => {
     const run = status.runs[runId];
-    const description = this.renderTaskDescription(task.metadata.description);
+    const description = this.renderTaskDescription(task.metadata);
 
     return (
       <tr key={`recent-task-${index}`}>
@@ -58,27 +65,19 @@ export default class WorkerTable extends React.PureComponent {
           </Label>
         </td>
         <td>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href={task.metadata.source}>
-            {task.metadata.name}
-          </a>
-          &nbsp;&nbsp;
           <OverlayTrigger
             trigger="click"
             rootClose
             placement="bottom"
             overlay={description}>
             <Icon role="button" name="info" />
-          </OverlayTrigger>
-        </td>
-        <td>
+          </OverlayTrigger>&nbsp;&nbsp;
           <Link
             to={`/groups/${status.taskGroupId}/tasks/${status.taskId}/runs/${runId}`}>
-            {status.taskId}
+            {task.metadata.name}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
           </Link>
         </td>
+        <td>{status.taskId}</td>
         <td>
           {run.started ? (
             <DateView placement="bottom" date={run.started} />
