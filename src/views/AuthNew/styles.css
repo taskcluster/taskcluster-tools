@@ -1,0 +1,16 @@
+.textCenter {
+  text-align: center;
+}
+
+.flexCenter {
+  display: flex;
+  justify-content: center;
+}
+
+.authItems {
+  max-width: 500px;
+}
+
+.editor {
+  max-width: 800px;
+}

@@ -13,7 +13,7 @@ export default class Auth0LoginMenuItem extends React.PureComponent {
     );
 
     return (
-      <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
+      <OverlayTrigger placement="bottom" delay={600} overlay={tooltip}>
         <NavItem onSelect={this.onSelect}>
           <Glyphicon glyph="log-in" /> Sign In with Auth0
         </NavItem>

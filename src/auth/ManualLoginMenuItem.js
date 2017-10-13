@@ -11,7 +11,7 @@ export default class ManualLoginMenuItem extends React.PureComponent {
     );
 
     return (
-      <OverlayTrigger placement="left" delay={600} overlay={tooltip}>
+      <OverlayTrigger placement="bottom" delay={600} overlay={tooltip}>
         <NavItem onSelect={this.onSelect}>
           <Glyphicon glyph="paste" /> Sign In Manually
         </NavItem>
