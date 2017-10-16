@@ -1,10 +1,20 @@
 {
   "root": "build",
   "clean_urls": true,
+  "https_only": true,
   "routes": {
     "/**": "index.html"
   },
-  "https_only": true,
+  "redirects": {
+    "/robots.txt": {
+      "url": "/robots.txt",
+      "status": 404
+    },
+    "/sitemap.xml": {
+      "url": "/sitemap.xml",
+      "status": 404
+    }
+  },
   "headers": {
     "/**": {
       "Cache-Control": "no-store, no-cache, must-revalidate",
