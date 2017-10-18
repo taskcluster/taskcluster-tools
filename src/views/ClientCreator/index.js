@@ -1,11 +1,11 @@
 import React from 'react';
 import Clients from '../../components/Clients';
-import AuthNew from './AuthNew';
+import ClientCreator from './ClientCreator';
 
 const View = ({ userSession, authController, location }) => (
   <Clients userSession={userSession} Auth>
     {({ auth }) => (
-      <AuthNew
+      <ClientCreator
         location={location}
         auth={auth}
         authController={authController}

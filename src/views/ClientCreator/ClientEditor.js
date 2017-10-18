@@ -7,8 +7,7 @@ import {
   Col,
   Button,
   Glyphicon,
-  ButtonToolbar,
-  InputGroup
+  ButtonToolbar
 } from 'react-bootstrap';
 import { assoc } from 'ramda';
 import TimeInput from '../../components/TimeInput';
@@ -26,9 +25,7 @@ export default class ClientEditor extends React.PureComponent {
   }
 
   validClientId = () =>
-    /^[A-Za-z0-9@/:._-]+$/.test(this.state.currentClient.clientId || '') &&
-    (this.props.isNewClient ||
-      this.state.currentClient.clientId !== this.props.client.clientId);
+    /^[A-Za-z0-9@/:._-]+$/.test(this.state.currentClient.clientId || '');
 
   handleClientIdChange = e =>
     this.setState({
@@ -61,7 +58,6 @@ export default class ClientEditor extends React.PureComponent {
   };
 
   render() {
-    const { isNewClient, client } = this.props;
     const { currentClient } = this.state;
     const validClientId = this.validClientId();
 
@@ -70,30 +66,6 @@ export default class ClientEditor extends React.PureComponent {
         <h4 style={{ marginTop: 0 }}>Create New Client</h4>
         <hr style={{ marginBottom: 10 }} />
         <Form horizontal>
-          {!isNewClient && (
-            <FormGroup>
-              <Col componentClass={ControlLabel} sm={2}>
-                <ControlLabel>Old ClientId</ControlLabel>
-              </Col>
-              <Col sm={10}>
-                <InputGroup>
-                  <FormControl
-                    type="text"
-                    disabled={true}
-                    value={client.clientId}
-                  />
-                  <InputGroup.Button>
-                    <Button
-                      onClick={this.props.resetAccessToken}
-                      bsStyle="warning">
-                      <Glyphicon glyph="fire" /> Reset accessToken
-                    </Button>
-                  </InputGroup.Button>
-                </InputGroup>
-              </Col>
-            </FormGroup>
-          )}
-
           <FormGroup
             controlId="clientId"
             validationState={!validClientId ? 'error' : null}>
@@ -101,9 +73,6 @@ export default class ClientEditor extends React.PureComponent {
               ClientId
             </Col>
             <Col sm={10}>
-              {!validClientId && (
-                <ControlLabel>Pick a different clientId</ControlLabel>
-              )}
               <FormControl
                 type="text"
                 value={currentClient.clientId}

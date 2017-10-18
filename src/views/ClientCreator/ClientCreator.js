@@ -1,0 +1,194 @@
+import React from 'react';
+import { Button, ButtonToolbar, Alert } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
+import { parse } from 'qs';
+import { fromNow } from 'taskcluster-client-web';
+import Error from '../../components/Error';
+import Spinner from '../../components/Spinner';
+import ClientEditor from './ClientEditor';
+import styles from './styles.css';
+
+export default class ClientCreator extends React.PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      creating: false,
+      loading: false,
+      client: null,
+      clientPrefix: null,
+      query: parse(props.location.search.slice(1)),
+      error: null
+    };
+  }
+
+  async componentWillMount() {
+    await this.loadClientPrefix(this.props.userSession);
+    this.loadClient(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.loadClientPrefix(nextProps.userSession);
+    this.loadClient(nextProps);
+  }
+
+  handleResetAccessToken = async () => {
+    try {
+      const client = await this.props.auth.resetAccessToken(
+        this.state.client.clientId
+      );
+
+      this.triggerCallback(client.clientId, client.accessToken);
+    } catch (error) {
+      this.setState({ error });
+    }
+  };
+
+  triggerCallback = (clientId, accessToken) => {
+    window.location.replace(
+      `${this.state.query
+        .callback_url}?clientId=${clientId}&accessToken=${accessToken}`
+    );
+  };
+
+  createClient = client => {
+    this.setState({ error: null }, async () => {
+      try {
+        const newClient = await this.props.auth.createClient(client.clientId, {
+          description: client.description,
+          expires: client.expires,
+          scopes: client.scopes,
+          deleteOnExpiration: true
+        });
+
+        this.triggerCallback(newClient.clientId, newClient.accessToken);
+      } catch (error) {
+        this.setState({ error });
+      }
+    });
+  };
+
+  nextAvailableClientId = async (clientName, suffix) => {
+    const clientWithSuffix = (clientName, suffix) =>
+      suffix ? `${clientName}-${suffix}` : clientName;
+
+    try {
+      await this.props.auth.client(clientWithSuffix(clientName, suffix));
+
+      return this.nextAvailableClientId(clientName, suffix + 1);
+    } catch (err) {
+      return clientWithSuffix(clientName, suffix);
+    }
+  };
+
+  constructClient = async clientName => {
+    const description =
+      this.state.query.description ||
+      `Client created ${new Date()} for ${this.state.query.callback_url}`;
+    const clientId = await this.nextAvailableClientId(clientName, 0);
+
+    return {
+      clientId,
+      scopes: this.state.query.scope || [],
+      description,
+      expires: fromNow(this.state.query.expires || '3 days')
+    };
+  };
+
+  handleCreateNewClient = () => {
+    this.setState({ loading: true }, async () => {
+      const client = await this.constructClient(
+        `${this.state.clientPrefix}/${this.state.query.name}`
+      );
+
+      this.setState({ client, creating: true, loading: false });
+    });
+  };
+
+  loadClientPrefix = async userSession => {
+    if (!userSession) {
+      return;
+    }
+
+    try {
+      const { clientId } = await userSession.getCredentials();
+
+      this.setState({ clientPrefix: clientId });
+
+      return clientId;
+    } catch (error) {
+      this.setState({ clientPrefix: '' });
+
+      return '';
+    }
+  };
+
+  loadClient = async ({ userSession, auth }) => {
+    if (!userSession) {
+      return;
+    }
+
+    const clientName = `${this.state.clientPrefix}/${this.state.query.name}`;
+
+    try {
+      const client = await auth.client(clientName);
+
+      this.setState({ client });
+    } catch (error) {
+      this.handleCreateNewClient();
+    }
+  };
+
+  renderClientAlreadyExists = () => (
+    <div className={styles.textCenter}>
+      <h3>This clientId already exists.</h3>
+      <h4>
+        You can re-use it by resetting the access token, but that will cause any
+        other uses of that clientId (with the old access token) to stop working.
+      </h4>
+      <h5>What do you want to do?</h5>
+      <ButtonToolbar className={styles.flexCenter}>
+        <Button bsStyle="primary" onClick={this.handleCreateNewClient}>
+          Create a new clientId
+        </Button>
+        <Button bsStyle="warning" onClick={this.handleResetAccessToken}>
+          <Icon name="refresh" /> Reset accessToken
+        </Button>
+      </ButtonToolbar>
+    </div>
+  );
+
+  requestLogin = () => (
+    <div>
+      <Alert bsStyle="warning">Please sign in to continue.</Alert>
+    </div>
+  );
+
+  render() {
+    if (this.state.loading) {
+      return <Spinner />;
+    }
+
+    if (!this.props.userSession) {
+      return this.requestLogin();
+    }
+
+    return (
+      <div>
+        {this.state.error && <Error error={this.state.error} />}
+
+        {!this.state.creating &&
+          this.state.client &&
+          this.renderClientAlreadyExists()}
+
+        {this.state.creating &&
+          this.state.client && (
+            <ClientEditor
+              client={this.state.client}
+              createClient={this.createClient}
+            />
+          )}
+      </div>
+    );
+  }
+}

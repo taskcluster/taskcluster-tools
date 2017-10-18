@@ -1,12 +1,6 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import {
-  Glyphicon,
-  NavDropdown,
-  NavItem,
-  MenuItem,
-  Nav
-} from 'react-bootstrap';
+import { Glyphicon, NavDropdown, NavItem, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { loadable } from '../../utils';
 
@@ -78,31 +72,7 @@ class CredentialsMenu extends React.PureComponent {
     );
   }
 
-  renderAsList = () => {
-    if (this.props.userSession) {
-      return;
-    }
-
-    return (
-      <Nav bsStyle="pills" stacked>
-        {this.props.authController.canSignInUsing('auth0') && (
-          <Auth0LoginMenuItem key="auth0" />
-        )}
-        {this.props.authController.canSignInUsing('development') && (
-          <DevelopmentLoginMenuItem key="development" />
-        )}
-        {this.props.authController.canSignInUsing('manual') && (
-          <ManualLoginMenuItem key="manual" />
-        )}
-      </Nav>
-    );
-  };
-
   render() {
-    if (this.props.inline) {
-      return this.renderAsList();
-    }
-
     return this.props.userSession
       ? this.renderWithUser()
       : this.renderWithoutUser();
