@@ -58,6 +58,12 @@ export default [
       clients with a given scope. This is effectively reverse client and role lookup.`
   },
   {
+    title: 'Scope Grants',
+    link: '/auth/grants/',
+    icon: 'check',
+    description: `Grant scopes....`
+  },
+  {
     title: 'Pulse Inspector',
     link: '/pulse-inspector',
     icon: 'wifi',
