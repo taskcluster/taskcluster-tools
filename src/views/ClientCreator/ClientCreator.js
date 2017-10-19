@@ -44,12 +44,12 @@ export default class ClientCreator extends React.PureComponent {
     }
   };
 
-  triggerCallback = (clientId, accessToken) => {
+  triggerCallback(clientId, accessToken) {
     window.location.replace(
       `${this.state.query
         .callback_url}?clientId=${clientId}&accessToken=${accessToken}`
     );
-  };
+  }
 
   createClient = client => {
     this.setState({ error: null }, async () => {
@@ -68,7 +68,7 @@ export default class ClientCreator extends React.PureComponent {
     });
   };
 
-  nextAvailableClientId = async (clientName, suffix) => {
+  async nextAvailableClientId(clientName, suffix) {
     const clientWithSuffix = (clientName, suffix) =>
       suffix ? `${clientName}-${suffix}` : clientName;
 
@@ -79,17 +79,21 @@ export default class ClientCreator extends React.PureComponent {
     } catch (err) {
       return clientWithSuffix(clientName, suffix);
     }
-  };
+  }
 
   constructClient = async clientName => {
     const description =
       this.state.query.description ||
       `Client created ${new Date()} for ${this.state.query.callback_url}`;
     const clientId = await this.nextAvailableClientId(clientName, 0);
+    const scopes =
+      typeof this.state.query.scope === 'string'
+        ? [this.state.query.scope]
+        : this.state.query.scope;
 
     return {
       clientId,
-      scopes: this.state.query.scope || [],
+      scopes: scopes || [],
       description,
       expires: fromNow(this.state.query.expires || '3 days')
     };
@@ -105,7 +109,7 @@ export default class ClientCreator extends React.PureComponent {
     });
   };
 
-  loadClientPrefix = async userSession => {
+  async loadClientPrefix(userSession) {
     if (!userSession) {
       return;
     }
@@ -121,9 +125,9 @@ export default class ClientCreator extends React.PureComponent {
 
       return '';
     }
-  };
+  }
 
-  loadClient = async ({ userSession, auth }) => {
+  async loadClient({ userSession, auth }) {
     if (!userSession) {
       return;
     }
@@ -137,7 +141,7 @@ export default class ClientCreator extends React.PureComponent {
     } catch (error) {
       this.handleCreateNewClient();
     }
-  };
+  }
 
   renderClientAlreadyExists = () => (
     <div className={styles.textCenter}>
