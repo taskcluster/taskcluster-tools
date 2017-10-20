@@ -1,0 +1,12 @@
+.textCenter {
+  text-align: center;
+}
+
+.flexCenter {
+  display: flex;
+  justify-content: center;
+}
+
+.editor {
+  max-width: 800px;
+}

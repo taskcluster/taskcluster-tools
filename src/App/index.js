@@ -93,6 +93,9 @@ const DevelopmentLogin = loadable(() =>
 const ManualLogin = loadable(() =>
   import(/* webpackChunkName: 'ManualLogin' */ '../views/ManualLogin')
 );
+const ClientCreator = loadable(() =>
+  import(/* webpackChunkName: 'ClientCreator' */ '../views/ClientCreator')
+);
 
 export default class App extends React.Component {
   constructor(props) {
@@ -236,6 +239,12 @@ export default class App extends React.Component {
                 <PropsRoute
                   path="/provisioners/:provisionerId?"
                   component={Provisioners}
+                />
+                <PropsRoute
+                  path="/auth/clients/new"
+                  component={ClientCreator}
+                  authController={authController}
+                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/auth/clients/:clientId?"
