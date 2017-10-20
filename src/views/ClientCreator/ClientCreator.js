@@ -69,15 +69,14 @@ export default class ClientCreator extends React.PureComponent {
   };
 
   async nextAvailableClientId(clientName, suffix) {
-    const clientWithSuffix = (clientName, suffix) =>
-      suffix ? `${clientName}-${suffix}` : clientName;
+    const clientWithSuffix = suffix ? `${clientName}-${suffix}` : clientName;
 
     try {
-      await this.props.auth.client(clientWithSuffix(clientName, suffix));
+      await this.props.auth.client(clientWithSuffix);
 
       return this.nextAvailableClientId(clientName, suffix + 1);
     } catch (err) {
-      return clientWithSuffix(clientName, suffix);
+      return clientWithSuffix;
     }
   }
 
@@ -118,12 +117,8 @@ export default class ClientCreator extends React.PureComponent {
       const { clientId } = await userSession.getCredentials();
 
       this.setState({ clientPrefix: clientId });
-
-      return clientId;
     } catch (error) {
       this.setState({ clientPrefix: '' });
-
-      return '';
     }
   }
 
