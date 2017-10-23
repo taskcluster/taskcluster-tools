@@ -66,6 +66,9 @@ export default class ScopeGrants extends React.PureComponent {
     }
   }
 
+  handleGrantsRedirect = () => this.props.history.push(`/auth/grants`);
+  handleNewGrant = () => this.setState({ selected: null, args: {} });
+
   renderGrants() {
     if (this.state.error) {
       return <Error error={this.state.error} />;
@@ -85,7 +88,7 @@ export default class ScopeGrants extends React.PureComponent {
           <HelmetTitle title={pattern.title} />
           <Row>
             <Col md={1}>
-              <Button onClick={() => this.props.history.push(`/auth/grants/`)}>
+              <Button onClick={this.handleGrantsRedirect}>
                 <Glyphicon glyph="chevron-left" /> Back
               </Button>
             </Col>
@@ -102,20 +105,22 @@ export default class ScopeGrants extends React.PureComponent {
               <Table hover>
                 <thead>
                   <tr>
-                    {params.map((param, index) => <th key={index}>{param}</th>)}
+                    {params.map((param, index) => (
+                      <th key={`grant-${index}`}>{param}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {instantiatedArgs.map((args, index) => (
                     <tr
-                      key={index}
+                      key={`args-${index}`}
                       style={{ cursor: 'pointer' }}
                       className={
                         R.equals(args, this.state.selected) ? 'info' : null
                       }
                       onClick={() => this.setState({ selected: args })}>
                       {params.map((param, index) => (
-                        <td key={index}>
+                        <td key={`params-${index}`}>
                           <code>{args[param]}</code>
                         </td>
                       ))}
@@ -124,17 +129,16 @@ export default class ScopeGrants extends React.PureComponent {
                 </tbody>
               </Table>
               <hr />
-              <Button
-                onClick={() => this.setState({ selected: null, args: {} })}>
+              <Button onClick={this.handleNewGrant}>
                 <Glyphicon glyph="plus" /> New Grant
               </Button>
               <br />
               <br />
             </Col>
             <Col md={6}>
-              {!this.state.selected
-                ? this.renderCreateForm(pattern)
-                : this.renderPatternInstance(pattern, this.state.selected)}
+              {this.state.selected
+                ? this.renderPatternInstance(pattern, this.state.selected)
+                : this.renderCreateForm(pattern)}
             </Col>
           </Row>
         </Col>
@@ -142,56 +146,61 @@ export default class ScopeGrants extends React.PureComponent {
     );
   }
 
+  handleSave = async pattern => {
+    const instance = instantiate(pattern, this.state.args);
+    const roles = await this.props.auth.listRoles();
+    const toCreate = [];
+    const toUpdate = [];
+
+    Object.keys(instance).forEach(r => {
+      if (roles.some(({ roleId }) => r === roleId)) {
+        toUpdate.push(r);
+      } else {
+        toCreate.push(r);
+      }
+    });
+
+    await Promise.all([
+      ...toCreate.map(role =>
+        this.props.auth.createRole(role, {
+          description: '',
+          scopes: instance[role]
+        })
+      ),
+      ...toUpdate.map(role => {
+        const { scopes, description } = roles.find(
+          ({ roleId }) => roleId === role
+        );
+
+        return this.props.auth.updateRole(role, {
+          description,
+          scopes: R.uniq([...scopes, ...instance[role]])
+        });
+      })
+    ]);
+  };
+
+  handleCreatedCompleted = async () => {
+    const { args } = this.state;
+
+    this.setState({ selected: null, roles: null, args: {} });
+    await this.load();
+    this.setState({ selected: args });
+  };
+
+  handleParamChanged = (param, e) => {
+    this.setState({
+      args: R.merge(this.state.args, { [param]: e.target.value })
+    });
+  };
+
+  validateArg = (pattern, param) =>
+    this.state.args[param] &&
+    pattern.params[param].exec(this.state.args[param]);
+
   renderCreateForm(pattern) {
     const params = Object.keys(pattern.params);
     const { args } = this.state;
-    const save = async () => {
-      const instance = instantiate(pattern, this.state.args);
-      const roles = await this.props.auth.listRoles();
-      const toCreate = [];
-      const toUpdate = [];
-
-      Object.keys(instance).forEach(r => {
-        if (roles.some(({ roleId }) => r === roleId)) {
-          toUpdate.push(r);
-        } else {
-          toCreate.push(r);
-        }
-      });
-
-      await Promise.all([
-        ...toCreate.map(role =>
-          this.props.auth.createRole(role, {
-            description: '',
-            scopes: instance[role]
-          })
-        ),
-        ...toUpdate.map(role => {
-          const { scopes, description } = roles.find(
-            ({ roleId }) => roleId === role
-          );
-
-          return this.props.auth.updateRole(role, {
-            description,
-            scopes: R.uniq([...scopes, ...instance[role]])
-          });
-        })
-      ]);
-    };
-
-    const reload = async () => {
-      this.setState({ selected: null, roles: null, args: {} });
-      await this.load();
-      this.setState({ selected: args });
-    };
-
-    const setArg = (param, text) => {
-      this.setState({ args: R.merge(this.state.args, { [param]: text }) });
-    };
-
-    const validateArg = param =>
-      this.state.args[param] &&
-      pattern.params[param].exec(this.state.args[param]);
 
     return (
       <span>
@@ -200,7 +209,9 @@ export default class ScopeGrants extends React.PureComponent {
           {params.map((param, index) => (
             <FormGroup
               key={index}
-              validationState={validateArg(param) ? 'success' : 'error'}>
+              validationState={
+                this.validateArg(pattern, param) ? 'success' : 'error'
+              }>
               <Col componentClass={ControlLabel} sm={2}>
                 {param}
               </Col>
@@ -208,7 +219,7 @@ export default class ScopeGrants extends React.PureComponent {
                 <FormControl
                   type="text"
                   placeholder={pattern.params[param].source.slice(1, -1)}
-                  onChange={e => setArg(param, e.target.value)}
+                  onChange={e => this.handleParamChanged(param, e)}
                 />
                 <FormControl.Feedback />
               </Col>
@@ -219,9 +230,9 @@ export default class ScopeGrants extends React.PureComponent {
               <ModalItem
                 button={true}
                 bsStyle="primary"
-                onSubmit={save}
-                disabled={!params.every(validateArg)}
-                onComplete={reload}
+                onSubmit={() => this.handleSave(pattern)}
+                disabled={!params.every(p => this.validateArg(pattern, p))}
+                onComplete={this.handleCreatedCompleted}
                 body={
                   <span>
                     Are you sure you want to <b>grant scopes</b>?
@@ -241,28 +252,29 @@ export default class ScopeGrants extends React.PureComponent {
     );
   }
 
+  handleReload = () => {
+    this.setState({ selected: null, roles: null });
+    this.load();
+  };
+
+  handleRemove = async pattern => {
+    const instance = instantiate(pattern, this.state.selected);
+    const roles = await this.props.auth.listRoles();
+
+    await Promise.all(
+      roles
+        .filter(({ roleId }) => instance[roleId])
+        .map(({ roleId, description, scopes }) =>
+          this.props.auth.updateRole(roleId, {
+            description,
+            scopes: R.without(instance[roleId], scopes)
+          })
+        )
+    );
+  };
+
   renderPatternInstance(pattern, args) {
     const params = Object.keys(pattern.params);
-    const reload = () => {
-      this.setState({ selected: null, roles: null });
-      this.load();
-    };
-
-    const remove = async () => {
-      const instance = instantiate(pattern, this.state.selected);
-      const roles = await this.props.auth.listRoles();
-
-      await Promise.all(
-        roles
-          .filter(({ roleId }) => instance[roleId])
-          .map(({ roleId, description, scopes }) =>
-            this.props.auth.updateRole(roleId, {
-              description,
-              scopes: R.without(instance[roleId], scopes)
-            })
-          )
-      );
-    };
 
     return (
       <span>
@@ -270,8 +282,8 @@ export default class ScopeGrants extends React.PureComponent {
         <dl className="dl-horizontal">
           {R.unnest(
             params.map((param, index) => [
-              <dt key={param}>{param}</dt>,
-              <dd key={index}>
+              <dt key={`key-${index}`}>{param}</dt>,
+              <dd key={`val-${index}`}>
                 <code>{args[params]}</code>
               </dd>
             ])
@@ -283,11 +295,12 @@ export default class ScopeGrants extends React.PureComponent {
         <ModalItem
           button={true}
           bsStyle="danger"
-          onSubmit={remove}
-          onComplete={reload}
+          onSubmit={() => this.handleRemove(pattern)}
+          onComplete={this.handleReload}
           body={
             <span>
-              Are you sure you want to <b>remove scope grants</b> from role?
+              Are you sure you want to <strong>remove scope grants</strong>
+              from role?
               <br />
               <br />
               {this.renderInstanceGrants(pattern, args)}
@@ -311,11 +324,11 @@ export default class ScopeGrants extends React.PureComponent {
     return (
       <ul>
         {Object.keys(inst).map((roleId, index) => (
-          <li key={index} className="list-unstyled">
+          <li key={`role:${index}`} className="list-unstyled">
             <Icon name="users" fixedWidth={true} /> <code>{roleId}</code>
             <ul>
               {inst[roleId].map((scope, index) => (
-                <li key={index}>
+                <li key={`scope-${index}`}>
                   <code>{scope}</code>
                 </li>
               ))}
@@ -326,31 +339,34 @@ export default class ScopeGrants extends React.PureComponent {
     );
   }
 
+  handleOpenPattern = name => this.props.history.push(`/auth/grants/${name}`);
+
   renderPatternSelector() {
     return (
       <Col smOffset={1} sm={10}>
         <h2>Scope Grant Patterns</h2>
         <p>
-          This <i>scope grant</i> tool is an administrative utility for granting
-          scopes by creating/updating roles following predefined patterns. These
-          patterns are declared in the taskcluster-tools repository. Each
-          pattern takes a set of parameters that is used to instantiate scope
-          patterns which are then granted to instantiated role patterns. Below
-          is a list of patterns supported, after selecting a pattern, this tool
-          will display existing instantiations of the pattern by inspecting
-          existing roles and offer a UI for creating new instantiations.
+          This <em>scope grant</em> tool is an administrative utility for
+          granting scopes by creating or updating roles following predefined
+          patterns. These patterns are declared in the taskcluster-tools
+          repository. Each pattern takes a set of parameters that is used to
+          instantiate scope patterns which are then granted to instantiated role
+          patterns. Below is a list of supported patterns. After selecting a
+          pattern, this tool will display existing instantiations of the pattern
+          by inspecting existing roles and enable creation of new
+          instantiations.
         </p>
         <br />
         <ListGroup>
           {PATTERNS.map(({ name, title, icon, description }, index) => (
             <ListGroupItem
-              key={index}
+              key={`pattern-${index}`}
               header={
                 <h3>
                   <Icon name={icon} /> {title}
                 </h3>
               }
-              onClick={() => this.props.history.push(`/auth/grants/${name}`)}>
+              onClick={() => this.handleOpenPattern(name)}>
               <Markdown>{description}</Markdown>
             </ListGroupItem>
           ))}

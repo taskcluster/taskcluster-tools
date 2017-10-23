@@ -61,7 +61,8 @@ export default [
     title: 'Scope Grants',
     link: '/auth/grants/',
     icon: 'check',
-    description: `Grant scopes....`
+    description: `Grant scopes following predefined patterns for how scopes can be granted to
+      roles associated with entities like a repository, hook, user, etc.`
   },
   {
     title: 'Pulse Inspector',

@@ -1,5 +1,10 @@
-import assert from 'assert';
 import R from 'ramda';
+
+const assert = (condition, message) => {
+  if (!condition) {
+    throw new Error(message);
+  }
+};
 
 // cartesian product of multiple lists
 // xproduct([[a, b], [1, 2], [C]]) == [[a, 1, C], [a, 2, C], [b, 1, C], [b, 2, C]]
