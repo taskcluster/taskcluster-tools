@@ -1,17 +1,22 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithUserSession from '../../components/WithUserSession';
+import WithClients from '../../components/WithClients';
 import Provisioners from './Provisioners';
 
-const View = ({ match, userSession }) => (
-  <Clients userSession={userSession} Queue>
-    {({ queue }) => (
-      <Provisioners
-        queue={queue}
-        userSession={userSession}
-        provisionerId={match.params.provisionerId || ''}
-      />
+const View = ({ match }) => (
+  <WithUserSession>
+    {userSession => (
+      <WithClients Queue>
+        {clients => (
+          <Provisioners
+            {...clients}
+            userSession={userSession}
+            provisionerId={match.params.provisionerId || ''}
+          />
+        )}
+      </WithClients>
     )}
-  </Clients>
+  </WithUserSession>
 );
 
 export default View;

@@ -1,8 +1,9 @@
 import React from 'react';
+import WithUserSession from '../../components/WithUserSession';
 import DisplayList from './DisplayList';
 import HelmetTitle from '../../components/HelmetTitle';
 
-const View = ({ location, userSession }) => {
+const View = ({ location }) => {
   const search = new URLSearchParams(location.search);
   const props = [
     'displaysUrl',
@@ -19,7 +20,9 @@ const View = ({ location, userSession }) => {
   return (
     <div>
       <HelmetTitle title="Display" />
-      <DisplayList userSession={userSession} {...props} />
+      <WithUserSession>
+        {userSession => <DisplayList userSession={userSession} {...props} />}
+      </WithUserSession>
     </div>
   );
 };

@@ -1,17 +1,22 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import InteractiveConnect from './InteractiveConnect';
 
-const View = ({ userSession, match }) => (
-  <Clients userSession={userSession} Queue QueueEvents>
-    {clients => (
-      <InteractiveConnect
-        userSession={userSession}
-        {...clients}
-        taskId={match.params.taskId || ''}
-      />
+const View = ({ match }) => (
+  <WithUserSession>
+    {userSession => (
+      <WithClients Queue QueueEvents>
+        {clients => (
+          <InteractiveConnect
+            {...clients}
+            userSession={userSession}
+            taskId={match.params.taskId || ''}
+          />
+        )}
+      </WithClients>
     )}
-  </Clients>
+  </WithUserSession>
 );
 
 export default View;

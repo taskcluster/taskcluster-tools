@@ -1,9 +1,10 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import ClientManager from './ClientManager';
 
-const View = ({ userSession, match, history, location }) => {
+const View = ({ match, history, location }) => {
   const clientId = location.hash.slice(1);
 
   if (clientId) {
@@ -11,20 +12,24 @@ const View = ({ userSession, match, history, location }) => {
   }
 
   return (
-    <Clients userSession={userSession} Auth>
-      {({ auth }) => (
-        <ClientManager
-          auth={auth}
-          history={history}
-          userSession={userSession}
-          clientId={
-            match.params.clientId
-              ? decodeURIComponent(match.params.clientId)
-              : ''
-          }
-        />
+    <WithUserSession>
+      {userSession => (
+        <WithClients Auth>
+          {clients => (
+            <ClientManager
+              {...clients}
+              userSession={userSession}
+              history={history}
+              clientId={
+                match.params.clientId
+                  ? decodeURIComponent(match.params.clientId)
+                  : ''
+              }
+            />
+          )}
+        </WithClients>
       )}
-    </Clients>
+    </WithUserSession>
   );
 };
 

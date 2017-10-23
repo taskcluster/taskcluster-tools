@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { object } from 'prop-types';
 import { Helmet, link } from 'react-helmet';
 import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
@@ -101,17 +102,26 @@ const ClientCreator = loadable(() =>
 );
 
 export default class App extends React.Component {
+  static childContextTypes = {
+    authController: object.isRequired
+  };
+
   constructor(props) {
     super(props);
+
     this.authController = new AuthController();
+
     this.state = {
       userSession: null,
       authReady: false
     };
   }
 
-  componentWillMount() {
-    this.authController.onUserSessionChanged(this.handleUserSessionChanged);
+  componentDidMount() {
+    this.authController.on(
+      'user-session-changed',
+      this.handleUserSessionChanged
+    );
 
     // we do not want to automatically load a user session on the login views; this is
     // a hack until they get an entry point of their own with no UI.
@@ -120,6 +130,19 @@ export default class App extends React.Component {
     } else {
       this.setState({ authReady: true });
     }
+  }
+
+  componentWillUnmount() {
+    this.authController.removeListener(
+      'user-session-changed',
+      this.handleUserSessionChanged
+    );
+  }
+
+  getChildContext() {
+    return {
+      authController: this.authController
+    };
   }
 
   handleUserSessionChanged = userSession => {
@@ -136,7 +159,7 @@ export default class App extends React.Component {
   };
 
   render() {
-    const { authReady, userSession } = this.state;
+    const { authReady } = this.state;
     const { authController } = this;
 
     return (
@@ -145,11 +168,7 @@ export default class App extends React.Component {
           <Helmet>
             <link rel="shortcut icon" type="image/png" href={iconUrl} />
           </Helmet>
-          <PropsRoute
-            component={Navigation}
-            userSession={userSession}
-            authController={authController}
-          />
+          <PropsRoute component={Navigation} />
           <Grid fluid id="container">
             {authReady ? (
               <Switch>
@@ -170,48 +189,33 @@ export default class App extends React.Component {
                 <PropsRoute path="/interactive" component={LegacyRedirect} />
                 <PropsRoute path="/task-creator" component={LegacyRedirect} />
 
-                <PropsRoute
-                  path="/"
-                  exact={true}
-                  component={Home}
-                  userSession={userSession}
-                />
+                <PropsRoute path="/" exact={true} component={Home} />
                 <PropsRoute
                   path="/tasks/create/interactive"
                   component={TaskCreator}
-                  userSession={userSession}
                   interactive={true}
                 />
                 <PropsRoute
                   path="/tasks/create"
                   component={TaskCreator}
-                  userSession={userSession}
                   interactive={false}
                 />
                 <PropsRoute
                   path="/tasks/:taskId/connect"
                   component={InteractiveConnect}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/tasks/:taskId?/:action?"
                   component={TaskRedirect}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/groups/:taskGroupId?/:groupSection?/:taskId?/:sectionId?/:runId?/:subSectionId?/:artifactId?"
                   component={UnifiedInspector}
-                  userSession={userSession}
                 />
-                <PropsRoute
-                  path="/quickstart"
-                  component={QuickStart}
-                  userSession={userSession}
-                />
+                <PropsRoute path="/quickstart" component={QuickStart} />
                 <PropsRoute
                   path="/aws-provisioner/:workerType?/:currentTab?"
                   component={AwsProvisioner}
-                  userSession={userSession}
                   baseUrl="https://aws-provisioner.taskcluster.net/v1"
                   provisionerId="aws-provisioner-v1"
                   routeRoot="/aws-provisioner"
@@ -219,7 +223,6 @@ export default class App extends React.Component {
                 <PropsRoute
                   path="/aws-provisioner-staging/:workerType?/:currentTab?"
                   component={AwsProvisioner}
-                  userSession={userSession}
                   baseUrl="https://provisioner-staging.herokuapp.com/v1"
                   provisionerId="staging-aws"
                   routeRoot="/aws-provisioner-staging"
@@ -227,99 +230,70 @@ export default class App extends React.Component {
                 <PropsRoute
                   path="/provisioners/:provisionerId/worker-types/:workerType/workers/:workerGroup?/:workerId?"
                   component={WorkerManager}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/provisioners/:provisionerId/worker-types/:workerType"
                   component={Workers}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/provisioners/:provisionerId/worker-types"
                   component={WorkerTypes}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/provisioners/:provisionerId?"
                   component={Provisioners}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/auth/clients/new"
                   component={ClientCreator}
-                  authController={authController}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/auth/clients/:clientId?"
                   component={ClientManager}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/auth/roles/:roleId?"
                   component={RoleManager}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/auth/scopes/:selectedScope?/:selectedEntity?"
                   component={ScopeInspector}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/auth/grants/:pattern?"
                   component={ScopeGrants}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/pulse-inspector"
                   component={PulseInspector}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/purge-caches"
                   component={CachePurgeInspector}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/index/artifacts/:namespace?/:namespaceTaskId?"
                   component={IndexedArtifactBrowser}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/index/:namespace?/:namespaceTaskId?"
                   component={IndexBrowser}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/hooks/:hookGroupId?/:hookId?"
                   component={HooksManager}
-                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/secrets/:secretId?"
                   component={SecretsManager}
-                  userSession={userSession}
                 />
-                <PropsRoute
-                  path="/diagnostics"
-                  component={Diagnostics}
-                  userSession={userSession}
-                />
+                <PropsRoute path="/diagnostics" component={Diagnostics} />
                 <PropsRoute
                   path="/credentials"
                   component={CredentialsManager}
-                  userSession={userSession}
                 />
-                <PropsRoute
-                  path="/display"
-                  component={Displays}
-                  userSession={userSession}
-                />
-                <PropsRoute
-                  path="/shell"
-                  component={Shell}
-                  userSession={userSession}
-                />
+                <PropsRoute path="/display" component={Displays} />
+                <PropsRoute path="/shell" component={Shell} />
                 {authController.canSignInUsing('auth0') && (
                   <PropsRoute
                     path="/login/auth0"

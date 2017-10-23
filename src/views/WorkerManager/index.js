@@ -1,23 +1,30 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithUserSession from '../../components/WithUserSession';
+import WithClients from '../../components/WithClients';
 import WorkerManager from './WorkerManager';
 
-const View = ({ userSession, history, match }) => (
-  <Clients userSession={userSession} Queue>
-    {clients => (
-      <WorkerManager
-        {...clients}
-        history={history}
-        provisionerId={
-          match.params.provisionerId ? match.params.provisionerId : ''
-        }
-        workerType={match.params.workerType ? match.params.workerType : ''}
-        workerGroup={match.params.workerGroup ? match.params.workerGroup : ''}
-        workerId={match.params.workerId ? match.params.workerId : ''}
-        userSession={userSession}
-      />
+const View = ({ history, match }) => (
+  <WithUserSession>
+    {userSession => (
+      <WithClients Queue>
+        {clients => (
+          <WorkerManager
+            {...clients}
+            history={history}
+            provisionerId={
+              match.params.provisionerId ? match.params.provisionerId : ''
+            }
+            workerType={match.params.workerType ? match.params.workerType : ''}
+            workerGroup={
+              match.params.workerGroup ? match.params.workerGroup : ''
+            }
+            workerId={match.params.workerId ? match.params.workerId : ''}
+            userSession={userSession}
+          />
+        )}
+      </WithClients>
     )}
-  </Clients>
+  </WithUserSession>
 );
 
 export default View;

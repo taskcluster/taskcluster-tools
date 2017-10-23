@@ -1,10 +1,9 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
 import WorkerManager from './WorkerManager';
 
-const View = ({ userSession, history, match, location }) => (
-  <Clients
-    userSession={userSession}
+const View = ({ history, match, location }) => (
+  <WithClients
     Queue
     AwsProvisioner={{ baseUrl: 'https://aws-provisioner.taskcluster.net/v1' }}>
     {clients => (
@@ -17,7 +16,7 @@ const View = ({ userSession, history, match, location }) => (
         }
       />
     )}
-  </Clients>
+  </WithClients>
 );
 
 export default View;

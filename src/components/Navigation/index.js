@@ -10,8 +10,6 @@ import logoUrl from '../../taskcluster.png';
 
 export default class Navigation extends React.PureComponent {
   render() {
-    const { userSession, authController } = this.props;
-
     return (
       <div className={navigation}>
         <Navbar
@@ -47,11 +45,7 @@ export default class Navigation extends React.PureComponent {
                   )
               )}
             </NavDropdown>
-
-            <CredentialsMenu
-              userSession={userSession}
-              authController={authController}
-            />
+            <CredentialsMenu />
           </Nav>
         </Navbar>
       </div>
