@@ -1,4 +1,5 @@
 import React from 'react';
+import { object } from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Glyphicon, NavDropdown, NavItem, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
@@ -15,8 +16,30 @@ const ManualLoginMenuItem = loadable(() =>
 );
 
 class CredentialsMenu extends React.PureComponent {
-  renderWithUser() {
-    const { userSession, authController } = this.props;
+  static contextTypes = {
+    authController: object.isRequired
+  };
+
+  handleUserSessionChanged = () => {
+    this.forceUpdate();
+  };
+
+  componentDidMount() {
+    this.context.authController.on(
+      'user-session-changed',
+      this.handleUserSessionChanged
+    );
+  }
+
+  componentWillUnmount() {
+    this.context.authController.off(
+      'user-session-changed',
+      this.handleUserSessionChanged
+    );
+  }
+
+  renderWithUser(userSession) {
+    const { authController } = this.context;
     const icon = userSession.picture ? (
       <img
         src={userSession.picture}
@@ -46,7 +69,7 @@ class CredentialsMenu extends React.PureComponent {
   }
 
   renderWithoutUser() {
-    const { registerChild, authController } = this.props;
+    const { authController } = this.context;
     const title = (
       <span>
         <Glyphicon glyph="log-in" /> Sign In
@@ -54,11 +77,7 @@ class CredentialsMenu extends React.PureComponent {
     );
 
     return (
-      <NavDropdown
-        id="sign-in-menu"
-        key="sign-in-menu"
-        title={title}
-        ref={registerChild}>
+      <NavDropdown id="sign-in-menu" key="sign-in-menu" title={title}>
         {authController.canSignInUsing('auth0') && (
           <Auth0LoginMenuItem key="auth0" />
         )}
@@ -73,8 +92,11 @@ class CredentialsMenu extends React.PureComponent {
   }
 
   render() {
-    return this.props.userSession
-      ? this.renderWithUser()
+    // note: an update to the userSession will cause a forceUpdate
+    const userSession = this.context.authController.getUserSession();
+
+    return userSession
+      ? this.renderWithUser(userSession)
       : this.renderWithoutUser();
   }
 }

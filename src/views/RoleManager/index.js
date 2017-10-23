@@ -1,9 +1,10 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import RoleManager from './RoleManager';
 
-const View = ({ userSession, history, match }) => {
+const View = ({ history, match }) => {
   const roleId = window.location.hash.slice(1);
 
   if (roleId) {
@@ -11,18 +12,24 @@ const View = ({ userSession, history, match }) => {
   }
 
   return (
-    <Clients userSession={userSession} Auth>
-      {({ auth }) => (
-        <RoleManager
-          auth={auth}
-          history={history}
-          userSession={userSession}
-          roleId={
-            match.params.roleId ? decodeURIComponent(match.params.roleId) : ''
-          }
-        />
+    <WithUserSession>
+      {userSession => (
+        <WithClients Auth>
+          {clients => (
+            <RoleManager
+              {...clients}
+              userSession={userSession}
+              history={history}
+              roleId={
+                match.params.roleId
+                  ? decodeURIComponent(match.params.roleId)
+                  : ''
+              }
+            />
+          )}
+        </WithClients>
       )}
-    </Clients>
+    </WithUserSession>
   );
 };
 

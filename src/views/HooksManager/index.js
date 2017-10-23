@@ -1,9 +1,10 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import HooksManager from './HooksManager';
 
-const View = ({ userSession, match, history, location }) => {
+const View = ({ match, history, location }) => {
   const [groupId, id] = location.hash.slice(1).split('/');
 
   if (groupId && id) {
@@ -13,22 +14,26 @@ const View = ({ userSession, match, history, location }) => {
   }
 
   return (
-    <Clients userSession={userSession} Hooks>
-      {({ hooks }) => (
-        <HooksManager
-          history={history}
-          userSession={userSession}
-          hooks={hooks}
-          hookGroupId={
-            match.params.hookGroupId &&
-            decodeURIComponent(match.params.hookGroupId)
-          }
-          hookId={
-            match.params.hookId && decodeURIComponent(match.params.hookId)
-          }
-        />
+    <WithUserSession>
+      {userSession => (
+        <WithClients Hooks>
+          {clients => (
+            <HooksManager
+              {...clients}
+              userSession={userSession}
+              history={history}
+              hookGroupId={
+                match.params.hookGroupId &&
+                decodeURIComponent(match.params.hookGroupId)
+              }
+              hookId={
+                match.params.hookId && decodeURIComponent(match.params.hookId)
+              }
+            />
+          )}
+        </WithClients>
       )}
-    </Clients>
+    </WithUserSession>
   );
 };
 
