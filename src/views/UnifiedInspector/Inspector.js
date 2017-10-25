@@ -5,6 +5,7 @@ import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { WebListener, request } from 'taskcluster-client-web';
 import { isNil } from 'ramda';
+import Helmet from 'react-helmet';
 import PropsRoute from '../../components/PropsRoute';
 import Error from '../../components/Error';
 import SearchForm from './SearchForm';
@@ -12,7 +13,9 @@ import ActionsMenu from './ActionsMenu';
 import RunsMenu from './RunsMenu';
 import LogsMenu from './LogsMenu';
 import ArtifactList from '../../components/ArtifactList';
-import HelmetTitle from '../../components/HelmetTitle';
+import successFavIcon from '../../images/taskcluster-group-success.png';
+import pendingFavIcon from '../../images/taskcluster-group-pending.png';
+import failedFavIcon from '../../images/taskcluster-group-failed.png';
 import { loadable } from '../../utils';
 import iconUrl from '../../taskcluster.png';
 import UserSession from '../../auth/UserSession';
@@ -61,7 +64,8 @@ export default class Inspector extends React.PureComponent {
       selectedRun: null,
       notify:
         'Notification' in window && localStorage.getItem(notifyKey) === 'true',
-      filterStatus: 'all'
+      filterStatus: 'all',
+      groupState: 'pending'
     };
   }
 
@@ -398,6 +402,10 @@ export default class Inspector extends React.PureComponent {
     );
   };
 
+  handleGroupStateChange = groupState => {
+    this.setState({ groupState });
+  };
+
   navigate = (taskGroupId, taskId) => {
     const { history } = this.props;
 
@@ -482,6 +490,24 @@ export default class Inspector extends React.PureComponent {
   getLogsFromArtifacts(artifacts) {
     return artifacts.filter(({ name }) => /^public\/logs\//.test(name));
   }
+
+  getFavicon = () => {
+    let FavIcon;
+
+    switch (this.state.groupState) {
+      case 'pending':
+        FavIcon = pendingFavIcon;
+        break;
+      case 'failed':
+        FavIcon = failedFavIcon;
+        break;
+      default:
+        FavIcon = successFavIcon;
+        break;
+    }
+
+    return FavIcon;
+  };
 
   updateLocalHistory(id, localKey) {
     const ids = new Set(this.getLocalHistory(localKey).reverse());
@@ -588,7 +614,10 @@ export default class Inspector extends React.PureComponent {
     return (
       <div>
         <Row style={{ marginBottom: 40, marginTop: 40 }}>
-          <GroupProgress tasks={tasks} />
+          <GroupProgress
+            onGroupStateChange={this.handleGroupStateChange}
+            tasks={tasks}
+          />
         </Row>
 
         <Row>
@@ -697,12 +726,14 @@ export default class Inspector extends React.PureComponent {
     const { taskGroupId, taskId } = this.props;
     const { task, error, selectedTaskId, notify } = this.state;
     const trackedTaskId = taskId || selectedTaskId;
+    const FavIcon = this.getFavicon();
 
     return (
       <div>
-        <HelmetTitle
-          title={`${task ? task.metadata.name : 'Task Inspector'}`}
-        />
+        <Helmet>
+          <title>{`${task ? task.metadata.name : 'Task Inspector'}`}</title>
+          <link rel="shortcut icon" type="image/png" href={FavIcon} />
+        </Helmet>
         <h4>Task &amp; Group Inspector</h4>
         <Row>
           <Col xs={12}>
