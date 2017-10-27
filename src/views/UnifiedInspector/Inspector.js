@@ -1,8 +1,7 @@
 import React from 'react';
 import { Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
-import Icon from 'react-fontawesome';
+import { Row, Col, Nav, NavItem } from 'react-bootstrap';
 import { WebListener, request } from 'taskcluster-client-web';
 import { isNil } from 'ramda';
 import PropsRoute from '../../components/PropsRoute';
@@ -14,7 +13,6 @@ import LogsMenu from './LogsMenu';
 import ArtifactList from '../../components/ArtifactList';
 import HelmetTitle from '../../components/HelmetTitle';
 import { loadable } from '../../utils';
-import iconUrl from '../../taskcluster.png';
 import UserSession from '../../auth/UserSession';
 
 const GroupProgress = loadable(() =>
@@ -34,7 +32,6 @@ const LogView = loadable(() =>
 );
 const taskGroupItemKey = 'inspector-items-taskGroupId';
 const taskItemKey = 'inspector-items-taskId';
-const notifyKey = 'inspector-notify';
 const PATHS = {
   TASK_LIST: '/groups/:taskGroupId',
   TASK_DETAILS: '/groups/:taskGroupId/tasks/:taskId/details',
@@ -59,8 +56,6 @@ export default class Inspector extends React.PureComponent {
       task: null,
       artifacts: null,
       selectedRun: null,
-      notify:
-        'Notification' in window && localStorage.getItem(notifyKey) === 'true',
       filterStatus: 'all'
     };
   }
@@ -329,24 +324,6 @@ export default class Inspector extends React.PureComponent {
     return listener;
   }
 
-  handleRequestNotify = async () => {
-    const notify = !this.state.notify;
-
-    // If we are turning off notifications, or if the notification permission is already granted,
-    // just change the notification state to the new value
-    if (!notify || Notification.permission === 'granted') {
-      localStorage.setItem(notifyKey, notify);
-
-      return this.setState({ notify });
-    }
-
-    // Here we know the user is requesting to be notified, but has not yet granted permission
-    const permission = await Notification.requestPermission();
-
-    localStorage.setItem(notifyKey, permission === 'granted');
-    this.setState({ notify: permission === 'granted' });
-  };
-
   handleTaskMessage = async ({ payload, exchange }) => {
     const { queueEvents, runId } = this.props;
     const { taskId } = payload.status;
@@ -387,14 +364,7 @@ export default class Inspector extends React.PureComponent {
           }));
 
     this.setState(
-      taskId === this.props.taskId ? { status, task, tasks } : { tasks },
-      () => {
-        if (exchange === queueEvents.taskException().exchange) {
-          this.notify('A task exception occurred');
-        } else if (exchange === queueEvents.taskFailed().exchange) {
-          this.notify('A task failure occurred');
-        }
-      }
+      taskId === this.props.taskId ? { status, task, tasks } : { tasks }
     );
   };
 
@@ -538,17 +508,6 @@ export default class Inspector extends React.PureComponent {
     }
 
     return 0;
-  }
-
-  notify(message) {
-    if (!this.state.notify) {
-      return;
-    }
-
-    return new Notification('Taskcluster', {
-      icon: iconUrl,
-      body: message
-    });
   }
 
   handleFilterChange = filterStatus => this.setState({ filterStatus });
@@ -695,7 +654,7 @@ export default class Inspector extends React.PureComponent {
 
   render() {
     const { taskGroupId, taskId } = this.props;
-    const { task, error, selectedTaskId, notify } = this.state;
+    const { task, error, selectedTaskId } = this.state;
     const trackedTaskId = taskId || selectedTaskId;
 
     return (
@@ -715,24 +674,6 @@ export default class Inspector extends React.PureComponent {
             />
           </Col>
         </Row>
-
-        {'Notification' in window ? (
-          <Row>
-            <Col xs={12}>
-              <Button
-                bsSize="sm"
-                bsStyle="primary"
-                onClick={this.handleRequestNotify}
-                disabled={
-                  !('Notification' in window) ||
-                  Notification.permission === 'denied'
-                }>
-                <Icon name={notify ? 'check-square-o' : 'square-o'} />
-                &nbsp;&nbsp;Notify me on task failures
-              </Button>
-            </Col>
-          </Row>
-        ) : null}
 
         {error && <Error error={error} />}
         {taskGroupId && this.renderTaskGroup()}
