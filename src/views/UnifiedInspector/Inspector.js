@@ -491,23 +491,16 @@ export default class Inspector extends React.PureComponent {
     return artifacts.filter(({ name }) => /^public\/logs\//.test(name));
   }
 
-  getFavicon = () => {
-    let FavIcon;
-
+  getFavicon() {
     switch (this.state.groupState) {
       case 'pending':
-        FavIcon = pendingFavIcon;
-        break;
+        return pendingFavIcon;
       case 'failed':
-        FavIcon = failedFavIcon;
-        break;
+        return failedFavIcon;
       default:
-        FavIcon = successFavIcon;
-        break;
+        return successFavIcon;
     }
-
-    return FavIcon;
-  };
+  }
 
   updateLocalHistory(id, localKey) {
     const ids = new Set(this.getLocalHistory(localKey).reverse());

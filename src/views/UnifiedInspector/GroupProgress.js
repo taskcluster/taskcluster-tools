@@ -98,17 +98,13 @@ export default class GroupProgress extends React.PureComponent {
   }
 
   handleGroupStateChange(percents) {
-    let state;
-
     if (percents.completed === 100) {
-      state = 'success';
+      this.props.onGroupStateChange('success');
     } else if (percents.failed) {
-      state = 'failed';
+      this.props.onGroupStateChange('failed');
     } else {
-      state = 'pending';
+      this.props.onGroupStateChange('pending');
     }
-
-    this.props.onGroupStateChange(state);
   }
 
   render() {
