@@ -72,6 +72,7 @@ export default class GroupProgress extends React.PureComponent {
       percents,
       weightedTotal
     });
+    this.handleGroupStateChange(percents);
   }
 
   groupTasksByStatus(tasks) {
@@ -94,6 +95,16 @@ export default class GroupProgress extends React.PureComponent {
       }),
       {}
     );
+  }
+
+  handleGroupStateChange(percents) {
+    if (percents.completed === 100) {
+      this.props.onGroupStateChange('success');
+    } else if (percents.failed) {
+      this.props.onGroupStateChange('failed');
+    } else {
+      this.props.onGroupStateChange('pending');
+    }
   }
 
   render() {
