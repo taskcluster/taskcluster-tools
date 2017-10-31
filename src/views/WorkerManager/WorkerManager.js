@@ -7,8 +7,10 @@ import {
   OverlayTrigger,
   Tooltip
 } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
+import Notification from '../../components/Notification';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import SearchForm from './SearchForm';
@@ -159,6 +161,35 @@ export default class WorkerManager extends React.PureComponent {
     }
   };
 
+  handleActionClick(action) {
+    const {
+      provisionerId,
+      workerType,
+      workerGroup,
+      workerId
+    } = this.state.worker;
+    const query = [
+      `provisionerId=${provisionerId}`,
+      `workerType=${workerType}`,
+      `workerGroup=${workerGroup}`,
+      `workerId=${workerId}`
+    ].join('&');
+
+    fetch(`${action.url}?${query}`, {
+      method: 'POST',
+      mode: 'cors'
+    })
+      .then(({ json }) => json())
+      .then(() =>
+        this.notification.show(
+          <span>
+            {action.name}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        )
+      )
+      .catch(error => this.setState({ error }));
+  }
+
   render() {
     const {
       provisioners,
@@ -204,6 +235,11 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
+        <Notification
+          ref={child => {
+            this.notification = child;
+          }}
+        />
         <Breadcrumb navList={navList} active={[workerGroup, workerId]} />
         <SearchForm
           key="input-form"
@@ -235,31 +271,27 @@ export default class WorkerManager extends React.PureComponent {
                   <td style={{ verticalAlign: 'inherit' }}>Actions</td>
                   <td>
                     <ButtonToolbar>
-                      <Button
-                        disabled
-                        title="Coming soon!"
-                        bsSize="small"
-                        bsStyle="info">
-                        Reboot
-                      </Button>
                       <OverlayTrigger
                         delay={600}
                         placement="bottom"
                         overlay={disableTooltip}>
                         <Button
                           onClick={this.toggleWorkerStatus}
+                          className={styles.actionButton}
                           bsSize="small"
                           bsStyle="warning">
                           {worker.disabled ? 'Enable' : 'Disable'}
                         </Button>
                       </OverlayTrigger>
-                      <Button
-                        disabled
-                        title="Coming soon!"
-                        bsSize="small"
-                        bsStyle="danger">
-                        Kill
-                      </Button>
+                      {worker.actions.map((action, key) => (
+                        <Button
+                          key={`worker-action-${key}`}
+                          className={styles.actionButton}
+                          bsSize="small"
+                          onClick={() => this.handleActionClick(action)}>
+                          {action.name}
+                        </Button>
+                      ))}
                     </ButtonToolbar>
                   </td>
                 </tr>

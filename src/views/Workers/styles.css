@@ -5,3 +5,7 @@
 .pagination {
   margin: 20px 0 20px 0;
 }
+
+.buttonToolbar > div{
+  margin-bottom: 5px;
+}

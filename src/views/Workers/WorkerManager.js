@@ -4,15 +4,18 @@ import {
   Table,
   Button,
   ButtonGroup,
+  ButtonToolbar,
   Glyphicon,
   DropdownButton,
   MenuItem,
   Label
 } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
+import Notification from '../../components/Notification';
 import DateView from '../../components/DateView';
 import { labels } from '../../utils';
 import styles from './styles.css';
@@ -111,6 +114,27 @@ export default class WorkerManager extends React.PureComponent {
       filter: filter.includes('disabled') ? 'disabled' : filter
     });
 
+  handleActionClick = action => {
+    const query = [
+      `provisionerId=${this.props.provisionerId}`,
+      `workerType=${this.props.workerType}`
+    ].join('&');
+
+    fetch(`${action.url}?${query}`, {
+      method: 'POST',
+      mode: 'cors'
+    })
+      .then(({ json }) => json())
+      .then(() =>
+        this.notification.show(
+          <span>
+            {action.name}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        )
+      )
+      .catch(error => this.setState({ error }));
+  };
+
   render() {
     const { filter, workers, workerToken, loading, error } = this.state;
     const { provisionerId, workerType } = this.props;
@@ -134,21 +158,42 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Workers" />
           <h4>Workers Explorer</h4>
         </div>
+        <Notification
+          ref={child => {
+            this.notification = child;
+          }}
+        />
         <Breadcrumb navList={navList} active={workerType} />
         <div className={styles.filters}>
-          <DropdownButton
-            id="workers-dropdown"
-            bsSize="small"
-            title={`Filter by: ${filter || 'None'}`}
-            onSelect={this.onFilterSelect}>
-            <MenuItem eventKey="None">None</MenuItem>
-            <MenuItem divider />
-            {['Status: disabled'].map((property, key) => (
-              <MenuItem eventKey={property} key={`workers-dropdown-${key}`}>
-                {property}
-              </MenuItem>
-            ))}
-          </DropdownButton>
+          <ButtonToolbar className={styles.buttonToolbar}>
+            <DropdownButton
+              id="workers-dropdown"
+              bsSize="small"
+              title={`Filter by: ${filter || 'None'}`}
+              onSelect={this.onFilterSelect}>
+              <MenuItem eventKey="None">None</MenuItem>
+              <MenuItem divider />
+              {['Status: disabled'].map((property, key) => (
+                <MenuItem eventKey={property} key={`workers-dropdown-${key}`}>
+                  {property}
+                </MenuItem>
+              ))}
+            </DropdownButton>
+
+            <DropdownButton
+              id="actions-dropdown"
+              bsSize="small"
+              title="Actions"
+              disabled={!workers || !workers.actions.length}
+              onSelect={this.handleActionClick}>
+              {workers &&
+                workers.actions.map((action, key) => (
+                  <MenuItem eventKey={action} key={`action-dropdown-${key}`}>
+                    {action.name}
+                  </MenuItem>
+                ))}
+            </DropdownButton>
+          </ButtonToolbar>
         </div>
         {error && <Error error={error} />}
         {loading && <Spinner />}

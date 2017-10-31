@@ -26,6 +26,7 @@ export default class WorkerTypeTable extends React.PureComponent {
     queue: object,
     awsProvisioner: object,
     setOrderableProperties: func,
+    setActions: func,
     provisionerId: string,
     orderBy: string,
     searchTerm: string,
@@ -76,6 +77,7 @@ export default class WorkerTypeTable extends React.PureComponent {
     try {
       const {
         workerTypes,
+        actions,
         continuationToken
       } = await this.props.queue.listWorkerTypes(
         provisionerId,
@@ -123,6 +125,7 @@ export default class WorkerTypeTable extends React.PureComponent {
       );
 
       this.props.setOrderableProperties(workerTypeSummaries[0]);
+      this.props.setActions(actions);
       this.setState({ workerTypeSummaries, error: null, loading: false });
     } catch (err) {
       this.setState({ workerTypeSummaries: [], error: err, loading: false });
