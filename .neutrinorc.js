@@ -83,23 +83,65 @@ module.exports = {
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
 
-      neutrino.config.module
-        .rule('plain-style')
-          .test(/\.css$/)
-          .include
-            .add(neutrino.options.node_modules).end()
-          .use('style')
-            .loader(require.resolve('style-loader'))
-            .end()
-          .use('css')
-              .loader(require.resolve('css-loader'));
+      neutrino.config.devtool('cheap-module-eval-source-map');
 
       neutrino.config.module
-        .rule('style')
-          .exclude
-            .add(neutrino.options.node_modules).end()
+        .rule('svg')
+          .use('svg')
+            .loader(require.resolve('svg-url-loader'))
+            .options({ noquotes: true });
+
+      neutrino.config.module.rules.delete('style');
+
+      neutrino.config.module
+        .rule('local-sass')
+          .test(/\.scss/)
+          .include
+            .add(path => path.startsWith(neutrino.options.source) && !path.includes('global'))
+            .end()
+          .use('style')
+            .loader(require.resolve('style-loader')).end()
           .use('css')
+            .loader(require.resolve('css-loader')).end()
+          .use('sass')
+            .loader(require.resolve('sass-loader'));
+
+      neutrino.config.module
+        .rule('local-css')
+          .test(/\.css$/)
+          .include
+            .add(path => path.startsWith(neutrino.options.source) && !path.includes('global'))
+            .end()
+          .use('style')
+            .loader(require.resolve('style-loader')).end()
+          .use('css')
+            .loader(require.resolve('css-loader'))
             .options({ modules: true });
+
+      neutrino.config.module
+        .rule('global-sass')
+          .test(/\.scss/)
+          .include
+            .add(path => !path.startsWith(neutrino.options.source))
+            .end()
+          .use('style')
+            .loader(require.resolve('style-loader')).end()
+          .use('css')
+            .loader(require.resolve('css-loader')).end()
+          .use('sass')
+            .loader(require.resolve('sass-loader'));
+
+      neutrino.config.module
+        .rule('global-css')
+          .test(/\.css$/)
+          .include
+            .add(path => !path.startsWith(neutrino.options.source))
+            .end()
+          .use('style')
+            .loader(require.resolve('style-loader')).end()
+          .use('css')
+            .loader(require.resolve('css-loader'))
+            .options({ modules: false });
 
       // The JSONStream module's main file has a Node.js shebang
       // which Webpack doesn't like loading as JS
@@ -137,9 +179,7 @@ module.exports = {
           'qs',
           'react',
           'react-tooltip',
-          'react-bootstrap',
           'react-loadable',
-          'react-fontawesome',
           'react-router-bootstrap',
           'slugid',
           'react-dom',

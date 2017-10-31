@@ -47,10 +47,12 @@
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
     "markdown-it": "^8.4.0",
+    "material-design-icons": "^3.0.1",
     "moment": "^2.15.0",
     "neutrino": "^7.0.2",
     "neutrino-middleware-env": "^7.0.2",
     "neutrino-preset-mozilla-rpweb": "^5.0.1",
+    "photon-colors": "^1.3.1",
     "prettier": "^1.7.4",
     "prop-types": "^15.6.0",
     "qs": "^6.5.1",
@@ -60,12 +62,14 @@
     "react-datepicker": "^0.55.0",
     "react-dom": "^15.5.4",
     "react-fontawesome": "^1.6.1",
+    "react-fout-stager": "^1.0.3",
     "react-helmet": "^5.2.0",
     "react-hot-loader": "3.0.0-beta.6",
     "react-input-enhancements": "^0.5.4",
     "react-json-inspector": "^7.1.0",
     "react-lazylog": "^1.2.0",
     "react-loadable": "^4.0.5",
+    "react-md": "^1.2.4",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.2.2",
     "react-tooltip": "^3.1.8",
@@ -74,6 +78,8 @@
     "shebang-loader": "0.0.1",
     "slugid": "^1.1.0",
     "taskcluster-client-web": "^4.0.2",
+    "typeface-fira-mono": "^0.0.43",
+    "typeface-fira-sans": "^0.0.43",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
     "xml2js": "^0.4.19"
@@ -81,5 +87,9 @@
   "optionalDependencies": {
     "bufferutil": "^3.0.2",
     "utf-8-validate": "^3.0.3"
+  },
+  "devDependencies": {
+    "neutrino-middleware-sass": "^0.0.1",
+    "svg-url-loader": "^2.3.0"
   }
 }

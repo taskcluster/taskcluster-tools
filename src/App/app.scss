@@ -1,0 +1,335 @@
+@import '~photon-colors/colors.scss';
+
+$md-primary-color: $blue-60;
+$md-secondary-color: $blue-60;
+
+$md-font-name: sans-serif;
+$md-font-family: sans-serif;
+
+$md-display-4-font-size: 33px;
+$md-display-3-font-size: 22px;
+$md-display-2-font-size: 17px;
+$md-display-1-font-size: 13px;
+
+@import '~react-md/src/scss/react-md';
+
+$md-colors-warn-md: false;
+
+@include react-md-everything;
+
+@font-face {
+  font-family: FiraSans200;
+  src:
+    url('~typeface-fira-sans/files/fira-sans-latin-200.woff2') format('woff2'),
+    url('~typeface-fira-sans/files/fira-sans-latin-200.woff') format('woff');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: FiraSans300;
+  src:
+    url('~typeface-fira-sans/files/fira-sans-latin-300.woff2') format('woff2'),
+    url('~typeface-fira-sans/files/fira-sans-latin-300.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: FiraSans400;
+  src:
+    url('~typeface-fira-sans/files/fira-sans-latin-400.woff2') format('woff2'),
+    url('~typeface-fira-sans/files/fira-sans-latin-400.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: FiraSans500;
+  src:
+    url('~typeface-fira-sans/files/fira-sans-latin-500.woff2') format('woff2'),
+    url('~typeface-fira-sans/files/fira-sans-latin-500.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: FiraSans700;
+  src:
+    url('~typeface-fira-sans/files/fira-sans-latin-700.woff2') format('woff2'),
+    url('~typeface-fira-sans/files/fira-sans-latin-700.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: FiraSans400Italic;
+  src:
+    url('~typeface-fira-sans/files/fira-sans-latin-400italic.woff2') format('woff2'),
+    url('~typeface-fira-sans/files/fira-sans-latin-400italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: FiraSans700Italic;
+  src:
+    url('~typeface-fira-sans/files/fira-sans-latin-700italic.woff2') format('woff2'),
+    url('~typeface-fira-sans/files/fira-sans-latin-700italic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+}
+@font-face {
+  font-family: FiraMono400;
+  src:
+    url('~typeface-fira-mono/files/fira-mono-latin-400.woff2') format('woff2'),
+    url('~typeface-fira-mono/files/fira-mono-latin-400.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: FiraMono700;
+  src:
+    url('~typeface-fira-mono/files/fira-mono-latin-700.woff2') format('woff2'),
+    url('~typeface-fira-mono/files/fira-mono-latin-700.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/*
+  The purpose of defining class stages is to
+  re-render once a stage has been met. We start
+  with the minimal default stage of sans-serif,
+  and progressively re-render.
+*/
+html, body {
+  //background-color: #fff;
+  background-color: #f9f9fa;
+  margin: 0;
+}
+
+body, p {
+  font-size: 15px;
+  font-family: sans-serif;
+  font-weight: 400;
+}
+
+h1, h2, h3, h4, h5, h6, p, button, input, textarea, html {
+  font-family: sans-serif;
+}
+
+code {
+  font-family: monospace;
+  font-weight: 400;
+}
+
+h1, .display-20 {
+  font-size: $md-display-4-font-size;
+  font-weight: 200;
+}
+
+h2, .title-30 {
+  font-size: $md-display-3-font-size;
+  font-weight: 300;
+}
+
+h3, .title-20 {
+  font-size: $md-display-2-font-size;
+  font-weight: 500;
+}
+
+h4, .title-10 {
+  font-size: $md-display-1-font-size;
+  font-weight: 500;
+}
+
+strong {
+  font-weight: 700;
+}
+
+em {
+  font-style: italic;
+}
+
+@media screen and (min-width: 1025px) {
+  .md-tile-text--primary, .md-tile-text--secondary {
+    font-size: 15px;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1025px) {
+  .md-title--toolbar {
+    height: 56px;
+
+    .md-title {
+      margin-top: 2px;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 13/9) and (min-width: 320px) and (max-width: 767px) {
+  .md-toolbar {
+    height: 56px;
+
+    .md-title--toolbar {
+      margin-top: 4px;
+    }
+  }
+}
+
+$search-size: 180px;
+
+.search .md-divider--text-field:not(.md-divider--text-field-error)::after {
+  background: $md-white-base;
+}
+
+.search {
+  cursor: pointer;
+
+  &.md-grid {
+    flex-wrap: nowrap;
+  }
+
+  &__input {
+    max-width: 0;
+    transition-duration: $md-transition-time * 2;
+    transition-property: max-width;
+
+    &--active {
+      min-width: $search-size;
+    }
+
+    &--visible {
+      max-width: $search-size;
+    }
+  }
+
+  &__results.md-list {
+    width: 100%;
+
+    @media #{$md-tablet-media} {
+      max-width: 300px;
+    }
+
+    pre {
+      margin: 0;
+    }
+  }
+
+  &__scss-item {
+    .md-list-tile {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .md-tile-text--primary {
+      padding-left: $md-default-padding;
+      padding-right: $md-default-padding;
+    }
+  }
+
+  .md-divider--text-field,
+  .md-divider--text-field.md-divider--text-field::after {
+    background: $md-white-base;
+  }
+
+  .md-icon.md-icon {
+    color: get-color('secondary', false);
+
+    &.md-text-field-icon--active {
+      color: $md-white-base;
+    }
+  }
+}
+
+@media (max-width: #{$md-tablet-min-width - 1}) {
+  .main-toolbar__title {
+    max-width: calc(100% - #{$md-btn-icon-size * 2 + $md-default-padding});
+    overflow: hidden;
+    transition-duration: $md-transition-time;
+    transition-property: margin-left, max-width;
+
+    &--minified.md-title--toolbar {
+      margin-left: 0;
+      max-width: 0;
+    }
+  }
+}
+
+.md-drawer header {
+  height: auto;
+  background-color: $grey-10;
+}
+
+.md-list--drawer {
+  .md-text--theme-primary {
+    font-family: FiraSans700, sans-serif;
+    font-weight: 700;
+  }
+
+  .md-list--nested-1 .md-list-tile {
+    padding-left: 40px;
+    font-size: $md-display-1-font-size;
+  }
+}
+
+/*
+  The defined stages now modify the display of
+  elements once they are loaded.
+*/
+
+/*
+  During primary stage we only load the Fira Sans font.
+  Once it's loaded, update the body to use it.
+*/
+.font-stage-primary {
+  h1, h2, h3, h4, h5, h6, p, input, textarea, html, body {
+    font-family: FiraSans400, sans-serif;
+  }
+}
+
+/*
+  During secondary stage we load Fira Sans Bold, Fira Sans Italic,
+  and Fira Sans Bold Italic. Once these 3 are loaded, we can once
+  again update relevant elements to render using these fonts.
+*/
+.font-stage-secondary {
+  h1, .display-20 {
+    font-family: FiraSans200, sans-serif;
+  }
+
+  h2, .title-30 {
+    font-family: FiraSans300, sans-serif;
+  }
+
+  h3, .title-20 {
+    font-family: FiraSans500, sans-serif;
+  }
+
+  em {
+    font-family: FiraSans400Italic, sans-serif;
+
+    strong {
+      font-family: FiraSans700Italic, sans-serif;
+    }
+  }
+
+  button {
+    font-family: FiraSans700, sans-serif;
+    font-weight: 700;
+  }
+
+  strong {
+    font-family: FiraSans700, sans-serif;
+
+    em {
+      font-family: FiraSans700Italic, sans-serif;
+    }
+  }
+}
+
+.font-stage-tertiary {
+  code {
+    font-family: FiraMono400, monospace;
+  }
+
+  h1, h2, h3, h4, h5, h6, strong {
+    code {
+      font-family: FiraMono700, monospace;
+    }
+  }
+}
