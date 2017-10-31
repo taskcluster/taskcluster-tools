@@ -107,7 +107,8 @@ export default class WorkerTypeTable extends React.PureComponent {
             provisionerId: workerType.provisionerId,
             workerType: workerType.workerType,
             stability: workerType.stability,
-            lastDateActive: workerType.lastDateActive
+            lastDateActive: workerType.lastDateActive,
+            description: workerType.description
           };
           const dynamic =
             provisionerId === 'aws-provisioner-v1'
