@@ -3,6 +3,7 @@ import { Button, ButtonToolbar, Alert } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { parse } from 'qs';
 import { fromNow } from 'taskcluster-client-web';
+import { scopeIntersection } from 'taskcluster-lib-scopes';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ClientEditor from './ClientEditor';
@@ -100,9 +101,12 @@ export default class ClientCreator extends React.PureComponent {
 
   handleCreateNewClient = () => {
     this.setState({ loading: true }, async () => {
+      const currentScopes = await this.props.auth.currentScopes();
       const client = await this.constructClient(
         `${this.state.clientPrefix}/${this.state.query.name}`
       );
+
+      client.scopes = scopeIntersection(client.scopes, currentScopes.scopes);
 
       this.setState({ client, creating: true, loading: false });
     });
