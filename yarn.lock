@@ -6102,9 +6102,9 @@ react-loadable@^4.0.5:
     is-webpack-bundle "^1.0.0"
     webpack-require-weak "^1.0.1"
 
-react-md@^1.2.4:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/react-md/-/react-md-1.2.4.tgz#69c3a76fd6e0116f928034c80170fb66c4b76be1"
+react-md@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/react-md/-/react-md-1.2.8.tgz#727762efb17a6dd2d00a87f671f72f21330fc853"
   dependencies:
     classnames "^2.2.5"
     prop-types "15.6.0"
