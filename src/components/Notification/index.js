@@ -3,7 +3,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Alert } from 'react-bootstrap';
 import styles from './styles.css';
 
-class Notification extends React.PureComponent {
+export default class Notification extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -44,5 +44,3 @@ class Notification extends React.PureComponent {
 
   show = message => this.setState({ message, show: true });
 }
-
-export default Notification;
