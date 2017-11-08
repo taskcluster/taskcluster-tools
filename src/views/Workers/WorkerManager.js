@@ -114,25 +114,24 @@ export default class WorkerManager extends React.PureComponent {
       filter: filter.includes('disabled') ? 'disabled' : filter
     });
 
-  handleActionClick = action => {
-    const query = [
-      `provisionerId=${this.props.provisionerId}`,
-      `workerType=${this.props.workerType}`
-    ].join('&');
+  handleActionClick = async action => {
+    const url = action.url
+      .replace(':provisionerId', this.props.provisionerId)
+      .replace(':workerType', this.props.workerType);
 
-    fetch(`${action.url}?${query}`, {
-      method: 'POST',
-      mode: 'cors'
-    })
-      .then(({ json }) => json())
-      .then(() =>
-        this.notification.show(
-          <span>
-            {action.name}&nbsp;&nbsp;<Icon name="check" />
-          </span>
-        )
-      )
-      .catch(error => this.setState({ error }));
+    try {
+      const response = await fetch(url, { method: 'POST', mode: 'cors' });
+
+      await response.json();
+
+      this.notification.show(
+        <span>
+          {action.name}&nbsp;&nbsp;<Icon name="check" />
+        </span>
+      );
+    } catch (error) {
+      this.setState({ error });
+    }
   };
 
   render() {
