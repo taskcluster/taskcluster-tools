@@ -61,15 +61,23 @@ export default class WorkerManager extends React.PureComponent {
       return {};
     }
 
-    const { status } = await this.props.queue.status(latestTask.taskId);
-    const { state, started, resolved } = status.runs[latestTask.runId];
+    try {
+      const { status } = await this.props.queue.status(latestTask.taskId);
+      const { state, started, resolved } = status.runs[latestTask.runId];
 
-    return {
-      state,
-      taskGroupId: status.taskGroupId,
-      lastClaimStarted: started,
-      lastClaimResolved: resolved
-    };
+      return {
+        state,
+        taskGroupId: status.taskGroupId,
+        lastClaimStarted: started,
+        lastClaimResolved: resolved
+      };
+    } catch (error) {
+      if (error.response.statusCode === 404) {
+        return null;
+      }
+
+      this.setState({ error });
+    }
   };
 
   async loadWorkers({ provisionerId, workerType }) {
@@ -172,64 +180,68 @@ export default class WorkerManager extends React.PureComponent {
           <tbody>
             {!loading &&
               workers &&
-              workers.workers.map((worker, index) => (
-                <tr key={`worker-${index}`}>
-                  <td>{worker.workerGroup}</td>
-                  <td>
-                    <Link
-                      to={`/provisioners/${provisionerId}/worker-types/${workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
-                      {worker.workerId}
-                    </Link>
-                  </td>
-                  <td>
-                    {worker.latestTask ? (
-                      <Link
-                        to={`/groups/${worker.taskGroupId}/tasks/${worker
-                          .latestTask.taskId}/runs/${worker.latestTask.runId}`}>
-                        {worker.latestTask.taskId}
-                      </Link>
-                    ) : (
-                      '-'
-                    )}
-                  </td>
-                  <td>
-                    <Label bsSize="sm" bsStyle={labels[worker.state]}>
-                      {worker.state}
-                    </Label>
-                  </td>
-                  <td>
-                    {worker.lastClaimStarted ? (
-                      <DateView date={worker.lastClaimStarted} />
-                    ) : (
-                      '-'
-                    )}
-                  </td>
-                  <td>
-                    {worker.lastClaimResolved ? (
-                      <DateView
-                        date={worker.lastClaimResolved}
-                        since={worker.lastClaimStarted}
-                      />
-                    ) : (
-                      '-'
-                    )}
-                  </td>
-                  <td>
-                    {worker.firstClaim ? (
-                      <DateView date={worker.firstClaim} />
-                    ) : (
-                      '-'
-                    )}
-                  </td>
-                  <td>
-                    <Label
-                      bsSize="sm"
-                      bsStyle={worker.disabled ? 'danger' : 'success'}>
-                      {worker.disabled ? 'disabled' : 'enabled'}
-                    </Label>
-                  </td>
-                </tr>
-              ))}
+              workers.workers.map(
+                (worker, index) =>
+                  worker.state && (
+                    <tr key={`worker-${index}`}>
+                      <td>{worker.workerGroup}</td>
+                      <td>
+                        <Link
+                          to={`/provisioners/${provisionerId}/worker-types/${workerType}/workers/${worker.workerGroup}/${worker.workerId}`}>
+                          {worker.workerId}
+                        </Link>
+                      </td>
+                      <td>
+                        {worker.latestTask ? (
+                          <Link
+                            to={`/groups/${worker.taskGroupId}/tasks/${worker
+                              .latestTask.taskId}/runs/${worker.latestTask
+                              .runId}`}>
+                            {worker.latestTask.taskId}
+                          </Link>
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td>
+                        <Label bsSize="sm" bsStyle={labels[worker.state]}>
+                          {worker.state}
+                        </Label>
+                      </td>
+                      <td>
+                        {worker.lastClaimStarted ? (
+                          <DateView date={worker.lastClaimStarted} />
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td>
+                        {worker.lastClaimResolved ? (
+                          <DateView
+                            date={worker.lastClaimResolved}
+                            since={worker.lastClaimStarted}
+                          />
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td>
+                        {worker.firstClaim ? (
+                          <DateView date={worker.firstClaim} />
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td>
+                        <Label
+                          bsSize="sm"
+                          bsStyle={worker.disabled ? 'danger' : 'success'}>
+                          {worker.disabled ? 'disabled' : 'enabled'}
+                        </Label>
+                      </td>
+                    </tr>
+                  )
+              )}
           </tbody>
         </Table>
         {workers &&
