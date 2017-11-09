@@ -27,7 +27,8 @@ export default class WorkerManager extends React.PureComponent {
       recentTasks: [],
       worker: null,
       error: null,
-      loading: false
+      loading: false,
+      actionLoading: false
     };
   }
 
@@ -161,29 +162,32 @@ export default class WorkerManager extends React.PureComponent {
     }
   };
 
-  async handleActionClick(action) {
+  handleActionClick(action) {
     const url = action.url
       .replace('<provisionerId>', this.state.worker.provisionerId)
       .replace('<workerType>', this.state.worker.workerType)
       .replace('<workerGroup>', this.state.worker.workerGroup)
       .replace('<workerId>', this.state.worker.workerId);
 
-    try {
-      const response = await fetch(url, {
-        method: action.method,
-        mode: 'cors'
-      });
+    this.setState({ actionLoading: true }, async () => {
+      try {
+        const response = await fetch(url, {
+          method: action.method,
+          mode: 'cors'
+        });
 
-      await response.json();
+        await response.json();
 
-      this.notification.show(
-        <span>
-          {action.name}&nbsp;&nbsp;<Icon name="check" />
-        </span>
-      );
-    } catch (error) {
-      this.setState({ error });
-    }
+        this.notification.show(
+          <span>
+            {action.name}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        );
+        this.setState({ actionLoading: false });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
   }
 
   render() {
@@ -193,7 +197,8 @@ export default class WorkerManager extends React.PureComponent {
       worker,
       recentTasks,
       loading,
-      error
+      error,
+      actionLoading
     } = this.state;
     const { provisionerId, workerType, workerGroup, workerId } = this.props;
     const disableTooltip = (
@@ -284,6 +289,7 @@ export default class WorkerManager extends React.PureComponent {
                           key={`worker-action-${key}`}
                           className={styles.actionButton}
                           bsSize="small"
+                          disabled={actionLoading}
                           onClick={() => this.handleActionClick(action)}>
                           {action.name}
                         </Button>
@@ -295,6 +301,7 @@ export default class WorkerManager extends React.PureComponent {
             </Table>
           </div>
         )}
+        {actionLoading && <Spinner />}
         {worker && <WorkerTable tasks={recentTasks} />}
       </div>
     );

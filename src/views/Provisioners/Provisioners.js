@@ -31,7 +31,8 @@ export default class Provisioners extends React.PureComponent {
       provisioner: null,
       error: null,
       provisionerLoading: false,
-      provisionersLoading: true
+      provisionersLoading: true,
+      actionLoading: false
     };
   }
 
@@ -91,7 +92,7 @@ export default class Provisioners extends React.PureComponent {
   handleActionClick = action => {
     const url = action.url.replace('<provisionerId>', this.props.provisionerId);
 
-    this.setState({ provisionerLoading: true }, async () => {
+    this.setState({ actionLoading: true }, async () => {
       try {
         const response = await fetch(url, {
           method: action.method,
@@ -106,9 +107,9 @@ export default class Provisioners extends React.PureComponent {
           </span>
         );
 
-        this.setState({ provisionerLoading: false });
+        this.setState({ actionLoading: false });
       } catch (error) {
-        this.setState({ error, provisionerLoading: false });
+        this.setState({ error, actionLoading: false });
       }
     });
   };
@@ -119,6 +120,7 @@ export default class Provisioners extends React.PureComponent {
       provisioner,
       provisionerLoading,
       provisionersLoading,
+      actionLoading,
       error
     } = this.state;
 
@@ -156,48 +158,48 @@ export default class Provisioners extends React.PureComponent {
           </Col>
           <Col md={6}>
             {provisionerLoading && <Spinner />}
-            {!provisionerLoading &&
-              provisioner && (
-                <div>
-                  <div className={styles.dataContainer}>
-                    <div>
-                      <ControlLabel>Provisioner</ControlLabel>
-                    </div>
-                    <div>
-                      <Link
-                        to={`/provisioners/${provisioner.provisionerId}/worker-types`}>
-                        {provisioner.provisionerId}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
-                      </Link>
-                    </div>
+            {provisioner && (
+              <div>
+                <div className={styles.dataContainer}>
+                  <div>
+                    <ControlLabel>Provisioner</ControlLabel>
                   </div>
-                  <div className={styles.dataContainer}>
-                    <div>
-                      <ControlLabel>Expires</ControlLabel>
-                    </div>
-                    <div>
-                      <DateView date={provisioner.expires} />
-                    </div>
+                  <div>
+                    <Link
+                      to={`/provisioners/${provisioner.provisionerId}/worker-types`}>
+                      {provisioner.provisionerId}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
+                    </Link>
                   </div>
-                  <div className={styles.dataContainer}>
-                    <div>
-                      <ControlLabel>Stability</ControlLabel>
-                    </div>
-                    <div>
-                      <Label
-                        bsSize="sm"
-                        bsStyle={stabilityColors[provisioner.stability]}>
-                        {provisioner.stability}
-                      </Label>
-                    </div>
+                </div>
+                <div className={styles.dataContainer}>
+                  <div>
+                    <ControlLabel>Expires</ControlLabel>
                   </div>
-                  <div
-                    className={`${styles.dataContainer} ${styles.actionLabel}`}>
-                    <div>
-                      <ControlLabel>Actions</ControlLabel>
-                    </div>
-                    <div>
-                      <ButtonToolbar>
-                        {provisioner.actions.length
+                  <div>
+                    <DateView date={provisioner.expires} />
+                  </div>
+                </div>
+                <div className={styles.dataContainer}>
+                  <div>
+                    <ControlLabel>Stability</ControlLabel>
+                  </div>
+                  <div>
+                    <Label
+                      bsSize="sm"
+                      bsStyle={stabilityColors[provisioner.stability]}>
+                      {provisioner.stability}
+                    </Label>
+                  </div>
+                </div>
+                <div
+                  className={`${styles.dataContainer} ${styles.actionLabel}`}>
+                  <div>
+                    <ControlLabel>Actions</ControlLabel>
+                  </div>
+                  <div>
+                    <ButtonToolbar>
+                      {!actionLoading &&
+                        (provisioner.actions.length
                           ? provisioner.actions.map(
                               (action, key) =>
                                 action.context === 'provisioner' && (
@@ -211,17 +213,18 @@ export default class Provisioners extends React.PureComponent {
                                   </Button>
                                 )
                             )
-                          : '-'}
-                      </ButtonToolbar>
-                    </div>
-                  </div>
-                  <div>
-                    <Panel collapsible defaultExpanded header="Description">
-                      <Markdown>{provisioner.description || '`-`'}</Markdown>
-                    </Panel>
+                          : '-')}
+                      {actionLoading && <Spinner />}
+                    </ButtonToolbar>
                   </div>
                 </div>
-              )}
+                <div>
+                  <Panel collapsible defaultExpanded header="Description">
+                    <Markdown>{provisioner.description || '`-`'}</Markdown>
+                  </Panel>
+                </div>
+              </div>
+            )}
           </Col>
         </Row>
       </div>

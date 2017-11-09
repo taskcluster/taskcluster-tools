@@ -25,6 +25,7 @@ export default class WorkerManager extends React.PureComponent {
     super(props);
     this.state = {
       loading: true,
+      actionLoading: false,
       workers: null,
       workerToken: null,
       error: null,
@@ -119,26 +120,36 @@ export default class WorkerManager extends React.PureComponent {
       .replace('<provisionerId>', this.props.provisionerId)
       .replace('<workerType>', this.props.workerType);
 
-    try {
-      const response = await fetch(url, {
-        method: action.method,
-        mode: 'cors'
-      });
+    this.setState({ actionLoading: true }, async () => {
+      try {
+        const response = await fetch(url, {
+          method: action.method,
+          mode: 'cors'
+        });
 
-      await response.json();
+        await response.json();
 
-      this.notification.show(
-        <span>
-          {action.name}&nbsp;&nbsp;<Icon name="check" />
-        </span>
-      );
-    } catch (error) {
-      this.setState({ error });
-    }
+        this.notification.show(
+          <span>
+            {action.name}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        );
+        this.setState({ actionLoading: false });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
   };
 
   render() {
-    const { filter, workers, workerToken, loading, error } = this.state;
+    const {
+      filter,
+      workers,
+      workerToken,
+      loading,
+      error,
+      actionLoading
+    } = this.state;
     const { provisionerId, workerType } = this.props;
     const navList = [
       {
@@ -186,7 +197,7 @@ export default class WorkerManager extends React.PureComponent {
               id="actions-dropdown"
               bsSize="small"
               title="Actions"
-              disabled={!workers || !workers.actions.length}
+              disabled={actionLoading || !workers || !workers.actions.length}
               onSelect={this.handleActionClick}>
               {workers &&
                 workers.actions.map((action, key) => (
@@ -198,6 +209,7 @@ export default class WorkerManager extends React.PureComponent {
           </ButtonToolbar>
         </div>
         {error && <Error error={error} />}
+        {actionLoading && <Spinner />}
         {loading && <Spinner />}
         <Table
           className={styles.workersTable}
