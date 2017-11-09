@@ -163,13 +163,16 @@ export default class WorkerManager extends React.PureComponent {
 
   async handleActionClick(action) {
     const url = action.url
-      .replace(':provisionerId', this.state.worker.provisionerId)
-      .replace(':workerType', this.state.worker.workerType)
-      .replace(':workerGroup', this.state.worker.workerGroup)
-      .replace(':workerId', this.state.worker.workerId);
+      .replace('<provisionerId>', this.state.worker.provisionerId)
+      .replace('<workerType>', this.state.worker.workerType)
+      .replace('<workerGroup>', this.state.worker.workerGroup)
+      .replace('<workerId>', this.state.worker.workerId);
 
     try {
-      const response = await fetch(url, { method: 'POST', mode: 'cors' });
+      const response = await fetch(url, {
+        method: action.method,
+        mode: 'cors'
+      });
 
       await response.json();
 

@@ -14,7 +14,6 @@ import { parse, stringify } from 'qs';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
-import Notification from '../../components/Notification';
 import SearchForm from './SearchForm';
 import WorkerTypeTable from './WorkerTypeTable';
 import OrderByDropdown from './OrderByDropdown';
@@ -135,24 +134,6 @@ export default class WorkerManager extends React.PureComponent {
     });
   };
 
-  handleActionClick = async action => {
-    const url = action.url.replace(':provisionerId', this.props.provisionerId);
-
-    try {
-      const response = await fetch(url, { method: 'POST', mode: 'cors' });
-
-      await response.json();
-
-      this.notification.show(
-        <span>
-          {action.name}&nbsp;&nbsp;<Icon name="check" />
-        </span>
-      );
-    } catch (error) {
-      this.setState({ error });
-    }
-  };
-
   render() {
     const { provisionerId, awsProvisioner, queue } = this.props;
     const tooltip = (
@@ -173,11 +154,6 @@ export default class WorkerManager extends React.PureComponent {
 
     return (
       <div>
-        <Notification
-          ref={child => {
-            this.notification = child;
-          }}
-        />
         <div>
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Worker Types Explorer</h4>
@@ -241,19 +217,6 @@ export default class WorkerManager extends React.PureComponent {
                   <Icon name="th" />&nbsp;&nbsp;Table
                 </ToggleButton>
               </ToggleButtonGroup>
-
-              <DropdownButton
-                id="actions-dropdown"
-                bsSize="small"
-                title="Actions"
-                disabled={!this.state.actions.length}
-                onSelect={this.handleActionClick}>
-                {this.state.actions.map((action, key) => (
-                  <MenuItem eventKey={action} key={`action-dropdown-${key}`}>
-                    {action.name}
-                  </MenuItem>
-                ))}
-              </DropdownButton>
             </ButtonToolbar>
           </div>
         )}
@@ -267,7 +230,6 @@ export default class WorkerManager extends React.PureComponent {
             orderBy={this.state.orderBy}
             layout={this.state.layout}
             searchTerm={this.state.search}
-            setActions={this.setActions}
           />
         )}
       </div>

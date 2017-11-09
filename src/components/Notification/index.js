@@ -20,6 +20,8 @@ export default class Notification extends React.PureComponent {
     }
   }
 
+  show = message => this.setState({ message, show: true });
+
   render() {
     return (
       <div className={styles.container}>
@@ -41,6 +43,4 @@ export default class Notification extends React.PureComponent {
       </div>
     );
   }
-
-  show = message => this.setState({ message, show: true });
 }

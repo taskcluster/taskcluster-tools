@@ -5,6 +5,8 @@ import {
   ListGroup,
   ListGroupItem,
   Label,
+  ButtonToolbar,
+  Button,
   ControlLabel,
   Panel
 } from 'react-bootstrap';
@@ -12,6 +14,7 @@ import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
 import { LinkContainer } from 'react-router-bootstrap';
 import Markdown from '../../components/Markdown';
+import Notification from '../../components/Notification';
 import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
 import { stabilityColors } from '../../utils';
@@ -85,6 +88,31 @@ export default class Provisioners extends React.PureComponent {
   handleProvisionerClick = ({ target }) =>
     this.loadProvisioner(target.innerText);
 
+  handleActionClick = action => {
+    const url = action.url.replace('<provisionerId>', this.props.provisionerId);
+
+    this.setState({ provisionerLoading: true }, async () => {
+      try {
+        const response = await fetch(url, {
+          method: action.method,
+          mode: 'cors'
+        });
+
+        await response.json();
+
+        this.notification.show(
+          <span>
+            {action.name}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        );
+
+        this.setState({ provisionerLoading: false });
+      } catch (error) {
+        this.setState({ error, provisionerLoading: false });
+      }
+    });
+  };
+
   render() {
     const {
       provisioners,
@@ -100,6 +128,11 @@ export default class Provisioners extends React.PureComponent {
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Provisioners</h4>
         </div>
+        <Notification
+          ref={child => {
+            this.notification = child;
+          }}
+        />
         {error && <Error error={error} />}
         <Row>
           <Col md={6}>
@@ -123,46 +156,72 @@ export default class Provisioners extends React.PureComponent {
           </Col>
           <Col md={6}>
             {provisionerLoading && <Spinner />}
-            {provisioner && (
-              <div>
-                <div className={styles.dataContainer}>
-                  <div>
-                    <ControlLabel>Provisioner</ControlLabel>
-                  </div>
-                  <div>
-                    <Link
-                      to={`/provisioners/${provisioner.provisionerId}/worker-types`}>
-                      {provisioner.provisionerId}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
-                    </Link>
-                  </div>
-                </div>
-                <div className={styles.dataContainer}>
-                  <div>
-                    <ControlLabel>Expires</ControlLabel>
-                  </div>
-                  <div>
-                    <DateView date={provisioner.expires} />
-                  </div>
-                </div>
-                <div className={styles.dataContainer}>
-                  <div>
-                    <ControlLabel>Stability</ControlLabel>
-                  </div>
-                  <div>
-                    <Label
-                      bsSize="sm"
-                      bsStyle={stabilityColors[provisioner.stability]}>
-                      {provisioner.stability}
-                    </Label>
-                  </div>
-                </div>
+            {!provisionerLoading &&
+              provisioner && (
                 <div>
-                  <Panel collapsible defaultExpanded header="Description">
-                    <Markdown>{provisioner.description || '`-`'}</Markdown>
-                  </Panel>
+                  <div className={styles.dataContainer}>
+                    <div>
+                      <ControlLabel>Provisioner</ControlLabel>
+                    </div>
+                    <div>
+                      <Link
+                        to={`/provisioners/${provisioner.provisionerId}/worker-types`}>
+                        {provisioner.provisionerId}&nbsp;&nbsp;&nbsp;<Icon name="long-arrow-right" />
+                      </Link>
+                    </div>
+                  </div>
+                  <div className={styles.dataContainer}>
+                    <div>
+                      <ControlLabel>Expires</ControlLabel>
+                    </div>
+                    <div>
+                      <DateView date={provisioner.expires} />
+                    </div>
+                  </div>
+                  <div className={styles.dataContainer}>
+                    <div>
+                      <ControlLabel>Stability</ControlLabel>
+                    </div>
+                    <div>
+                      <Label
+                        bsSize="sm"
+                        bsStyle={stabilityColors[provisioner.stability]}>
+                        {provisioner.stability}
+                      </Label>
+                    </div>
+                  </div>
+                  <div
+                    className={`${styles.dataContainer} ${styles.actionLabel}`}>
+                    <div>
+                      <ControlLabel>Actions</ControlLabel>
+                    </div>
+                    <div>
+                      <ButtonToolbar>
+                        {provisioner.actions.length
+                          ? provisioner.actions.map(
+                              (action, key) =>
+                                action.context === 'provisioner' && (
+                                  <Button
+                                    key={`worker-action-${key}`}
+                                    className={styles.actionButton}
+                                    bsSize="small"
+                                    onClick={() =>
+                                      this.handleActionClick(action)}>
+                                    {action.name}
+                                  </Button>
+                                )
+                            )
+                          : '-'}
+                      </ButtonToolbar>
+                    </div>
+                  </div>
+                  <div>
+                    <Panel collapsible defaultExpanded header="Description">
+                      <Markdown>{provisioner.description || '`-`'}</Markdown>
+                    </Panel>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </Col>
         </Row>
       </div>
