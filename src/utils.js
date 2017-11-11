@@ -1,5 +1,5 @@
 import { fromNowJSON } from 'taskcluster-client-web';
-import { omit } from 'ramda';
+import { omit, identity, of, T, cond } from 'ramda';
 import merge from 'deepmerge';
 import cloneDeep from 'lodash.clonedeep';
 import Loadable from 'react-loadable';
@@ -96,6 +96,9 @@ export const parameterizeTask = task =>
       })
     }
   );
+
+// toArray :: a -> Array
+export const toArray = cond([[Array.isArray, identity], [T, of]]);
 
 export const labels = {
   running: 'primary',

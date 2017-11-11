@@ -7,6 +7,7 @@ import { scopeIntersection } from 'taskcluster-lib-scopes';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ClientEditor from './ClientEditor';
+import { toArray } from '../../utils';
 import styles from './styles.css';
 
 export default class ClientCreator extends React.PureComponent {
@@ -39,10 +40,7 @@ export default class ClientCreator extends React.PureComponent {
         const description =
           this.state.query.description ||
           `Client created ${new Date()} for ${this.state.query.callback_url}`;
-        const { scope } = this.state.query;
-        const scopes = (typeof scope === 'string' ? [scope] : scope).filter(
-          s => s
-        );
+        const scopes = toArray(this.state.query.scope);
 
         await this.props.auth.updateClient(this.state.client.clientId, {
           description,
@@ -103,8 +101,7 @@ export default class ClientCreator extends React.PureComponent {
       this.state.query.description ||
       `Client created ${new Date()} for ${this.state.query.callback_url}`;
     const clientId = await this.nextAvailableClientId(clientName, 0);
-    const { scope } = this.state.query;
-    const scopes = (typeof scope === 'string' ? [scope] : scope).filter(s => s);
+    const scopes = toArray(this.state.query.scope);
 
     return {
       clientId,
