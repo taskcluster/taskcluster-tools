@@ -1,8 +1,11 @@
 import React from 'react';
 import { object, shape, arrayOf } from 'prop-types';
-import { Table } from 'react-bootstrap';
+import { Table, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
 import DateView from '../../components/DateView';
+import Error from '../../components/Error';
+import Spinner from '../../components/Spinner/index';
 
 const awsUrl = 'https://console.aws.amazon.com/ec2/v2/home';
 
@@ -14,6 +17,15 @@ export default class WorkerTypeResources extends React.PureComponent {
       requests: arrayOf(object)
     }).isRequired
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      actionLoading: false,
+      error: null
+    };
+  }
 
   getCapacityFor(stateKey, instanceState) {
     const { instanceTypes } = this.props.workerType;
@@ -47,6 +59,26 @@ export default class WorkerTypeResources extends React.PureComponent {
     return this.getCapacityFor('requests');
   }
 
+  async terminateInstance(instanceId, region) {
+    const baseUrl = 'https://ec2-manager.taskcluster.net/v1';
+
+    this.setState({ actionLoading: true }, async () => {
+      const credentials =
+        this.props.userSession && this.props.userSession.credentials;
+
+      try {
+        await request(`${baseUrl}/region/${region}/instance/${instanceId}`, {
+          method: 'DELETE',
+          credentials
+        });
+
+        this.setState({ actionLoading: false });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  }
+
   renderInstanceRow = (instance, index) => (
     <tr key={index}>
       <td>{this.renderInstanceIdLink(instance.id, instance.region)}</td>
@@ -62,6 +94,14 @@ export default class WorkerTypeResources extends React.PureComponent {
       <td>{this.renderImageIdLink(instance.ami, instance.region)}</td>
       <td>
         <DateView date={new Date(instance.launch)} />
+      </td>
+      <td>
+        <Button
+          bsStyle="danger"
+          bsSize="small"
+          onClick={() => this.terminateInstance(instance.id, instance.region)}>
+          Kill
+        </Button>
       </td>
     </tr>
   );
@@ -136,6 +176,8 @@ export default class WorkerTypeResources extends React.PureComponent {
     return (
       <span>
         <h3>Running Instances</h3>
+        {this.state.actionLoading && <Spinner />}
+        {this.state.error && <Error error={this.state.error} />}
         We have a total running instance capacity of {this.runningCapacity()}.
         These are instances that the provisioner counts as doing work.
         <Table>
@@ -147,6 +189,7 @@ export default class WorkerTypeResources extends React.PureComponent {
               <th>Availability Zone</th>
               <th>AMI</th>
               <th>Launch Time</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>

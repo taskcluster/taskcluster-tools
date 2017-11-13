@@ -29,7 +29,7 @@ export default class Error extends React.PureComponent {
     const { error } = this.props;
     const { open } = this.state;
 
-    // Handle the common 403 error more neatly, especially since its msessage is large but
+    // Handle the common 403 error more neatly, especially since its message is large but
     // sometimes useful.
     if (
       error.response &&
