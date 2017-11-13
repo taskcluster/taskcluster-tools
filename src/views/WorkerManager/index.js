@@ -14,6 +14,7 @@ const View = ({ userSession, history, match }) => (
         workerType={match.params.workerType ? match.params.workerType : ''}
         workerGroup={match.params.workerGroup ? match.params.workerGroup : ''}
         workerId={match.params.workerId ? match.params.workerId : ''}
+        userSession={userSession}
       />
     )}
   </Clients>

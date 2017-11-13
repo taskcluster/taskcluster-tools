@@ -242,6 +242,7 @@ export default class App extends React.Component {
                 <PropsRoute
                   path="/provisioners/:provisionerId?"
                   component={Provisioners}
+                  userSession={userSession}
                 />
                 <PropsRoute
                   path="/auth/clients/new"

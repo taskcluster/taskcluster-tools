@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
 import { LinkContainer } from 'react-router-bootstrap';
 import Markdown from '../../components/Markdown';
 import Notification from '../../components/Notification';
@@ -94,12 +95,13 @@ export default class Provisioners extends React.PureComponent {
 
     this.setState({ actionLoading: true }, async () => {
       try {
-        const response = await fetch(url, {
-          method: action.method,
-          mode: 'cors'
-        });
+        const credentials =
+          this.props.userSession && (await this.props.userSession.credentials);
 
-        await response.json();
+        await request(url, {
+          method: action.method,
+          credentials
+        });
 
         this.notification.show(
           <span>

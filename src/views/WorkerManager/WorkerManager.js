@@ -8,6 +8,7 @@ import {
   Tooltip
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
 import Notification from '../../components/Notification';
@@ -171,12 +172,13 @@ export default class WorkerManager extends React.PureComponent {
 
     this.setState({ actionLoading: true }, async () => {
       try {
-        const response = await fetch(url, {
-          method: action.method,
-          mode: 'cors'
-        });
+        const credentials =
+          this.props.userSession && (await this.props.userSession.credentials);
 
-        await response.json();
+        await request(url, {
+          method: action.method,
+          credentials
+        });
 
         this.notification.show(
           <span>
