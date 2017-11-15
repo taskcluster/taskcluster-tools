@@ -96,6 +96,7 @@ export default class WorkerTypeView extends React.PureComponent {
           userSession={this.props.userSession}
           workerType={workerType}
           awsState={awsState}
+          baseUrl="https://ec2-manager.taskcluster.net/v1"
         />
       ) : (
         <Spinner />
