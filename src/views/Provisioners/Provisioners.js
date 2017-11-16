@@ -112,10 +112,9 @@ export default class Provisioners extends React.PureComponent {
 
         this.notification.show(
           <span>
-            {action.name}&nbsp;&nbsp;<Icon name="check" />
+            {action.title}&nbsp;&nbsp;<Icon name="check" />
           </span>
         );
-
         this.setState({ actionLoading: false });
       } catch (error) {
         this.setState({ error, actionLoading: false });
