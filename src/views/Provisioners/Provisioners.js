@@ -5,13 +5,17 @@ import {
   ListGroup,
   ListGroupItem,
   Label,
+  ButtonToolbar,
+  Button,
   ControlLabel,
   Panel
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
 import { LinkContainer } from 'react-router-bootstrap';
 import Markdown from '../../components/Markdown';
+import Snackbar from '../../components/Snackbar';
 import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
 import { stabilityColors } from '../../utils';
@@ -28,7 +32,9 @@ export default class Provisioners extends React.PureComponent {
       provisioner: null,
       error: null,
       provisionerLoading: false,
-      provisionersLoading: true
+      provisionersLoading: true,
+      actionLoading: false,
+      actions: []
     };
   }
 
@@ -40,11 +46,17 @@ export default class Provisioners extends React.PureComponent {
     }
   }
 
-  loadProvisioner(provisioner) {
+  loadProvisioner(prov) {
     this.setState({ provisionerLoading: true, provisioner: null }, async () => {
       try {
+        const provisioner = await this.props.queue.getProvisioner(prov);
+        const actions = provisioner.actions.filter(
+          action => action.context === 'provisioner'
+        );
+
         this.setState({
-          provisioner: await this.props.queue.getProvisioner(provisioner),
+          provisioner,
+          actions,
           provisionerLoading: false,
           error: null
         });
@@ -85,12 +97,39 @@ export default class Provisioners extends React.PureComponent {
   handleProvisionerClick = ({ target }) =>
     this.loadProvisioner(target.innerText);
 
+  handleActionClick = action => {
+    const url = action.url.replace('<provisionerId>', this.props.provisionerId);
+
+    this.setState({ actionLoading: true }, async () => {
+      try {
+        const credentials =
+          this.props.userSession && (await this.props.userSession.credentials);
+
+        await request(url, {
+          method: action.method,
+          credentials
+        });
+
+        this.notification.show(
+          <span>
+            {action.title}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        );
+        this.setState({ actionLoading: false });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  };
+
   render() {
     const {
       provisioners,
       provisioner,
       provisionerLoading,
       provisionersLoading,
+      actions,
+      actionLoading,
       error
     } = this.state;
 
@@ -100,6 +139,11 @@ export default class Provisioners extends React.PureComponent {
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Provisioners</h4>
         </div>
+        <Snackbar
+          ref={child => {
+            this.notification = child;
+          }}
+        />
         {error && <Error error={error} />}
         <Row>
           <Col md={6}>
@@ -154,6 +198,29 @@ export default class Provisioners extends React.PureComponent {
                       bsStyle={stabilityColors[provisioner.stability]}>
                       {provisioner.stability}
                     </Label>
+                  </div>
+                </div>
+                <div
+                  className={`${styles.dataContainer} ${styles.actionLabel}`}>
+                  <div>
+                    <ControlLabel>Actions</ControlLabel>
+                  </div>
+                  <div>
+                    <ButtonToolbar>
+                      {!actionLoading &&
+                        (actions.length
+                          ? actions.map((action, key) => (
+                              <Button
+                                key={`worker-action-${key}`}
+                                className={styles.actionButton}
+                                bsSize="small"
+                                onClick={() => this.handleActionClick(action)}>
+                                {action.title}
+                              </Button>
+                            ))
+                          : '-')}
+                      {actionLoading && <Spinner />}
+                    </ButtonToolbar>
                   </div>
                 </div>
                 <div>

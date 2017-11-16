@@ -7,8 +7,11 @@ import {
   OverlayTrigger,
   Tooltip
 } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
+import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import SearchForm from './SearchForm';
@@ -25,7 +28,8 @@ export default class WorkerManager extends React.PureComponent {
       recentTasks: [],
       worker: null,
       error: null,
-      loading: false
+      loading: false,
+      actionLoading: false
     };
   }
 
@@ -159,6 +163,35 @@ export default class WorkerManager extends React.PureComponent {
     }
   };
 
+  handleActionClick(action) {
+    const url = action.url
+      .replace('<provisionerId>', this.state.worker.provisionerId)
+      .replace('<workerType>', this.state.worker.workerType)
+      .replace('<workerGroup>', this.state.worker.workerGroup)
+      .replace('<workerId>', this.state.worker.workerId);
+
+    this.setState({ actionLoading: true }, async () => {
+      try {
+        const credentials =
+          this.props.userSession && (await this.props.userSession.credentials);
+
+        await request(url, {
+          method: action.method,
+          credentials
+        });
+
+        this.notification.show(
+          <span>
+            {action.title}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        );
+        this.setState({ actionLoading: false });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  }
+
   render() {
     const {
       provisioners,
@@ -166,7 +199,8 @@ export default class WorkerManager extends React.PureComponent {
       worker,
       recentTasks,
       loading,
-      error
+      error,
+      actionLoading
     } = this.state;
     const { provisionerId, workerType, workerGroup, workerId } = this.props;
     const disableTooltip = (
@@ -204,6 +238,11 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
+        <Snackbar
+          ref={child => {
+            this.notification = child;
+          }}
+        />
         <Breadcrumb navList={navList} active={[workerGroup, workerId]} />
         <SearchForm
           key="input-form"
@@ -235,31 +274,37 @@ export default class WorkerManager extends React.PureComponent {
                   <td style={{ verticalAlign: 'inherit' }}>Actions</td>
                   <td>
                     <ButtonToolbar>
-                      <Button
-                        disabled
-                        title="Coming soon!"
-                        bsSize="small"
-                        bsStyle="info">
-                        Reboot
-                      </Button>
                       <OverlayTrigger
                         delay={600}
                         placement="bottom"
                         overlay={disableTooltip}>
                         <Button
                           onClick={this.toggleWorkerStatus}
+                          className={styles.actionButton}
                           bsSize="small"
                           bsStyle="warning">
                           {worker.disabled ? 'Enable' : 'Disable'}
                         </Button>
                       </OverlayTrigger>
-                      <Button
-                        disabled
-                        title="Coming soon!"
-                        bsSize="small"
-                        bsStyle="danger">
-                        Kill
-                      </Button>
+                      {worker.actions.map((action, key) => (
+                        <OverlayTrigger
+                          key={`worker-action-${key}`}
+                          delay={600}
+                          placement="bottom"
+                          overlay={
+                            <Tooltip id={`action-tooltip-${key}`}>
+                              {action.description}
+                            </Tooltip>
+                          }>
+                          <Button
+                            className={styles.actionButton}
+                            bsSize="small"
+                            disabled={actionLoading}
+                            onClick={() => this.handleActionClick(action)}>
+                            {action.title}
+                          </Button>
+                        </OverlayTrigger>
+                      ))}
                     </ButtonToolbar>
                   </td>
                 </tr>
@@ -267,6 +312,7 @@ export default class WorkerManager extends React.PureComponent {
             </Table>
           </div>
         )}
+        {actionLoading && <Spinner />}
         {worker && <WorkerTable tasks={recentTasks} />}
       </div>
     );

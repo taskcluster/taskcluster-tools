@@ -6,3 +6,11 @@
 .dataContainer > div {
   margin: 0 10px 10px 0;
 }
+
+.actionButton {
+  margin-bottom: 5px;
+}
+
+.actionLabel {
+  align-items: center;
+}

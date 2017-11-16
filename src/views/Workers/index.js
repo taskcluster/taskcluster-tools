@@ -16,6 +16,7 @@ const View = ({ userSession, history, match, location }) => (
           match.params.provisionerId ? match.params.provisionerId : ''
         }
         workerType={match.params.workerType ? match.params.workerType : ''}
+        userSession={userSession}
       />
     )}
   </Clients>

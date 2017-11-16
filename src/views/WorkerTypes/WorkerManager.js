@@ -30,6 +30,7 @@ export default class WorkerManager extends React.PureComponent {
       lastActive: true,
       layout: 'grid',
       orderBy: null,
+      actions: [],
       error: null,
       ...this.getSettingsFromProps(props)
     };
@@ -38,6 +39,12 @@ export default class WorkerManager extends React.PureComponent {
   componentWillMount() {
     this.loadProvisioners();
   }
+
+  setActions = actions => {
+    this.setState({
+      actions: actions.filter(({ context }) => context === 'provisioner')
+    });
+  };
 
   async loadProvisioners(token) {
     try {
@@ -165,7 +172,11 @@ export default class WorkerManager extends React.PureComponent {
             </MenuItem>
           ))}
         </DropdownButton>
-        {this.state.error && <Error error={this.state.error} />}
+        {this.state.error && (
+          <div className={styles.error}>
+            <Error error={this.state.error} />
+          </div>
+        )}
         {provisionerId && (
           <SearchForm
             default={this.state.search}

@@ -4,15 +4,21 @@ import {
   Table,
   Button,
   ButtonGroup,
+  ButtonToolbar,
   Glyphicon,
   DropdownButton,
   MenuItem,
-  Label
+  Label,
+  Tooltip,
+  OverlayTrigger
 } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
+import Snackbar from '../../components/Snackbar';
 import DateView from '../../components/DateView';
 import { labels } from '../../utils';
 import styles from './styles.css';
@@ -22,7 +28,9 @@ export default class WorkerManager extends React.PureComponent {
     super(props);
     this.state = {
       loading: true,
+      actionLoading: false,
       workers: null,
+      actions: [],
       workerToken: null,
       error: null,
       filter: 'None'
@@ -31,6 +39,7 @@ export default class WorkerManager extends React.PureComponent {
 
   componentWillMount() {
     this.loadWorkers(this.props);
+    this.loadActions(this.props);
   }
 
   componentDidUpdate(prevProps, { workerToken, filter }) {
@@ -80,6 +89,19 @@ export default class WorkerManager extends React.PureComponent {
     }
   };
 
+  async loadActions({ provisionerId, workerType }) {
+    try {
+      const { actions } = await this.props.queue.getWorkerType(
+        provisionerId,
+        workerType
+      );
+
+      this.setState({ actions });
+    } catch (error) {
+      this.setState({ error });
+    }
+  }
+
   async loadWorkers({ provisionerId, workerType }) {
     try {
       const workers = await this.props.queue.listWorkers(
@@ -119,8 +141,43 @@ export default class WorkerManager extends React.PureComponent {
       filter: filter.includes('disabled') ? 'disabled' : filter
     });
 
+  handleActionClick = async action => {
+    const url = action.url
+      .replace('<provisionerId>', this.props.provisionerId)
+      .replace('<workerType>', this.props.workerType);
+
+    this.setState({ actionLoading: true }, async () => {
+      try {
+        const credentials =
+          this.props.userSession && (await this.props.userSession.credentials);
+
+        await request(url, {
+          method: action.method,
+          credentials
+        });
+
+        this.notification.show(
+          <span>
+            {action.title}&nbsp;&nbsp;<Icon name="check" />
+          </span>
+        );
+        this.setState({ actionLoading: false });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  };
+
   render() {
-    const { filter, workers, workerToken, loading, error } = this.state;
+    const {
+      filter,
+      workers,
+      workerToken,
+      loading,
+      error,
+      actions,
+      actionLoading
+    } = this.state;
     const { provisionerId, workerType } = this.props;
     const navList = [
       {
@@ -142,23 +199,53 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Workers" />
           <h4>Workers Explorer</h4>
         </div>
+        <Snackbar
+          ref={child => {
+            this.notification = child;
+          }}
+        />
         <Breadcrumb navList={navList} active={workerType} />
         <div className={styles.filters}>
-          <DropdownButton
-            id="workers-dropdown"
-            bsSize="small"
-            title={`Filter by: ${filter || 'None'}`}
-            onSelect={this.onFilterSelect}>
-            <MenuItem eventKey="None">None</MenuItem>
-            <MenuItem divider />
-            {['Status: disabled'].map((property, key) => (
-              <MenuItem eventKey={property} key={`workers-dropdown-${key}`}>
-                {property}
-              </MenuItem>
-            ))}
-          </DropdownButton>
+          <ButtonToolbar className={styles.buttonToolbar}>
+            <DropdownButton
+              id="workers-dropdown"
+              bsSize="small"
+              title={`Filter by: ${filter || 'None'}`}
+              onSelect={this.onFilterSelect}>
+              <MenuItem eventKey="None">None</MenuItem>
+              <MenuItem divider />
+              {['Status: disabled'].map((property, key) => (
+                <MenuItem eventKey={property} key={`workers-dropdown-${key}`}>
+                  {property}
+                </MenuItem>
+              ))}
+            </DropdownButton>
+
+            <DropdownButton
+              id="actions-dropdown"
+              bsSize="small"
+              title="Actions"
+              disabled={actionLoading || !actions.length}>
+              {actions.map((action, key) => (
+                <OverlayTrigger
+                  key={`action-dropdown-${key}`}
+                  delay={600}
+                  placement="right"
+                  overlay={
+                    <Tooltip id={`action-tooltip-${key}`}>
+                      {action.description}
+                    </Tooltip>
+                  }>
+                  <MenuItem onSelect={this.handleActionClick} eventKey={action}>
+                    {action.title}
+                  </MenuItem>
+                </OverlayTrigger>
+              ))}
+            </DropdownButton>
+          </ButtonToolbar>
         </div>
         {error && <Error error={error} />}
+        {actionLoading && <Spinner />}
         {loading && <Spinner />}
         <Table
           className={styles.workersTable}
