@@ -8,7 +8,9 @@ import {
   Glyphicon,
   DropdownButton,
   MenuItem,
-  Label
+  Label,
+  Tooltip,
+  OverlayTrigger
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
@@ -16,7 +18,7 @@ import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
-import Notification from '../../components/Notification';
+import Snackbar from '../../components/Snackbar';
 import DateView from '../../components/DateView';
 import { labels } from '../../utils';
 import styles from './styles.css';
@@ -28,6 +30,7 @@ export default class WorkerManager extends React.PureComponent {
       loading: true,
       actionLoading: false,
       workers: null,
+      actions: [],
       workerToken: null,
       error: null,
       filter: 'None'
@@ -36,6 +39,7 @@ export default class WorkerManager extends React.PureComponent {
 
   componentWillMount() {
     this.loadWorkers(this.props);
+    this.loadActions(this.props);
   }
 
   componentDidUpdate(prevProps, { workerToken, filter }) {
@@ -76,6 +80,19 @@ export default class WorkerManager extends React.PureComponent {
       lastClaimResolved: resolved
     };
   };
+
+  async loadActions({ provisionerId, workerType }) {
+    try {
+      const { actions } = await this.props.queue.getWorkerType(
+        provisionerId,
+        workerType
+      );
+
+      this.setState({ actions });
+    } catch (error) {
+      this.setState({ error });
+    }
+  }
 
   async loadWorkers({ provisionerId, workerType }) {
     try {
@@ -150,6 +167,7 @@ export default class WorkerManager extends React.PureComponent {
       workerToken,
       loading,
       error,
+      actions,
       actionLoading
     } = this.state;
     const { provisionerId, workerType } = this.props;
@@ -173,7 +191,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Workers" />
           <h4>Workers Explorer</h4>
         </div>
-        <Notification
+        <Snackbar
           ref={child => {
             this.notification = child;
           }}
@@ -199,14 +217,22 @@ export default class WorkerManager extends React.PureComponent {
               id="actions-dropdown"
               bsSize="small"
               title="Actions"
-              disabled={actionLoading || !workers || !workers.actions.length}
-              onSelect={this.handleActionClick}>
-              {workers &&
-                workers.actions.map((action, key) => (
-                  <MenuItem eventKey={action} key={`action-dropdown-${key}`}>
-                    {action.name}
+              disabled={actionLoading || !actions.length}>
+              {actions.map((action, key) => (
+                <OverlayTrigger
+                  key={`action-dropdown-${key}`}
+                  delay={600}
+                  placement="right"
+                  overlay={
+                    <Tooltip id={`action-tooltip-${key}`}>
+                      {action.description}
+                    </Tooltip>
+                  }>
+                  <MenuItem onSelect={this.handleActionClick} eventKey={action}>
+                    {action.title}
                   </MenuItem>
-                ))}
+                </OverlayTrigger>
+              ))}
             </DropdownButton>
           </ButtonToolbar>
         </div>

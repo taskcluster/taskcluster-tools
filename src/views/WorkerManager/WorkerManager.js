@@ -11,7 +11,7 @@ import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
-import Notification from '../../components/Notification';
+import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import SearchForm from './SearchForm';
@@ -238,7 +238,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
-        <Notification
+        <Snackbar
           ref={child => {
             this.notification = child;
           }}
@@ -287,14 +287,23 @@ export default class WorkerManager extends React.PureComponent {
                         </Button>
                       </OverlayTrigger>
                       {worker.actions.map((action, key) => (
-                        <Button
+                        <OverlayTrigger
                           key={`worker-action-${key}`}
-                          className={styles.actionButton}
-                          bsSize="small"
-                          disabled={actionLoading}
-                          onClick={() => this.handleActionClick(action)}>
-                          {action.name}
-                        </Button>
+                          delay={600}
+                          placement="bottom"
+                          overlay={
+                            <Tooltip id={`action-tooltip-${key}`}>
+                              {action.description}
+                            </Tooltip>
+                          }>
+                          <Button
+                            className={styles.actionButton}
+                            bsSize="small"
+                            disabled={actionLoading}
+                            onClick={() => this.handleActionClick(action)}>
+                            {action.title}
+                          </Button>
+                        </OverlayTrigger>
                       ))}
                     </ButtonToolbar>
                   </td>

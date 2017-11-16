@@ -3,7 +3,7 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Alert } from 'react-bootstrap';
 import styles from './styles.css';
 
-export default class Notification extends React.PureComponent {
+export default class Snackbar extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {

@@ -15,7 +15,7 @@ import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
 import { LinkContainer } from 'react-router-bootstrap';
 import Markdown from '../../components/Markdown';
-import Notification from '../../components/Notification';
+import Snackbar from '../../components/Snackbar';
 import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
 import { stabilityColors } from '../../utils';
@@ -33,7 +33,8 @@ export default class Provisioners extends React.PureComponent {
       error: null,
       provisionerLoading: false,
       provisionersLoading: true,
-      actionLoading: false
+      actionLoading: false,
+      actions: []
     };
   }
 
@@ -45,11 +46,17 @@ export default class Provisioners extends React.PureComponent {
     }
   }
 
-  loadProvisioner(provisioner) {
+  loadProvisioner(prov) {
     this.setState({ provisionerLoading: true, provisioner: null }, async () => {
       try {
+        const provisioner = await this.props.queue.getProvisioner(prov);
+        const actions = provisioner.actions.filter(
+          action => action.context === 'provisioner'
+        );
+
         this.setState({
-          provisioner: await this.props.queue.getProvisioner(provisioner),
+          provisioner,
+          actions,
           provisionerLoading: false,
           error: null
         });
@@ -122,6 +129,7 @@ export default class Provisioners extends React.PureComponent {
       provisioner,
       provisionerLoading,
       provisionersLoading,
+      actions,
       actionLoading,
       error
     } = this.state;
@@ -132,7 +140,7 @@ export default class Provisioners extends React.PureComponent {
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Provisioners</h4>
         </div>
-        <Notification
+        <Snackbar
           ref={child => {
             this.notification = child;
           }}
@@ -201,20 +209,16 @@ export default class Provisioners extends React.PureComponent {
                   <div>
                     <ButtonToolbar>
                       {!actionLoading &&
-                        (provisioner.actions.length
-                          ? provisioner.actions.map(
-                              (action, key) =>
-                                action.context === 'provisioner' && (
-                                  <Button
-                                    key={`worker-action-${key}`}
-                                    className={styles.actionButton}
-                                    bsSize="small"
-                                    onClick={() =>
-                                      this.handleActionClick(action)}>
-                                    {action.name}
-                                  </Button>
-                                )
-                            )
+                        (actions.length
+                          ? actions.map((action, key) => (
+                              <Button
+                                key={`worker-action-${key}`}
+                                className={styles.actionButton}
+                                bsSize="small"
+                                onClick={() => this.handleActionClick(action)}>
+                                {action.title}
+                              </Button>
+                            ))
                           : '-')}
                       {actionLoading && <Spinner />}
                     </ButtonToolbar>
