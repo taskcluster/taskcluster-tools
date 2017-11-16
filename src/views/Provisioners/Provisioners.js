@@ -102,8 +102,7 @@ export default class Provisioners extends React.PureComponent {
 
     this.setState({ actionLoading: true }, async () => {
       try {
-        const credentials =
-          this.props.userSession && (await this.props.userSession.credentials);
+        const credentials = await this.props.userSession.getCredentials();
 
         await request(url, {
           method: action.method,
