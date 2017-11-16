@@ -62,13 +62,13 @@ export default class WorkerTypeResources extends React.PureComponent {
 
   async terminateInstance(instanceId, region) {
     this.setState({ actionLoading: true }, async () => {
-      const credentials =
-        this.props.userSession && this.props.userSession.credentials;
+      const credentials = await this.props.userSession.getCredentials();
 
       try {
         await request(
           `${this.props.baseUrl}/region/${region}/instance/${instanceId}`,
           {
+            extra: this.props.queue.buildExtraData(credentials),
             method: 'DELETE',
             credentials
           }
@@ -85,13 +85,13 @@ export default class WorkerTypeResources extends React.PureComponent {
     const { workerType } = this.props.workerType;
 
     this.setState({ actionLoading: true }, async () => {
-      const credentials =
-        this.props.userSession && this.props.userSession.credentials;
+      const credentials = await this.props.userSession.getCredentials();
 
       try {
         await request(
           `${this.props.baseUrl}/worker-types/${workerType}/resources`,
           {
+            extra: this.props.queue.buildExtraData(credentials),
             method: 'DELETE',
             credentials
           }
