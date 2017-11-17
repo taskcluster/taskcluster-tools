@@ -112,7 +112,7 @@ export default class WorkerManager extends React.PureComponent {
             ? { continuationToken: this.state.workerToken }
             : {}),
           ...{ limit: 15 },
-          ...(this.state.filter.includes('disabled') ? { disabled: true } : {})
+          ...(this.state.filter === 'quarantined' ? { quarantined: true } : {})
         }
       );
 
@@ -136,10 +136,7 @@ export default class WorkerManager extends React.PureComponent {
     !this.state.loading &&
     this.setState({ workerToken: this.state.workers.continuationToken });
 
-  onFilterSelect = filter =>
-    this.setState({
-      filter: filter.includes('disabled') ? 'disabled' : filter
-    });
+  onFilterSelect = filter => this.setState({ filter });
 
   handleActionClick = async action => {
     const url = action.url
@@ -214,11 +211,7 @@ export default class WorkerManager extends React.PureComponent {
               onSelect={this.onFilterSelect}>
               <MenuItem eventKey="None">None</MenuItem>
               <MenuItem divider />
-              {['Status: disabled'].map((property, key) => (
-                <MenuItem eventKey={property} key={`workers-dropdown-${key}`}>
-                  {property}
-                </MenuItem>
-              ))}
+              <MenuItem eventKey="quarantined">Quarantined</MenuItem>
             </DropdownButton>
 
             <DropdownButton
@@ -261,7 +254,7 @@ export default class WorkerManager extends React.PureComponent {
               <th>Task Started</th>
               <th>Task Resolved</th>
               <th>First Claim</th>
-              <th>Status</th>
+              <th>Quarantined</th>
             </tr>
           </thead>
           <tbody>
@@ -322,8 +315,10 @@ export default class WorkerManager extends React.PureComponent {
                       <td>
                         <Label
                           bsSize="sm"
-                          bsStyle={worker.disabled ? 'danger' : 'success'}>
-                          {worker.disabled ? 'disabled' : 'enabled'}
+                          bsStyle={
+                            worker.quarantineUntil ? 'danger' : 'success'
+                          }>
+                          {worker.quarantineUntil ? 'yes' : 'no'}
                         </Label>
                       </td>
                     </tr>
