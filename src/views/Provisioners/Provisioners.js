@@ -105,8 +105,9 @@ export default class Provisioners extends React.PureComponent {
         const credentials = await this.props.userSession.getCredentials();
 
         await request(url, {
-          method: action.method,
-          credentials
+          extra: this.props.queue.buildExtraData(credentials),
+          credentials,
+          method: action.method
         });
 
         this.notification.show(
