@@ -14,6 +14,7 @@ import {
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
+import moment from 'moment';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
 import Error from '../../components/Error';
@@ -313,13 +314,12 @@ export default class WorkerManager extends React.PureComponent {
                         )}
                       </td>
                       <td>
-                        <Label
-                          bsSize="sm"
-                          bsStyle={
-                            worker.quarantineUntil ? 'danger' : 'success'
-                          }>
-                          {worker.quarantineUntil ? 'yes' : 'no'}
-                        </Label>
+                        {worker.quarantineUntil
+                          ? `${moment(worker.quarantineUntil).diff(
+                              moment(),
+                              'days'
+                            )} days`
+                          : '-'}
                       </td>
                     </tr>
                   )

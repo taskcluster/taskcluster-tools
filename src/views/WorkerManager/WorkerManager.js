@@ -8,7 +8,7 @@ import {
   Tooltip
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { request } from 'taskcluster-client-web';
+import { request, fromNow } from 'taskcluster-client-web';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
 import Snackbar from '../../components/Snackbar';
@@ -143,17 +143,17 @@ export default class WorkerManager extends React.PureComponent {
       workerType,
       workerGroup,
       workerId,
-      disabled
+      quarantineUntil
     } = this.state.worker;
 
     try {
-      const worker = await this.props.queue.declareWorker(
+      const worker = await this.props.queue.quarantineWorker(
         provisionerId,
         workerType,
         workerGroup,
         workerId,
         {
-          disabled: !disabled
+          quarantineUntil: quarantineUntil ? null : fromNow('7 days')
         }
       );
 
@@ -203,13 +203,16 @@ export default class WorkerManager extends React.PureComponent {
       actionLoading
     } = this.state;
     const { provisionerId, workerType, workerGroup, workerId } = this.props;
-    const disableTooltip = (
+    const quarantineTooltip = (
       <Tooltip id="tooltip">
-        {worker && worker.disabled
+        {worker && worker.quarantineUntil
           ? 'Enabling a worker will resume accepting jobs.'
-          : 'Disabling a worker allows the machine to remain alive but not accept jobs.'}
+          : 'Quarantining a worker allows the machine to remain alive but not accept jobs for 7 days.'}
       </Tooltip>
     );
+    const isQuarantined =
+      worker &&
+      new Date(worker.quarantineUntil).getTime() > new Date().getTime();
     const firstClaim = worker && moment(worker.firstClaim);
     const navList = [
       {
@@ -277,13 +280,13 @@ export default class WorkerManager extends React.PureComponent {
                       <OverlayTrigger
                         delay={600}
                         placement="bottom"
-                        overlay={disableTooltip}>
+                        overlay={quarantineTooltip}>
                         <Button
                           onClick={this.toggleWorkerStatus}
                           className={styles.actionButton}
                           bsSize="small"
                           bsStyle="warning">
-                          {worker.disabled ? 'Enable' : 'Disable'}
+                          {isQuarantined ? 'Enable' : 'Quarantine'}
                         </Button>
                       </OverlayTrigger>
                       {worker.actions.map((action, key) => (
