@@ -9,7 +9,9 @@ import {
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
+import 'react-datepicker/dist/react-datepicker.css';
 import HelmetTitle from '../../components/HelmetTitle';
+import QuarantineButton from '../../components/QuarantineButton';
 import Breadcrumb from '../../components/Breadcrumb';
 import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
@@ -137,23 +139,22 @@ export default class WorkerManager extends React.PureComponent {
     this.props.history.push(url);
   };
 
-  toggleWorkerStatus = async () => {
+  updateWorkerQuarantine = async quarantineUntil => {
     const {
       provisionerId,
       workerType,
       workerGroup,
-      workerId,
-      disabled
+      workerId
     } = this.state.worker;
 
     try {
-      const worker = await this.props.queue.declareWorker(
+      const worker = await this.props.queue.quarantineWorker(
         provisionerId,
         workerType,
         workerGroup,
         workerId,
         {
-          disabled: !disabled
+          quarantineUntil
         }
       );
 
@@ -203,11 +204,11 @@ export default class WorkerManager extends React.PureComponent {
       actionLoading
     } = this.state;
     const { provisionerId, workerType, workerGroup, workerId } = this.props;
-    const disableTooltip = (
-      <Tooltip id="tooltip">
-        {worker && worker.disabled
+    const quarantineTooltip = (
+      <Tooltip id="quarantine-tooltip">
+        {worker && worker.quarantineUntil
           ? 'Enabling a worker will resume accepting jobs.'
-          : 'Disabling a worker allows the machine to remain alive but not accept jobs.'}
+          : 'Quarantining a worker allows the machine to remain alive but not accept jobs.'}
       </Tooltip>
     );
     const firstClaim = worker && moment(worker.firstClaim);
@@ -276,21 +277,21 @@ export default class WorkerManager extends React.PureComponent {
                     <ButtonToolbar>
                       <OverlayTrigger
                         delay={600}
-                        placement="bottom"
-                        overlay={disableTooltip}>
-                        <Button
-                          onClick={this.toggleWorkerStatus}
-                          className={styles.actionButton}
-                          bsSize="small"
-                          bsStyle="warning">
-                          {worker.disabled ? 'Enable' : 'Disable'}
-                        </Button>
+                        placement="top"
+                        overlay={quarantineTooltip}>
+                        <div>
+                          <QuarantineButton
+                            className={styles.actionButton}
+                            onSubmit={this.updateWorkerQuarantine}
+                            quarantineUntil={worker.quarantineUntil}
+                          />
+                        </div>
                       </OverlayTrigger>
                       {worker.actions.map((action, key) => (
                         <OverlayTrigger
                           key={`worker-action-${key}`}
                           delay={600}
-                          placement="bottom"
+                          placement="top"
                           overlay={
                             <Tooltip id={`action-tooltip-${key}`}>
                               {action.description}
