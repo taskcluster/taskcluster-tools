@@ -8,8 +8,10 @@ import {
   Tooltip
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { request, fromNow } from 'taskcluster-client-web';
+import { request } from 'taskcluster-client-web';
+import 'react-datepicker/dist/react-datepicker.css';
 import HelmetTitle from '../../components/HelmetTitle';
+import QuarantineButton from '../../components/QuarantineButton';
 import Breadcrumb from '../../components/Breadcrumb';
 import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
@@ -137,13 +139,12 @@ export default class WorkerManager extends React.PureComponent {
     this.props.history.push(url);
   };
 
-  toggleWorkerStatus = async () => {
+  updateWorkerQuarantine = async quarantineUntil => {
     const {
       provisionerId,
       workerType,
       workerGroup,
-      workerId,
-      quarantineUntil
+      workerId
     } = this.state.worker;
 
     try {
@@ -153,7 +154,7 @@ export default class WorkerManager extends React.PureComponent {
         workerGroup,
         workerId,
         {
-          quarantineUntil: quarantineUntil ? null : fromNow('7 days')
+          quarantineUntil
         }
       );
 
@@ -204,15 +205,12 @@ export default class WorkerManager extends React.PureComponent {
     } = this.state;
     const { provisionerId, workerType, workerGroup, workerId } = this.props;
     const quarantineTooltip = (
-      <Tooltip id="tooltip">
+      <Tooltip id="quarantine-tooltip">
         {worker && worker.quarantineUntil
           ? 'Enabling a worker will resume accepting jobs.'
-          : 'Quarantining a worker allows the machine to remain alive but not accept jobs for 7 days.'}
+          : 'Quarantining a worker allows the machine to remain alive but not accept jobs.'}
       </Tooltip>
     );
-    const isQuarantined =
-      worker &&
-      new Date(worker.quarantineUntil).getTime() > new Date().getTime();
     const firstClaim = worker && moment(worker.firstClaim);
     const navList = [
       {
@@ -279,21 +277,21 @@ export default class WorkerManager extends React.PureComponent {
                     <ButtonToolbar>
                       <OverlayTrigger
                         delay={600}
-                        placement="bottom"
+                        placement="top"
                         overlay={quarantineTooltip}>
-                        <Button
-                          onClick={this.toggleWorkerStatus}
-                          className={styles.actionButton}
-                          bsSize="small"
-                          bsStyle="warning">
-                          {isQuarantined ? 'Enable' : 'Quarantine'}
-                        </Button>
+                        <div>
+                          <QuarantineButton
+                            className={styles.actionButton}
+                            onSubmit={this.updateWorkerQuarantine}
+                            quarantineUntil={worker.quarantineUntil}
+                          />
+                        </div>
                       </OverlayTrigger>
                       {worker.actions.map((action, key) => (
                         <OverlayTrigger
                           key={`worker-action-${key}`}
                           delay={600}
-                          placement="bottom"
+                          placement="top"
                           overlay={
                             <Tooltip id={`action-tooltip-${key}`}>
                               {action.description}

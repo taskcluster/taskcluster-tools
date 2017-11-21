@@ -1,0 +1,8 @@
+.datePickerContainer {
+  display: flex;
+  align-items: center;
+}
+
+.datePickerContainer > label {
+  margin-right: 10px;
+}
