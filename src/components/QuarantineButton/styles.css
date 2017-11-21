@@ -1,8 +1,7 @@
-.datePickerContainer {
-  display: flex;
-  align-items: center;
+:global .react-datepicker-wrapper, :global .react-datepicker__input-container {
+  display: block;
 }
 
-.datePickerContainer > label {
-  margin-right: 10px;
+.datePicker {
+  width: 100%;
 }

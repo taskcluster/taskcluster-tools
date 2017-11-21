@@ -55,14 +55,14 @@ export default class QuarantineButton extends PureComponent {
               accept jobs. Note that a quarantine can be lifted by setting
               `quarantineUntil` to the present time (or somewhere in the past).
             </Markdown>
-            <div className={styles.datePickerContainer}>
-              <label>Quarantine Until</label>
-              <DatePicker
-                dateFormat="L"
-                selected={this.state.quarantineUntil}
-                onChange={this.handleQuarantineChange}
-              />
-            </div>
+            <br />
+            <label>Quarantine Until</label>
+            <DatePicker
+              className={styles.datePicker}
+              dateFormat="L"
+              selected={this.state.quarantineUntil}
+              onChange={this.handleQuarantineChange}
+            />
           </div>
         }>
         {isQuarantined ? 'Update Quarantine' : 'Quarantine'}
