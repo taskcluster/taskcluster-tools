@@ -3,6 +3,7 @@ import { object } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Table, Label } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import BarSpinner from '../../components/BarSpinner';
 import Markdown from '../../components/Markdown';
 import Code from '../../components/Code';
 import DateView from '../../components/DateView';
@@ -14,8 +15,50 @@ export default class TaskDetails extends React.PureComponent {
     task: object
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dependencies: [],
+      dependenciesLoading: false
+    };
+  }
+
+  loadDependencies(taskIds) {
+    const dependencies = {};
+
+    this.setState({ dependenciesLoading: true }, async () => {
+      try {
+        await Promise.all(
+          taskIds.map(async taskId => {
+            const [task, { status }] = await Promise.all([
+              this.props.queue.task(taskId),
+              this.props.queue.status(taskId)
+            ]);
+
+            dependencies[taskId] = {
+              task,
+              status
+            };
+          })
+        );
+
+        this.setState({ dependencies, dependenciesLoading: false });
+      } catch (error) {
+        this.setState({ error });
+      }
+    });
+  }
+
+  componentWillReceiveProps({ task }) {
+    if (!this.props.task && task) {
+      this.loadDependencies(task.dependencies);
+    }
+  }
+
   render() {
     const { status, task } = this.props;
+    const { dependencies, dependenciesLoading } = this.state;
 
     if (!status || !task) {
       return null;
@@ -130,13 +173,49 @@ export default class TaskDetails extends React.PureComponent {
             <tr>
               <td>Dependencies</td>
               <td>
-                {task.dependencies.length
-                  ? task.dependencies.map((dependency, key) => (
-                      <div key={`task-dependency-${key}`}>
-                        <Link to={`/tasks/${dependency}`}>{dependency}</Link>
-                      </div>
-                    ))
-                  : '-'}
+                <Table condensed>
+                  <thead>
+                    <tr>
+                      <td>Task ID</td>
+                      <td>Task Name</td>
+                      <td>Task Status</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {task.dependencies.length
+                      ? task.dependencies.map((dependency, key) => (
+                          <tr key={`task-dependency-${key}`}>
+                            <td>
+                              <Link to={`/tasks/${dependency}`}>
+                                {dependency}
+                              </Link>
+                            </td>
+                            <td>
+                              {dependenciesLoading ? (
+                                <BarSpinner />
+                              ) : (
+                                dependencies[dependency].task.metadata.name
+                              )}
+                            </td>
+                            <td>
+                              {dependenciesLoading ? (
+                                <BarSpinner />
+                              ) : (
+                                <Label
+                                  bsStyle={
+                                    labels[
+                                      dependencies[dependency].status.state
+                                    ]
+                                  }>
+                                  {dependencies[dependency].status.state}
+                                </Label>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      : '-'}
+                  </tbody>
+                </Table>
               </td>
             </tr>
 
