@@ -30,7 +30,8 @@ export default class ScopeInspector extends React.PureComponent {
       roles: null,
       clients: null,
       scopeSearchTerm: '',
-      entitySearchMode: 'Has Scope'
+      entitySearchMode: 'Has Scope',
+      directEntitySearch: false
     };
   }
 
@@ -132,6 +133,9 @@ export default class ScopeInspector extends React.PureComponent {
 
   clearScopeSearchTerm = () => this.setState({ scopeSearchTerm: '' });
 
+  toggleDirectEntitySearch = () =>
+    this.setState({ directEntitySearch: !this.state.directEntitySearch });
+
   // selectScope = (scope) => this.props.history.replace(`/auth/scopes/${scope}`);
 
   renderSelectedScope() {
@@ -162,11 +166,14 @@ export default class ScopeInspector extends React.PureComponent {
         scope === pattern ? true : scope.indexOf(pattern.slice(0, -1)) === 0;
     }
 
+    const searchProperty = this.state.directEntitySearch
+      ? 'scopes'
+      : 'expandedScopes';
     const clients = this.state.clients
-      .filter(client => client.expandedScopes.some(match))
+      .filter(client => client[searchProperty].some(match))
       .sort((a, b) => a.clientId.localeCompare(b.clientId));
     const roles = this.state.roles
-      .filter(role => role.expandedScopes.some(match))
+      .filter(role => role[searchProperty].some(match))
       .sort((a, b) => a.roleId.localeCompare(b.roleId));
 
     return (
@@ -221,6 +228,20 @@ export default class ScopeInspector extends React.PureComponent {
                       }
                     />{' '}
                     Has Sub-Scope
+                  </MenuItem>
+                  <MenuItem key="match-options-divider" divider />
+                  <MenuItem
+                    key="toggle-match-mode"
+                    onClick={() => this.toggleDirectEntitySearch()}>
+                    <Glyphicon
+                      glyph="ok"
+                      style={
+                        this.state.directEntitySearch
+                          ? {}
+                          : { visibility: 'hidden' }
+                      }
+                    />{' '}
+                    Direct Ownership
                   </MenuItem>
                 </DropdownButton>
               </InputGroup>
