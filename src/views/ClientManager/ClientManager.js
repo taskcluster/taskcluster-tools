@@ -5,8 +5,10 @@ import {
   ButtonToolbar,
   Button,
   Glyphicon,
-  Table
+  Table,
+  Checkbox
 } from 'react-bootstrap';
+import moment from 'moment';
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -22,6 +24,7 @@ export default class ClientManager extends Component {
       clients: null,
       clientPrefixLoaded: false,
       clientPrefix: null,
+      sortByLastUsed: false,
       error: null
     };
   }
@@ -139,7 +142,9 @@ export default class ClientManager extends Component {
             <th>ClientId</th>
           </tr>
         </thead>
-        <tbody>{this.state.clients.map(this.renderClientRow)}</tbody>
+        <tbody>
+          {clients.sort(this.sortClients).map(this.renderClientRow)}
+        </tbody>
       </Table>
     );
   }
@@ -158,8 +163,40 @@ export default class ClientManager extends Component {
     );
   };
 
+  handleSortChange = ({ target }) => {
+    this.setState({ sortByLastUsed: target.checked });
+  };
+
+  sortByLastUsed(clientA, clientB) {
+    const clientALastUsed = moment(clientA.lastDateUsed);
+    const clientBLastUsed = moment(clientB.lastDateUsed);
+
+    if (clientALastUsed.isBefore(clientBLastUsed)) {
+      return 1;
+    }
+
+    if (clientBLastUsed.isBefore(clientALastUsed)) {
+      return -1;
+    }
+
+    return 0;
+  }
+
+  sortClients = (clientA, clientB) => {
+    if (this.state.sortByLastUsed) {
+      return this.sortByLastUsed(clientA, clientB);
+    }
+
+    return clientA.clientId.localeCompare(clientB.clientId);
+  };
+
   render() {
-    const { clients, clientPrefixLoaded, clientPrefix } = this.state;
+    const {
+      clients,
+      clientPrefixLoaded,
+      clientPrefix,
+      sortByLastUsed
+    } = this.state;
 
     if (!clientPrefixLoaded) {
       return <Spinner />;
@@ -170,6 +207,11 @@ export default class ClientManager extends Component {
         <HelmetTitle title="Client Manager" />
         <Col md={5}>
           {this.renderPrefixInput()}
+          <Checkbox
+            defaultChecked={sortByLastUsed}
+            onChange={this.handleSortChange}>
+            Sort by last used
+          </Checkbox>
           {this.renderClientsTable()}
           <ButtonToolbar>
             <Button
