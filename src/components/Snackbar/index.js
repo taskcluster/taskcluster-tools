@@ -1,28 +1,45 @@
 import React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { arrayOf, shape, string, func, node } from 'prop-types';
 import { Alert } from 'react-bootstrap';
 import styles from './styles.css';
 
-export default class Snackbar extends React.PureComponent {
+export default class SnackBar extends React.PureComponent {
+  static propTypes = {
+    toasts: arrayOf(
+      shape({
+        text: string.isRequired,
+        icon: node
+      })
+    ),
+    onDismiss: func.isRequired
+  };
+
   constructor(props) {
     super(props);
+
     this.state = {
-      message: '',
+      toasts: [],
       show: false
     };
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (!prevState.show && this.state.show) {
-      setTimeout(() => {
-        this.setState({ show: false });
-      }, 2000);
+  componentWillReceiveProps({ toasts }) {
+    const length = toasts && toasts.length;
+
+    if (length && length !== this.state.toasts.length) {
+      this.setState({ toasts, show: true }, () =>
+        setTimeout(
+          () => this.setState({ show: false }, this.props.onDismiss),
+          2000
+        )
+      );
     }
   }
 
-  show = message => this.setState({ message, show: true });
-
   render() {
+    const [toast] = this.state.toasts;
+
     return (
       <div className={styles.container}>
         <ReactCSSTransitionGroup
@@ -36,7 +53,10 @@ export default class Snackbar extends React.PureComponent {
           transitionLeaveTimeout={500}>
           {this.state.show && (
             <Alert className={styles.alert} bsStyle="success">
-              {this.state.message}
+              <div>
+                {toast.icon && <span>{toast.icon}&nbsp;&nbsp;</span>}
+                {toast.text}
+              </div>
             </Alert>
           )}
         </ReactCSSTransitionGroup>

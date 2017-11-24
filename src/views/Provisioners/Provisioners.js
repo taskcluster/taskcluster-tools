@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
+import { tail } from 'ramda';
 import { request } from 'taskcluster-client-web';
 import { LinkContainer } from 'react-router-bootstrap';
 import Markdown from '../../components/Markdown';
@@ -34,7 +35,8 @@ export default class Provisioners extends React.PureComponent {
       provisionerLoading: false,
       provisionersLoading: true,
       actionLoading: false,
-      actions: []
+      actions: [],
+      toasts: []
     };
   }
 
@@ -110,17 +112,22 @@ export default class Provisioners extends React.PureComponent {
           method: action.method
         });
 
-        this.notification.show(
-          <span>
-            {action.title}&nbsp;&nbsp;<Icon name="check" />
-          </span>
-        );
-        this.setState({ actionLoading: false });
+        const toast = {
+          text: action.title,
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
       } catch (error) {
         this.setState({ error, actionLoading: false });
       }
     });
   };
+
+  onToastDismiss = () => this.setState({ toasts: tail(this.state.toasts) });
 
   render() {
     const {
@@ -139,11 +146,7 @@ export default class Provisioners extends React.PureComponent {
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Provisioners</h4>
         </div>
-        <Snackbar
-          ref={child => {
-            this.notification = child;
-          }}
-        />
+        <Snackbar toasts={this.state.toasts} onDismiss={this.onToastDismiss} />
         {error && <Error error={error} />}
         <Row>
           <Col md={6}>

@@ -15,6 +15,7 @@ import {
 import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
 import moment from 'moment';
+import { tail } from 'ramda';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
 import Error from '../../components/Error';
@@ -34,7 +35,8 @@ export default class WorkerManager extends React.PureComponent {
       actions: [],
       workerToken: null,
       error: null,
-      filter: 'None'
+      filter: 'None',
+      toasts: []
     };
   }
 
@@ -154,17 +156,22 @@ export default class WorkerManager extends React.PureComponent {
           method: action.method
         });
 
-        this.notification.show(
-          <span>
-            {action.title}&nbsp;&nbsp;<Icon name="check" />
-          </span>
-        );
-        this.setState({ actionLoading: false });
+        const toast = {
+          text: action.title,
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
       } catch (error) {
         this.setState({ error, actionLoading: false });
       }
     });
   };
+
+  onToastDismiss = () => this.setState({ toasts: tail(this.state.toasts) });
 
   render() {
     const {
@@ -197,11 +204,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Workers" />
           <h4>Workers Explorer</h4>
         </div>
-        <Snackbar
-          ref={child => {
-            this.notification = child;
-          }}
-        />
+        <Snackbar toasts={this.state.toasts} onDismiss={this.onToastDismiss} />
         <Breadcrumb navList={navList} active={workerType} />
         <div className={styles.filters}>
           <ButtonToolbar className={styles.buttonToolbar}>
