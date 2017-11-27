@@ -167,7 +167,7 @@ export default class App extends Component {
         tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT}
         desktopDrawerType={NavigationDrawer.DrawerTypes.CLIPPED}
         drawerHeaderChildren={
-          <div style={{ margin: '12px 8px' }}>
+          <div style={{ margin: '12px 8px', width: '100%' }}>
             <AccountMenu simplifiedMenu={false} />
           </div>
         }
