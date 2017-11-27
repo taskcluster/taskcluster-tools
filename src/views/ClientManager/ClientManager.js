@@ -8,7 +8,6 @@ import {
   Table,
   Checkbox
 } from 'react-bootstrap';
-import moment from 'moment';
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -168,27 +167,24 @@ export default class ClientManager extends Component {
   };
 
   sortByLastUsed(clientA, clientB) {
-    const clientALastUsed = moment(clientA.lastDateUsed);
-    const clientBLastUsed = moment(clientB.lastDateUsed);
+    const clientALastUsed = new Date(clientA.lastDateUsed);
+    const clientBLastUsed = new Date(clientB.lastDateUsed);
 
-    if (clientALastUsed.isBefore(clientBLastUsed)) {
-      return 1;
+    if (clientALastUsed > clientBLastUsed) {
+      return -1;
     }
 
-    if (clientBLastUsed.isBefore(clientALastUsed)) {
-      return -1;
+    if (clientALastUsed < clientBLastUsed) {
+      return 1;
     }
 
     return 0;
   }
 
-  sortClients = (clientA, clientB) => {
-    if (this.state.sortByLastUsed) {
-      return this.sortByLastUsed(clientA, clientB);
-    }
-
-    return clientA.clientId.localeCompare(clientB.clientId);
-  };
+  sortClients = (clientA, clientB) =>
+    this.state.sortByLastUsed
+      ? this.sortByLastUsed(clientA, clientB)
+      : clientA.clientId.localeCompare(clientB.clientId);
 
   render() {
     const {
