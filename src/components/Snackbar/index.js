@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { arrayOf, shape, string, func, node } from 'prop-types';
+import equal from 'deep-equal';
 import { Alert } from 'react-bootstrap';
 import styles from './styles.css';
 
@@ -15,19 +16,13 @@ export default class SnackBar extends React.PureComponent {
     onDismiss: func.isRequired
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      toasts: [],
-      show: false
-    };
-  }
+  state = {
+    toasts: [],
+    show: false
+  };
 
   componentWillReceiveProps({ toasts }) {
-    const length = toasts && toasts.length;
-
-    if (length && length !== this.state.toasts.length) {
+    if (!equal(toasts, this.state.toasts)) {
       this.setState({ toasts, show: true });
 
       setTimeout(() => {
