@@ -1,5 +1,4 @@
 import React from 'react';
-import ErrorStatus from '../Error';
 
 export default class NotFound extends React.PureComponent {
   render() {
@@ -14,6 +13,6 @@ export default class NotFound extends React.PureComponent {
       }
     );
 
-    return <ErrorStatus error={ex} />;
+    return <div>{ex.toString()}</div>;
   }
 }
