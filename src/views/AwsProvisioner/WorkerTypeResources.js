@@ -193,7 +193,7 @@ export default class WorkerTypeResources extends React.PureComponent {
     return (
       <a href={`${awsUrl}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{imageId}</code>
-        <Icon name="fa fa-external-link" style={{ paddingLeft: 5 }} />
+        <Icon name="external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
   }
