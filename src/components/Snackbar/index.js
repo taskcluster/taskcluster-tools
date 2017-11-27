@@ -28,12 +28,12 @@ export default class SnackBar extends React.PureComponent {
     const length = toasts && toasts.length;
 
     if (length && length !== this.state.toasts.length) {
-      this.setState({ toasts, show: true }, () =>
-        setTimeout(
-          () => this.setState({ show: false }, this.props.onDismiss),
-          2000
-        )
-      );
+      this.setState({ toasts, show: true });
+
+      setTimeout(() => {
+        this.setState({ show: false });
+        this.props.onDismiss();
+      }, 2000);
     }
   }
 
