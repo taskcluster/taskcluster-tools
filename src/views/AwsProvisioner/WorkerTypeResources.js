@@ -126,7 +126,7 @@ export default class WorkerTypeResources extends React.PureComponent {
           bsSize="small"
           disabled={this.state.actionLoading}
           onClick={() => this.terminateInstance(instance.id, instance.region)}>
-          Kill
+          Terminate
         </Button>
       </td>
     </tr>
@@ -211,7 +211,7 @@ export default class WorkerTypeResources extends React.PureComponent {
             bsSize="small"
             disabled={this.state.actionLoading}
             onClick={this.terminateAllInstances}>
-            Kill All Instances
+            Terminate All Instances
           </Button>
         </div>
         {this.state.actionLoading && <Spinner />}
