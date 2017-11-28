@@ -9,6 +9,7 @@ import {
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
+import { tail } from 'ramda';
 import 'react-datepicker/dist/react-datepicker.css';
 import HelmetTitle from '../../components/HelmetTitle';
 import QuarantineButton from '../../components/QuarantineButton';
@@ -31,7 +32,8 @@ export default class WorkerManager extends React.PureComponent {
       worker: null,
       error: null,
       loading: false,
-      actionLoading: false
+      actionLoading: false,
+      toasts: []
     };
   }
 
@@ -181,17 +183,22 @@ export default class WorkerManager extends React.PureComponent {
           method: action.method
         });
 
-        this.notification.show(
-          <span>
-            {action.title}&nbsp;&nbsp;<Icon name="check" />
-          </span>
-        );
-        this.setState({ actionLoading: false });
+        const toast = {
+          text: action.title,
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
       } catch (error) {
         this.setState({ error, actionLoading: false });
       }
     });
   }
+
+  onToastDismiss = () => this.setState({ toasts: tail(this.state.toasts) });
 
   render() {
     const {
@@ -239,11 +246,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
-        <Snackbar
-          ref={child => {
-            this.notification = child;
-          }}
-        />
+        <Snackbar toasts={this.state.toasts} onDismiss={this.onToastDismiss} />
         <Breadcrumb navList={navList} active={[workerGroup, workerId]} />
         <SearchForm
           key="input-form"
