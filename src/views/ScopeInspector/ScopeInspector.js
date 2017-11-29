@@ -232,12 +232,12 @@ export default class ScopeInspector extends React.PureComponent {
                   <MenuItem key="match-options-divider" divider />
                   <MenuItem
                     key="toggle-match-mode"
-                    onClick={() => this.toggleDirectEntitySearch()}>
+                    onClick={this.toggleDirectEntitySearch}>
                     <Glyphicon
                       glyph="ok"
                       style={
                         this.state.directEntitySearch
-                          ? {}
+                          ? null
                           : { visibility: 'hidden' }
                       }
                     />{' '}
