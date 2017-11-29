@@ -3,7 +3,9 @@ import { object, shape, arrayOf } from 'prop-types';
 import { Table, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { request } from 'taskcluster-client-web';
+import { tail } from 'ramda';
 import DateView from '../../components/DateView';
+import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner/index';
 import styles from './styles.css';
@@ -24,9 +26,12 @@ export default class WorkerTypeResources extends React.PureComponent {
 
     this.state = {
       actionLoading: false,
+      toasts: [],
       error: null
     };
   }
+
+  onToastDismiss = () => this.setState({ toasts: tail(this.state.toasts) });
 
   getCapacityFor(stateKey, instanceState) {
     const { instanceTypes } = this.props.workerType;
@@ -74,7 +79,15 @@ export default class WorkerTypeResources extends React.PureComponent {
           }
         );
 
-        this.setState({ actionLoading: false });
+        const toast = {
+          text: 'Terminate',
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
       } catch (error) {
         this.setState({ error, actionLoading: false });
       }
@@ -97,7 +110,15 @@ export default class WorkerTypeResources extends React.PureComponent {
           }
         );
 
-        this.setState({ actionLoading: false });
+        const toast = {
+          text: 'Terminate All',
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
       } catch (error) {
         this.setState({ error, actionLoading: false });
       }
@@ -201,6 +222,7 @@ export default class WorkerTypeResources extends React.PureComponent {
   render() {
     return (
       <span>
+        <Snackbar toasts={this.state.toasts} onDismiss={this.onToastDismiss} />
         <h3>Running Instances</h3>
         We have a total running instance capacity of {this.runningCapacity()}.
         These are instances that the provisioner counts as doing work.
