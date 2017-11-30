@@ -4,23 +4,22 @@ import { Link, Route } from 'react-router-dom';
 import { FontIcon, ListItem, Subheader } from 'react-md';
 
 export default class NavItemLink extends React.PureComponent {
-  createRoute = ({ key, props }) => (
-    <Route key={key || undefined} path={props.to} exact={props.exact}>
+  createRoute = item => (
+    <Route path={item.to} exact={item.exact}>
       {({ match }) =>
-        props.to
-          ? this.renderLinkItem(props, match)
-          : this.renderItem(props, match)}
+        item.to
+          ? this.renderLinkItem(item, match)
+          : this.renderItem(item, match)}
     </Route>
   );
 
   renderLinkItem({ to, icon, primaryText, ...props }, match) {
     return (
       <ListItem
-        {...props}
         component={Link}
         to={to}
         active={!!match}
-        leftIcon={<FontIcon>{icon}</FontIcon>}
+        leftIcon={<FontIcon>{icon || props.leftIcon}</FontIcon>}
         primaryText={primaryText}
       />
     );
@@ -36,7 +35,9 @@ export default class NavItemLink extends React.PureComponent {
     }
 
     if (this.props.nestedItems) {
-      const nestedItems = this.props.nestedItems.map(this.createRoute);
+      const nestedItems = this.props.nestedItems.map(item => (
+        <span key={item.key}>{this.createRoute(item)}</span>
+      ));
 
       return (
         <ListItem
@@ -48,7 +49,7 @@ export default class NavItemLink extends React.PureComponent {
     }
 
     return this.props.to
-      ? this.createRoute(this.renderLinkItem(this.props))
+      ? this.createRoute(this.props)
       : this.renderItem(this.props);
   }
 }
