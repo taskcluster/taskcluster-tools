@@ -41,10 +41,10 @@ export default class App extends Component {
   };
 
   render() {
-    const App = withRouter(() => (
+    const App = withRouter(props => (
       <NavigationDrawer
-        navItems={menuItems.map((props, key) => (
-          <NavItemLink {...props} key={`nav-${key}`} />
+        navItems={menuItems.map((itemProps, key) => (
+          <NavItemLink {...itemProps} {...props} key={`nav-${key}`} />
         ))}
         mobileDrawerType={NavigationDrawer.DrawerTypes.TEMPORARY}
         tabletDrawerType={NavigationDrawer.DrawerTypes.PERSISTENT}

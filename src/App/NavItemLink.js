@@ -5,7 +5,7 @@ import { FontIcon, ListItem, Subheader } from 'react-md';
 
 export default class NavItemLink extends React.PureComponent {
   createRoute = ({ key, props }) => (
-    <Route key={key} path={props.to} exact={props.exact}>
+    <Route key={key || undefined} path={props.to} exact={props.exact}>
       {({ match }) =>
         props.to
           ? this.renderLinkItem(props, match)
@@ -48,14 +48,14 @@ export default class NavItemLink extends React.PureComponent {
     }
 
     return this.props.to
-      ? this.renderLinkItem(this.props)
+      ? this.createRoute(this.renderLinkItem(this.props))
       : this.renderItem(this.props);
   }
 }
 
 NavItemLink.propTypes = {
   primaryText: string.isRequired,
-  icon: string.isRequired,
+  icon: string,
   header: bool,
   to: string,
   exact: bool
