@@ -23,6 +23,7 @@ export default [
         key="taskcluster-reference"
         icon="chrome_reader_mode"
         primaryText="Reference"
+        to="/test2"
       />,
       <ListItem
         key="taskcluster-resources"
@@ -37,14 +38,7 @@ export default [
     ]
   },
   {
-    key: 'taskcluster-task-groups',
-    primaryText: 'Task Groups',
-    to: '/groups',
-    icon: 'group_work'
-  },
-  {
     key: 'taskcluster-tasks',
-    active: true,
     defaultVisible: true,
     primaryText: 'Tasks',
     icon: 'play_for_work',
@@ -56,39 +50,38 @@ export default [
         primaryText="Create task"
       />,
       <ListItem
-        key="taskcluster-task-details"
-        icon="details"
-        primaryText="Details"
-      />,
-      <ListItem
-        key="taskcluster-task-runs"
-        icon="format_list_numbered"
-        primaryText="Runs"
-        nestedItems={[
-          <ListItem
-            key="taskcluster-task-run-logs"
-            icon="description"
-            primaryText="Logs"
-          />,
-          <ListItem
-            key="taskcluster-task-run-artifacts"
-            icon="attachment"
-            primaryText="Artifacts"
-          />
-        ]}
+        key="taskcluster-task-groups"
+        icon="group_work"
+        to="/groups"
+        primaryText="Inspect Task(s)"
       />
     ]
   },
   {
-    key: 'taskcluster-provisioners',
+    key: 'taskcluster-entities',
+    defaultVisible: true,
     primaryText: 'Provisioners',
-    to: '/provisioners',
-    icon: 'cloud_queue'
-  },
-  {
-    key: 'taskcluster-workers',
-    primaryText: 'Workers',
-    icon: 'assignment'
+    icon: 'cloud_queue',
+    nestedItems: [
+      <ListItem
+        key="taskcluster-provisioners"
+        icon="assignment"
+        to="/provisioners"
+        primaryText="Provisioners"
+      />,
+      <ListItem
+        key="taskcluster-aws-provisioner"
+        icon="cloud"
+        to="/aws-provisioner"
+        primaryText="AWS Provisioner"
+      />,
+      <ListItem
+        key="taskcluster-cache-purge"
+        icon="delete"
+        to="/pulse-caches"
+        primaryText="Purge Caches"
+      />
+    ]
   },
   {
     key: 'taskcluster-authentication',
@@ -99,19 +92,44 @@ export default [
         key="taskcluster-authentication-clients"
         icon="add_circle_outline"
         to="/auth/clients"
-        primaryText="Clients"
+        primaryText="Client Manager"
       />,
       <ListItem
         key="taskcluster-authentication-roles"
         icon="web_asset"
         to="/auth/roles"
-        primaryText="Roles"
+        primaryText="Role Manager"
       />,
       <ListItem
         key="taskcluster-authentication-scopes"
-        icon="attachment"
+        icon="find_in_page"
         to="/auth/scopes"
-        primaryText="Scopes"
+        primaryText="Scope Inspector"
+      />,
+      <ListItem
+        key="taskcluster-authentication-scope-grants"
+        icon="add_to_queue"
+        to="/auth/scopes"
+        primaryText="Scope Grants"
+      />
+    ]
+  },
+  {
+    key: 'taskcluster-indexed',
+    primaryText: 'Indexed',
+    icon: 'bookmark_border',
+    nestedItems: [
+      <ListItem
+        key="taskcluster-indexed-tasks"
+        icon="low_priority"
+        to="/index"
+        primaryText="Tasks"
+      />,
+      <ListItem
+        key="taskcluster-indexed-artifacts"
+        icon="attachment"
+        to="/index/artifacts"
+        primaryText="Artifacts"
       />
     ]
   },
@@ -120,24 +138,6 @@ export default [
     primaryText: 'Pulse exchanges',
     to: '/pulse-inspector',
     icon: 'message'
-  },
-  {
-    key: 'taskcluster-purge-caches',
-    primaryText: 'Purge Caches',
-    to: '/pulse-caches',
-    icon: 'delete'
-  },
-  {
-    key: 'taskcluster-indexed-tasks',
-    primaryText: 'Indexed Tasks',
-    to: '/index',
-    icon: 'low_priority'
-  },
-  {
-    key: 'taskcluster-indexed-artifacts',
-    primaryText: 'Indexed Artifacts',
-    to: '/index/artifacts',
-    icon: 'attachment'
   },
   {
     key: 'taskcluster-hooks',
