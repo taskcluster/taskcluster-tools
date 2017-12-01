@@ -46,14 +46,15 @@ export default class SnackBar extends React.PureComponent {
           }}
           transitionEnterTimeout={500}
           transitionLeaveTimeout={500}>
-          {this.state.show && (
-            <Alert className={styles.alert} bsStyle="success">
-              <div>
-                {toast.icon && <span>{toast.icon}&nbsp;&nbsp;</span>}
-                {toast.text}
-              </div>
-            </Alert>
-          )}
+          {toast &&
+            this.state.show && (
+              <Alert className={styles.alert} bsStyle="success">
+                <div>
+                  {toast.icon && <span>{toast.icon}&nbsp;&nbsp;</span>}
+                  {toast.text}
+                </div>
+              </Alert>
+            )}
         </ReactCSSTransitionGroup>
       </div>
     );
