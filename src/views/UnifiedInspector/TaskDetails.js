@@ -200,7 +200,7 @@ export default class TaskDetails extends React.PureComponent {
             <tr>
               <td>Dependencies</td>
               <td>
-                {this.state.dependenciesLoading || task.dependencies.length ? (
+                {this.state.dependencies.length ? (
                   <Table condensed>
                     <thead>
                       <tr>
