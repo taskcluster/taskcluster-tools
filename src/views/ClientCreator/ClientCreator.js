@@ -29,8 +29,8 @@ export default class ClientCreator extends React.PureComponent {
     this.loadClient(this.props);
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.loadClientPrefix(nextProps.userSession);
+  async componentWillReceiveProps(nextProps) {
+    await this.loadClientPrefix(nextProps.userSession);
     this.loadClient(nextProps);
   }
 
