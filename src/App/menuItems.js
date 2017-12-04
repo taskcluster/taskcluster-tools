@@ -1,141 +1,150 @@
-import React from 'react';
-import { FontIcon, ListItem, Subheader } from 'react-md';
-
 export default [
-  <Subheader key="taskcluster-heading" primaryText="Taskcluster" inset />,
   {
-    key: 'taskcluster-documentation',
-    primaryText: 'Documentation',
-    leftIcon: <FontIcon>local_library</FontIcon>,
-    nestedItems: [
-      <ListItem
-        key="taskcluster-tutorial"
-        leftIcon={<FontIcon>accessibility</FontIcon>}
-        primaryText="Tutorial"
-      />,
-      <ListItem
-        key="taskcluster-manual"
-        leftIcon={<FontIcon>toc</FontIcon>}
-        primaryText="Manual"
-      />,
-      <ListItem
-        key="taskcluster-reference"
-        leftIcon={<FontIcon>chrome_reader_mode</FontIcon>}
-        primaryText="Reference"
-      />,
-      <ListItem
-        key="taskcluster-resources"
-        leftIcon={<FontIcon>help_outline</FontIcon>}
-        primaryText="Resources"
-      />,
-      <ListItem
-        key="taskcluster-people"
-        leftIcon={<FontIcon>person_pin</FontIcon>}
-        primaryText="People"
-      />
-    ]
+    key: 'taskcluster-heading',
+    primaryText: 'Taskcluster',
+    header: true
   },
   {
-    key: 'taskcluster-task-groups',
-    primaryText: 'Task Groups',
-    leftIcon: <FontIcon>group_work</FontIcon>
+    primaryText: 'Documentation',
+    icon: 'local_library',
+    key: 'taskcluster-documentation',
+    nestedItems: [
+      {
+        key: 'taskcluster-tutorial',
+        primaryText: 'Tutorial',
+        to: '/test',
+        icon: 'accessibility'
+      },
+      {
+        key: 'taskcluster-reference',
+        icon: 'chrome_reader_mode',
+        to: '/test2',
+        primaryText: 'Reference'
+      },
+      {
+        key: 'taskcluster-resources',
+        icon: 'help_outline',
+        primaryText: 'Resources'
+      },
+      {
+        key: 'taskcluster-people',
+        icon: 'person_pin',
+        primaryText: 'People'
+      }
+    ]
   },
   {
     key: 'taskcluster-tasks',
-    active: true,
     defaultVisible: true,
     primaryText: 'Tasks',
-    leftIcon: <FontIcon>play_for_work</FontIcon>,
+    icon: 'play_for_work',
     nestedItems: [
-      <ListItem
-        key="taskcluster-create-task"
-        leftIcon={<FontIcon>add_circle_outline</FontIcon>}
-        primaryText="Create task"
-      />,
-      <ListItem
-        key="taskcluster-task-details"
-        leftIcon={<FontIcon>details</FontIcon>}
-        primaryText="Details"
-      />,
-      <ListItem
-        key="taskcluster-task-runs"
-        leftIcon={<FontIcon>format_list_numbered</FontIcon>}
-        primaryText="Runs"
-        nestedItems={[
-          <ListItem
-            key="taskcluster-task-run-logs"
-            leftIcon={<FontIcon>description</FontIcon>}
-            primaryText="Logs"
-          />,
-          <ListItem
-            key="taskcluster-task-run-artifacts"
-            leftIcon={<FontIcon>attachment</FontIcon>}
-            primaryText="Artifacts"
-          />
-        ]}
-      />
+      {
+        key: 'taskcluster-create-task',
+        icon: 'add_circle_outline',
+        to: '/tasks/create',
+        primaryText: 'Create task'
+      },
+      {
+        key: 'taskcluster-task-groups',
+        icon: 'group_work',
+        to: '/groups',
+        primaryText: 'Inspect task(s)'
+      }
     ]
   },
   {
-    key: 'taskcluster-provisioners',
+    key: 'taskcluster-entities',
+    defaultVisible: true,
     primaryText: 'Provisioners',
-    leftIcon: <FontIcon>cloud_queue</FontIcon>
-  },
-  {
-    key: 'taskcluster-workers',
-    primaryText: 'Workers',
-    leftIcon: <FontIcon>assignment</FontIcon>
+    icon: 'cloud_queue',
+    nestedItems: [
+      {
+        key: 'taskcluster-provisioners',
+        icon: 'assignment',
+        to: '/provisioners',
+        primaryText: 'Provisioners'
+      },
+      {
+        key: 'taskcluster-aws-provisioner',
+        icon: 'cloud',
+        to: '/aws-provisioner',
+        primaryText: 'AWS Provisioner'
+      },
+      {
+        key: 'taskcluster-cache-purge',
+        icon: 'delete',
+        to: '/pulse-caches',
+        primaryText: 'Purge Caches'
+      }
+    ]
   },
   {
     key: 'taskcluster-authentication',
     primaryText: 'Authentication',
-    leftIcon: <FontIcon>perm_identity</FontIcon>,
+    icon: 'perm_identity',
     nestedItems: [
-      <ListItem
-        key="taskcluster-authentication-clients"
-        leftIcon={<FontIcon>add_circle_outline</FontIcon>}
-        primaryText="Clients"
-      />,
-      <ListItem
-        key="taskcluster-authentication-roles"
-        leftIcon={<FontIcon>web_asset</FontIcon>}
-        primaryText="Roles"
-      />,
-      <ListItem
-        key="taskcluster-authentication-scopes"
-        leftIcon={<FontIcon>attachment</FontIcon>}
-        primaryText="Scopes"
-      />
+      {
+        key: 'taskcluster-authentication-clients',
+        icon: 'add_circle_outline',
+        to: '/auth/clients',
+        primaryText: 'Client Manager'
+      },
+      {
+        key: 'taskcluster-authentication-roles',
+        icon: 'web_asset',
+        to: '/auth/roles',
+        primaryText: 'Role Manager'
+      },
+      {
+        key: 'taskcluster-authentication-scopes',
+        icon: 'find_in_page',
+        to: '/auth/scopes',
+        primaryText: 'Scope Inspector'
+      },
+      {
+        key: 'taskcluster-authentication-grants',
+        icon: 'add_to_queue',
+        to: '/auth/grants',
+        primaryText: 'Scope Grants'
+      }
+    ]
+  },
+  {
+    key: 'taskcluster-core-services',
+    primaryText: 'Core Services',
+    icon: 'fiber_manual_record',
+    nestedItems: [
+      {
+        key: 'taskcluster-hooks',
+        icon: 'compare_arrows',
+        to: '/hooks',
+        primaryText: 'Hooks'
+      },
+      {
+        key: 'taskcluster-secrets',
+        icon: 'lock_outline',
+        to: '/secrets',
+        primaryText: 'Secrets'
+      },
+      {
+        key: 'taskcluster-indexed-tasks',
+        icon: 'low_priority',
+        to: '/index',
+        primaryText: 'Indexed Tasks'
+      },
+      {
+        key: 'taskcluster-indexed-artifacts',
+        icon: 'attachment',
+        to: '/index/artifacts',
+        primaryText: 'Indexed Artifacts'
+      }
     ]
   },
   {
     key: 'taskcluster-pulse-exchanges',
     primaryText: 'Pulse exchanges',
-    leftIcon: <FontIcon>message</FontIcon>
-  },
-  {
-    key: 'taskcluster-purge-caches',
-    primaryText: 'Purge Caches',
-    leftIcon: <FontIcon>delete</FontIcon>
-  },
-  {
-    key: 'taskcluster-indexed-tasks',
-    primaryText: 'Indexed Tasks',
-    leftIcon: <FontIcon>low_priority</FontIcon>
-  },
-  {
-    key: 'taskcluster-indexed-artifacts',
-    primaryText: 'Indexed Artifacts',
-    leftIcon: <FontIcon>attachment</FontIcon>
-  },
-  {
-    key: 'taskcluster-hooks',
-    primaryText: 'Hooks',
-    leftIcon: <FontIcon>compare_arrows</FontIcon>
-  },
-  {
-    key: 'taskcluster-secrets',
-    primaryText: 'Secrets',
-    leftIcon: <FontIcon>lock_outline</FontIcon>
+    to: '/pulse-inspector',
+    icon: 'message'
   }
 ];
