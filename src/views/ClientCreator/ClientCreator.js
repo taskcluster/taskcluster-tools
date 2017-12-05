@@ -139,7 +139,7 @@ export default class ClientCreator extends React.PureComponent {
   }
 
   async loadClient({ userSession, auth }) {
-    if (!userSession) {
+    if (!userSession || !this.state.clientPrefix) {
       return;
     }
 
