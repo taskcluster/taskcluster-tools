@@ -5708,8 +5708,8 @@ query-string@^4.1.0:
     strict-uri-encode "^1.0.0"
 
 query-string@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/query-string/-/query-string-5.0.0.tgz#fbdf7004b4d2aff792f9871981b7a2794f555947"
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-5.0.1.tgz#6e2b86fe0e08aef682ecbe86e85834765402bd88"
   dependencies:
     decode-uri-component "^0.2.0"
     object-assign "^4.1.0"
@@ -6526,8 +6526,8 @@ sntp@1.x.x:
     hoek "2.x.x"
 
 sntp@2.x.x:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/sntp/-/sntp-2.0.2.tgz#5064110f0af85f7cfdb7d6b67a40028ce52b4b2b"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/sntp/-/sntp-2.1.0.tgz#2c6cec14fedc2222739caf9b5c3d85d1cc5a2cc8"
   dependencies:
     hoek "4.x.x"
 
@@ -6887,8 +6887,8 @@ tar@^2.2.1:
     inherits "2"
 
 taskcluster-client-web@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/taskcluster-client-web/-/taskcluster-client-web-5.0.0.tgz#1aec28df4b556df8f24b2343cf56c8b606efdb77"
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/taskcluster-client-web/-/taskcluster-client-web-5.0.1.tgz#ee05830fa9506881cb3acc54528e243e1537f5f7"
   dependencies:
     hawk "^6.0.2"
     query-string "^5.0.0"
