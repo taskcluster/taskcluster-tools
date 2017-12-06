@@ -3,14 +3,15 @@ import { branding, style } from './styles.css';
 
 // By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL
 
-const BarSpinner = () => (
+const BarSpinner = props => (
   <svg
     width="135"
     height="140"
     viewBox="0 0 135 140"
     xmlns="http://www.w3.org/2000/svg"
     fill="#fff"
-    className={`${branding} ${style}`}>
+    className={`${branding} ${style}`}
+    {...props}>
     <rect y="10" width="15" height="120" rx="6">
       <animate
         attributeName="height"
