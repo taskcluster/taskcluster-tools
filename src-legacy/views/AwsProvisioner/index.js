@@ -1,10 +1,10 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import Clients from '../../components/Clients';
+import WithUserSession from '../../components/WithUserSession';
+import WithClients from '../../components/WithClients';
 import WorkerTypeTable from './WorkerTypeTable';
 
 const View = ({
-  userSession,
   match,
   history,
   location,
@@ -21,19 +21,23 @@ const View = ({
   }
 
   return (
-    <Clients userSession={userSession} Queue AwsProvisioner={{ baseUrl }}>
-      {clients => (
-        <WorkerTypeTable
-          {...clients}
-          history={history}
-          userSession={userSession}
-          routeRoot={routeRoot}
-          provisionerId={provisionerId}
-          workerType={match.params.workerType}
-          currentTab={match.params.currentTab}
-        />
+    <WithUserSession>
+      {userSession => (
+        <WithClients Queue AwsProvisioner={{ baseUrl }}>
+          {clients => (
+            <WorkerTypeTable
+              {...clients}
+              userSession={userSession}
+              history={history}
+              routeRoot={routeRoot}
+              provisionerId={provisionerId}
+              workerType={match.params.workerType}
+              currentTab={match.params.currentTab}
+            />
+          )}
+        </WithClients>
       )}
-    </Clients>
+    </WithUserSession>
   );
 };
 

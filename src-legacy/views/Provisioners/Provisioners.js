@@ -5,13 +5,18 @@ import {
   ListGroup,
   ListGroupItem,
   Label,
+  ButtonToolbar,
+  Button,
   ControlLabel,
   Panel
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
+import { tail } from 'ramda';
+import { request } from 'taskcluster-client-web';
 import { LinkContainer } from 'react-router-bootstrap';
 import Markdown from '../../components/Markdown';
+import Snackbar from '../../components/Snackbar';
 import DateView from '../../components/DateView';
 import Spinner from '../../components/Spinner';
 import { stabilityColors } from '../../utils';
@@ -28,7 +33,10 @@ export default class Provisioners extends React.PureComponent {
       provisioner: null,
       error: null,
       provisionerLoading: false,
-      provisionersLoading: true
+      provisionersLoading: true,
+      actionLoading: false,
+      actions: [],
+      toasts: []
     };
   }
 
@@ -40,11 +48,17 @@ export default class Provisioners extends React.PureComponent {
     }
   }
 
-  loadProvisioner(provisioner) {
+  loadProvisioner(prov) {
     this.setState({ provisionerLoading: true, provisioner: null }, async () => {
       try {
+        const provisioner = await this.props.queue.getProvisioner(prov);
+        const actions = provisioner.actions.filter(
+          action => action.context === 'provisioner'
+        );
+
         this.setState({
-          provisioner: await this.props.queue.getProvisioner(provisioner),
+          provisioner,
+          actions,
           provisionerLoading: false,
           error: null
         });
@@ -85,12 +99,47 @@ export default class Provisioners extends React.PureComponent {
   handleProvisionerClick = ({ target }) =>
     this.loadProvisioner(target.innerText);
 
+  handleActionClick = action => {
+    const url = action.url.replace('<provisionerId>', this.props.provisionerId);
+
+    this.setState({ actionLoading: true }, async () => {
+      try {
+        const credentials =
+          (this.props.userSession &&
+            (await this.props.userSession.getCredentials())) ||
+          {};
+
+        await request(url, {
+          extra: this.props.queue.buildExtraData(credentials),
+          credentials,
+          method: action.method
+        });
+
+        const toast = {
+          text: action.title,
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  };
+
+  onToastDismiss = () => this.setState({ toasts: tail(this.state.toasts) });
+
   render() {
     const {
       provisioners,
       provisioner,
       provisionerLoading,
       provisionersLoading,
+      actions,
+      actionLoading,
       error
     } = this.state;
 
@@ -100,6 +149,7 @@ export default class Provisioners extends React.PureComponent {
           <HelmetTitle title="Worker Types Explorer" />
           <h4>Provisioners</h4>
         </div>
+        <Snackbar toasts={this.state.toasts} onDismiss={this.onToastDismiss} />
         {error && <Error error={error} />}
         <Row>
           <Col md={6}>
@@ -154,6 +204,29 @@ export default class Provisioners extends React.PureComponent {
                       bsStyle={stabilityColors[provisioner.stability]}>
                       {provisioner.stability}
                     </Label>
+                  </div>
+                </div>
+                <div
+                  className={`${styles.dataContainer} ${styles.actionLabel}`}>
+                  <div>
+                    <ControlLabel>Actions</ControlLabel>
+                  </div>
+                  <div>
+                    <ButtonToolbar>
+                      {!actionLoading &&
+                        (actions.length
+                          ? actions.map((action, key) => (
+                              <Button
+                                key={`worker-action-${key}`}
+                                className={styles.actionButton}
+                                bsSize="small"
+                                onClick={() => this.handleActionClick(action)}>
+                                {action.title}
+                              </Button>
+                            ))
+                          : '-')}
+                      {actionLoading && <Spinner />}
+                    </ButtonToolbar>
                   </div>
                 </div>
                 <div>

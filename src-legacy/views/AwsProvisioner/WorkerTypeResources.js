@@ -1,8 +1,14 @@
 import React from 'react';
 import { object, shape, arrayOf } from 'prop-types';
-import { Table } from 'react-bootstrap';
+import { Table, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
+import { tail } from 'ramda';
 import DateView from '../../components/DateView';
+import Snackbar from '../../components/Snackbar';
+import Error from '../../components/Error';
+import Spinner from '../../components/Spinner/index';
+import styles from './styles.css';
 
 const awsUrl = 'https://console.aws.amazon.com/ec2/v2/home';
 
@@ -14,6 +20,18 @@ export default class WorkerTypeResources extends React.PureComponent {
       requests: arrayOf(object)
     }).isRequired
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      actionLoading: false,
+      toasts: [],
+      error: null
+    };
+  }
+
+  onToastDismiss = () => this.setState({ toasts: tail(this.state.toasts) });
 
   getCapacityFor(stateKey, instanceState) {
     const { instanceTypes } = this.props.workerType;
@@ -47,6 +65,66 @@ export default class WorkerTypeResources extends React.PureComponent {
     return this.getCapacityFor('requests');
   }
 
+  async terminateInstance(instanceId, region) {
+    this.setState({ actionLoading: true }, async () => {
+      const credentials = await this.props.userSession.getCredentials();
+
+      try {
+        await request(
+          `${this.props.baseUrl}/region/${region}/instance/${instanceId}`,
+          {
+            extra: this.props.queue.buildExtraData(credentials),
+            method: 'DELETE',
+            credentials
+          }
+        );
+
+        const toast = {
+          text: 'Terminate',
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  }
+
+  terminateAllInstances = () => {
+    const { workerType } = this.props.workerType;
+
+    this.setState({ actionLoading: true }, async () => {
+      const credentials = await this.props.userSession.getCredentials();
+
+      try {
+        await request(
+          `${this.props.baseUrl}/worker-types/${workerType}/resources`,
+          {
+            extra: this.props.queue.buildExtraData(credentials),
+            method: 'DELETE',
+            credentials
+          }
+        );
+
+        const toast = {
+          text: 'Terminate All',
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  };
+
   renderInstanceRow = (instance, index) => (
     <tr key={index}>
       <td>{this.renderInstanceIdLink(instance.id, instance.region)}</td>
@@ -62,6 +140,15 @@ export default class WorkerTypeResources extends React.PureComponent {
       <td>{this.renderImageIdLink(instance.ami, instance.region)}</td>
       <td>
         <DateView date={new Date(instance.launch)} />
+      </td>
+      <td>
+        <Button
+          bsStyle="danger"
+          bsSize="small"
+          disabled={this.state.actionLoading}
+          onClick={() => this.terminateInstance(instance.id, instance.region)}>
+          Terminate
+        </Button>
       </td>
     </tr>
   );
@@ -127,7 +214,7 @@ export default class WorkerTypeResources extends React.PureComponent {
     return (
       <a href={`${awsUrl}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{imageId}</code>
-        <Icon name="fa fa-external-link" style={{ paddingLeft: 5 }} />
+        <Icon name="external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
   }
@@ -135,9 +222,22 @@ export default class WorkerTypeResources extends React.PureComponent {
   render() {
     return (
       <span>
+        <Snackbar toasts={this.state.toasts} onDismiss={this.onToastDismiss} />
         <h3>Running Instances</h3>
         We have a total running instance capacity of {this.runningCapacity()}.
         These are instances that the provisioner counts as doing work.
+        <div className={styles.actions}>
+          <label>Actions</label>
+          <Button
+            bsStyle="danger"
+            bsSize="small"
+            disabled={this.state.actionLoading}
+            onClick={this.terminateAllInstances}>
+            Terminate All Instances
+          </Button>
+        </div>
+        {this.state.actionLoading && <Spinner />}
+        {this.state.error && <Error error={this.state.error} />}
         <Table>
           <thead>
             <tr>
@@ -147,6 +247,7 @@ export default class WorkerTypeResources extends React.PureComponent {
               <th>Availability Zone</th>
               <th>AMI</th>
               <th>Launch Time</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>

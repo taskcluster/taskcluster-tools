@@ -7,8 +7,14 @@ import {
   OverlayTrigger,
   Tooltip
 } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
+import { request } from 'taskcluster-client-web';
+import { tail } from 'ramda';
+import 'react-datepicker/dist/react-datepicker.css';
 import HelmetTitle from '../../components/HelmetTitle';
+import QuarantineButton from '../../components/QuarantineButton';
 import Breadcrumb from '../../components/Breadcrumb';
+import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import SearchForm from './SearchForm';
@@ -25,7 +31,9 @@ export default class WorkerManager extends React.PureComponent {
       recentTasks: [],
       worker: null,
       error: null,
-      loading: false
+      loading: false,
+      actionLoading: false,
+      toasts: []
     };
   }
 
@@ -133,23 +141,22 @@ export default class WorkerManager extends React.PureComponent {
     this.props.history.push(url);
   };
 
-  toggleWorkerStatus = async () => {
+  updateWorkerQuarantine = async quarantineUntil => {
     const {
       provisionerId,
       workerType,
       workerGroup,
-      workerId,
-      disabled
+      workerId
     } = this.state.worker;
 
     try {
-      const worker = await this.props.queue.declareWorker(
+      const worker = await this.props.queue.quarantineWorker(
         provisionerId,
         workerType,
         workerGroup,
         workerId,
         {
-          disabled: !disabled
+          quarantineUntil
         }
       );
 
@@ -159,6 +166,43 @@ export default class WorkerManager extends React.PureComponent {
     }
   };
 
+  handleActionClick(action) {
+    const url = action.url
+      .replace('<provisionerId>', this.state.worker.provisionerId)
+      .replace('<workerType>', this.state.worker.workerType)
+      .replace('<workerGroup>', this.state.worker.workerGroup)
+      .replace('<workerId>', this.state.worker.workerId);
+
+    this.setState({ actionLoading: true }, async () => {
+      try {
+        const credentials =
+          (this.props.userSession &&
+            (await this.props.userSession.getCredentials())) ||
+          {};
+
+        await request(url, {
+          extra: this.props.queue.buildExtraData(credentials),
+          credentials,
+          method: action.method
+        });
+
+        const toast = {
+          text: action.title,
+          icon: <Icon name="check" />
+        };
+
+        this.setState({
+          actionLoading: false,
+          toasts: this.state.toasts.concat(toast)
+        });
+      } catch (error) {
+        this.setState({ error, actionLoading: false });
+      }
+    });
+  }
+
+  onToastDismiss = () => this.setState({ toasts: tail(this.state.toasts) });
+
   render() {
     const {
       provisioners,
@@ -166,14 +210,15 @@ export default class WorkerManager extends React.PureComponent {
       worker,
       recentTasks,
       loading,
-      error
+      error,
+      actionLoading
     } = this.state;
     const { provisionerId, workerType, workerGroup, workerId } = this.props;
-    const disableTooltip = (
-      <Tooltip id="tooltip">
-        {worker && worker.disabled
+    const quarantineTooltip = (
+      <Tooltip id="quarantine-tooltip">
+        {worker && worker.quarantineUntil
           ? 'Enabling a worker will resume accepting jobs.'
-          : 'Disabling a worker allows the machine to remain alive but not accept jobs.'}
+          : 'Quarantining a worker allows the machine to remain alive but not accept jobs.'}
       </Tooltip>
     );
     const firstClaim = worker && moment(worker.firstClaim);
@@ -204,6 +249,7 @@ export default class WorkerManager extends React.PureComponent {
           <HelmetTitle title="Worker Explorer" />
           <h4>Worker Explorer</h4>
         </div>
+        <Snackbar toasts={this.state.toasts} onDismiss={this.onToastDismiss} />
         <Breadcrumb navList={navList} active={[workerGroup, workerId]} />
         <SearchForm
           key="input-form"
@@ -235,31 +281,37 @@ export default class WorkerManager extends React.PureComponent {
                   <td style={{ verticalAlign: 'inherit' }}>Actions</td>
                   <td>
                     <ButtonToolbar>
-                      <Button
-                        disabled
-                        title="Coming soon!"
-                        bsSize="small"
-                        bsStyle="info">
-                        Reboot
-                      </Button>
                       <OverlayTrigger
                         delay={600}
-                        placement="bottom"
-                        overlay={disableTooltip}>
-                        <Button
-                          onClick={this.toggleWorkerStatus}
-                          bsSize="small"
-                          bsStyle="warning">
-                          {worker.disabled ? 'Enable' : 'Disable'}
-                        </Button>
+                        placement="top"
+                        overlay={quarantineTooltip}>
+                        <div>
+                          <QuarantineButton
+                            className={styles.actionButton}
+                            onSubmit={this.updateWorkerQuarantine}
+                            quarantineUntil={worker.quarantineUntil}
+                          />
+                        </div>
                       </OverlayTrigger>
-                      <Button
-                        disabled
-                        title="Coming soon!"
-                        bsSize="small"
-                        bsStyle="danger">
-                        Kill
-                      </Button>
+                      {worker.actions.map((action, key) => (
+                        <OverlayTrigger
+                          key={`worker-action-${key}`}
+                          delay={600}
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`action-tooltip-${key}`}>
+                              {action.description}
+                            </Tooltip>
+                          }>
+                          <Button
+                            className={styles.actionButton}
+                            bsSize="small"
+                            disabled={actionLoading}
+                            onClick={() => this.handleActionClick(action)}>
+                            {action.title}
+                          </Button>
+                        </OverlayTrigger>
+                      ))}
                     </ButtonToolbar>
                   </td>
                 </tr>
@@ -267,6 +319,7 @@ export default class WorkerManager extends React.PureComponent {
             </Table>
           </div>
         )}
+        {actionLoading && <Spinner />}
         {worker && <WorkerTable tasks={recentTasks} />}
       </div>
     );

@@ -1,3 +1,11 @@
 .workerTypes :global(.progress) {
   margin-bottom: 0;
 }
+
+.actions {
+  margin: 10px 0;
+}
+
+.actions > label {
+  margin-right: 10px;
+}

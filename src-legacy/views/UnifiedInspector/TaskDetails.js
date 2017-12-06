@@ -3,6 +3,8 @@ import { object } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Table, Label } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import { isEmpty } from 'ramda';
+import BarSpinner from '../../components/BarSpinner';
 import Markdown from '../../components/Markdown';
 import Code from '../../components/Code';
 import DateView from '../../components/DateView';
@@ -13,6 +15,75 @@ export default class TaskDetails extends React.PureComponent {
     status: object,
     task: object
   };
+
+  state = {
+    dependencies: {},
+    dependenciesLoading: false
+  };
+
+  async loadDependencies(taskIds) {
+    this.setState({ dependenciesLoading: true });
+
+    try {
+      const dependencies = await Promise.all(
+        taskIds.map(taskId =>
+          Promise.all([
+            this.props.queue.task(taskId),
+            this.props.queue.status(taskId)
+          ])
+        )
+      );
+
+      this.setState({
+        dependenciesLoading: false,
+        dependencies: dependencies.reduce(
+          (deps, [task, { status }]) => ({
+            ...deps,
+            [status.taskId]: { task, status }
+          }),
+          {}
+        )
+      });
+    } catch (error) {
+      this.setState({ error });
+    }
+  }
+
+  componentWillReceiveProps({ task }) {
+    if (!this.props.task && task) {
+      this.loadDependencies(task.dependencies);
+    }
+  }
+
+  renderDependencies() {
+    const { dependenciesLoading, dependencies } = this.state;
+
+    if (dependenciesLoading) {
+      return (
+        <tr>
+          <td colSpan="3">
+            <BarSpinner
+              style={{ marginLeft: '33.3%', marginBottom: '-20px' }}
+            />
+          </td>
+        </tr>
+      );
+    }
+
+    return this.props.task.dependencies.map((dependency, key) => (
+      <tr key={`task-dependency-${key}`}>
+        <td>
+          <Link to={`/tasks/${dependency}`}>{dependency}</Link>
+        </td>
+        <td>{dependencies[dependency].task.metadata.name}</td>
+        <td>
+          <Label bsStyle={labels[dependencies[dependency].status.state]}>
+            {dependencies[dependency].status.state}
+          </Label>
+        </td>
+      </tr>
+    ));
+  }
 
   render() {
     const { status, task } = this.props;
@@ -130,13 +201,20 @@ export default class TaskDetails extends React.PureComponent {
             <tr>
               <td>Dependencies</td>
               <td>
-                {task.dependencies.length
-                  ? task.dependencies.map((dependency, key) => (
-                      <div key={`task-dependency-${key}`}>
-                        <Link to={`/tasks/${dependency}`}>{dependency}</Link>
-                      </div>
-                    ))
-                  : '-'}
+                {!isEmpty(this.state.dependencies) ? (
+                  <Table condensed>
+                    <thead>
+                      <tr>
+                        <td>Task ID</td>
+                        <td>Task Name</td>
+                        <td>Task Status</td>
+                      </tr>
+                    </thead>
+                    <tbody>{this.renderDependencies()}</tbody>
+                  </Table>
+                ) : (
+                  '-'
+                )}
               </td>
             </tr>
 

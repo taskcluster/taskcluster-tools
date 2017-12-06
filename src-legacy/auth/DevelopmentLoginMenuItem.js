@@ -22,11 +22,16 @@ export default class DevelopmentLoginMenuItem extends React.PureComponent {
   onSelect() {
     const query = new URLSearchParams();
 
-    query.set('target', new URL('/login/development', window.location));
+    query.set('callback_url', new URL('/login/development', window.location));
+    query.set('scope', 'xyz'); // defeat the default '*' and require user to enter desired scopes
+    query.set('name', 'tools-devel');
     query.set(
       'description',
-      'Taskcluster Tools offers various way to create and inspect both tasks and task groups.'
+      'Temporary client for developing and testing taskcluster-tools'
     );
-    window.open(`https://login.taskcluster.net/?${query.toString()}`, '_blank');
+    window.open(
+      `https://tools.taskcluster.net/auth/clients/new?${query.toString()}`,
+      '_blank'
+    );
   }
 }

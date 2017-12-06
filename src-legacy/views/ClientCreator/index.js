@@ -1,18 +1,22 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import ClientCreator from './ClientCreator';
 
-const View = ({ userSession, authController, location }) => (
-  <Clients userSession={userSession} Auth>
-    {({ auth }) => (
-      <ClientCreator
-        location={location}
-        auth={auth}
-        authController={authController}
-        userSession={userSession}
-      />
+const View = ({ location }) => (
+  <WithUserSession>
+    {userSession => (
+      <WithClients Auth>
+        {clients => (
+          <ClientCreator
+            {...clients}
+            userSession={userSession}
+            location={location}
+          />
+        )}
+      </WithClients>
     )}
-  </Clients>
+  </WithUserSession>
 );
 
 export default View;

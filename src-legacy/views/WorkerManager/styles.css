@@ -36,3 +36,7 @@
 .tasksTable > div {
   min-height: 300px;
 }
+
+.actionButton {
+  margin-top: 5px;
+}

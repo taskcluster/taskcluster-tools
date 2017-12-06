@@ -5,7 +5,8 @@ import {
   ButtonToolbar,
   Button,
   Glyphicon,
-  Table
+  Table,
+  Checkbox
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
@@ -22,6 +23,7 @@ export default class ClientManager extends Component {
       clients: null,
       clientPrefixLoaded: false,
       clientPrefix: null,
+      sortByLastUsed: false,
       error: null
     };
   }
@@ -139,7 +141,9 @@ export default class ClientManager extends Component {
             <th>ClientId</th>
           </tr>
         </thead>
-        <tbody>{this.state.clients.map(this.renderClientRow)}</tbody>
+        <tbody>
+          {clients.sort(this.sortClients).map(this.renderClientRow)}
+        </tbody>
       </Table>
     );
   }
@@ -158,8 +162,37 @@ export default class ClientManager extends Component {
     );
   };
 
+  handleSortChange = ({ target }) => {
+    this.setState({ sortByLastUsed: target.checked });
+  };
+
+  sortByLastUsed(clientA, clientB) {
+    const clientALastUsed = new Date(clientA.lastDateUsed);
+    const clientBLastUsed = new Date(clientB.lastDateUsed);
+
+    if (clientALastUsed > clientBLastUsed) {
+      return -1;
+    }
+
+    if (clientALastUsed < clientBLastUsed) {
+      return 1;
+    }
+
+    return 0;
+  }
+
+  sortClients = (clientA, clientB) =>
+    this.state.sortByLastUsed
+      ? this.sortByLastUsed(clientA, clientB)
+      : clientA.clientId.localeCompare(clientB.clientId);
+
   render() {
-    const { clients, clientPrefixLoaded, clientPrefix } = this.state;
+    const {
+      clients,
+      clientPrefixLoaded,
+      clientPrefix,
+      sortByLastUsed
+    } = this.state;
 
     if (!clientPrefixLoaded) {
       return <Spinner />;
@@ -170,6 +203,11 @@ export default class ClientManager extends Component {
         <HelmetTitle title="Client Manager" />
         <Col md={5}>
           {this.renderPrefixInput()}
+          <Checkbox
+            defaultChecked={sortByLastUsed}
+            onChange={this.handleSortChange}>
+            Sort by last used
+          </Checkbox>
           {this.renderClientsTable()}
           <ButtonToolbar>
             <Button

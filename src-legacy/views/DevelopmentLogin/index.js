@@ -11,8 +11,7 @@ export default class DevelopmentLogin extends React.Component {
     this.state = {
       credentials: {
         clientId: search.get('clientId'),
-        accessToken: search.get('accessToken'),
-        certificate: search.get('certificate')
+        accessToken: search.get('accessToken')
       }
     };
   }

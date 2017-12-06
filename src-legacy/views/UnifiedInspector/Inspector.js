@@ -698,6 +698,7 @@ export default class Inspector extends React.PureComponent {
             <PropsRoute
               path={PATHS.TASK_DETAILS}
               component={TaskDetails}
+              queue={queue}
               status={status}
               task={task}
             />

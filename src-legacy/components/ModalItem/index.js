@@ -6,6 +6,7 @@ import Error from '../Error';
 
 export default class ModalItem extends React.PureComponent {
   static propTypes = {
+    className: string,
     disabled: bool,
     onSubmit: func,
     onComplete: func,
@@ -17,6 +18,7 @@ export default class ModalItem extends React.PureComponent {
   };
 
   static defaultProps = {
+    className: null,
     disabled: false,
     button: false,
     bsStyle: 'primary'
@@ -24,9 +26,6 @@ export default class ModalItem extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.handleOpen = this.handleOpen.bind(this);
-    this.handleClose = this.handleClose.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
       show: false,
       executing: false,
@@ -34,19 +33,17 @@ export default class ModalItem extends React.PureComponent {
     };
   }
 
-  handleOpen(e) {
+  handleOpen = e => {
     if (e) {
       e.preventDefault();
     }
 
     this.setState({ show: true });
-  }
+  };
 
-  handleClose() {
-    this.setState({ show: false });
-  }
+  handleClose = () => this.setState({ show: false });
 
-  handleSubmit() {
+  handleSubmit = () => {
     this.setState({ executing: true }, async () => {
       try {
         const result = await (this.props.onSubmit && this.props.onSubmit());
@@ -63,7 +60,7 @@ export default class ModalItem extends React.PureComponent {
         });
       }
     });
-  }
+  };
 
   render() {
     const {
@@ -99,6 +96,7 @@ export default class ModalItem extends React.PureComponent {
 
     return button ? (
       <Button
+        className={this.props.className}
         onClick={this.handleOpen}
         disabled={disabled}
         bsStyle={bsStyle}
