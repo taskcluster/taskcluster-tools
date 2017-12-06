@@ -3,6 +3,7 @@ import { object } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Table, Label } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
+import { isEmpty } from 'ramda';
 import BarSpinner from '../../components/BarSpinner';
 import Markdown from '../../components/Markdown';
 import Code from '../../components/Code';
@@ -16,7 +17,7 @@ export default class TaskDetails extends React.PureComponent {
   };
 
   state = {
-    dependencies: [],
+    dependencies: {},
     dependenciesLoading: false
   };
 
@@ -200,7 +201,7 @@ export default class TaskDetails extends React.PureComponent {
             <tr>
               <td>Dependencies</td>
               <td>
-                {this.state.dependencies.length ? (
+                {!isEmpty(this.state.dependencies) ? (
                   <Table condensed>
                     <thead>
                       <tr>
