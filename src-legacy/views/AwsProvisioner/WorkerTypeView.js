@@ -92,7 +92,13 @@ export default class WorkerTypeView extends React.PureComponent {
 
     if (currentTab === 'resources') {
       return awsState ? (
-        <WorkerTypeResources workerType={workerType} awsState={awsState} />
+        <WorkerTypeResources
+          userSession={this.props.userSession}
+          workerType={workerType}
+          awsState={awsState}
+          queue={this.props.queue}
+          baseUrl="https://ec2-manager.taskcluster.net/v1"
+        />
       ) : (
         <Spinner />
       );

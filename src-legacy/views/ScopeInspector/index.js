@@ -1,9 +1,10 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import ScopeInspector from './ScopeInspector';
 
-const View = ({ userSession, match, history }) => {
+const View = ({ match, history }) => {
   const [scope, entity] = window.location.hash.slice(1).split('/');
 
   if (scope && entity) {
@@ -16,17 +17,21 @@ const View = ({ userSession, match, history }) => {
   const selectedEntity = decodeURIComponent(match.params.selectedEntity || '');
 
   return (
-    <Clients userSession={userSession} Auth>
-      {({ auth }) => (
-        <ScopeInspector
-          auth={auth}
-          history={history}
-          userSession={userSession}
-          selectedScope={selectedScope}
-          selectedEntity={selectedEntity}
-        />
+    <WithUserSession>
+      {userSession => (
+        <WithClients Auth>
+          {clients => (
+            <ScopeInspector
+              {...clients}
+              userSession={userSession}
+              history={history}
+              selectedScope={selectedScope}
+              selectedEntity={selectedEntity}
+            />
+          )}
+        </WithClients>
       )}
-    </Clients>
+    </WithUserSession>
   );
 };
 

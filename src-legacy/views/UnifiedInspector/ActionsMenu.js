@@ -150,10 +150,7 @@ export default class ActionsMenu extends React.PureComponent {
         retries: 0,
         deadline: new Date(now + Date.parse(task.deadline) - created).toJSON(),
         expires: new Date(now + Date.parse(task.expires) - created).toJSON(),
-        created: new Date(now).toJSON(),
-        dependencies: task.dependencies.filter(
-          requiredTask => requiredTask !== taskId
-        )
+        created: new Date(now).toJSON()
       })
     );
 

@@ -1,13 +1,18 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import CachePurgeInspector from './CachePurgeInspector';
 
-const View = ({ userSession }) => (
-  <Clients userSession={userSession} PurgeCache>
-    {({ purgeCache }) => (
-      <CachePurgeInspector purgeCache={purgeCache} userSession={userSession} />
+const View = () => (
+  <WithUserSession>
+    {userSession => (
+      <WithClients PurgeCache>
+        {clients => (
+          <CachePurgeInspector {...clients} userSession={userSession} />
+        )}
+      </WithClients>
     )}
-  </Clients>
+  </WithUserSession>
 );
 
 export default View;

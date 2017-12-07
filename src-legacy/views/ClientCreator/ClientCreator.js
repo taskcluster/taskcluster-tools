@@ -3,9 +3,11 @@ import { Button, ButtonToolbar, Alert } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { parse } from 'qs';
 import { fromNow } from 'taskcluster-client-web';
+import { scopeIntersection } from 'taskcluster-lib-scopes';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import ClientEditor from './ClientEditor';
+import { toArray } from '../../utils';
 import styles from './styles.css';
 
 export default class ClientCreator extends React.PureComponent {
@@ -27,21 +29,35 @@ export default class ClientCreator extends React.PureComponent {
     this.loadClient(this.props);
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.loadClientPrefix(nextProps.userSession);
+  async componentWillReceiveProps(nextProps) {
+    await this.loadClientPrefix(nextProps.userSession);
     this.loadClient(nextProps);
   }
 
   handleResetAccessToken = async () => {
-    try {
-      const client = await this.props.auth.resetAccessToken(
-        this.state.client.clientId
-      );
+    this.setState({ loading: true }, async () => {
+      try {
+        const description =
+          this.state.query.description ||
+          `Client created ${new Date()} for ${this.state.query.callback_url}`;
+        const scopes = toArray(this.state.query.scope);
 
-      this.triggerCallback(client.clientId, client.accessToken);
-    } catch (error) {
-      this.setState({ error });
-    }
+        await this.props.auth.updateClient(this.state.client.clientId, {
+          description,
+          expires: fromNow(this.state.query.expires || '3 days'),
+          scopes: scopeIntersection(this.state.client.scopes, scopes),
+          deleteOnExpiration: true
+        });
+
+        const client = await this.props.auth.resetAccessToken(
+          this.state.client.clientId
+        );
+
+        this.triggerCallback(client.clientId, client.accessToken);
+      } catch (error) {
+        this.setState({ error, loading: false });
+      }
+    });
   };
 
   triggerCallback(clientId, accessToken) {
@@ -85,10 +101,7 @@ export default class ClientCreator extends React.PureComponent {
       this.state.query.description ||
       `Client created ${new Date()} for ${this.state.query.callback_url}`;
     const clientId = await this.nextAvailableClientId(clientName, 0);
-    const scopes =
-      typeof this.state.query.scope === 'string'
-        ? [this.state.query.scope]
-        : this.state.query.scope;
+    const scopes = toArray(this.state.query.scope);
 
     return {
       clientId,
@@ -100,9 +113,12 @@ export default class ClientCreator extends React.PureComponent {
 
   handleCreateNewClient = () => {
     this.setState({ loading: true }, async () => {
+      const currentScopes = await this.props.auth.currentScopes();
       const client = await this.constructClient(
         `${this.state.clientPrefix}/${this.state.query.name}`
       );
+
+      client.scopes = scopeIntersection(client.scopes, currentScopes.scopes);
 
       this.setState({ client, creating: true, loading: false });
     });
@@ -123,7 +139,7 @@ export default class ClientCreator extends React.PureComponent {
   }
 
   async loadClient({ userSession, auth }) {
-    if (!userSession) {
+    if (!userSession || !this.state.clientPrefix) {
       return;
     }
 

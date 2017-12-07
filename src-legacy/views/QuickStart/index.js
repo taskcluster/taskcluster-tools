@@ -63,9 +63,8 @@ const cmdDirectory = (type, org = '<YOUR_ORG>', repo = '<YOUR_REPO>') =>
       '-c',
       baseCmd.concat(['pip install tox', 'tox']).join(' && ')
     ],
-    'jimmycuadra/rust': [
+    'rust:latest': [
       '/bin/bash',
-      '--login',
       '-c',
       baseCmd.concat(['rustc --test unit_test.rs', './unit_test']).join(' && ')
     ],

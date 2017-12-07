@@ -1,3 +1,4 @@
+import mitt from 'mitt';
 import UserSession from './UserSession';
 
 import { renew as auth0Renew } from './auth0';
@@ -11,7 +12,12 @@ import { renew as auth0Renew } from './auth0';
  */
 export default class AuthController {
   constructor() {
-    this.userSessionChangedCallbacks = [];
+    const events = mitt();
+
+    this.on = events.on;
+    this.off = events.off;
+    this.emit = events.emit;
+
     this.renewalTimer = null;
 
     window.addEventListener('storage', ({ storageArea, key }) => {
@@ -19,8 +25,6 @@ export default class AuthController {
         this.loadUserSession();
       }
     });
-
-    this.setUserSession = this.setUserSession.bind(this);
   }
 
   /**
@@ -60,7 +64,7 @@ export default class AuthController {
   /**
    * Load the current user session (from localStorage).
    *
-   * This will call the onUserSessionChanged callbacks, but does not
+   * This will emit the user-session-changed event, but does not
    * return the user session.
    */
   loadUserSession() {
@@ -69,8 +73,16 @@ export default class AuthController {
       ? UserSession.deserialize(storedUserSession)
       : null;
 
+    this.userSession = userSession;
     this.resetRenewalTimer(userSession);
-    this.userSessionChangedCallbacks.forEach(cb => cb(userSession));
+    this.emit('user-session-changed', userSession);
+  }
+
+  /**
+   * Get the current userSession instance
+   */
+  getUserSession() {
+    return this.userSession;
   }
 
   /**
@@ -79,7 +91,7 @@ export default class AuthController {
    * This will change the user session in all open windows/tabs, eventually triggering
    * a call to any onSessionChanged callbacks.
    */
-  setUserSession(userSession) {
+  setUserSession = userSession => {
     if (!userSession) {
       localStorage.removeItem('userSession');
     } else {
@@ -89,7 +101,7 @@ export default class AuthController {
     // localStorage updates do not trigger event listeners on the current window/tab,
     // so invoke it directly
     this.loadUserSession();
-  }
+  };
 
   /**
    * Renew the user session.  This is not possible for all auth methods, and will trivially succeed
@@ -107,13 +119,5 @@ export default class AuthController {
       /* eslint-disable no-console */
       console.error('Could not renew login:', err);
     }
-  }
-
-  /**
-   * Register to get a callback with a UserSession (or null) every time the user session changes.
-   * This is typically reflected into state at the top level and handed down as properties.
-   */
-  onUserSessionChanged(callback) {
-    this.userSessionChangedCallbacks.push(callback);
   }
 }

@@ -180,6 +180,7 @@ export default class WorkerTypeTable extends React.PureComponent {
           workerType={this.props.workerType}
           reload={this.setSelected}
           updateSummary={this.updateSummary}
+          userSession={this.props.userSession}
         />
       </div>
     );

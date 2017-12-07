@@ -1,20 +1,27 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import SecretsManager from './SecretsManager';
 
-const View = ({ userSession, history, match }) => (
-  <Clients userSession={userSession} Secrets>
-    {({ secrets }) => (
-      <SecretsManager
-        history={history}
-        userSession={userSession}
-        secrets={secrets}
-        secretId={
-          match.params.secretId ? decodeURIComponent(match.params.secretId) : ''
-        }
-      />
+const View = ({ history, match }) => (
+  <WithUserSession>
+    {userSession => (
+      <WithClients Secrets>
+        {clients => (
+          <SecretsManager
+            history={history}
+            {...clients}
+            userSession={userSession}
+            secretId={
+              match.params.secretId
+                ? decodeURIComponent(match.params.secretId)
+                : ''
+            }
+          />
+        )}
+      </WithClients>
     )}
-  </Clients>
+  </WithUserSession>
 );
 
 export default View;

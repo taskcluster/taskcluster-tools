@@ -1,19 +1,24 @@
 import React from 'react';
-import Clients from '../../components/Clients';
+import WithClients from '../../components/WithClients';
+import WithUserSession from '../../components/WithUserSession';
 import TaskCreator from './TaskCreator';
 
-const View = ({ userSession, history, location, interactive }) => (
-  <Clients userSession={userSession} Queue>
-    {({ queue }) => (
-      <TaskCreator
-        queue={queue}
-        history={history}
-        location={location}
-        interactive={interactive}
-        userSession={userSession}
-      />
+const View = ({ history, location, interactive }) => (
+  <WithUserSession>
+    {userSession => (
+      <WithClients Queue>
+        {clients => (
+          <TaskCreator
+            {...clients}
+            history={history}
+            location={location}
+            interactive={interactive}
+            userSession={userSession}
+          />
+        )}
+      </WithClients>
     )}
-  </Clients>
+  </WithUserSession>
 );
 
 export default View;

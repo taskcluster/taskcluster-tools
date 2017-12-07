@@ -1,0 +1,32 @@
+.enter {
+  opacity: 0.01;
+  transition: opacity 500ms ease-in;
+}
+
+.enterActive {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.leave {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.leaveActive {
+  opacity: 0.01;
+  transition: opacity 500ms ease-in;
+}
+
+.container {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+
+.alert {
+  text-align: center;
+  margin-bottom: 0;
+  min-height: 60px;
+}
