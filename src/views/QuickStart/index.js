@@ -9,7 +9,8 @@ import {
   Checkbox,
   ButtonToolbar,
   Button,
-  Glyphicon
+  Glyphicon,
+  Radio
 } from 'react-bootstrap';
 import { safeDump } from 'js-yaml';
 import { Github } from 'taskcluster-client-web';
@@ -107,7 +108,8 @@ export default class YamlCreator extends React.Component {
       resetActive: false,
       owner: '',
       repo: '',
-      installedState: null
+      installedState: null,
+      allowPullRequests: 'collaborators'
     };
   }
 
@@ -116,6 +118,13 @@ export default class YamlCreator extends React.Component {
       [e.target.name]: e.target.value,
       resetActive: true
     });
+
+  handleAllowPullRequestsSelection = event => {
+    this.setState({
+      allowPullRequests:
+        event.target.id === 'prPublic' ? 'public' : 'collaborators'
+    });
+  };
 
   handleEventsSelection = event => {
     const events = new Set(this.state.events);
@@ -171,6 +180,7 @@ export default class YamlCreator extends React.Component {
   renderEditor() {
     const newYaml = safeDump({
       ...initialYaml,
+      allowPullRequests: this.state.allowPullRequests,
       tasks: [
         {
           ...initialYaml.tasks[0],
@@ -350,7 +360,25 @@ export default class YamlCreator extends React.Component {
               />
             </FormGroup>
 
-            <FormGroup id="checkboxGroup">
+            <FormGroup>
+              <ControlLabel>Who can trigger tasks from PRs</ControlLabel>
+              <Radio
+                name="allowPullRequests"
+                id="prPublic"
+                checked={this.state.allowPullRequests === 'public'}
+                onChange={this.handleAllowPullRequestsSelection}>
+                Public
+              </Radio>
+              <Radio
+                name="allowPullRequests"
+                id="prCollaborators"
+                checked={this.state.allowPullRequests === 'collaborators'}
+                onChange={this.handleAllowPullRequestsSelection}>
+                Only Collaborators
+              </Radio>
+            </FormGroup>
+
+            <FormGroup>
               <ControlLabel>This task should run when:</ControlLabel>
               <Checkbox
                 name="pull_request.opened"
