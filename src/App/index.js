@@ -7,8 +7,9 @@ import {
   Link
 } from 'react-router-dom';
 import { Helmet, link } from 'react-helmet';
-import { Autocomplete, Button, FontIcon, NavigationDrawer } from 'react-md';
+import { Button, FontIcon, NavigationDrawer } from 'react-md';
 import NavItemLink from './NavItemLink';
+import GlobalSearch from '../components/GlobalSearch';
 import FontLoader from '../components/FontLoader';
 import PropsRoute from '../components/PropsRoute';
 import NotFound from '../components/NotFound';
@@ -56,25 +57,7 @@ export default class App extends Component {
         }
         toolbarActions={
           <div>
-            <Autocomplete
-              id="documentation-search"
-              placeholder="Search"
-              inputClassName={
-                'search__input search__input--visible search__input--active'
-              }
-              filter={null}
-              data={[]}
-              total={0}
-              style={{ position: 'absolute', width: 80, right: 250 }}
-              leftIcon={<FontIcon>search</FontIcon>}
-              listClassName="search__results"
-              value={'e9qa7fJkS1WjwU3w1Q4w7A'}
-              sameWidth={false}
-              simplifiedMenu={false}
-              minBottom={20}
-              fillViewportWidth={false}
-              fillViewportHeight={false}
-            />
+            <GlobalSearch />
             <Button icon onClick={this.handleActionClick}>
               feedback
             </Button>
