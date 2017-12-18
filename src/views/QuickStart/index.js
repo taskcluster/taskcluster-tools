@@ -88,18 +88,22 @@ const cmdDirectory = (type, org = '<YOUR_ORG>', repo = '<YOUR_REPO>') =>
 const githubClient = new Github({});
 
 export default class YamlCreator extends React.Component {
+  static initialState = {
+    resetActive: false,
+    tasks: [],
+    events: new Set(),
+    taskName: '',
+    taskDescription: ''
+  };
+
   constructor(props) {
     super(props);
     this.state = {
-      tasks: [],
-      events: new Set(),
+      ...YamlCreator.initialState,
       image: 'node',
       commands: cmdDirectory('node'),
       currentCmd: cmdDirectory('node'),
       displayCmds: true,
-      taskName: '',
-      taskDescription: '',
-      resetActive: false,
       owner: '',
       repo: '',
       installedState: null,
@@ -155,14 +159,9 @@ export default class YamlCreator extends React.Component {
       commands: e.target.value === 'standard' ? this.state.commands : []
     });
 
-  resetAll = () =>
-    this.setState({
-      resetActive: false,
-      tasks: [],
-      events: new Set(),
-      taskName: '',
-      taskDescription: ''
-    });
+  resetAll = () => {
+    this.setState(YamlCreator.initialState);
+  };
 
   renderEditor() {
     const newYaml = safeDump({
