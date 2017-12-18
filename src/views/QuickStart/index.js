@@ -88,24 +88,26 @@ const cmdDirectory = (type, org = '<YOUR_ORG>', repo = '<YOUR_REPO>') =>
 const githubClient = new Github({});
 
 export default class YamlCreator extends React.Component {
+  static initialState = {
+    resetActive: false,
+    tasks: [],
+    events: new Set([
+      'pull_request.opened',
+      'pull_request.reopened',
+      'pull_request.synchronize'
+    ]),
+    taskName: '',
+    taskDescription: ''
+  };
+
   constructor(props) {
     super(props);
     this.state = {
-      tasks: [],
-      events: new Set(),
+      ...YamlCreator.initialState,
       image: 'node',
       commands: cmdDirectory('node'),
       currentCmd: cmdDirectory('node'),
       displayCmds: true,
-      taskName: '',
-      taskDescription: '',
-      pullRequestOpened: false,
-      pullRequestClosed: false,
-      pullRequestSynchronized: false,
-      pullRequestReopened: false,
-      pushMade: false,
-      releaseMade: false,
-      resetActive: false,
       owner: '',
       repo: '',
       installedState: null,
@@ -134,8 +136,7 @@ export default class YamlCreator extends React.Component {
       : events.add(event.target.name);
 
     this.setState({
-      events: [...events],
-      [event.target.id]: !this.state[event.target.id],
+      events,
       resetActive: true
     });
   };
@@ -162,20 +163,9 @@ export default class YamlCreator extends React.Component {
       commands: e.target.value === 'standard' ? this.state.commands : []
     });
 
-  resetAll = () =>
-    this.setState({
-      resetActive: false,
-      tasks: [],
-      events: new Set(),
-      taskName: '',
-      taskDescription: '',
-      pullRequestOpened: false,
-      pullRequestClosed: false,
-      pullRequestSynchronized: false,
-      pullRequestReopened: false,
-      pushMade: false,
-      releaseMade: false
-    });
+  resetAll = () => {
+    this.setState(YamlCreator.initialState);
+  };
 
   renderEditor() {
     const newYaml = safeDump({
@@ -192,7 +182,7 @@ export default class YamlCreator extends React.Component {
             },
             extra: {
               github: {
-                events: [...this.state.events]
+                events: [...this.state.events].sort()
               }
             },
             payload: {
@@ -382,49 +372,43 @@ export default class YamlCreator extends React.Component {
               <ControlLabel>This task should run when:</ControlLabel>
               <Checkbox
                 name="pull_request.opened"
-                id="pullRequestOpened"
                 className="data_checkboxes"
-                checked={this.state.pullRequestOpened}
+                checked={this.state.events.has('pull_request.opened')}
                 onChange={this.handleEventsSelection}>
                 Pull request opened
               </Checkbox>
               <Checkbox
                 name="pull_request.closed"
-                id="pullRequestClosed"
                 className="data_checkboxes"
-                checked={this.state.pullRequestClosed}
+                checked={this.state.events.has('pull_request.closed')}
                 onChange={this.handleEventsSelection}>
                 Pull request merged or closed
               </Checkbox>
               <Checkbox
                 name="pull_request.synchronize"
-                id="pullRequestSynchronized"
                 className="data_checkboxes"
-                checked={this.state.pullRequestSynchronized}
+                checked={this.state.events.has('pull_request.synchronize')}
                 onChange={this.handleEventsSelection}>
                 New commit made in an opened pull request
               </Checkbox>
               <Checkbox
                 name="pull_request.reopened"
-                id="pullRequestReopened"
                 className="data_checkboxes"
-                checked={this.state.pullRequestReopened}
+                checked={this.state.events.has('pull_request.reopened')}
                 onChange={this.handleEventsSelection}>
                 Pull request re-opened
               </Checkbox>
               <Checkbox
                 name="push"
-                id="pushMade"
                 className="data_checkboxes"
-                checked={this.state.pushMade}
+                checked={this.state.events.has('push')}
                 onChange={this.handleEventsSelection}>
                 Push
               </Checkbox>
               <Checkbox
                 name="release"
-                id="releaseMade"
                 className="data_checkboxes"
-                checked={this.state.releaseMade}
+                checked={this.state.events.has('release')}
                 onChange={this.handleEventsSelection}>
                 Release or tag created
               </Checkbox>
