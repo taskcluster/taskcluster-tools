@@ -91,7 +91,11 @@ export default class YamlCreator extends React.Component {
   static initialState = {
     resetActive: false,
     tasks: [],
-    events: new Set(),
+    events: new Set([
+      'pull_request.opened',
+      'pull_request.reopened',
+      'pull_request.synchronize'
+    ]),
     taskName: '',
     taskDescription: ''
   };
