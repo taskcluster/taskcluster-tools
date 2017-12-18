@@ -57,7 +57,7 @@ export default class App extends Component {
         }
         toolbarActions={
           <div>
-            <GlobalSearch />
+            <GlobalSearch history={props.history} />
             <Button icon onClick={this.handleActionClick}>
               feedback
             </Button>
