@@ -99,12 +99,6 @@ export default class YamlCreator extends React.Component {
       displayCmds: true,
       taskName: '',
       taskDescription: '',
-      pullRequestOpened: false,
-      pullRequestClosed: false,
-      pullRequestSynchronized: false,
-      pullRequestReopened: false,
-      pushMade: false,
-      releaseMade: false,
       resetActive: false,
       owner: '',
       repo: '',
@@ -134,8 +128,7 @@ export default class YamlCreator extends React.Component {
       : events.add(event.target.name);
 
     this.setState({
-      events: [...events],
-      [event.target.id]: !this.state[event.target.id],
+      events,
       resetActive: true
     });
   };
@@ -168,13 +161,7 @@ export default class YamlCreator extends React.Component {
       tasks: [],
       events: new Set(),
       taskName: '',
-      taskDescription: '',
-      pullRequestOpened: false,
-      pullRequestClosed: false,
-      pullRequestSynchronized: false,
-      pullRequestReopened: false,
-      pushMade: false,
-      releaseMade: false
+      taskDescription: ''
     });
 
   renderEditor() {
@@ -192,7 +179,7 @@ export default class YamlCreator extends React.Component {
             },
             extra: {
               github: {
-                events: [...this.state.events]
+                events: [...this.state.events].sort()
               }
             },
             payload: {
@@ -382,49 +369,43 @@ export default class YamlCreator extends React.Component {
               <ControlLabel>This task should run when:</ControlLabel>
               <Checkbox
                 name="pull_request.opened"
-                id="pullRequestOpened"
                 className="data_checkboxes"
-                checked={this.state.pullRequestOpened}
+                checked={this.state.events.has('pull_request.opened')}
                 onChange={this.handleEventsSelection}>
                 Pull request opened
               </Checkbox>
               <Checkbox
                 name="pull_request.closed"
-                id="pullRequestClosed"
                 className="data_checkboxes"
-                checked={this.state.pullRequestClosed}
+                checked={this.state.events.has('pull_request.closed')}
                 onChange={this.handleEventsSelection}>
                 Pull request merged or closed
               </Checkbox>
               <Checkbox
                 name="pull_request.synchronize"
-                id="pullRequestSynchronized"
                 className="data_checkboxes"
-                checked={this.state.pullRequestSynchronized}
+                checked={this.state.events.has('pull_request.synchronize')}
                 onChange={this.handleEventsSelection}>
                 New commit made in an opened pull request
               </Checkbox>
               <Checkbox
                 name="pull_request.reopened"
-                id="pullRequestReopened"
                 className="data_checkboxes"
-                checked={this.state.pullRequestReopened}
+                checked={this.state.events.has('pull_request.reopened')}
                 onChange={this.handleEventsSelection}>
                 Pull request re-opened
               </Checkbox>
               <Checkbox
                 name="push"
-                id="pushMade"
                 className="data_checkboxes"
-                checked={this.state.pushMade}
+                checked={this.state.events.has('push')}
                 onChange={this.handleEventsSelection}>
                 Push
               </Checkbox>
               <Checkbox
                 name="release"
-                id="releaseMade"
                 className="data_checkboxes"
-                checked={this.state.releaseMade}
+                checked={this.state.events.has('release')}
                 onChange={this.handleEventsSelection}>
                 Release or tag created
               </Checkbox>
