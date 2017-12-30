@@ -93,6 +93,10 @@ export default class TaskDetails extends React.PureComponent {
     }
 
     const { metadata } = task;
+    const shortSource =
+      metadata.source.length > 90
+        ? `...${metadata.source.substr(8 - 90)}`
+        : metadata.source;
 
     return (
       <div>
@@ -122,13 +126,13 @@ export default class TaskDetails extends React.PureComponent {
             <tr>
               <td>Source</td>
               <td>
-                <a href={metadata.source}>
-                  <span>
-                    {metadata.source.length > 90
-                      ? `...${metadata.source.substr(8 - 90)}`
-                      : metadata.source}
-                  </span>
-                </a>
+                {metadata.source.startsWith('https://') ? (
+                  <a href={metadata.source}>
+                    <span>{shortSource}</span>
+                  </a>
+                ) : (
+                  <span>{shortSource}</span>
+                )}
               </td>
             </tr>
 
