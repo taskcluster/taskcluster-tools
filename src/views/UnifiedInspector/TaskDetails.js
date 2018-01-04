@@ -49,6 +49,12 @@ export default class TaskDetails extends React.PureComponent {
     }
   }
 
+  componentWillMount() {
+    if (this.props.task && this.props.task.dependencies.length) {
+      this.loadDependencies(this.props.task.dependencies);
+    }
+  }
+
   componentWillReceiveProps({ task }) {
     if (!this.props.task && task) {
       this.loadDependencies(task.dependencies);
