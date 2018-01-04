@@ -87,7 +87,11 @@ export default class RoleManager extends React.PureComponent {
             <th>RoleId</th>
           </tr>
         </thead>
-        <tbody>{this.state.roles.map(this.renderRoleRow)}</tbody>
+        <tbody>
+          {this.state.roles
+            .sort((a, b) => a.roleId.localeCompare(b.roleId))
+            .map(this.renderRoleRow)}
+        </tbody>
       </Table>
     );
   }
