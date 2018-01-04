@@ -86,13 +86,6 @@ export default [
       the index, and discover indexed tasks.`
   },
   {
-    title: 'Indexed Artifact Browser',
-    link: '/index/artifacts/',
-    icon: 'folder-open',
-    description: `The indexed artifact browser lets you easily view the artifacts from the latest
-      run of an indexed task.`
-  },
-  {
     title: 'Hooks Manager',
     link: '/hooks',
     icon: 'repeat',
