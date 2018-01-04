@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
 import JsonInspector from '../../components/JsonInspector';
-import ArtifactView from '../IndexedArtifactBrowser/ArtifactView';
+import ArtifactView from './ArtifactView';
 import UserSession from '../../auth/UserSession';
 
 export default class EntryView extends React.PureComponent {
