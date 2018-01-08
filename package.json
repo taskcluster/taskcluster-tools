@@ -41,7 +41,7 @@
     "husky": "^0.14.3",
     "jquery": "^3.1.0",
     "js-yaml": "^3.10.0",
-    "json-e": "^2.3.1",
+    "json-e": "^2.5.0",
     "json-schema-defaults": "^0.3.0",
     "lint-staged": "^4.2.3",
     "lodash.chunk": "^4.2.0",
