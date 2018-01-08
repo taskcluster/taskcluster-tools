@@ -138,7 +138,7 @@ export default class PulseInspector extends React.PureComponent {
 
   stopListening = () => {
     this.setState({ listening: false });
-    this.listener.pause();
+    this.listener.close();
   };
 
   startListening = () => {
