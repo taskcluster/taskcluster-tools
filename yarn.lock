@@ -6889,8 +6889,8 @@ tar@^2.2.1:
     inherits "2"
 
 taskcluster-client-web@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/taskcluster-client-web/-/taskcluster-client-web-5.0.1.tgz#ee05830fa9506881cb3acc54528e243e1537f5f7"
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/taskcluster-client-web/-/taskcluster-client-web-5.0.2.tgz#ccd184d9614163c323d68c23fb337cea6f0a936f"
   dependencies:
     hawk "^6.0.2"
     query-string "^5.0.0"
