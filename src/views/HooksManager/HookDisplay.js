@@ -4,7 +4,7 @@ import { ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import HookStatusDisplay from './HookStatusDisplay';
 import Code from '../../components/Code';
 import Markdown from '../../components/Markdown';
-import ModalItem from '../../components/ModalItem';
+import TriggerButton from './TriggerButton';
 
 export default class HookDisplay extends React.PureComponent {
   static propTypes = {
@@ -24,14 +24,6 @@ export default class HookDisplay extends React.PureComponent {
       startEditing,
       triggerHook
     } = this.props;
-    const triggerModal = (
-      <div>
-        Trigger Hook{' '}
-        <tt>
-          {hookGroupId}/{hookId}
-        </tt>
-      </div>
-    );
 
     return (
       <div>
@@ -92,9 +84,13 @@ export default class HookDisplay extends React.PureComponent {
           <Button bsStyle="success" onClick={startEditing}>
             <Glyphicon glyph="pencil" /> Edit Hook
           </Button>
-          <ModalItem onSubmit={triggerHook} button={true} body={triggerModal}>
+          <TriggerButton
+            hookGroupId={hookGroupId}
+            hookId={hookId}
+            schema={hook.triggerSchema}
+            onTrigger={triggerHook}>
             <Glyphicon glyph="repeat" /> Trigger Hook
-          </ModalItem>
+          </TriggerButton>
         </ButtonToolbar>
       </div>
     );
