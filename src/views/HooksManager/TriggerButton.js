@@ -1,4 +1,6 @@
 import React from 'react';
+import Ajv from 'ajv';
+import jsonSchemaDefaults from 'json-schema-defaults';
 import { string, object, func } from 'prop-types';
 import { Row, Col, Alert } from 'react-bootstrap';
 import { safeLoad, safeDump } from 'js-yaml';
@@ -16,10 +18,19 @@ export default class TriggerButton extends React.PureComponent {
 
   constructor(props) {
     super(props);
+    this.ajv = new Ajv({ format: 'full', verbose: true, allErrors: true });
+    this.validate = this.ajv.compile(props.schema);
     this.state = {
       context: {},
-      contextValid: true
+      contextValid: true,
+      validityMessage: undefined,
+      initialContext: safeDump(jsonSchemaDefaults(props.schema) || {})
     };
+  }
+
+  componentWillMount() {
+    // initialize context validation
+    this.handleContextChange(this.state.initialContext);
   }
 
   handleSubmit = () => {
@@ -43,6 +54,16 @@ export default class TriggerButton extends React.PureComponent {
       });
     }
 
+    const valid = this.validate(context);
+
+    if (!valid) {
+      return this.setState({
+        context: null,
+        contextValid: false,
+        validityMessage: this.ajv.errorsText(this.validate.errors)
+      });
+    }
+
     this.setState({
       context,
       contextValid: true,
@@ -52,7 +73,7 @@ export default class TriggerButton extends React.PureComponent {
 
   render() {
     const { hookGroupId, hookId, schema } = this.props;
-    const { validityMessage } = this.state;
+    const { initialContext, validityMessage } = this.state;
     const triggerModal = (
       <div>
         Trigger Hook{' '}
@@ -66,7 +87,7 @@ export default class TriggerButton extends React.PureComponent {
             <CodeEditor
               mode="yaml"
               lint={true}
-              value={'{}'}
+              value={initialContext}
               onChange={this.handleContextChange}
             />
             {validityMessage && (
@@ -81,7 +102,6 @@ export default class TriggerButton extends React.PureComponent {
               {safeDump(schema)}
             </Code>
           </Col>
-          <pre>{JSON.stringify(this.state, null, 2)}</pre>
         </Row>
       </div>
     );
