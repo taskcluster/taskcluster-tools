@@ -74,12 +74,12 @@ export default class HookEditView extends React.PureComponent {
 
   startEditing = () => this.setState({ editing: true });
 
-  triggerHook = async () => {
+  triggerHook = async context => {
     const { hooks, hookGroupId, hookId } = this.props;
 
     try {
       // Payloads are ignored, so we send empty data over
-      await hooks.triggerHook(hookGroupId, hookId, {});
+      await hooks.triggerHook(hookGroupId, hookId, context || {});
 
       this.setState({
         hookStatus: await hooks.getHookStatus(hookGroupId, hookId)
