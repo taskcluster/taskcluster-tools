@@ -8,7 +8,7 @@ import Code from '../../components/Code';
 import CodeEditor from '../../components/CodeEditor';
 import ModalItem from '../../components/ModalItem';
 
-export default class TriggerButton extends React.PureComponent {
+export default class TriggerButton extends React.Component {
   static propTypes = {
     hookId: string.isRequired,
     hookGroupId: string.isRequired,
@@ -23,7 +23,7 @@ export default class TriggerButton extends React.PureComponent {
     this.state = {
       context: {},
       contextValid: true,
-      validityMessage: undefined,
+      validityMessage: null,
       initialContext: safeDump(jsonSchemaDefaults(props.schema) || {})
     };
   }
@@ -35,40 +35,31 @@ export default class TriggerButton extends React.PureComponent {
 
   handleSubmit = () => {
     if (!this.state.contextValid) {
-      throw new Error('Trigger context is not valid');
+      throw new Error(this.state.validityMessage);
     } else {
       this.props.onTrigger(this.state.context);
     }
   };
 
   handleContextChange = value => {
-    let context;
-
     try {
-      context = safeLoad(value);
-    } catch (e) {
+      const context = safeLoad(value);
+      const valid = this.validate(context);
+
+      this.setState({
+        context: valid ? context : null,
+        contextValid: valid,
+        validityMessage: valid
+          ? null
+          : this.ajv.errorsText(this.validate.errors)
+      });
+    } catch (err) {
       return this.setState({
         context: null,
         contextValid: false,
         validityMessage: 'Trigger context is not valid YAML'
       });
     }
-
-    const valid = this.validate(context);
-
-    if (!valid) {
-      return this.setState({
-        context: null,
-        contextValid: false,
-        validityMessage: this.ajv.errorsText(this.validate.errors)
-      });
-    }
-
-    this.setState({
-      context,
-      contextValid: true,
-      validityMessage: undefined
-    });
   };
 
   render() {
@@ -90,9 +81,6 @@ export default class TriggerButton extends React.PureComponent {
               value={initialContext}
               onChange={this.handleContextChange}
             />
-            {validityMessage && (
-              <Alert bsStyle="warning">{validityMessage}</Alert>
-            )}
           </Col>
           <Col lg={6} md={6} sm={12}>
             <h4>Trigger Schema</h4>
@@ -103,6 +91,7 @@ export default class TriggerButton extends React.PureComponent {
             </Code>
           </Col>
         </Row>
+        {validityMessage && <Alert bsStyle="warning">{validityMessage}</Alert>}
       </div>
     );
 
