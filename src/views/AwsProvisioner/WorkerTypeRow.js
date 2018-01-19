@@ -21,7 +21,7 @@ export default class WorkerTypeRow extends React.Component {
     super(props);
 
     this.state = {
-      pendingTasks: { pendingTasks: 0 },
+      pendingTasks: { pendingTasks: null },
       error: null
     };
   }
@@ -154,15 +154,17 @@ export default class WorkerTypeRow extends React.Component {
   }
 
   renderState() {
-    if (this.state.error) {
-      return <span />;
+    const { error, pendingTasks } = this.state;
+
+    if (error) {
+      return <span style={{ color: '#f00' }}>*</span>;
     }
 
-    if (!this.state.pendingTasks) {
-      return <span>...</span>;
+    if (pendingTasks == null || pendingTasks.pendingTasks == null) {
+      return <span>-</span>;
     }
 
-    return this.state.pendingTasks.pendingTasks;
+    return <span>{pendingTasks.pendingTasks}</span>;
   }
 
   render() {
