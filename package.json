@@ -24,7 +24,7 @@
     "ajv": "^5.2.3",
     "auth0-js": "^8.10.1",
     "babel-polyfill": "^6.26.0",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^4.0.0",
     "change-case": "^3.0.0",
     "classnames": "^2.2.5",
     "codemirror": "^5.30.0",
