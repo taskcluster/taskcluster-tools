@@ -1,6 +1,7 @@
 import React from 'react';
 import { string, shape, number, bool, func } from 'prop-types';
 import { OverlayTrigger, ProgressBar, Tooltip } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
 
 export default class WorkerTypeRow extends React.Component {
   static propTypes = {
@@ -157,7 +158,15 @@ export default class WorkerTypeRow extends React.Component {
     const { error, pendingTasks } = this.state;
 
     if (error) {
-      return <span style={{ color: '#f00' }}>*</span>;
+      const tooltip = (
+        <Tooltip id={'worker-type-row-loading-error'}>{error.message}</Tooltip>
+      );
+
+      return (
+        <OverlayTrigger placement="left" overlay={tooltip}>
+          <Icon name="exclamation-circle" />
+        </OverlayTrigger>
+      );
     }
 
     if (pendingTasks == null || pendingTasks.pendingTasks == null) {
