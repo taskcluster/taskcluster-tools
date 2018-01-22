@@ -1,6 +1,7 @@
 import React from 'react';
 import { string, shape, number, bool, func } from 'prop-types';
 import { OverlayTrigger, ProgressBar, Tooltip } from 'react-bootstrap';
+import Icon from 'react-fontawesome';
 
 export default class WorkerTypeRow extends React.Component {
   static propTypes = {
@@ -21,7 +22,7 @@ export default class WorkerTypeRow extends React.Component {
     super(props);
 
     this.state = {
-      pendingTasks: { pendingTasks: 0 },
+      pendingTasks: { pendingTasks: null },
       error: null
     };
   }
@@ -154,15 +155,25 @@ export default class WorkerTypeRow extends React.Component {
   }
 
   renderState() {
-    if (this.state.error) {
-      return <span />;
+    const { error, pendingTasks } = this.state;
+
+    if (error) {
+      const tooltip = (
+        <Tooltip id={'worker-type-row-loading-error'}>{error.message}</Tooltip>
+      );
+
+      return (
+        <OverlayTrigger placement="left" overlay={tooltip}>
+          <Icon name="exclamation-circle" />
+        </OverlayTrigger>
+      );
     }
 
-    if (!this.state.pendingTasks) {
-      return <span>...</span>;
+    if (pendingTasks == null || pendingTasks.pendingTasks == null) {
+      return <span>-</span>;
     }
 
-    return this.state.pendingTasks.pendingTasks;
+    return <span>{pendingTasks.pendingTasks}</span>;
   }
 
   render() {
