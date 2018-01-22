@@ -169,6 +169,10 @@ export default class App extends React.Component {
           <Grid fluid id="container">
             {authReady ? (
               <Switch>
+                <PropsRoute
+                  path="/index/artifacts"
+                  component={LegacyRedirect}
+                />
                 <PropsRoute path="/task-inspector" component={LegacyRedirect} />
                 <PropsRoute
                   path="/task-graph-inspector"
@@ -267,10 +271,6 @@ export default class App extends React.Component {
                 <PropsRoute
                   path="/purge-caches"
                   component={CachePurgeInspector}
-                />
-                <PropsRoute
-                  path="/index/artifacts/:namespace?/:namespaceTaskId?"
-                  component={IndexBrowser}
                 />
                 <PropsRoute
                   path="/index/:namespace?/:namespaceTaskId?"
