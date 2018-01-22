@@ -135,7 +135,7 @@ export default class EntryView extends React.PureComponent {
             />
             <br />
             <div className="alert alert-info" role="alert">
-              <strong>Latest Artifacts</strong>&nbsp; is the artifacts from the
+              <strong>Latest Artifacts</strong>&nbsp;is the artifacts from the
               last run of the task. View the task in the{' '}
               <Link to={`/tasks/${task.taskId}`}>
                 Task &amp; Group Inspector

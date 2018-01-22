@@ -269,6 +269,10 @@ export default class App extends React.Component {
                   component={CachePurgeInspector}
                 />
                 <PropsRoute
+                  path="/index/artifacts/:namespace?/:namespaceTaskId?"
+                  component={IndexBrowser}
+                />
+                <PropsRoute
                   path="/index/:namespace?/:namespaceTaskId?"
                   component={IndexBrowser}
                 />
