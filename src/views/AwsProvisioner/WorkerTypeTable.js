@@ -181,6 +181,7 @@ export default class WorkerTypeTable extends React.PureComponent {
           reload={this.setSelected}
           updateSummary={this.updateSummary}
           userSession={this.props.userSession}
+          ec2BaseUrl={this.props.ec2BaseUrl}
         />
       </div>
     );

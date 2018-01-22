@@ -217,6 +217,7 @@ export default class App extends React.Component {
                   path="/aws-provisioner/:workerType?/:currentTab?"
                   component={AwsProvisioner}
                   baseUrl="https://aws-provisioner.taskcluster.net/v1"
+                  ec2BaseUrl="https://ec2-manager.taskcluster.net/v1"
                   provisionerId="aws-provisioner-v1"
                   routeRoot="/aws-provisioner"
                 />
@@ -224,6 +225,7 @@ export default class App extends React.Component {
                   path="/aws-provisioner-staging/:workerType?/:currentTab?"
                   component={AwsProvisioner}
                   baseUrl="https://provisioner-staging.herokuapp.com/v1"
+                  ec2BaseUrl="https://ec2-manager-staging.taskcluster.net/v1"
                   provisionerId="staging-aws"
                   routeRoot="/aws-provisioner-staging"
                 />
