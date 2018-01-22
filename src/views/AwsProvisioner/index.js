@@ -9,6 +9,7 @@ const View = ({
   history,
   location,
   baseUrl,
+  ec2BaseUrl,
   provisionerId,
   routeRoot
 }) => {
@@ -33,6 +34,7 @@ const View = ({
               provisionerId={provisionerId}
               workerType={match.params.workerType}
               currentTab={match.params.currentTab}
+              ec2BaseUrl={ec2BaseUrl}
             />
           )}
         </WithClients>

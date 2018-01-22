@@ -71,7 +71,7 @@ export default class WorkerTypeResources extends React.PureComponent {
 
       try {
         await request(
-          `${this.props.baseUrl}/region/${region}/instance/${instanceId}`,
+          `${this.props.ec2BaseUrl}/region/${region}/instance/${instanceId}`,
           {
             extra: this.props.queue.buildExtraData(credentials),
             method: 'DELETE',
@@ -102,7 +102,7 @@ export default class WorkerTypeResources extends React.PureComponent {
 
       try {
         await request(
-          `${this.props.baseUrl}/worker-types/${workerType}/resources`,
+          `${this.props.ec2BaseUrl}/worker-types/${workerType}/resources`,
           {
             extra: this.props.queue.buildExtraData(credentials),
             method: 'DELETE',
