@@ -125,9 +125,6 @@ export default class WorkerTypeResources extends React.PureComponent {
     <tr key={index}>
       <td>{this.renderInstanceIdLink(instance.id, instance.region)}</td>
       <td>
-        {this.renderSpotRequestLink(instance.srId, instance.region, true)}
-      </td>
-      <td>
         <code>{instance.type}</code>
       </td>
       <td>
@@ -149,31 +146,6 @@ export default class WorkerTypeResources extends React.PureComponent {
     </tr>
   );
 
-  renderSpotRow = (spotReq, index) => (
-    <tr key={index}>
-      <td>
-        {this.renderSpotRequestLink(
-          spotReq.id,
-          spotReq.region,
-          spotReq.visibleToEC2Api
-        )}
-      </td>
-      <td>
-        <code>{spotReq.type}</code>
-      </td>
-      <td>
-        <code>{spotReq.zone}</code>
-      </td>
-      <td>
-        <code>{spotReq.ami}</code>
-      </td>
-      <td>{this.renderImageIdLink(spotReq.ami, spotReq.region)}</td>
-      <td>
-        <DateView date={new Date(spotReq.time)} />
-      </td>
-    </tr>
-  );
-
   renderInstanceIdLink(instanceId, region) {
     const qs = `?region=${region}#Instances:instanceId=${instanceId};sort=Name`;
 
@@ -181,25 +153,6 @@ export default class WorkerTypeResources extends React.PureComponent {
       <a href={`${awsUrl}${qs}`} target="_blank" rel="noopener noreferrer">
         <code>{instanceId}</code>
         <i className="fa fa-external-link" style={{ paddingLeft: 5 }} />
-      </a>
-    );
-  }
-
-  renderSpotRequestLink(spotReqId, region, visibleToEC2) {
-    const qs = `?region=${region}#SpotInstances:spotInstanceRequestId=${spotReqId};sort=requestId`;
-
-    // API Visibility refers to the fact that the spot request has been made
-    // but due to eventual consistency is not yet showing up in the
-    // describe* EC2 API endpoints
-    //
-    // NOTE: only doing comparison to false instead of !visibleToEC2 for
-    // deployment reasons since the API currently spits out 'undefined' for
-    // both internally tracked and api tracked requests
-    return (
-      <a href={`${awsUrl}${qs}`} target="_blank" rel="noopener noreferrer">
-        <code>{spotReqId}</code>
-        {!visibleToEC2 ? ' (Internally tracked)' : ''}
-        <Icon name="external-link" style={{ paddingLeft: 5 }} />
       </a>
     );
   }
@@ -238,7 +191,6 @@ export default class WorkerTypeResources extends React.PureComponent {
           <thead>
             <tr>
               <th>Instance Id</th>
-              <th>Spot Request Id</th>
               <th>Instance Type</th>
               <th>Availability Zone</th>
               <th>AMI</th>
@@ -260,7 +212,6 @@ export default class WorkerTypeResources extends React.PureComponent {
           <thead>
             <tr>
               <th>Instance Id</th>
-              <th>Spot Request Id</th>
               <th>Instance Type</th>
               <th>Availability Zone</th>
               <th>Image Id</th>
