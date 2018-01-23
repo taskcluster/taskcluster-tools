@@ -61,10 +61,6 @@ export default class WorkerTypeResources extends React.PureComponent {
     return this.getCapacityFor('instances', 'pending');
   }
 
-  spotReqCapacity() {
-    return this.getCapacityFor('requests');
-  }
-
   async terminateInstance(instanceId, region) {
     this.setState({ actionLoading: true }, async () => {
       const credentials = await this.props.userSession.getCredentials();
@@ -276,22 +272,6 @@ export default class WorkerTypeResources extends React.PureComponent {
               .filter(x => x.state === 'pending')
               .map(this.renderInstanceRow)}
           </tbody>
-        </Table>
-        <h3>Spot Requests</h3>
-        We have unfilled spot requests for a capacity of{' '}
-        {this.spotReqCapacity()}. Amazon is yet to decide on the bid, or they
-        have not told us the outcome yet.
-        <Table>
-          <thead>
-            <tr>
-              <th>Spot Request Id</th>
-              <th>Instance Type</th>
-              <th>Availability Zone</th>
-              <th>Image Id</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-          <tbody>{this.props.awsState.requests.map(this.renderSpotRow)}</tbody>
         </Table>
       </span>
     );
