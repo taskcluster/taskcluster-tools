@@ -65,6 +65,12 @@ export default [
       roles associated with entities like a repository, hook, user, etc.`
   },
   {
+    title: 'Scopeset Expander',
+    link: '/scopeset-expand',
+    icon: 'plus',
+    description: 'Takes a list of scopes and expand it.'
+  },
+  {
     title: 'Pulse Inspector',
     link: '/pulse-inspector',
     icon: 'wifi',

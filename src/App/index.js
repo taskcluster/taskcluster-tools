@@ -55,6 +55,9 @@ const ScopeInspector = loadable(() =>
 const ScopeGrants = loadable(() =>
   import(/* webpackChunkName: 'ScopeGrants' */ '../views/ScopeGrants')
 );
+const ScopesetExpander = loadable(() =>
+  import(/* webpackChunkName: 'ScopesetExpander' */ '../views/ScopesetExpander')
+);
 const PulseInspector = loadable(() =>
   import(/* webpackChunkName: 'PulseInspector' */ '../views/PulseInspector')
 );
@@ -262,6 +265,10 @@ export default class App extends React.Component {
                 <PropsRoute
                   path="/auth/grants/:pattern?"
                   component={ScopeGrants}
+                />
+                <PropsRoute
+                  path="/scopeset-expand"
+                  component={ScopesetExpander}
                 />
                 <PropsRoute
                   path="/pulse-inspector"
