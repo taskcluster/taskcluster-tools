@@ -66,7 +66,7 @@ export default [
   },
   {
     title: 'Scopeset Expander',
-    link: '/scopeset-expand',
+    link: '/auth/scopeset-expand',
     icon: 'plus',
     description: 'Takes a list of scopes and expand it.'
   },

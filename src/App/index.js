@@ -267,7 +267,7 @@ export default class App extends React.Component {
                   component={ScopeGrants}
                 />
                 <PropsRoute
-                  path="/scopeset-expand"
+                  path="/auth/scopeset-expand"
                   component={ScopesetExpander}
                 />
                 <PropsRoute
