@@ -33,6 +33,11 @@ const initialHook = {
       owner: 'name@example.com',
       source: 'https://tools.taskcluster.net/hooks'
     }
+  },
+  triggerSchema: {
+    type: 'object',
+    properties: {},
+    additionalProperties: false
   }
 };
 
@@ -53,14 +58,16 @@ export default class HookEditor extends React.PureComponent {
     this.state = {
       newScheduleValue: '',
       hook: null,
-      hookValidJson: false
+      hookValidJson: false,
+      triggerSchemaValidJson: false
     };
   }
 
   componentWillMount() {
     this.setState({
       hook: clone(this.props.isCreating ? initialHook : this.props.hook),
-      hookValidJson: true
+      hookValidJson: true,
+      triggerSchemaValidJson: true
     });
   }
 
@@ -72,7 +79,8 @@ export default class HookEditor extends React.PureComponent {
     ) {
       this.setState({
         hook: clone(this.props.isCreating ? initialHook : this.props.hook),
-        hookValidJson: true
+        hookValidJson: true,
+        triggerSchemaValidJson: true
       });
     }
   }
@@ -88,7 +96,8 @@ export default class HookEditor extends React.PureComponent {
       hook.metadata.description &&
       hook.metadata.owner &&
       hook.deadline &&
-      this.state.hookValidJson
+      this.state.hookValidJson &&
+      this.state.triggerSchemaValidJson
     );
   };
 
@@ -177,6 +186,19 @@ export default class HookEditor extends React.PureComponent {
     } catch (err) {
       this.setState({
         hookValidJson: false
+      });
+    }
+  };
+
+  onTriggerSchemaChange = value => {
+    try {
+      this.setState({
+        hook: assocPath(['triggerSchema'], JSON.parse(value), this.state.hook),
+        triggerSchemaValidJson: true
+      });
+    } catch (err) {
+      this.setState({
+        triggerSchemaValidJson: false
       });
     }
   };
@@ -422,12 +444,22 @@ export default class HookEditor extends React.PureComponent {
           </div>
         </div>
         <div className="form-group">
-          <label className="control-label col-md-2">Task</label>
+          <label className="control-label col-md-2">Task Template</label>
           <div className="col-md-10">
             <CodeEditor
               mode="json"
               value={JSON.stringify(hook.task, null, 2)}
               onChange={this.onTaskChange}
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <label className="control-label col-md-2">Trigger Schema</label>
+          <div className="col-md-10">
+            <CodeEditor
+              mode="json"
+              value={JSON.stringify(hook.triggerSchema, null, 2)}
+              onChange={this.onTriggerSchemaChange}
             />
           </div>
         </div>
