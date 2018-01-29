@@ -76,10 +76,35 @@ export default class HookDisplay extends React.PureComponent {
           refreshHookStatus={refreshHookStatus}
         />
         <dl className="dl-horizontal">
-          <dt>Task Definition</dt>
-          <dd />
+          <dt>Task Template</dt>
+          <dd>
+            When the hook fires, this template is rendered with{' '}
+            <a
+              href="https://taskcluster.github.io/json-e/"
+              target="_blank"
+              rel="noopener noreferrer">
+              JSON-e
+            </a>
+            to create the the task definition. See{' '}
+            <a
+              href="https://docs.taskcluster.net/reference/core/taskcluster-hooks/docs/firing-hooks"
+              target="_blank"
+              rel="noopener noreferrer">
+              &dquot;firing hooks&dquot;
+            </a>{' '}
+            for more information.
+          </dd>
         </dl>
         <Code language="json">{JSON.stringify(hook.task, null, 2)}</Code>
+        <dl className="dl-horizontal">
+          <dt>Trigger Schema</dt>
+          <dd>
+            The payload to <code>triggerHook</code> must match this schema.
+          </dd>
+        </dl>
+        <Code language="json">
+          {JSON.stringify(hook.triggerSchema, null, 2)}
+        </Code>
         <ButtonToolbar>
           <Button bsStyle="success" onClick={startEditing}>
             <Glyphicon glyph="pencil" /> Edit Hook
