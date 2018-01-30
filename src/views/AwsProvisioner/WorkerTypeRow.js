@@ -10,7 +10,6 @@ export default class WorkerTypeRow extends React.Component {
       workerType: string.isRequired,
       minCapacity: number.isRequired,
       maxCapacity: number.isRequired,
-      requestedCapacity: number.isRequired,
       pendingCapacity: number.isRequired,
       runningCapacity: number.isRequired
     }).isRequired,
@@ -83,29 +82,17 @@ export default class WorkerTypeRow extends React.Component {
       );
     }
 
-    if (progress.s) {
-      progressBars.push(
-        <ProgressBar
-          bsStyle="info"
-          key="spotReq"
-          now={progress.s}
-          label={progress.sc}
-        />
-      );
-    }
-
     return <ProgressBar>{progressBars}</ProgressBar>;
   }
 
   /* Return an object which has the fuzzed percentages to use for creating
    * progress bars and the unfuzzed capacities.  If we have a state with 0%, we
    * don't fuzz at all.  If we have 1-4%, we round to 5% and we don't fuzz
-   * above 5% for the running, pending and requested numbers */
+   * above 5% for the running and pending numbers */
   doMath() {
     // Actual capacities
     const runningCap = this.props.workerType.runningCapacity;
     const pendingCap = this.props.workerType.pendingCapacity;
-    const spotReqCap = this.props.workerType.requestedCapacity;
     const maxCap = this.props.workerType.maxCapacity;
     // We want to make sure that if a bar is there that it's visible
     const smallestCapUnit = maxCap * 0.05;
@@ -118,27 +105,21 @@ export default class WorkerTypeRow extends React.Component {
     const fuzzedPending = pendingCap
       ? Math.max(pendingCap, smallestCapUnit)
       : 0;
-    const fuzzedSpotReq = spotReqCap
-      ? Math.max(spotReqCap, smallestCapUnit)
-      : 0;
     // Determine the number which we should use to figure out our percentages.
     // When we have less than the max configured, we use that setting.  When we
     // exceed that amount, we want to sum up all the capacity units
-    const count = fuzzedRunning + fuzzedPending + fuzzedSpotReq;
+    const count = fuzzedRunning + fuzzedPending;
     const divideBy = Math.max(maxCap, count);
     // Calculate the percentages to use for the bars.  These numbers are
     // invalid for other purposes
     const runPer = fuzzedRunning / divideBy;
     const pendPer = fuzzedPending / divideBy;
-    const spotPer = fuzzedSpotReq / divideBy;
 
     return {
       r: runPer * 100,
       p: pendPer * 100,
-      s: spotPer * 100,
       rc: runningCap,
-      pc: pendingCap,
-      sc: spotReqCap
+      pc: pendingCap
     };
   }
 
@@ -146,10 +127,9 @@ export default class WorkerTypeRow extends React.Component {
     return (
       <Tooltip id={this.props.workerType.workerType}>
         {this.props.workerType.workerType} has running capacity to handle{' '}
-        {this.props.workerType.runningCapacity || '0'} tasks, pending instances
-        to handle {this.props.workerType.pendingCapacity || '0'} tasks, and spot
-        requests for capacity to handle{' '}
-        {this.props.workerType.requestedCapacity || '0'} tasks in parallel.
+        {this.props.workerType.runningCapacity || '0'} tasks and pending
+        instances to handle {this.props.workerType.pendingCapacity || '0'}{' '}
+        tasks.
       </Tooltip>
     );
   }
