@@ -25,7 +25,8 @@ const defaultTask = {
       '-c',
       'for ((i=1;i<=600;i++)); do echo $i; sleep 1; done'
     ],
-    maxRunTime: 60 * 10
+    // 30s margin to avoid task timeout winning race against task command.
+    maxRunTime: 600 + 30
   },
   metadata: {
     name: 'Example Task',
