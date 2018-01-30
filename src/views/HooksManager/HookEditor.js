@@ -193,7 +193,8 @@ export default class HookEditor extends React.PureComponent {
       schedule: hook.schedule,
       expires: hook.expires,
       deadline: hook.deadline,
-      task: hook.task
+      task: hook.task,
+      triggerSchema: hook.triggerSchema,
     };
   };
 
