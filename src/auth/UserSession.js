@@ -1,5 +1,7 @@
 import { OIDCCredentialAgent } from 'taskcluster-client-web';
 
+const SESSION_KEY = 'taskcluster-client-pool-credentials';
+
 /**
  * An object representing a user session.  Tools supports a variety of login methods,
  * so this combines them all in a single representation.
@@ -82,10 +84,44 @@ export default class UserSession {
   }
 
   // load Taskcluster credentials for this user
-  getCredentials() {
-    return this.credentials
-      ? Promise.resolve(this.credentials)
-      : this.credentialAgent.getCredentials({});
+  async getCredentials() {
+    if (this.credentials) {
+      return Promise.resolve(this.credentials);
+    }
+
+    const sessionCredentials = localStorage.getItem(SESSION_KEY);
+
+    if (!sessionCredentials) {
+      localStorage.setItem(SESSION_KEY, 'pending');
+
+      const credentials = await this.credentialAgent.getCredentials({});
+
+      localStorage.setItem(SESSION_KEY, JSON.stringify(credentials));
+
+      return credentials;
+    } else if (sessionCredentials === 'pending') {
+      return new Promise(resolve => {
+        window.addEventListener('storage', function handler({
+          storageArea,
+          key
+        }) {
+          if (storageArea !== localStorage || key !== SESSION_KEY) {
+            return;
+          }
+
+          const sessionCredentials = localStorage.getItem(SESSION_KEY);
+
+          if (sessionCredentials === 'pending') {
+            return;
+          }
+
+          window.removeEventListener('storage', handler);
+          resolve(JSON.parse(sessionCredentials));
+        });
+      });
+    }
+
+    return Promise.resolve(JSON.parse(sessionCredentials));
   }
 
   static deserialize(value) {
