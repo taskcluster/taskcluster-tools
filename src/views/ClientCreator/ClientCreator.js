@@ -40,12 +40,13 @@ export default class ClientCreator extends React.PureComponent {
         const description =
           this.state.query.description ||
           `Client created ${new Date()} for ${this.state.query.callback_url}`;
-        const scopes = toArray(this.state.query.scope);
+        const requestedScopes = toArray(this.state.query.scope);
+        const currentScopes = (await this.props.auth.currentScopes()).scopes;
 
         await this.props.auth.updateClient(this.state.client.clientId, {
           description,
           expires: fromNow(this.state.query.expires || '3 days'),
-          scopes: scopeIntersection(this.state.client.scopes, scopes),
+          scopes: scopeIntersection(currentScopes, requestedScopes),
           deleteOnExpiration: true
         });
 
