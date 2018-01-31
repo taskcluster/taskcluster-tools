@@ -1,5 +1,6 @@
 import React from 'react';
 import { ButtonToolbar, Button, Glyphicon, Row, Col } from 'react-bootstrap';
+import equal from 'deep-equal';
 import HelmetTitle from '../../components/HelmetTitle';
 import ScopeEditor from '../../components/ScopeEditor';
 
@@ -9,8 +10,18 @@ export default class ScopesetExpander extends React.PureComponent {
 
     this.state = {
       scopes: [],
-      expandedscopes: []
+      expandedscopes: null,
+      error: null
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      this.state.error &&
+      !equal(nextProps.userSession, this.props.userSession)
+    ) {
+      this.setState({ error: null });
+    }
   }
 
   scopesUpdated = scopes => {
@@ -25,7 +36,7 @@ export default class ScopesetExpander extends React.PureComponent {
         {expandedscopes ? (
           <div>
             <h3>Expanded Scopes</h3>
-            <ScopeEditor scopes={expandedscopes} />
+            <ScopeEditor scopes={expandedscopes.scopes} />
           </div>
         ) : null}
       </div>
@@ -37,9 +48,21 @@ export default class ScopesetExpander extends React.PureComponent {
   };
 
   fetchExpandedScopes = async () => {
-    this.setState({
-      expandedscopes: await this.props.auth.expandScopes(this.state.scopes)
-    });
+    try {
+      const expandedscopes = await this.props.auth.expandScopes({
+        scopes: this.state.scopes
+      });
+
+      this.setState({
+        expandedscopes,
+        error: null
+      });
+    } catch (err) {
+      this.setState({
+        expandedscopes: [],
+        error: err
+      });
+    }
   };
 
   render() {
@@ -47,11 +70,11 @@ export default class ScopesetExpander extends React.PureComponent {
       <Row style={{ marginTop: 10 }}>
         <HelmetTitle title="Scopeset Expander" />
         <Col md={6}>
-          <ButtonToolbar>
+          <ButtonToolbar style={{ marginBottom: 7 }}>
             <Button bsStyle="info" onClick={this.fetchExpandedScopes}>
               <Glyphicon glyph="plus" />Expand Scopes
             </Button>
-            <Button onClick={this.cleanScopesetInput}>
+            <Button bsStyle="warning" onClick={this.cleanScopesetInput}>
               <Glyphicon glyph="remove" />Clean
             </Button>
           </ButtonToolbar>
@@ -61,7 +84,7 @@ export default class ScopesetExpander extends React.PureComponent {
             scopesUpdated={this.scopesUpdated}
           />
         </Col>
-        <Col md={6}>{this.renderExpandedScopes}</Col>
+        <Col md={6}>{this.renderExpandedScopes()}</Col>
       </Row>
     );
   }

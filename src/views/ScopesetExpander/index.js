@@ -3,17 +3,11 @@ import WithClients from '../../components/WithClients';
 import WithUserSession from '../../components/WithUserSession';
 import ScopesetExpander from './ScopesetExpander';
 
-const View = ({ history }) => (
+const View = () => (
   <WithUserSession>
     {userSession => (
       <WithClients Auth>
-        {clients => (
-          <ScopesetExpander
-            {...clients}
-            history={history}
-            userSession={userSession}
-          />
-        )}
+        {clients => <ScopesetExpander {...clients} userSession={userSession} />}
       </WithClients>
     )}
   </WithUserSession>

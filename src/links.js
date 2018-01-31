@@ -67,8 +67,9 @@ export default [
   {
     title: 'Scopeset Expander',
     link: '/auth/scopeset-expand',
-    icon: 'plus',
-    description: 'Takes a list of scopes and expand it.'
+    icon: 'expand',
+    description: `This tool allows you to find the expanded copy of a given scopeset, with 
+    scopes implied by any roles included.`
   },
   {
     title: 'Pulse Inspector',
