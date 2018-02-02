@@ -1,0 +1,28 @@
+:global .CodeMirror pre.CodeMirror-placeholder {
+  color: #777;
+}
+
+:global .cm-star {
+  color: #32cd32;
+}
+
+:global .cm-sep {
+  color: #999;
+  padding: 0 2px;
+}
+
+:global .cm-slash {
+  color: #999;
+}
+
+:global .cm-param {
+  color: #50a6c2;
+}
+
+:global .cm-mistake-param {
+  color: #dc143c;
+}
+
+:global .cm-kitchensink {
+  color: #333;
+}
