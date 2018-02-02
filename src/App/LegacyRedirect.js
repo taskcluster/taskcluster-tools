@@ -56,7 +56,9 @@ const LegacyRedirect = props => {
     }
 
     case '/index/artifacts': {
-      return <Redirect to={`/index/${props.location.pathname.slice(17)}`} />;
+      return (
+        <Redirect to={props.location.pathname.replace('/artifacts', '')} />
+      );
     }
 
     default: {
