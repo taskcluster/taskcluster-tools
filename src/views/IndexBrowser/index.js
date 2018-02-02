@@ -20,7 +20,7 @@ const View = ({ match, history, location }) => {
   return (
     <WithUserSession>
       {userSession => (
-        <WithClients Index>
+        <WithClients Index Queue>
           {clients => (
             <div>
               <HelmetTitle title="Index Browser" />

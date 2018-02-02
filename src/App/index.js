@@ -61,9 +61,6 @@ const PulseInspector = loadable(() =>
 const CachePurgeInspector = loadable(() =>
   import(/* webpackChunkName: 'CachePurgeInspector' */ '../views/CachePurgeInspector')
 );
-const IndexedArtifactBrowser = loadable(() =>
-  import(/* webpackChunkName: 'IndexedArtifactBrowser' */ '../views/IndexedArtifactBrowser')
-);
 const IndexBrowser = loadable(() =>
   import(/* webpackChunkName: 'IndexBrowser' */ '../views/IndexBrowser')
 );
@@ -172,6 +169,10 @@ export default class App extends React.Component {
           <Grid fluid id="container">
             {authReady ? (
               <Switch>
+                <PropsRoute
+                  path="/index/artifacts"
+                  component={LegacyRedirect}
+                />
                 <PropsRoute path="/task-inspector" component={LegacyRedirect} />
                 <PropsRoute
                   path="/task-graph-inspector"
@@ -272,10 +273,6 @@ export default class App extends React.Component {
                 <PropsRoute
                   path="/purge-caches"
                   component={CachePurgeInspector}
-                />
-                <PropsRoute
-                  path="/index/artifacts/:namespace?/:namespaceTaskId?"
-                  component={IndexedArtifactBrowser}
                 />
                 <PropsRoute
                   path="/index/:namespace?/:namespaceTaskId?"

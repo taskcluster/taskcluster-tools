@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner';
 import DateView from '../../components/DateView';
 import JsonInspector from '../../components/JsonInspector';
+import ArtifactView from './ArtifactView';
 import UserSession from '../../auth/UserSession';
 
 export default class EntryView extends React.PureComponent {
@@ -93,6 +94,8 @@ export default class EntryView extends React.PureComponent {
       return null;
     }
 
+    const { queue, userSession } = this.props;
+
     return (
       <div>
         <dl className="dl-horizontal">
@@ -118,6 +121,27 @@ export default class EntryView extends React.PureComponent {
           <dt>Data</dt>
           <dd>
             <JsonInspector data={this.state.task.data} />
+          </dd>
+        </dl>
+
+        <dl className="dl-horizontal">
+          <dt>Latest Artifacts</dt>
+          <dd>
+            <ArtifactView
+              taskId={this.state.task.taskId}
+              namespace={this.state.task.namespace}
+              queue={queue}
+              userSession={userSession}
+            />
+            <br />
+            <div className="alert alert-info" role="alert">
+              <strong>Latest Artifacts</strong>&nbsp;is the artifacts from the
+              last run of the task. View the task in the{' '}
+              <Link to={`/tasks/${task.taskId}`}>
+                Task &amp; Group Inspector
+              </Link>{' '}
+              to discover artifacts from other runs.
+            </div>
           </dd>
         </dl>
       </div>
