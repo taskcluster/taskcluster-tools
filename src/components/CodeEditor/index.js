@@ -29,6 +29,7 @@ export default class CodeEditor extends React.PureComponent {
 
   register(ref) {
     this.codeMirror = ref ? ref.getCodeMirror() : null;
+    this.codeMirrorInstance = ref ? ref.getCodeMirrorInstance() : null;
   }
 
   render() {
