@@ -259,16 +259,16 @@ export default class App extends React.Component {
                   component={RoleManager}
                 />
                 <PropsRoute
+                  path="/auth/scopes/expansions"
+                  component={ScopesetExpander}
+                />
+                <PropsRoute
                   path="/auth/scopes/:selectedScope?/:selectedEntity?"
                   component={ScopeInspector}
                 />
                 <PropsRoute
                   path="/auth/grants/:pattern?"
                   component={ScopeGrants}
-                />
-                <PropsRoute
-                  path="/auth/scopeset-expand"
-                  component={ScopesetExpander}
                 />
                 <PropsRoute
                   path="/pulse-inspector"

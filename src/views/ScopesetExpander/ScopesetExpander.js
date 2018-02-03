@@ -5,15 +5,11 @@ import HelmetTitle from '../../components/HelmetTitle';
 import ScopeEditor from '../../components/ScopeEditor';
 
 export default class ScopesetExpander extends React.PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      scopes: [],
-      expandedscopes: null,
-      error: null
-    };
-  }
+  state = {
+    scopes: [],
+    expandedScopes: null,
+    error: null
+  };
 
   componentWillReceiveProps(nextProps) {
     if (
@@ -28,38 +24,36 @@ export default class ScopesetExpander extends React.PureComponent {
     this.setState({ scopes });
   };
 
-  renderExpandedScopes() {
-    const { expandedscopes } = this.state;
+  renderexpandedScopes() {
+    const { expandedScopes } = this.state;
+
+    if (!expandedScopes) {
+      return null;
+    }
 
     return (
       <div>
-        {expandedscopes ? (
-          <div>
-            <h3>Expanded Scopes</h3>
-            <ScopeEditor scopes={expandedscopes.scopes} />
-          </div>
-        ) : null}
+        <h3>Expanded Scopes</h3>
+        <ScopeEditor scopes={expandedScopes.scopes} />
       </div>
     );
   }
 
-  cleanScopesetInput = () => {
+  handleClickCleanScopes = () => {
     this.setState({ scopes: [] });
   };
 
-  fetchExpandedScopes = async () => {
+  handleClickFetchExpanded = async () => {
     try {
-      const expandedscopes = await this.props.auth.expandScopes({
-        scopes: this.state.scopes
-      });
-
       this.setState({
-        expandedscopes,
+        expandedScopes: await this.props.auth.expandScopes({
+          scopes: this.state.scopes
+        }),
         error: null
       });
     } catch (err) {
       this.setState({
-        expandedscopes: [],
+        expandedScopes: [],
         error: err
       });
     }
@@ -71,10 +65,10 @@ export default class ScopesetExpander extends React.PureComponent {
         <HelmetTitle title="Scopeset Expander" />
         <Col md={6}>
           <ButtonToolbar style={{ marginBottom: 7 }}>
-            <Button bsStyle="info" onClick={this.fetchExpandedScopes}>
+            <Button bsStyle="info" onClick={this.handleClickFetchExpanded}>
               <Glyphicon glyph="plus" />Expand Scopes
             </Button>
-            <Button bsStyle="warning" onClick={this.cleanScopesetInput}>
+            <Button bsStyle="warning" onClick={this.handleClickCleanScopes}>
               <Glyphicon glyph="remove" />Clean
             </Button>
           </ButtonToolbar>
@@ -84,7 +78,7 @@ export default class ScopesetExpander extends React.PureComponent {
             scopesUpdated={this.scopesUpdated}
           />
         </Col>
-        <Col md={6}>{this.renderExpandedScopes()}</Col>
+        <Col md={6}>{this.renderexpandedScopes()}</Col>
       </Row>
     );
   }
