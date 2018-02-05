@@ -66,10 +66,10 @@ export default class ScopesetExpander extends React.PureComponent {
         <Col md={6}>
           <ButtonToolbar style={{ marginBottom: 7 }}>
             <Button bsStyle="info" onClick={this.handleClickFetchExpanded}>
-              <Glyphicon glyph="plus" />Expand Scopes
+              <Glyphicon glyph="plus" /> Expand Scopes
             </Button>
             <Button bsStyle="warning" onClick={this.handleClickCleanScopes}>
-              <Glyphicon glyph="remove" />Clean
+              <Glyphicon glyph="remove" /> Clean
             </Button>
           </ButtonToolbar>
           <ScopeEditor
