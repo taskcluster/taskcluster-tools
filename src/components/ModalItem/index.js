@@ -8,6 +8,7 @@ export default class ModalItem extends React.PureComponent {
   static propTypes = {
     className: string,
     disabled: bool,
+    submitDisabled: bool,
     onSubmit: func,
     onComplete: func,
     button: bool,
@@ -20,6 +21,7 @@ export default class ModalItem extends React.PureComponent {
   static defaultProps = {
     className: null,
     disabled: false,
+    submitDisabled: false,
     button: false,
     bsStyle: 'primary'
   };
@@ -64,6 +66,7 @@ export default class ModalItem extends React.PureComponent {
 
   render() {
     const {
+      submitDisabled,
       disabled,
       body,
       children,
@@ -86,7 +89,7 @@ export default class ModalItem extends React.PureComponent {
           <Button onClick={this.handleClose}>Cancel</Button>
           <Button
             onClick={this.handleSubmit}
-            disabled={executing}
+            disabled={executing || submitDisabled}
             bsStyle={bsStyle}>
             {executing ? <Icon name="spinner" pulse /> : children}
           </Button>

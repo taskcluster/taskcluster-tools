@@ -4,6 +4,7 @@ import { ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import HookStatusDisplay from './HookStatusDisplay';
 import Code from '../../components/Code';
 import Markdown from '../../components/Markdown';
+import TriggerButton from './TriggerButton';
 
 export default class HookDisplay extends React.PureComponent {
   static propTypes = {
@@ -83,9 +84,13 @@ export default class HookDisplay extends React.PureComponent {
           <Button bsStyle="success" onClick={startEditing}>
             <Glyphicon glyph="pencil" /> Edit Hook
           </Button>
-          <Button bsStyle="success" onClick={triggerHook}>
+          <TriggerButton
+            hookGroupId={hookGroupId}
+            hookId={hookId}
+            schema={hook.triggerSchema}
+            onTrigger={triggerHook}>
             <Glyphicon glyph="repeat" /> Trigger Hook
-          </Button>
+          </TriggerButton>
         </ButtonToolbar>
       </div>
     );

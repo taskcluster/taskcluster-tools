@@ -1,8 +1,13 @@
 import React from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
-import clone from 'lodash.clonedeep';
 import equal from 'deep-equal';
 import { Link } from 'react-router-dom';
+import 'codemirror/addon/display/placeholder';
+import 'codemirror/addon/lint/lint.css';
+import 'codemirror/addon/mode/simple';
+import CodeEditor from '../CodeEditor';
+import './scopemode';
+import './styles.css';
 
 export default class ScopeEditor extends React.Component {
   static propTypes = {
@@ -14,55 +19,60 @@ export default class ScopeEditor extends React.Component {
     scopesUpdated: func
   };
 
-  componentDidUpdate(prevProps) {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      scopeText: props.scopes.join('\n')
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
     // If we've gotten an update to the set of scopes, and it does
     // not correspond to what's in the textarea right now, update
     // the textarea, even at the cost of hurting user input
     const notEqual =
-      !equal(this.props.scopes, prevProps.scopes) &&
-      !equal(this.props.scopes, this.getScopesFromTextarea());
+      !equal(nextProps.scopes, this.props.scopes) &&
+      !equal(nextProps.scopes, this.parseScopes(this.state.scopeText));
 
     if (notEqual) {
-      this.scopeText.value = this.props.scopes.join('\n');
+      this.setState({ scopeText: nextProps.scopes.join('\n') });
     }
   }
 
-  onChange = () => {
-    const newScopes = this.getScopesFromTextarea();
+  onChange = scopeText => {
+    const newScopes = this.parseScopes(scopeText);
+
+    this.setState({ scopeText });
 
     if (!equal(this.props.scopes, newScopes)) {
       this.props.scopesUpdated(newScopes);
     }
   };
 
-  getScopesFromTextarea = () => {
-    const textarea = this.scopeText;
-
-    if (!textarea) {
-      return this.props.scopes;
-    }
-
-    const scopes = textarea.value
-      .split(/[\r\n]+/)
-      .map(s => s.trim())
-      .filter(s => s !== '');
-
-    return Array.from(new Set(scopes)).sort();
-  };
+  parseScopes(scopeText) {
+    return [
+      ...new Set(
+        scopeText
+          .split(/[\r\n]+/)
+          .map(s => s.trim())
+          .filter(Boolean)
+      )
+    ];
+  }
 
   /** Render scopes and associated editor */
   renderScopeEditor() {
-    const scopes = clone(this.props.scopes || []).sort();
+    const { scopeText } = this.state;
 
     return (
       <div>
-        <textarea
-          className="form-control"
-          placeholder="new-scope:for-something:*"
-          rows={scopes.length + 1}
-          defaultValue={scopes.join('\n')}
+        <CodeEditor
+          value={scopeText}
           onChange={this.onChange}
-          ref={ref => (this.scopeText = ref)}
+          mode="scopemode"
+          lint={true}
+          placeholder="new-scope:for-something:*"
         />
       </div>
     );
@@ -70,7 +80,7 @@ export default class ScopeEditor extends React.Component {
 
   /** Render a list of scopes */
   renderScopes() {
-    const scopes = clone(this.props.scopes || []).sort();
+    const { scopes } = this.props;
 
     return (
       <ul className="form-control-static" style={{ paddingLeft: 20 }}>

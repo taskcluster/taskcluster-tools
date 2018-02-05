@@ -52,13 +52,15 @@ export default class HookEditor extends React.PureComponent {
 
     this.state = {
       newScheduleValue: '',
-      hook: null
+      hook: null,
+      hookValidJson: false
     };
   }
 
   componentWillMount() {
     this.setState({
-      hook: clone(this.props.isCreating ? initialHook : this.props.hook)
+      hook: clone(this.props.isCreating ? initialHook : this.props.hook),
+      hookValidJson: true
     });
   }
 
@@ -69,7 +71,8 @@ export default class HookEditor extends React.PureComponent {
       !equal(nextProps.hook, this.props.hook)
     ) {
       this.setState({
-        hook: clone(this.props.isCreating ? initialHook : this.props.hook)
+        hook: clone(this.props.isCreating ? initialHook : this.props.hook),
+        hookValidJson: true
       });
     }
   }
@@ -79,24 +82,14 @@ export default class HookEditor extends React.PureComponent {
 
   validHook = () => {
     const { hook } = this.state;
-    const isValid =
+
+    return (
       hook.metadata.name &&
       hook.metadata.description &&
       hook.metadata.owner &&
-      hook.deadline;
-
-    if (!isValid) {
-      return false;
-    }
-
-    // TODO: parse against schema and show errors
-    try {
-      JSON.parse(JSON.stringify(hook.task));
-
-      return true;
-    } catch (err) {
-      return false;
-    }
+      hook.deadline &&
+      this.state.hookValidJson
+    );
   };
 
   onHookGroupIdChange = e =>
@@ -175,10 +168,18 @@ export default class HookEditor extends React.PureComponent {
       hook: assocPath(['deadline'], e.target.value, this.state.hook)
     });
 
-  onTaskChange = value =>
-    this.setState({
-      hook: assocPath(['task'], JSON.parse(value), this.state.hook)
-    });
+  onTaskChange = value => {
+    try {
+      this.setState({
+        hook: assocPath(['task'], JSON.parse(value), this.state.hook),
+        hookValidJson: true
+      });
+    } catch (err) {
+      this.setState({
+        hookValidJson: false
+      });
+    }
+  };
 
   getHookDefinition = () => {
     const { hook } = this.state;
@@ -193,7 +194,8 @@ export default class HookEditor extends React.PureComponent {
       schedule: hook.schedule,
       expires: hook.expires,
       deadline: hook.deadline,
-      task: hook.task
+      task: hook.task,
+      triggerSchema: hook.triggerSchema
     };
   };
 

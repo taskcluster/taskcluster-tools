@@ -12,7 +12,7 @@ export default class WorkerTypeStatus extends React.Component {
   };
 
   renderRow(instTypeDef, availabilityZone) {
-    // Find number of running, pending and spotRequests
+    // Find number of running and pending
     const running = this.props.awsState.instances.filter(
       inst =>
         inst.type === instTypeDef.instanceType &&
@@ -25,13 +25,8 @@ export default class WorkerTypeStatus extends React.Component {
         inst.state === 'pending' &&
         inst.zone === availabilityZone
     ).length;
-    const spotReq = this.props.awsState.requests.filter(
-      spotReq =>
-        spotReq.type === instTypeDef.instanceType &&
-        spotReq.zone === availabilityZone
-    ).length;
 
-    if (running + pending + spotReq === 0) {
+    if (running + pending === 0) {
       return;
     }
 
@@ -48,9 +43,6 @@ export default class WorkerTypeStatus extends React.Component {
         </td>
         <td>
           {pending * instTypeDef.capacity} ({pending} instances)
-        </td>
-        <td>
-          {spotReq * instTypeDef.capacity} ({spotReq} instances)
         </td>
       </tr>
     );
@@ -72,7 +64,6 @@ export default class WorkerTypeStatus extends React.Component {
             <th>Availability Zone</th>
             <th>Running Capacity</th>
             <th>Pending Capacity</th>
-            <th>Requested Spot Capacity</th>
           </tr>
         </thead>
         <tbody>

@@ -55,6 +55,12 @@ const LegacyRedirect = props => {
       );
     }
 
+    case '/index/artifacts': {
+      return (
+        <Redirect to={props.location.pathname.replace('/artifacts', '')} />
+      );
+    }
+
     default: {
       return <NotFound />;
     }

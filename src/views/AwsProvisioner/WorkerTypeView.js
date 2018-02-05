@@ -97,7 +97,7 @@ export default class WorkerTypeView extends React.PureComponent {
           workerType={workerType}
           awsState={awsState}
           queue={this.props.queue}
-          baseUrl="https://ec2-manager.taskcluster.net/v1"
+          ec2BaseUrl={this.props.ec2BaseUrl}
         />
       ) : (
         <Spinner />
