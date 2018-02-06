@@ -14,8 +14,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "neutrino lint --fix",
-      "git add"
+      "neutrino lint"
     ]
   },
   "repository": "taskcluster/taskcluster-tools",
