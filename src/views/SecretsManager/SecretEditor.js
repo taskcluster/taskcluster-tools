@@ -3,6 +3,7 @@ import { func, object } from 'prop-types';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client-web';
 import Icon from 'react-fontawesome';
+import { toJSON } from 'hanson';
 import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
 import TimeInput from '../../components/TimeInput';
@@ -118,14 +119,14 @@ export default class SecretEditor extends React.PureComponent {
 
     try {
       const { expires, secretValue } = this.state;
-      const secret = JSON.parse(secretValue);
+      const secret = JSON.parse(toJSON(secretValue));
 
       await this.props.secrets.set(secretId, { secret, expires });
 
       if (shouldReload) {
         this.props.selectSecretId(secretId);
       } else {
-        this.setState({ error: null });
+        this.loadSecret(this.props);
       }
     } catch (err) {
       this.setState({ error: err });

@@ -3245,6 +3245,10 @@ handle-thing@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/handle-thing/-/handle-thing-1.2.5.tgz#fd7aad726bf1a5fd16dfc29b2f7a6601d27139c4"
 
+hanson@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/hanson/-/hanson-1.2.0.tgz#2d198d5ca03ebccdcaeb7c9d9c492e18405be002"
+
 har-schema@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/har-schema/-/har-schema-1.0.5.tgz#d263135f43307c02c602afc8fe95970c0151369e"
