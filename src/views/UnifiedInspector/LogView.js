@@ -30,7 +30,7 @@ export default class LogView extends React.PureComponent {
 
     this.state = {
       streaming,
-      follow: streaming,
+      follow: streaming || this.prefersFollow(),
       isFullscreen: false,
       fullscreenEnabled: fscreen.fullscreenEnabled,
       lazyViewerHeight: VIEWER_HEIGHT_MIN
@@ -71,7 +71,7 @@ export default class LogView extends React.PureComponent {
 
       this.setState({
         streaming,
-        follow: streaming,
+        follow: streaming || this.prefersFollow(),
         isFullscreen: false
       });
     }
@@ -81,13 +81,20 @@ export default class LogView extends React.PureComponent {
     this.handleLazyViewerHeight();
   }
 
+  prefersFollow() {
+    return localStorage.getItem('follow-log') === 'true';
+  }
+
   isStreaming(status) {
     return status
       ? status.state === 'pending' || status.state === 'running'
       : false;
   }
 
-  handleFollowClick = () => this.setState({ follow: !this.state.follow });
+  handleFollowClick = () => {
+    localStorage.setItem('follow-log', !this.state.follow);
+    this.setState({ follow: !this.state.follow });
+  };
 
   handleScroll = ({ scrollTop, scrollHeight, clientHeight }) => {
     if (this.state.follow && scrollHeight - scrollTop !== clientHeight) {
