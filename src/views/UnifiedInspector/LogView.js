@@ -1,11 +1,12 @@
 import React from 'react';
 import { findDOMNode } from 'react-dom';
-import { Button } from 'react-bootstrap';
+import { Button, FormControl } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { arrayOf, oneOfType, string, object, number, func } from 'prop-types';
 import { LazyLog, LazyStream, ScrollFollow } from 'react-lazylog';
 import { isNil } from 'ramda';
 import fscreen from 'fscreen';
+import ModalItem from '../../components/ModalItem';
 
 const VIEWER_HEIGHT_MIN = 400;
 const buttonStyle = {
@@ -33,7 +34,9 @@ export default class LogView extends React.PureComponent {
       follow: streaming || this.prefersFollow(),
       isFullscreen: false,
       fullscreenEnabled: fscreen.fullscreenEnabled,
-      lazyViewerHeight: VIEWER_HEIGHT_MIN
+      lazyViewerHeight: VIEWER_HEIGHT_MIN,
+      jump: false,
+      lineNumber: ''
     };
   }
 
@@ -79,11 +82,23 @@ export default class LogView extends React.PureComponent {
 
   componentDidUpdate() {
     this.handleLazyViewerHeight();
+
+    if (this.state.jump) {
+      this.setState({ jump: false });
+    }
   }
 
   prefersFollow() {
     return localStorage.getItem('follow-log') === 'true';
   }
+
+  jump = () => {
+    this.setState({
+      lineNumber: this.state.lineNumber,
+      jump: true,
+      follow: false
+    });
+  };
 
   isStreaming(status) {
     return status
@@ -137,6 +152,9 @@ export default class LogView extends React.PureComponent {
     [this.lazylog] = node.children;
   };
 
+  handleLineNumberChange = ({ target }) =>
+    this.setState({ lineNumber: target.value });
+
   render() {
     const {
       queue,
@@ -152,7 +170,8 @@ export default class LogView extends React.PureComponent {
       follow,
       fullscreenEnabled,
       isFullscreen,
-      lazyViewerHeight
+      lazyViewerHeight,
+      lineNumber
     } = this.state;
 
     if (!queue || !taskId || isNil(runId) || !status || !log) {
@@ -173,6 +192,24 @@ export default class LogView extends React.PureComponent {
             <Icon name={follow ? 'check-square-o' : 'square-o'} />
             &nbsp;&nbsp;Follow log
           </Button>
+
+          <ModalItem
+            bsSize="sm"
+            bsStyle="default"
+            button={true}
+            style={{ margin: '10px 0px 10px 10px' }}
+            onComplete={this.jump}
+            body={
+              <FormControl
+                type="number"
+                placeholder="0"
+                autoComplete="off"
+                onChange={this.handleLineNumberChange}
+                value={this.state.lineNumber}
+              />
+            }>
+            <Icon name="sort-numeric-asc" /> Go to line
+          </ModalItem>
 
           <Button
             href={url}
@@ -204,7 +241,11 @@ export default class LogView extends React.PureComponent {
                   : lazyViewerHeight
               }
               follow={follow}
-              scrollToLine={!follow && highlight ? scrollToLine : null}
+              scrollToLine={
+                !follow &&
+                ((this.state.jump ? lineNumber : null) ||
+                  (highlight ? scrollToLine : null))
+              }
               scrollToAlignment="start"
               highlight={highlight}
               onHighlight={onHighlight}
