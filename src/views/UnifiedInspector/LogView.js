@@ -95,7 +95,8 @@ export default class LogView extends React.PureComponent {
   jump = () => {
     this.setState({
       lineNumber: this.state.lineNumber,
-      jump: true
+      jump: true,
+      follow: false
     });
   };
 
