@@ -426,7 +426,7 @@ export default class YamlCreator extends React.Component {
                 onChange={this.handleImageSelection}>
                 <option value="node">Node.js</option>
                 <option value="python">Python</option>
-                <option value="jimmycuadra/rust">Rust</option>
+                <option value="rust:latest">Rust</option>
                 <option value="golang">Go</option>
               </FormControl>
             </FormGroup>
