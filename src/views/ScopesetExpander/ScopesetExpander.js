@@ -8,7 +8,8 @@ export default class ScopesetExpander extends React.PureComponent {
   state = {
     scopes: [],
     expandedScopes: null,
-    error: null
+    error: null,
+    scopesIsValid: false
   };
 
   componentWillReceiveProps(nextProps) {
@@ -17,6 +18,16 @@ export default class ScopesetExpander extends React.PureComponent {
       !equal(nextProps.userSession, this.props.userSession)
     ) {
       this.setState({ error: null });
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.scopeEditor) {
+      this.setState({
+        scopesIsValid:
+          this.scopeEditor.codeEditor.codeMirror.doc.cm.state.lint.marked
+            .length === 0
+      });
     }
   }
 
@@ -65,7 +76,12 @@ export default class ScopesetExpander extends React.PureComponent {
         <HelmetTitle title="Scopeset Expander" />
         <Col md={6}>
           <ButtonToolbar style={{ marginBottom: 7 }}>
-            <Button bsStyle="info" onClick={this.handleClickFetchExpanded}>
+            <Button
+              bsStyle="info"
+              onClick={this.handleClickFetchExpanded}
+              disabled={
+                this.state.scopes.length === 0 || !this.state.scopesIsValid
+              }>
               <Glyphicon glyph="plus" /> Expand Scopes
             </Button>
             <Button bsStyle="warning" onClick={this.handleClickCleanScopes}>
@@ -73,6 +89,7 @@ export default class ScopesetExpander extends React.PureComponent {
             </Button>
           </ButtonToolbar>
           <ScopeEditor
+            ref={editorref => (this.scopeEditor = editorref)}
             editing={true}
             scopes={this.state.scopes}
             scopesUpdated={this.scopesUpdated}

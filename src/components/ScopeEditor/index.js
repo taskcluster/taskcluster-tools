@@ -61,6 +61,10 @@ export default class ScopeEditor extends React.Component {
     ];
   }
 
+  captureCodeEditor(ref) {
+    this.codeEditor = ref;
+  }
+
   /** Render scopes and associated editor */
   renderScopeEditor() {
     const { scopeText } = this.state;
@@ -68,6 +72,7 @@ export default class ScopeEditor extends React.Component {
     return (
       <div>
         <CodeEditor
+          ref={editorRef => this.captureCodeEditor(editorRef)}
           value={scopeText}
           onChange={this.onChange}
           mode="scopemode"
