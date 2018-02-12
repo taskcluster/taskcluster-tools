@@ -1,9 +1,9 @@
 import React from 'react';
 import { func, object } from 'prop-types';
+import { safeLoad, safeDump } from 'js-yaml';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client-web';
 import Icon from 'react-fontawesome';
-import { toJSON } from 'hanson';
 import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
 import TimeInput from '../../components/TimeInput';
@@ -12,27 +12,25 @@ import CodeEditor from '../../components/CodeEditor';
 import ModalItem from '../../components/ModalItem';
 import UserSession from '../../auth/UserSession';
 
+const safeDumpOpts = { noCompatMode: true, noRefs: true };
+
 export default class SecretEditor extends React.PureComponent {
   static propTypes = {
     reloadSecrets: func.isRequired,
     secrets: object.isRequired
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      secretNameValue: '',
-      secretValue: '{}',
-      secret: null,
-      expires: null,
-      editing: true,
-      working: false,
-      loading: false,
-      error: null,
-      showSecret: false
-    };
-  }
+  state = {
+    secretNameValue: '',
+    secretValue: '',
+    invalid: false,
+    secret: null,
+    expires: null,
+    editing: true,
+    loading: false,
+    error: null,
+    showSecret: false
+  };
 
   componentWillMount() {
     this.loadSecret(this.props);
@@ -53,12 +51,13 @@ export default class SecretEditor extends React.PureComponent {
   async loadSecret(props) {
     // If there is a secretId, we load it. Otherwise we create a new secret
     if (!props.secretId) {
+      const defaultSecret = { foo: 'bar' };
+
       return this.setState({
-        secret: {},
-        secretValue: '{}',
+        secret: defaultSecret,
+        secretValue: safeDump(defaultSecret, safeDumpOpts),
         expires: fromNow('1000 years'),
         editing: true,
-        working: false,
         loading: false,
         error: null
       });
@@ -75,10 +74,9 @@ export default class SecretEditor extends React.PureComponent {
 
       this.setState({
         secret,
-        secretValue: JSON.stringify(secret),
+        secretValue: safeDump(secret, safeDumpOpts),
         expires,
         editing: false,
-        working: false,
         loading: false,
         error: null,
         showSecret: false
@@ -88,7 +86,6 @@ export default class SecretEditor extends React.PureComponent {
         error: err,
         secret: null,
         secretValue: null,
-        working: false,
         loading: false,
         expires: null
       });
@@ -103,7 +100,14 @@ export default class SecretEditor extends React.PureComponent {
   handleSecretNameChange = e =>
     this.setState({ secretNameValue: e.target.value });
 
-  handleValueChange = value => this.setState({ secretValue: value });
+  handleValueChange = value => {
+    try {
+      safeLoad(value);
+      this.setState({ invalid: false, secretValue: value });
+    } catch (err) {
+      this.setState({ invalid: true });
+    }
+  };
 
   startEditing = () => this.setState({ editing: true });
 
@@ -119,7 +123,7 @@ export default class SecretEditor extends React.PureComponent {
 
     try {
       const { expires, secretValue } = this.state;
-      const secret = JSON.parse(toJSON(secretValue));
+      const secret = safeLoad(secretValue);
 
       await this.props.secrets.set(secretId, { secret, expires });
 
@@ -144,13 +148,15 @@ export default class SecretEditor extends React.PureComponent {
   dismissError = () => this.setState({ error: null });
 
   renderValue() {
-    const { editing, secret, showSecret } = this.state;
+    const { editing, secret, secretValue, showSecret } = this.state;
 
     if (editing) {
       return (
         <CodeEditor
-          mode="json"
-          value={JSON.stringify(secret, null, 2)}
+          gutters={['CodeMirror-lint-markers']}
+          lint={true}
+          mode="yaml"
+          value={secretValue}
           onChange={this.handleValueChange}
         />
       );
@@ -158,7 +164,7 @@ export default class SecretEditor extends React.PureComponent {
 
     if (secret) {
       return showSecret ? (
-        <pre>{JSON.stringify(secret, null, 2)}</pre>
+        <pre>{safeDump(secret, safeDumpOpts)}</pre>
       ) : (
         <Button onClick={this.openSecret} bsStyle="warning">
           <Icon name="user-secret" style={{ padding: '.15em' }} /> Show secret
@@ -175,7 +181,7 @@ export default class SecretEditor extends React.PureComponent {
       error,
       expires,
       editing,
-      working,
+      invalid,
       loading,
       secretNameValue
     } = this.state;
@@ -249,7 +255,7 @@ export default class SecretEditor extends React.PureComponent {
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">
-              Secret Value (JSON Object)
+              Secret Value (YAML)
             </label>
             <div className="col-md-10">{this.renderValue()}</div>
           </div>
@@ -259,7 +265,7 @@ export default class SecretEditor extends React.PureComponent {
             <Button
               bsStyle="success"
               onClick={this.saveSecret}
-              disabled={working}>
+              disabled={invalid}>
               <Glyphicon glyph="ok" />{' '}
               {isCreating ? 'Create Secret' : 'Save Changes'}
             </Button>
@@ -270,7 +276,6 @@ export default class SecretEditor extends React.PureComponent {
                 bsStyle="danger"
                 onSubmit={this.deleteSecret}
                 onComplete={this.props.reloadSecrets}
-                disabled={working}
                 body={
                   <span>
                     Are you sure you want to delete secret{' '}
@@ -283,10 +288,7 @@ export default class SecretEditor extends React.PureComponent {
           </ButtonToolbar>
         ) : (
           <ButtonToolbar>
-            <Button
-              bsStyle="success"
-              onClick={this.startEditing}
-              disabled={working}>
+            <Button bsStyle="success" onClick={this.startEditing}>
               <Glyphicon glyph="pencil" /> Edit Secret
             </Button>
           </ButtonToolbar>
