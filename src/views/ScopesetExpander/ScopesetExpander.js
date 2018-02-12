@@ -21,13 +21,17 @@ export default class ScopesetExpander extends React.PureComponent {
     }
   }
 
-  componentDidUpdate() {
-    if (this.scopeEditor) {
-      this.setState({
-        scopesIsValid:
-          this.scopeEditor.codeEditor.codeMirror.doc.cm.state.lint.marked
-            .length === 0
-      });
+  componentDidUpdate(prevprops, { scopesIsValid }) {
+    if (!this.scopeEditor) {
+      return;
+    }
+
+    const isValid =
+      this.scopeEditor.codeEditor.codeMirror.doc.cm.state.lint.marked.length ===
+      0;
+
+    if (isValid !== scopesIsValid) {
+      this.setState({ scopesIsValid: isValid });
     }
   }
 
@@ -70,6 +74,10 @@ export default class ScopesetExpander extends React.PureComponent {
     }
   };
 
+  registerEditor = ref => {
+    this.scopeEditor = ref;
+  };
+
   render() {
     return (
       <Row style={{ marginTop: 10 }}>
@@ -89,7 +97,7 @@ export default class ScopesetExpander extends React.PureComponent {
             </Button>
           </ButtonToolbar>
           <ScopeEditor
-            ref={editorref => (this.scopeEditor = editorref)}
+            ref={this.registerEditor}
             editing={true}
             scopes={this.state.scopes}
             scopesUpdated={this.scopesUpdated}
