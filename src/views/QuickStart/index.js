@@ -160,7 +160,8 @@ export default class YamlCreator extends React.Component {
     this.setState({
       displayCmds: e.target.value === 'standard',
       currentCmd: this.state.commands,
-      commands: e.target.value === 'standard' ? this.state.commands : []
+      commands:
+        e.target.value === 'standard' ? cmdDirectory(this.state.image) : []
     });
 
   resetAll = () => {
