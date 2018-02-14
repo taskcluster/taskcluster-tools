@@ -113,7 +113,6 @@ export default class AuthController {
         await auth0Renew({ userSession, authController: this });
       }
     } catch (err) {
-      this.setUserSession(null);
       // usually this is just "user interaction required" or the like, but just
       // in case the user wants to peek, put it in the console
       /* eslint-disable no-console */
