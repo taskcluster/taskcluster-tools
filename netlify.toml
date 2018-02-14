@@ -1,0 +1,42 @@
+[build]
+  publish = "build"
+  command = "yarn build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+    Content-Security-Policy = "frame-ancestors 'self'"
+    Referrer-Policy = "origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; always;"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+
+[[headers]]
+  for = "/*.*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Security-Policy = "frame-ancestors 'self'"
+    Referrer-Policy = "origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; always;"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+    Content-Security-Policy = "frame-ancestors 'self'"
+    Referrer-Policy = "origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; always"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
