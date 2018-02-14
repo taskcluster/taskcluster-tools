@@ -8,7 +8,7 @@ export const webAuth = new WebAuth({
   audience: process.env.AUTH0_AUDIENCE,
   redirectUri: new URL('/login/auth0', window.location).href,
   responseType: 'token id_token',
-  scope: 'full-user-credentials openid profile'
+  scope: 'taskcluster-credentials openid profile'
 });
 
 export function userSessionFromAuthResult(authResult) {
