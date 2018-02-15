@@ -10,6 +10,8 @@ const envs = {
   AUTH0_DOMAIN: 'auth.mozilla.auth0.com',
   AUTH0_CLIENT_ID: 'TBD',
   AUTH0_AUDIENCE: 'login.taskcluster.net',
+  ROLLBAR_ACCESS_TOKEN: 'a0d3df266c2f487cac466e4e2fc04f68',
+  ROLLBAR_ENV: 'test',
   SIGN_IN_METHODS: process.env.NODE_ENV === 'development' ? 'development' : 'auth0 manual'
 };
 

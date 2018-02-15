@@ -72,6 +72,7 @@
     "react-tooltip": "^3.1.8",
     "react-treeview": "^0.4.7",
     "react-vnc-display": "^1.1.0",
+    "rollbar": "^2.3.8",
     "shebang-loader": "0.0.1",
     "slugid": "^1.1.0",
     "taskcluster-client-web": "^5.1.0",
