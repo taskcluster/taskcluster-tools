@@ -89,7 +89,7 @@ export default class ArtifactList extends React.PureComponent {
         if (userSession) {
           return {
             name,
-            icon: getIconFromMime(contentType),
+            icon: 'lock',
             url: isNil(runId)
               ? await queue.buildSignedUrl(
                   queue.getLatestArtifact,
