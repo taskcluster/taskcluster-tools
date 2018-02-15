@@ -1,4 +1,5 @@
 const merge = require('deepmerge');
+const RollbarSourceMapPlugin = require('rollbar-sourcemap-webpack-plugin')
 const { ProvidePlugin } = require('webpack');
 const { basename, extname } = require('path');
 
@@ -178,7 +179,15 @@ module.exports = {
       production: ({ config }) => {
         config.when(process.env.CI === 'true' && process.env.TRAVIS_BRANCH !== 'master',
           (config) => config.devtool(false),
-          (config) => config.devtool('source-map')
+          (config) => {
+            config.devtool('source-map');
+            config
+              .plugin('rollbar')
+              .use(RollbarSourceMapPlugin, [{
+                accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+                publicPath: config.output.get('publicPath')
+              }]);
+          }
         );
       }
     }

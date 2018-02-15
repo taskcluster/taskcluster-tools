@@ -84,5 +84,8 @@
   "optionalDependencies": {
     "bufferutil": "^3.0.2",
     "utf-8-validate": "^3.0.3"
+  },
+  "devDependencies": {
+    "rollbar-sourcemap-webpack-plugin": "^2.2.0"
   }
 }
