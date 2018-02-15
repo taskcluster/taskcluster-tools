@@ -1,4 +1,5 @@
 const merge = require('deepmerge');
+const RollbarSourceMapPlugin = require('rollbar-sourcemap-webpack-plugin')
 const { ProvidePlugin } = require('webpack');
 const { basename, extname } = require('path');
 
@@ -10,6 +11,8 @@ const envs = {
   AUTH0_DOMAIN: 'auth.mozilla.auth0.com',
   AUTH0_CLIENT_ID: 'TBD',
   AUTH0_AUDIENCE: 'login.taskcluster.net',
+  ROLLBAR_ACCESS_TOKEN: 'a0d3df266c2f487cac466e4e2fc04f68',
+  ROLLBAR_ENV: 'test',
   SIGN_IN_METHODS: process.env.NODE_ENV === 'development' ? 'development' : 'auth0 manual'
 };
 
@@ -176,7 +179,15 @@ module.exports = {
       production: ({ config }) => {
         config.when(process.env.CI === 'true' && process.env.TRAVIS_BRANCH !== 'master',
           (config) => config.devtool(false),
-          (config) => config.devtool('source-map')
+          (config) => {
+            config.devtool('source-map');
+            config
+              .plugin('rollbar')
+              .use(RollbarSourceMapPlugin, [{
+                accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+                publicPath: config.output.get('publicPath')
+              }]);
+          }
         );
       }
     }

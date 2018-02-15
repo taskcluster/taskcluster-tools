@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { object } from 'prop-types';
 import { Helmet, link } from 'react-helmet';
 import { Grid } from 'react-bootstrap';
+import * as Rollbar from 'rollbar';
 import PropsRoute from '../components/PropsRoute';
 import Navigation from '../components/Navigation';
 import NotFound from '../components/NotFound';
@@ -110,11 +111,25 @@ export default class App extends React.Component {
     super(props);
 
     this.authController = new AuthController();
+    this.rollbar = new Rollbar({
+      accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+      payload: {
+        environment: process.env.ROLLBAR_ENV
+      }
+    });
 
     this.state = {
       userSession: null,
       authReady: false
     };
+  }
+
+  componentDidCatch(err) {
+    if (this.rollbar) {
+      this.rollbar.error(err);
+    }
   }
 
   componentDidMount() {

@@ -114,10 +114,8 @@ export default class AuthController {
       }
     } catch (err) {
       this.setUserSession(null);
-      // usually this is just "user interaction required" or the like, but just
-      // in case the user wants to peek, put it in the console
-      /* eslint-disable no-console */
-      console.error('Could not renew login:', err);
+      // throw the error so it can be picked up by rollbar
+      throw err;
     }
   }
 }
