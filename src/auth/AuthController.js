@@ -113,7 +113,11 @@ export default class AuthController {
         await auth0Renew({ userSession, authController: this });
       }
     } catch (err) {
-      this.setUserSession(null);
+      // instance where a new scope was added and is now required in order to be logged in
+      if (err.error === 'consent_required') {
+        this.setUserSession(null);
+      }
+
       // usually this is just "user interaction required" or the like, but just
       // in case the user wants to peek, put it in the console
       /* eslint-disable no-console */
