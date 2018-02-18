@@ -33,7 +33,7 @@ export default class HookBrowser extends Component {
     // }
   }
 
-  async loadHooksList({ hooks, group }) {
+  async loadHooksList({ hooks, group, callbackChildLoaded }) {
     const { hooks: hooksList } = await hooks.listHooks(group);
 
     try {
@@ -47,6 +47,8 @@ export default class HookBrowser extends Component {
         error: err
       });
     }
+
+    callbackChildLoaded(group);
   }
 
   registerChild = ref => (this.treeView = ref);

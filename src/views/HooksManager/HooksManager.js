@@ -20,6 +20,7 @@ export default class HooksManager extends React.PureComponent {
 
     this.state = {
       groups: null,
+      groupsLoaded: [],
       error: null
     };
   }
@@ -45,7 +46,7 @@ export default class HooksManager extends React.PureComponent {
   }
 
   loadGroups = () => {
-    this.setState({ groups: [] }, async () => {
+    this.setState({ groups: [], groupsLoaded: [] }, async () => {
       try {
         const { groups } = await this.props.hooks.listHookGroups();
 
@@ -76,6 +77,15 @@ export default class HooksManager extends React.PureComponent {
     }
   };
 
+  callbackChildLoaded(loadedGroup) {
+    this.setState({
+      groupsLoaded: [
+        ...this.state.groupsLoaded.filter(group => group !== loadedGroup),
+        loadedGroup
+      ]
+    });
+  }
+
   renderGroups() {
     const { hooks, hookGroupId, hookId } = this.props;
     const { error, groups } = this.state;
@@ -84,7 +94,7 @@ export default class HooksManager extends React.PureComponent {
       return <Error error={error} />;
     }
 
-    if (!groups) {
+    if (!groups || this.state.groupsLoaded.length !== groups.length) {
       return <Spinner />;
     }
 
@@ -97,6 +107,7 @@ export default class HooksManager extends React.PureComponent {
             group={group}
             selectHook={this.selectHook}
             hookGroupId={hookGroupId}
+            callbackChildLoaded={this.callbackChildLoaded.bind(this)}
             hookId={hookId}
           />
         ))}
