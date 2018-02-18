@@ -172,7 +172,6 @@ export default class TaskCreator extends React.PureComponent {
     return (
       <div>
         <CodeEditor
-          gutters={['CodeMirror-lint-markers']}
           mode="yaml"
           lint={true}
           value={task}
