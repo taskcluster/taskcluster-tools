@@ -100,6 +100,12 @@ export default class IndexBrowser extends React.PureComponent {
     );
   };
 
+  renderSpinner() {
+    if (!this.state.namespaces && !this.state.tasks) {
+      return <Spinner />;
+    }
+  }
+
   renderBreadcrumbs() {
     const { namespace, urlRoot } = this.props;
     const parents = namespace.split('.');
@@ -125,10 +131,6 @@ export default class IndexBrowser extends React.PureComponent {
   }
 
   renderNamespaces() {
-    if (!this.state.namespaces) {
-      return <Spinner />;
-    }
-
     const tableStyle = { borderTop: 'none', borderBottom: '1px solid #ddd' };
 
     return (
@@ -171,11 +173,6 @@ export default class IndexBrowser extends React.PureComponent {
 
   renderTasks() {
     const { namespace, urlRoot } = this.props;
-
-    if (!this.state.tasks) {
-      return <Spinner />;
-    }
-
     const tableStyle = { borderTop: 'none', borderBottom: '1px solid #ddd' };
 
     return (
@@ -255,6 +252,7 @@ export default class IndexBrowser extends React.PureComponent {
               </div>
             </FormGroup>
           </form>
+          {this.renderSpinner()}
           {this.renderTasks()}
           {this.renderNamespaces()}
         </Col>
