@@ -18,6 +18,7 @@ import UserSession from '../../auth/UserSession';
 export default class ClientManager extends Component {
   constructor(props) {
     super(props);
+    this.loadClients = this.loadClients.bind(this);
 
     this.state = {
       clients: null,
