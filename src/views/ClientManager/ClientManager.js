@@ -68,23 +68,24 @@ export default class ClientManager extends Component {
   }
 
   async loadClients() {
-    await this.loadClientPrefix();
+    this.setState({ clients: null }, async () => {
+      try {
+        await this.loadClientPrefix();
+        const { clientPrefix } = this.state;
 
-    const { clientPrefix } = this.state;
-
-    try {
-      this.setState({
-        clients: await this.props.auth.listClients(
-          clientPrefix ? { prefix: clientPrefix } : null
-        ),
-        error: null
-      });
-    } catch (err) {
-      this.setState({
-        clients: null,
-        error: err
-      });
-    }
+        this.setState({
+          clients: await this.props.auth.listClients(
+            clientPrefix ? { prefix: clientPrefix } : null
+          ),
+          error: null
+        });
+      } catch (err) {
+        this.setState({
+          clients: null,
+          error: err
+        });
+      }
+    });
   }
 
   navigate = clientId => {
