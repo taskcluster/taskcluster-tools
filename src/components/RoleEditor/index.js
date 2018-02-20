@@ -294,7 +294,10 @@ export default class RoleEditor extends React.PureComponent {
               />
             </div>
           </div>
-          {!isEditing && !isCreating && this.state.role.expandedScopes ? (
+          {!isEditing &&
+          !isCreating &&
+          this.state.role.expandedScopes &&
+          !this.state.role.roleId.endsWith('*') ? (
             <div className="form-group">
               <label className="control-label col-md-3">Expanded Scopes</label>
               <div className="col-md-9">
