@@ -18,7 +18,6 @@ import UserSession from '../../auth/UserSession';
 export default class ClientManager extends Component {
   constructor(props) {
     super(props);
-    this.loadClients = this.loadClients.bind(this);
 
     this.state = {
       clients: null,
@@ -67,7 +66,7 @@ export default class ClientManager extends Component {
     }
   }
 
-  async loadClients() {
+  loadClients = async () => {
     this.setState({ clients: null }, async () => {
       try {
         await this.loadClientPrefix();
@@ -86,7 +85,7 @@ export default class ClientManager extends Component {
         });
       }
     });
-  }
+  };
 
   navigate = clientId => {
     this.loadClients();
