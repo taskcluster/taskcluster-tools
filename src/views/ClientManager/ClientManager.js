@@ -66,7 +66,7 @@ export default class ClientManager extends Component {
     }
   }
 
-  loadClients = async () => {
+  loadClients = () => {
     this.setState({ clients: null }, async () => {
       try {
         await this.loadClientPrefix();
