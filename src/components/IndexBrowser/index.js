@@ -100,12 +100,6 @@ export default class IndexBrowser extends React.PureComponent {
     );
   };
 
-  renderSpinner() {
-    if (!this.state.namespaces && !this.state.tasks) {
-      return <Spinner />;
-    }
-  }
-
   renderBreadcrumbs() {
     const { namespace, urlRoot } = this.props;
     const parents = namespace.split('.');
@@ -252,9 +246,14 @@ export default class IndexBrowser extends React.PureComponent {
               </div>
             </FormGroup>
           </form>
-          {this.renderSpinner()}
-          {this.renderTasks()}
-          {this.renderNamespaces()}
+          {this.state.tasks && this.state.namespaces ? (
+            <div>
+              {this.renderTasks()}
+              {this.renderNamespaces()}
+            </div>
+          ) : (
+            <Spinner />
+          )}
         </Col>
         <Col md={6}>{this.props.children}</Col>
       </Row>
