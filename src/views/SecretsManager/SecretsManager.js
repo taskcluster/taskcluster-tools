@@ -96,40 +96,51 @@ export default class SecretsManager extends React.PureComponent {
     );
   }
 
-  render() {
-    const { secretId } = this.props;
-    const { secrets } = this.state;
-
+  renderSecretsEditor() {
     return (
       <Row>
-        <HelmetTitle title="Secrets Manager" />
-        <Col md={5}>
-          {this.renderSecretsTable()}
-          <ButtonToolbar>
-            <Button
-              bsStyle="primary"
-              onClick={this.reloadSecrets}
-              disabled={!secretId}>
-              <Glyphicon glyph="plus" /> Add Secret
-            </Button>
-            <Button
-              bsStyle="success"
-              onClick={() => this.loadSecrets(this.props)}
-              disabled={!secrets}>
-              <Glyphicon glyph="refresh" /> Refresh
-            </Button>
-          </ButtonToolbar>
-        </Col>
-        <Col md={7}>
+        <Col md={12}>
+          <HelmetTitle title="Secrets Renderer" />
           <SecretEditor
             userSession={this.props.userSession}
-            secretId={secretId}
+            secretId={this.props.secretId}
             secrets={this.props.secrets}
             reloadSecrets={this.reloadSecrets}
             selectSecretId={this.selectSecretId}
           />
         </Col>
       </Row>
+    );
+  }
+
+  render() {
+    const { secretId } = this.props;
+    const { secrets } = this.state;
+
+    return (
+      <div>
+        <Row>
+          <HelmetTitle title="Secrets Manager" />
+          <Col md={5}>
+            {this.renderSecretsTable()}
+            <ButtonToolbar>
+              <Button
+                bsStyle="primary"
+                onClick={this.reloadSecrets}
+                disabled={!secretId}>
+                <Glyphicon glyph="plus" /> Add Secret
+              </Button>
+              <Button
+                bsStyle="success"
+                onClick={() => this.loadSecrets(this.props)}
+                disabled={!secrets}>
+                <Glyphicon glyph="refresh" /> Refresh
+              </Button>
+            </ButtonToolbar>
+          </Col>
+        </Row>
+        {this.renderSecretsEditor()}
+      </div>
     );
   }
 }
