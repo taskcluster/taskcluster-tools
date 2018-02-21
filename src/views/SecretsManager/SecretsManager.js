@@ -60,6 +60,8 @@ export default class SecretsManager extends React.PureComponent {
 
   reloadSecrets = () => this.props.history.replace('/secrets');
 
+  clearSelectedSecret = () => {};
+
   renderSecretsTable() {
     const { secretId } = this.props;
     const { error, secrets } = this.state;
@@ -96,10 +98,22 @@ export default class SecretsManager extends React.PureComponent {
     );
   }
 
-  renderSecretsEditor() {
+  renderSelectedSecret() {
     return (
       <Row>
         <Col md={12}>
+          <Row>
+            <Col md={1}>
+              <Button onClick={this.clearSelectedSecret}>
+                <Glyphicon glyph="chevron-left" /> Back
+              </Button>
+            </Col>
+            <Col md={11}>
+              <h4>OVERHERE</h4>
+            </Col>
+          </Row>
+          <br />
+          <br />
           <HelmetTitle title="Secrets Renderer" />
           <SecretEditor
             userSession={this.props.userSession}
@@ -139,7 +153,7 @@ export default class SecretsManager extends React.PureComponent {
             </ButtonToolbar>
           </Col>
         </Row>
-        {this.renderSecretsEditor()}
+        {this.renderSelectedSecret()}
       </div>
     );
   }
