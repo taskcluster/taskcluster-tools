@@ -89,7 +89,7 @@ export default class ArtifactList extends React.PureComponent {
         if (userSession) {
           return {
             name,
-            icon: 'lock',
+            icon: getIconFromMime(contentType),
             url: isNil(runId)
               ? await queue.buildSignedUrl(
                   queue.getLatestArtifact,
@@ -148,6 +148,9 @@ export default class ArtifactList extends React.PureComponent {
       <div style={{ fontSize: 14, ...style }}>
         {artifacts.map(({ name, icon, url }, index) => (
           <div key={`runs-menu-artifacts-${index}`} style={{ marginBottom: 8 }}>
+            {artifacts.userSession && (
+              <i className="fa fa-lock" style={{ marginRight: 5 }} />
+            )}
             <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
             <a href={url} target="_blank" rel="noopener noreferrer">
               {name}
