@@ -77,14 +77,14 @@ export default class HooksManager extends React.PureComponent {
     }
   };
 
-  callbackChildLoaded(loadedGroup) {
+  handleLoadHooksList = loadedGroup => {
     this.setState({
       groupsLoaded: [
         ...this.state.groupsLoaded.filter(group => group !== loadedGroup),
         loadedGroup
       ]
     });
-  }
+  };
 
   renderGroups() {
     const { hooks, hookGroupId, hookId } = this.props;
@@ -107,7 +107,7 @@ export default class HooksManager extends React.PureComponent {
             group={group}
             selectHook={this.selectHook}
             hookGroupId={hookGroupId}
-            callbackChildLoaded={this.callbackChildLoaded.bind(this)}
+            onLoadHooksList={this.handleLoadHooksList}
             hookId={hookId}
           />
         ))}
