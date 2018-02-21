@@ -4,12 +4,12 @@ import { safeLoad, safeDump } from 'js-yaml';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client-web';
 import Icon from 'react-fontawesome';
-import Spinner from '../../components/Spinner';
-import Error from '../../components/Error';
-import TimeInput from '../../components/TimeInput';
-import DateView from '../../components/DateView';
-import CodeEditor from '../../components/CodeEditor';
-import ModalItem from '../../components/ModalItem';
+import Spinner from '../Spinner';
+import Error from '../Error';
+import TimeInput from '../TimeInput';
+import DateView from '../DateView';
+import CodeEditor from '../CodeEditor';
+import ModalItem from '../ModalItem';
 import UserSession from '../../auth/UserSession';
 
 const safeDumpOpts = { noCompatMode: true, noRefs: true };

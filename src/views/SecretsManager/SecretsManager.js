@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
-import SecretEditor from './SecretEditor';
+import SecretEditor from '../../components/SecretEditor';
 import UserSession from '../../auth/UserSession';
 
 export default class SecretsManager extends React.PureComponent {
