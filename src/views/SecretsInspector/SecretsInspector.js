@@ -11,10 +11,9 @@ import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
-import SecretEditor from '../../components/SecretEditor';
 import UserSession from '../../auth/UserSession';
 
-export default class SecretsManager extends React.PureComponent {
+export default class SecretsInspector extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -37,33 +36,12 @@ export default class SecretsManager extends React.PureComponent {
     }
   }
 
-  loadSecrets = async (props = this.props) => {
-    try {
-      const { secrets } = await props.secrets.list();
-
-      this.setState({
-        secrets,
-        error: null
-      });
-    } catch (err) {
-      this.setState({
-        secrets: null,
-        error: err
-      });
-    }
-  };
-
   selectSecretId = (id = '') =>
     this.props.history.replace(
       `/secrets${id ? `/${encodeURIComponent(id)}` : ''}`
     );
 
   reloadSecrets = () => this.props.history.replace('/secrets');
-
-  clearSelectedSecret = () =>
-    this.props.history.replace(
-      `/secrets/${encodeURIComponent(this.props.selectedSecret)}`
-    );
 
   renderSecretsTable() {
     const { secretId } = this.props;
@@ -115,16 +93,6 @@ export default class SecretsManager extends React.PureComponent {
               <h4>OVERHERE</h4>
             </Col>
           </Row>
-          <br />
-          <br />
-          <HelmetTitle title="Secrets Renderer" />
-          <SecretEditor
-            userSession={this.props.userSession}
-            secretId={this.props.secretId}
-            secrets={this.props.secrets}
-            reloadSecrets={this.reloadSecrets}
-            selectSecretId={this.selectSecretId}
-          />
         </Col>
       </Row>
     );

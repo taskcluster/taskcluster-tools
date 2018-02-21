@@ -1,7 +1,7 @@
 import React from 'react';
 import WithClients from '../../components/WithClients';
 import WithUserSession from '../../components/WithUserSession';
-import SecretsManager from './SecretsManager';
+import SecretsInspector from './SecretsInspector';
 
 const View = ({ history, match }) => {
   const selectedSecret = decodeURIComponent(match.params.selectedSecret || '');
@@ -11,7 +11,7 @@ const View = ({ history, match }) => {
       {userSession => (
         <WithClients Secrets>
           {clients => (
-            <SecretsManager
+            <SecretsInspector
               history={history}
               {...clients}
               userSession={userSession}
