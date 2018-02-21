@@ -60,7 +60,10 @@ export default class SecretsManager extends React.PureComponent {
 
   reloadSecrets = () => this.props.history.replace('/secrets');
 
-  clearSelectedSecret = () => {};
+  clearSelectedSecret = () =>
+    this.props.history.replace(
+      `/secrets/${encodeURIComponent(this.props.selectedSecret)}`
+    );
 
   renderSecretsTable() {
     const { secretId } = this.props;
