@@ -79,10 +79,7 @@ export default class HooksManager extends React.PureComponent {
 
   handleLoadHooksList = loadedGroup => {
     this.setState({
-      groupsLoaded: [
-        ...this.state.groupsLoaded.filter(group => group !== loadedGroup),
-        loadedGroup
-      ]
+      groupsLoaded: [...new Set([...this.state.groupsLoaded, loadedGroup])]
     });
   };
 
