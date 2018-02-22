@@ -23,7 +23,7 @@ CodeMirror.registerHelper('lint', 'scopemode', text =>
 
 CodeMirror.defineSimpleMode('scopemode', {
   start: [
-    { regex: /\*/, token: 'star' },
+    { regex: /\*($|(\s+))/, token: 'star' },
     { regex: /:/, token: 'sep' },
     { regex: /\//, token: 'slash' },
     { regex: /<\.>/, token: 'mistake-param' },
