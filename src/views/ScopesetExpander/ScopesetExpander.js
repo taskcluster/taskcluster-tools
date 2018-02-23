@@ -55,7 +55,12 @@ export default class ScopesetExpander extends React.PureComponent {
   }
 
   handleClickCleanScopes = () => {
-    this.setState({ scopes: [] });
+    this.setState({
+      scopes: [],
+      expandedScopes: null,
+      error: null,
+      scopesIsValid: false
+    });
   };
 
   handleClickFetchExpanded = async () => {
