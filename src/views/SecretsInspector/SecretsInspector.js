@@ -20,7 +20,8 @@ export default class SecretsInspector extends React.PureComponent {
 
     this.state = {
       secrets: null,
-      error: null
+      error: null,
+      secretSearchTerm: ''
     };
   }
 
@@ -53,6 +54,11 @@ export default class SecretsInspector extends React.PureComponent {
     }
   };
 
+  secretSearchTermChanged = e =>
+    this.setState({ secretSearchTerm: e.target.value });
+
+  clearSecretSearchTerm = () => this.setState({ secretSearchTerm: '' });
+
   selectSecretId = (id = '') =>
     this.props.history.replace(
       `/secrets${id ? `/${encodeURIComponent(id)}` : ''}`
@@ -60,17 +66,10 @@ export default class SecretsInspector extends React.PureComponent {
 
   reloadSecrets = () => this.props.history.replace('/secrets');
 
-  renderSecretsTable() {
-    const { secretId } = this.props;
-    const { error, secrets } = this.state;
-
-    if (error) {
-      return <Error error={error} />;
-    }
-
-    if (!secrets) {
-      return <Spinner />;
-    }
+  renderSecrets() {
+    const filterSecrets = [...new Set(this.state.secrets)]
+      .sort()
+      .filter(secret => secret.includes(this.state.secretSearchTerm));
 
     return (
       <Row>
@@ -81,11 +80,11 @@ export default class SecretsInspector extends React.PureComponent {
             </InputGroup.Addon>
             <FormControl
               type="text"
-              value={this.state.scopeSearchTerm}
-              onChange={this.scopeSearchTermChanged}
+              value={this.state.secretSearchTerm}
+              onChange={this.secretSearchTermChanged}
             />
             <InputGroup.Button>
-              <Button onClick={this.clearScopeSearchTerm}>
+              <Button onClick={this.clearSecretSearchTerm}>
                 <Glyphicon glyph="remove" /> Clear
               </Button>
             </InputGroup.Button>
@@ -96,24 +95,26 @@ export default class SecretsInspector extends React.PureComponent {
                 <th>SecretId</th>
               </tr>
             </thead>
-            <tbody>
-              {secrets.map((id, index) => (
-                <tr
-                  key={`secret-row-${index}`}
-                  className={secretId === id ? 'info' : null}>
-                  <td>
-                    <Link to={`/secrets/${encodeURIComponent(id)}`}>
-                      <code>{id}</code>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            <tbody>{filterSecrets.map(this.renderSecretRow)}</tbody>
           </Table>
         </Col>
       </Row>
     );
   }
+
+  renderSecretRow = (id, index) => {
+    const isSelected = this.props.selectedSecret === id;
+
+    return (
+      <tr key={`secret-row-${index}`} className={isSelected ? 'info' : ''}>
+        <td>
+          <Link to={`/secrets/${encodeURIComponent(id)}`}>
+            <code>{id}</code>
+          </Link>
+        </td>
+      </tr>
+    );
+  };
 
   renderSelectedSecret() {
     return (
@@ -135,7 +136,17 @@ export default class SecretsInspector extends React.PureComponent {
   }
 
   renderInspector() {
-    return <div>{this.renderSecretsTable()}</div>;
+    const { error, secrets } = this.state;
+
+    if (error) {
+      return <Error error={error} />;
+    }
+
+    if (!secrets) {
+      return <Spinner />;
+    }
+
+    return <div>{this.renderSecrets()}</div>;
   }
 
   render() {
