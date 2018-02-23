@@ -5,13 +5,13 @@ import HelmetTitle from '../../components/HelmetTitle';
 import ScopeEditor from '../../components/ScopeEditor';
 
 export default class ScopesetExpander extends React.PureComponent {
-  initialState = {
+  static initialState = {
     scopes: [],
     expandedScopes: null,
     error: null,
     scopesIsValid: false
   };
-  state = this.initialState;
+  state = ScopesetExpander.initialState;
 
   componentWillReceiveProps(nextProps) {
     if (
@@ -56,7 +56,7 @@ export default class ScopesetExpander extends React.PureComponent {
   }
 
   handleClickCleanScopes = () => {
-    this.setState(this.initialState);
+    this.setState(ScopesetExpander.initialState);
   };
 
   handleClickFetchExpanded = async () => {
