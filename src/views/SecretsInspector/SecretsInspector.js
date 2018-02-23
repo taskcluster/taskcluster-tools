@@ -2,9 +2,10 @@ import React from 'react';
 import {
   Row,
   Col,
-  ButtonToolbar,
   Button,
   Glyphicon,
+  InputGroup,
+  FormControl,
   Table
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
@@ -36,6 +37,22 @@ export default class SecretsInspector extends React.PureComponent {
     }
   }
 
+  loadSecrets = async (props = this.props) => {
+    try {
+      const { secrets } = await props.secrets.list();
+
+      this.setState({
+        secrets,
+        error: null
+      });
+    } catch (err) {
+      this.setState({
+        secrets: null,
+        error: err
+      });
+    }
+  };
+
   selectSecretId = (id = '') =>
     this.props.history.replace(
       `/secrets${id ? `/${encodeURIComponent(id)}` : ''}`
@@ -56,26 +73,45 @@ export default class SecretsInspector extends React.PureComponent {
     }
 
     return (
-      <Table condensed={true} hover={true}>
-        <thead>
-          <tr>
-            <th>SecretId</th>
-          </tr>
-        </thead>
-        <tbody>
-          {secrets.map((id, index) => (
-            <tr
-              key={`secret-row-${index}`}
-              className={secretId === id ? 'info' : null}>
-              <td>
-                <Link to={`/secrets/${encodeURIComponent(id)}`}>
-                  <code>{id}</code>
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Row>
+        <Col md={12}>
+          <InputGroup style={{ marginBottom: 20 }}>
+            <InputGroup.Addon>
+              <Glyphicon glyph="search" />
+            </InputGroup.Addon>
+            <FormControl
+              type="text"
+              value={this.state.scopeSearchTerm}
+              onChange={this.scopeSearchTermChanged}
+            />
+            <InputGroup.Button>
+              <Button onClick={this.clearScopeSearchTerm}>
+                <Glyphicon glyph="remove" /> Clear
+              </Button>
+            </InputGroup.Button>
+          </InputGroup>
+          <Table condensed={true} hover={true}>
+            <thead>
+              <tr>
+                <th>SecretId</th>
+              </tr>
+            </thead>
+            <tbody>
+              {secrets.map((id, index) => (
+                <tr
+                  key={`secret-row-${index}`}
+                  className={secretId === id ? 'info' : null}>
+                  <td>
+                    <Link to={`/secrets/${encodeURIComponent(id)}`}>
+                      <code>{id}</code>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Col>
+      </Row>
     );
   }
 
@@ -98,33 +134,15 @@ export default class SecretsInspector extends React.PureComponent {
     );
   }
 
-  render() {
-    const { secretId } = this.props;
-    const { secrets } = this.state;
+  renderInspector() {
+    return <div>{this.renderSecretsTable()}</div>;
+  }
 
+  render() {
     return (
       <div>
-        <Row>
-          <HelmetTitle title="Secrets Manager" />
-          <Col md={5}>
-            {this.renderSecretsTable()}
-            <ButtonToolbar>
-              <Button
-                bsStyle="primary"
-                onClick={this.reloadSecrets}
-                disabled={!secretId}>
-                <Glyphicon glyph="plus" /> Add Secret
-              </Button>
-              <Button
-                bsStyle="success"
-                onClick={() => this.loadSecrets(this.props)}
-                disabled={!secrets}>
-                <Glyphicon glyph="refresh" /> Refresh
-              </Button>
-            </ButtonToolbar>
-          </Col>
-        </Row>
-        {this.renderSelectedSecret()}
+        <HelmetTitle title="Secret Inspector" />
+        {this.renderInspector()}
       </div>
     );
   }
