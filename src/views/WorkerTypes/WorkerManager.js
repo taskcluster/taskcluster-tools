@@ -82,6 +82,8 @@ export default class WorkerManager extends React.PureComponent {
   handleLayoutChange = () =>
     this.setQuery({ layout: this.state.layout === 'grid' ? 'table' : 'grid' });
 
+  handleRefresh = () => window.location.reload();
+
   handleLastActiveClick = () =>
     this.setQuery({ lastActive: !this.state.lastActive, orderBy: null });
 
@@ -218,6 +220,9 @@ export default class WorkerManager extends React.PureComponent {
                 </ToggleButton>
               </ToggleButtonGroup>
             </ButtonToolbar>
+            <Button onClick={this.handleRefresh} bsSize="sm">
+              &nbsp;&nbsp;Refresh
+            </Button>
           </div>
         )}
         {provisionerId && (
