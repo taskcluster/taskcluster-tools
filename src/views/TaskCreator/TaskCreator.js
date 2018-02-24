@@ -5,7 +5,6 @@ import { safeLoad, safeDump } from 'js-yaml';
 import { nice } from 'slugid';
 import moment from 'moment';
 import Error from '../../components/Error';
-import Spinner from '../../components/Spinner';
 import CodeEditor from '../../components/CodeEditor';
 import HelmetTitle from '../../components/HelmetTitle';
 import UserSession from '../../auth/UserSession';
@@ -125,15 +124,18 @@ export default class TaskCreator extends React.PureComponent {
 
   handleCreateTask = async () => {
     const { task } = this.state;
-    const taskId = nice();
-    const payload = safeLoad(task);
 
-    try {
-      await this.props.queue.createTask(taskId, payload);
-      localStorage.setItem(localStorageKey, task);
-      this.setState({ createdTaskId: taskId });
-    } catch (err) {
-      this.setState({ createdTaskError: err, createdTaskId: null });
+    if (task) {
+      const taskId = nice();
+      const payload = safeLoad(task);
+
+      try {
+        await this.props.queue.createTask(taskId, payload);
+        localStorage.setItem(localStorageKey, task);
+        this.setState({ createdTaskId: taskId });
+      } catch (err) {
+        this.setState({ createdTaskError: err, createdTaskId: null });
+      }
     }
   };
 
@@ -163,10 +165,6 @@ export default class TaskCreator extends React.PureComponent {
 
     if (error) {
       return <Error error={error} />;
-    }
-
-    if (!task) {
-      return <Spinner />;
     }
 
     return (
