@@ -79,8 +79,15 @@ export default class HooksManager extends React.PureComponent {
 
   handleLoadHooksList = loadedGroup => {
     this.setState({
-      groupsLoaded: [...new Set([...this.state.groupsLoaded, loadedGroup])]
+      groupsLoaded: [...this.state.groupsLoaded, loadedGroup]
     });
+  };
+
+  isAllGroupLoaded = () => {
+    const { groups } = this.state;
+    const groupsLoadedSet = new Set(this.state.groupsLoaded);
+
+    return groups.filter(group => groupsLoadedSet.has(group)).length > 0;
   };
 
   renderGroups() {
@@ -91,12 +98,11 @@ export default class HooksManager extends React.PureComponent {
       return <Error error={error} />;
     }
 
-    if (!groups || this.state.groupsLoaded.length !== groups.length) {
-      return <Spinner />;
-    }
+    const isAllGroupLoaded = this.isAllGroupLoaded();
 
     return (
       <div>
+        {!groups || !isAllGroupLoaded ? <Spinner /> : null}
         {groups.map(group => (
           <HookBrowser
             key={group}
@@ -105,6 +111,7 @@ export default class HooksManager extends React.PureComponent {
             selectHook={this.selectHook}
             hookGroupId={hookGroupId}
             onLoadHooksList={this.handleLoadHooksList}
+            showList={isAllGroupLoaded}
             hookId={hookId}
           />
         ))}
