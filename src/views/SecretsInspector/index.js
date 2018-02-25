@@ -4,7 +4,11 @@ import WithUserSession from '../../components/WithUserSession';
 import SecretsInspector from './SecretsInspector';
 
 const View = ({ history, match }) => {
-  const selectedSecret = decodeURIComponent(match.params.selectedSecret || '');
+  const otherSelectedSecret =
+    history.location.state && history.location.state.selectedSecret;
+  const selectedSecret = decodeURIComponent(
+    match.params.selectedSecret || otherSelectedSecret || ''
+  );
 
   return (
     <WithUserSession>

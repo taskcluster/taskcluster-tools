@@ -108,7 +108,11 @@ export default class SecretsInspector extends React.PureComponent {
     return (
       <tr key={`secret-row-${index}`} className={isSelected ? 'info' : ''}>
         <td>
-          <Link to={`/secrets/${encodeURIComponent(id)}`}>
+          <Link
+            to={{
+              pathname: `/secrets/${encodeURIComponent(id)}`,
+              state: { selectedSecret: id }
+            }}>
             <code>{id}</code>
           </Link>
         </td>
