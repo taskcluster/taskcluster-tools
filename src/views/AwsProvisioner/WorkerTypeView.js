@@ -8,6 +8,7 @@ import Code from '../../components/Code';
 import WorkerTypeEditor from './WorkerTypeEditor';
 import WorkerTypeResources from './WorkerTypeResources';
 import WorkerTypeStatus from './WorkerTypeStatus';
+import UserSession from '../../auth/UserSession';
 
 export default class WorkerTypeView extends React.PureComponent {
   static propTypes = {
@@ -37,9 +38,14 @@ export default class WorkerTypeView extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (
       nextProps.workerType !== this.props.workerType ||
-      nextProps.provisionerId !== this.props.provisionerId
+      nextProps.provisionerId !== this.props.provisionerId ||
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
     ) {
-      this.loadWorkerType(nextProps);
+      if (this.state.error) {
+        this.setState({ error: null }, () => this.loadWorkerType(nextProps));
+      } else {
+        this.loadWorkerType(nextProps);
+      }
     }
   }
 
