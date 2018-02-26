@@ -62,6 +62,10 @@ export default class ClientCreator extends React.PureComponent {
     });
   };
 
+  handleUnknownCallbackAcknowledgement = () => {
+    this.setState({ unknownCallbackAcknowledged: true });
+  };
+
   triggerCallback(clientId, accessToken) {
     window.location.replace(
       `${this.state.query
@@ -205,8 +209,7 @@ export default class ClientCreator extends React.PureComponent {
         <ButtonToolbar className={styles.flexRight}>
           <Button
             bsStyle="danger"
-            onClick={() =>
-              this.setState({ unknownCallbackAcknowledged: true })}>
+            onClick={this.handleUnknownCallbackAcknowledgement}>
             Proceed
           </Button>
         </ButtonToolbar>
