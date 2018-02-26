@@ -32,6 +32,7 @@ export default class WorkerManager extends React.PureComponent {
       orderBy: null,
       actions: [],
       error: null,
+      loading: false,
       ...this.getSettingsFromProps(props)
     };
   }
@@ -82,7 +83,10 @@ export default class WorkerManager extends React.PureComponent {
   handleLayoutChange = () =>
     this.setQuery({ layout: this.state.layout === 'grid' ? 'table' : 'grid' });
 
-  handleRefresh = () => window.location.reload();
+  handleRefresh = () => {
+    // window.location.reload();
+    this.setState({ loading: !this.state.loading });
+  };
 
   handleLastActiveClick = () =>
     this.setQuery({ lastActive: !this.state.lastActive, orderBy: null });
@@ -235,6 +239,7 @@ export default class WorkerManager extends React.PureComponent {
             orderBy={this.state.orderBy}
             layout={this.state.layout}
             searchTerm={this.state.search}
+            onClick={this.state.loading}
           />
         )}
       </div>
