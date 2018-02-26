@@ -55,6 +55,8 @@ export default class SecretsInspector extends React.PureComponent {
     }
   };
 
+  clearSelectedSecret = () => this.props.history.replace('./secrets');
+
   secretSearchTermChanged = e =>
     this.setState({ secretSearchTerm: e.target.value });
 
