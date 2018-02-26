@@ -34,7 +34,6 @@ export default class SearchForm extends React.PureComponent {
       taskGroupIdInput: props.taskGroupId || '',
       taskIdInput: props.taskId || ''
     };
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentWillReceiveProps({ taskGroupId, taskId }) {
@@ -62,6 +61,12 @@ export default class SearchForm extends React.PureComponent {
   };
 
   handleSubmit = e => {
+    const isValid = this.validate().form;
+
+    if (!isValid) {
+      return;
+    }
+
     this.props.onSearch({
       taskGroupId: this.state.taskGroupIdInput || '',
       taskId: this.state.taskIdInput || ''
