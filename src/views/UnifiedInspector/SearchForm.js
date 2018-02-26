@@ -64,14 +64,15 @@ export default class SearchForm extends React.PureComponent {
     const isValid = this.validate().form;
 
     if (!isValid) {
-      return;
+      e.preventDefault();
+
+      return false;
     }
 
     this.props.onSearch({
       taskGroupId: this.state.taskGroupIdInput || '',
       taskId: this.state.taskIdInput || ''
     });
-    e.preventDefault();
   };
   handleKeyPress = e => {
     if (e.key === 'Enter') {
