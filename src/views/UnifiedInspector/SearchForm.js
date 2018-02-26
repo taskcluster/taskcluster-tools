@@ -66,7 +66,7 @@ export default class SearchForm extends React.PureComponent {
     if (!isValid) {
       e.preventDefault();
 
-      return false;
+      return;
     }
 
     this.props.onSearch({
