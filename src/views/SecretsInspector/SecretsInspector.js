@@ -55,7 +55,7 @@ export default class SecretsInspector extends React.PureComponent {
     }
   };
 
-  clearSelectedSecret = () => this.props.history.replace('./secrets');
+  clearSelectedSecret = () => this.props.history.replace('/secrets');
 
   secretSearchTermChanged = e =>
     this.setState({ secretSearchTerm: e.target.value });
@@ -135,6 +135,8 @@ export default class SecretsInspector extends React.PureComponent {
             </Col>
             <Col md={11}>
               <SecretEditor
+                userSession={this.props.userSession}
+                selectSecretId={this.selectSecretId}
                 reloadSecrets={this.loadSecrets}
                 secrets={this.state.secrets}
               />
