@@ -181,6 +181,15 @@ export default class ClientCreator extends React.PureComponent {
     </div>
   );
 
+  renderInvalidQuery = () => (
+    <div>
+      <Alert bsStyle="danger">
+        This tool must be invoked with query parameters{' '}
+        <code>callback_url</code> and <code>name</code>.
+      </Alert>
+    </div>
+  );
+
   renderUnknownCallback = () => (
     <div>
       <Alert bsStyle="danger">
@@ -211,9 +220,15 @@ export default class ClientCreator extends React.PureComponent {
     /^https?:\/\/localhost(:[0-9]+)?(\/|$)/.test(callbackUrl);
 
   render() {
+    const { query, unknownCallbackAcknowledged } = this.state;
+
+    if (!query.callback_url || !query.name) {
+      return this.renderInvalidQuery();
+    }
+
     if (
-      !this.isWhitelistedCallback(this.state.query.callback_url) &&
-      !this.state.unknownCallbackAcknowledged
+      !this.isWhitelistedCallback(query.callback_url) &&
+      !unknownCallbackAcknowledged
     ) {
       return this.renderUnknownCallback();
     }
