@@ -13,6 +13,7 @@ import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
 import UserSession from '../../auth/UserSession';
+import SecretEditor from '../../components/SecretEditor';
 
 export default class SecretsInspector extends React.PureComponent {
   constructor(props) {
@@ -131,7 +132,10 @@ export default class SecretsInspector extends React.PureComponent {
               </Button>
             </Col>
             <Col md={11}>
-              <h4>OVERHERE</h4>
+              <SecretEditor
+                reloadSecrets={this.loadSecrets}
+                secrets={this.state.secrets}
+              />
             </Col>
           </Row>
         </Col>
@@ -140,6 +144,7 @@ export default class SecretsInspector extends React.PureComponent {
   }
 
   renderInspector() {
+    const { selectedSecret } = this.props;
     const { error, secrets } = this.state;
 
     if (error) {
@@ -150,7 +155,11 @@ export default class SecretsInspector extends React.PureComponent {
       return <Spinner />;
     }
 
-    return <div>{this.renderSecrets()}</div>;
+    if (selectedSecret) {
+      return this.renderSelectedSecret();
+    }
+
+    return this.renderSecrets();
   }
 
   render() {
