@@ -207,7 +207,7 @@ export default class ClientCreator extends React.PureComponent {
             bsStyle="danger"
             onClick={() =>
               this.setState({ unknownCallbackAcknowledged: true })}>
-            I am Sure
+            Proceed
           </Button>
         </ButtonToolbar>
       </Alert>
