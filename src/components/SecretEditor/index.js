@@ -221,28 +221,10 @@ export default class SecretEditor extends React.PureComponent {
               placeholder="garbage/<ircnick>/my-secret"
             />
             <br />
-        <div className="form-horizontal">
-              ) : (
-                <div className="form-control-static">
-                  {secretId}
-                  {secretId.startsWith('garbage/') && (
-                    <div className="alert alert-warning">
-                      This is a &quot;garbage&quot; secret and is visible to
-                      just about everybody. Do not put any real secrets here!
-                    </div>
-                  )}
-                </div>
-              )}
             <div className="alert alert-warning">
               Secrets starting with <code>garbage/</code> are visible to just
               about everybody. Use them to experiment, but not for real secrets!
             </div>
-          </div>
-          <div className="form-group">
-            <label className="control-label col-md-2">Expires</label>
-            <div className="col-md-10">
-                <DateView date={expires} />
-              )}
             <TimeInput
               value={new Date(expires)}
               onChange={this.onExpiresChange}
@@ -270,7 +252,25 @@ export default class SecretEditor extends React.PureComponent {
     );
   }
 
+  renderEdit() {
+    const { secretId } = this.props;
+    const { expires } = this.state;
+
+    return (
+      <div className="form-group">
+        <label className="control-label col-md-2">Secret Name</label>
+        <div className="col-md-10">
+          <div className="form-control-static">
+            {secretId}
+            {secretId.startsWith('garbage/') && (
+              <div className="alert alert-warning">
+                This is a &quot;garbage&quot; secret and is visible to just
+                about everybody. Do not put any real secrets here!
+              </div>
+            )}
           </div>
+          <DateView date={expires} />
+          <br />
           <div className="form-group">
             <label className="control-label col-md-2">
               Secret Value (YAML)
@@ -281,8 +281,24 @@ export default class SecretEditor extends React.PureComponent {
             <Button bsStyle="success" onClick={this.startEditing}>
               <Glyphicon glyph="pencil" /> Edit Secret
             </Button>
+            <ModalItem
+              button={true}
+              bsStyle="danger"
+              onSubmit={this.deleteSecret}
+              onComplete={this.props.reloadSecrets}
+              body={
+                <span>
+                  Are you sure you want to delete secret <code>{secretId}</code>?
+                </span>
+              }>
+              <Icon name="trash" /> Delete Secret
+            </ModalItem>
           </ButtonToolbar>
-        )}
+        </div>
+      </div>
+    );
+  }
+
       </div>
     );
   }
