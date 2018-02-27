@@ -184,26 +184,29 @@ export default class SecretEditor extends React.PureComponent {
       loading,
       secretNameValue
     } = this.state;
+  renderError() {
+    const { error } = this.state;
 
-    if (error) {
-      return <Error error={error} />;
+    if (!error) {
+      return null;
     }
 
     if (loading) {
       return <Spinner />;
     }
+    return (
+      <Alert bsStyle="danger" onDismiss={this.dismissError}>
+        <strong>Error executing operation</strong>
+        <br />
+        {error.toString()}
+      </Alert>
+    );
+  }
 
     const isCreating = editing && !secretId;
 
     return (
-      <div>
-        {error && (
-          <Alert bsStyle="danger" onDismiss={this.dismissError}>
-            <strong>Error executing operation</strong>
             <br />
-            {error.toString()}
-          </Alert>
-        )}
         <div className="form-horizontal">
           <div className="form-group">
             <label className="control-label col-md-2">Secret Name</label>
@@ -258,34 +261,6 @@ export default class SecretEditor extends React.PureComponent {
             </label>
             <div className="col-md-10">{this.renderValue()}</div>
           </div>
-        </div>
-        {editing ? (
-          <ButtonToolbar>
-            <Button
-              bsStyle="success"
-              onClick={this.saveSecret}
-              disabled={invalid}>
-              <Glyphicon glyph="ok" />{' '}
-              {isCreating ? 'Create Secret' : 'Save Changes'}
-            </Button>
-            &nbsp;&nbsp;
-            {!isCreating && (
-              <ModalItem
-                button={true}
-                bsStyle="danger"
-                onSubmit={this.deleteSecret}
-                onComplete={this.props.reloadSecrets}
-                body={
-                  <span>
-                    Are you sure you want to delete secret{' '}
-                    <code>{secretId}</code>?
-                  </span>
-                }>
-                <Icon name="trash" /> Delete Secret
-              </ModalItem>
-            )}
-          </ButtonToolbar>
-        ) : (
           <ButtonToolbar>
             <Button bsStyle="success" onClick={this.startEditing}>
               <Glyphicon glyph="pencil" /> Edit Secret
