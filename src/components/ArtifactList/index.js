@@ -89,6 +89,7 @@ export default class ArtifactList extends React.PureComponent {
         if (userSession) {
           return {
             name,
+            locked: true,
             icon: getIconFromMime(contentType),
             url: isNil(runId)
               ? await queue.buildSignedUrl(
@@ -107,8 +108,7 @@ export default class ArtifactList extends React.PureComponent {
 
         return {
           name,
-          url: null,
-          icon: 'lock'
+          url: null
         };
       })
     )
@@ -146,8 +146,9 @@ export default class ArtifactList extends React.PureComponent {
       </NavDropdown>
     ) : (
       <div style={{ fontSize: 14, ...style }}>
-        {artifacts.map(({ name, icon, url }, index) => (
+        {artifacts.map(({ name, locked, icon, url }, index) => (
           <div key={`runs-menu-artifacts-${index}`} style={{ marginBottom: 8 }}>
+            {locked && <i className="fa fa-lock" style={{ marginRight: 5 }} />}
             <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
             <a href={url} target="_blank" rel="noopener noreferrer">
               {name}
