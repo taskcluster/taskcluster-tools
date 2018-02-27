@@ -11,7 +11,7 @@ const View = ({ match, history, location }) => {
     return <Redirect to={`/hooks/${groupId}/${id}`} />;
   } else if (groupId) {
     return <Redirect to={`/hooks/${groupId}`} />;
-  } else if (!groupId && !id && create) {
+  } else if (create) {
     return <Redirect to={`/hooks/create`} />;
   }
 

@@ -67,12 +67,14 @@ export default class HooksManager extends React.PureComponent {
       hookId = encodeURIComponent(hookId); // eslint-disable-line no-param-reassign
     }
 
+    const { history } = this.props;
+
     if (hookGroupId && hookId) {
-      this.props.history.replace(`/hooks/${hookGroupId}/${hookId}`);
+      history.push(`/hooks/${hookGroupId}/${hookId}`);
     } else if (hookGroupId) {
-      this.props.history.replace(`/hooks/${hookGroupId}`);
+      history.push(`/hooks/${hookGroupId}`);
     } else if (!hookGroupId && !hookId) {
-      this.props.history.replace('/hooks/create');
+      history.push('/hooks/create');
     }
   };
 
