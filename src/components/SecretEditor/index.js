@@ -174,16 +174,6 @@ export default class SecretEditor extends React.PureComponent {
     return <em>none</em>;
   }
 
-  render() {
-    const { secretId } = this.props;
-    const {
-      error,
-      expires,
-      editing,
-      invalid,
-      loading,
-      secretNameValue
-    } = this.state;
   renderError() {
     const { error } = this.state;
 
@@ -191,9 +181,6 @@ export default class SecretEditor extends React.PureComponent {
       return null;
     }
 
-    if (loading) {
-      return <Spinner />;
-    }
     return (
       <Alert bsStyle="danger" onDismiss={this.dismissError}>
         <strong>Error executing operation</strong>
@@ -203,7 +190,6 @@ export default class SecretEditor extends React.PureComponent {
     );
   }
 
-    const isCreating = editing && !secretId;
   renderCreate() {
     const { expires, invalid, secretNameValue } = this.state;
 
@@ -299,6 +285,23 @@ export default class SecretEditor extends React.PureComponent {
     );
   }
 
+  render() {
+    const { secretId } = this.props;
+    const { error, editing, loading } = this.state;
+
+    if (error) {
+      return <Error error={error} />;
+    }
+
+    if (loading) {
+      return <Spinner />;
+    }
+
+    const isCreating = editing && !secretId;
+
+    return (
+      <div className="form-horizontal">
+        {isCreating ? this.renderCreate() : this.renderEdit()}
       </div>
     );
   }
