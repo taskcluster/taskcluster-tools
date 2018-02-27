@@ -153,7 +153,6 @@ export default class SecretEditor extends React.PureComponent {
     if (editing) {
       return (
         <CodeEditor
-          gutters={['CodeMirror-lint-markers']}
           lint={true}
           mode="yaml"
           value={secretValue}

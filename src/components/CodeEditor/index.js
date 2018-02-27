@@ -56,7 +56,7 @@ CodeEditor.propTypes = {
 CodeEditor.defaultProps = {
   lineNumbers: true,
   textAreaClassName: 'form-control',
-  gutter: ['CodeMirror-lint-markers'],
+  gutters: ['CodeMirror-lint-markers'],
   indentWithTabs: false,
   tabSize: 2,
   textAreaStyle: { minHeight: '20em' }
