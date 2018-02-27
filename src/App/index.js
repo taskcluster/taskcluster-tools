@@ -70,8 +70,8 @@ const IndexBrowser = loadable(() =>
 const HooksManager = loadable(() =>
   import(/* webpackChunkName: 'HooksManager' */ '../views/HooksManager')
 );
-const SecretsInspector = loadable(() =>
-  import(/* webpackChunkName: 'SecretsInspector' */ '../views/SecretsInspector')
+const SecretsManager = loadable(() =>
+  import(/* webpackChunkName: 'SecretsManager' */ '../views/SecretsManager')
 );
 const Diagnostics = loadable(() =>
   import(/* webpackChunkName: 'Diagnostics' */ '../views/Diagnostics')
@@ -291,7 +291,7 @@ export default class App extends React.Component {
                 />
                 <PropsRoute
                   path="/secrets/:secretId?"
-                  component={SecretsInspector}
+                  component={SecretsManager}
                 />
                 <PropsRoute path="/diagnostics" component={Diagnostics} />
                 <PropsRoute

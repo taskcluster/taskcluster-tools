@@ -1,7 +1,7 @@
 import React from 'react';
 import WithClients from '../../components/WithClients';
 import WithUserSession from '../../components/WithUserSession';
-import SecretsInspector from './SecretsInspector';
+import SecretsManager from './SecretsManager';
 
 const View = ({ history, match }) => {
   const otherSelectedSecret =
@@ -15,7 +15,7 @@ const View = ({ history, match }) => {
       {userSession => (
         <WithClients Secrets>
           {clients => (
-            <SecretsInspector
+            <SecretsManager
               history={history}
               {...clients}
               userSession={userSession}

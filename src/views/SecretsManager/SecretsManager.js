@@ -15,7 +15,7 @@ import HelmetTitle from '../../components/HelmetTitle';
 import UserSession from '../../auth/UserSession';
 import SecretEditor from '../../components/SecretEditor';
 
-export default class SecretsInspector extends React.PureComponent {
+export default class SecretsManager extends React.PureComponent {
   constructor(props) {
     super(props);
 
