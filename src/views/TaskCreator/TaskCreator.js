@@ -181,13 +181,13 @@ export default class TaskCreator extends React.PureComponent {
           <Button
             bsStyle="primary"
             onClick={this.handleCreateTask}
-            disabled={this.state.invalid}>
+            disabled={!task || this.state.invalid}>
             <Glyphicon glyph="ok" /> Create Task
           </Button>
           <Button
             bsStyle="info"
             onClick={this.handleUpdateTimestamps}
-            disabled={this.state.invalid}>
+            disabled={!task || this.state.invalid}>
             <Glyphicon glyph="repeat" /> Update Timestamps
           </Button>
           <Button bsStyle="danger" onClick={this.handleResetEditor}>
