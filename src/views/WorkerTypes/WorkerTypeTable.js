@@ -30,7 +30,7 @@ export default class WorkerTypeTable extends React.PureComponent {
     orderBy: string,
     searchTerm: string,
     lastActive: bool,
-    onClick: bool
+    clickState: bool
   };
 
   constructor(props) {
@@ -40,7 +40,6 @@ export default class WorkerTypeTable extends React.PureComponent {
       workerTypes: [],
       workerTypeSummaries: [],
       loading: false,
-      onClick: false,
       error: null
     };
   }
@@ -57,14 +56,10 @@ export default class WorkerTypeTable extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.onClick !== this.state.onClick) {
-      this.setState({ onClick: nextProps.onClick });
-      this.readWorkerTypes(nextProps);
-    }
-
     if (
-      this.props.provisionerId &&
-      this.props.provisionerId !== nextProps.provisionerId
+      (this.props.provisionerId &&
+        this.props.provisionerId !== nextProps.provisionerId) ||
+      this.props.clickState !== nextProps.clickState
     ) {
       this.readWorkerTypes(nextProps);
     }
