@@ -20,7 +20,8 @@ export default class ClientCreator extends React.PureComponent {
       client: null,
       clientPrefix: null,
       query: parse(props.location.search.slice(1)),
-      error: null
+      error: null,
+      unknownCallbackAcknowledged: false
     };
   }
 
@@ -59,6 +60,10 @@ export default class ClientCreator extends React.PureComponent {
         this.setState({ error, loading: false });
       }
     });
+  };
+
+  handleUnknownCallbackAcknowledgement = () => {
+    this.setState({ unknownCallbackAcknowledged: true });
   };
 
   triggerCallback(clientId, accessToken) {
@@ -174,19 +179,69 @@ export default class ClientCreator extends React.PureComponent {
     </div>
   );
 
-  requestLogin = () => (
+  renderRequestLogin = () => (
     <div>
       <Alert bsStyle="warning">Please sign in to continue.</Alert>
     </div>
   );
 
+  renderInvalidQuery = () => (
+    <div>
+      <Alert bsStyle="danger">
+        This tool must be invoked with query parameters{' '}
+        <code>callback_url</code> and <code>name</code>.
+      </Alert>
+    </div>
+  );
+
+  renderUnknownCallback = () => (
+    <div>
+      <Alert bsStyle="danger">
+        You are granting access to <code>{this.state.query.callback_url}</code>.
+        This tool is typically only used to grant access to{' '}
+        <code>http://localhost</code> as part of a
+        <code>taskcluster signin</code> operation.
+        <br />
+        Granting access to another URL might expose your credentials to an
+        attacker that controls that URL.
+        <br />
+        Are you sure you want to proceed?
+        <ButtonToolbar className={styles.flexRight}>
+          <Button
+            bsStyle="danger"
+            onClick={this.handleUnknownCallbackAcknowledgement}>
+            Proceed
+          </Button>
+        </ButtonToolbar>
+      </Alert>
+    </div>
+  );
+
+  // Only localhost callback_url's are whitelisted.  This tool is not intended for other uses
+  // than setting up credentials via `taskcluster signin`, which uses this URL format.
+  isWhitelistedCallback = callbackUrl =>
+    /^https?:\/\/localhost(:[0-9]+)?(\/|$)/.test(callbackUrl);
+
   render() {
+    const { query, unknownCallbackAcknowledged } = this.state;
+
+    if (!query.callback_url || !query.name) {
+      return this.renderInvalidQuery();
+    }
+
+    if (
+      !this.isWhitelistedCallback(query.callback_url) &&
+      !unknownCallbackAcknowledged
+    ) {
+      return this.renderUnknownCallback();
+    }
+
     if (this.state.loading) {
       return <Spinner />;
     }
 
     if (!this.props.userSession) {
-      return this.requestLogin();
+      return this.renderRequestLogin();
     }
 
     return (
