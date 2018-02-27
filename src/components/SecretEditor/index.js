@@ -204,30 +204,24 @@ export default class SecretEditor extends React.PureComponent {
   }
 
     const isCreating = editing && !secretId;
+  renderCreate() {
+    const { expires, invalid, secretNameValue } = this.state;
 
     return (
+      <div className="form-group">
+        <label className="control-label col-md-2">Secret Name</label>
+        <div className="col-md-10">
+          <div>
+            <input
+              type="text"
+              className="form-control"
+              required={true}
+              value={secretNameValue}
+              onChange={this.handleSecretNameChange}
+              placeholder="garbage/<ircnick>/my-secret"
+            />
             <br />
         <div className="form-horizontal">
-          <div className="form-group">
-            <label className="control-label col-md-2">Secret Name</label>
-            <div className="col-md-10">
-              {isCreating ? (
-                <div>
-                  <input
-                    type="text"
-                    className="form-control"
-                    required={true}
-                    value={secretNameValue}
-                    onChange={this.handleSecretNameChange}
-                    placeholder="garbage/<ircnick>/my-secret"
-                  />
-                  <br />
-                  <div className="alert alert-warning">
-                    Secrets starting with <code>garbage/</code> are visible to
-                    just about everybody. Use them to experiment, but not for
-                    real secrets!
-                  </div>
-                </div>
               ) : (
                 <div className="form-control-static">
                   {secretId}
@@ -239,21 +233,43 @@ export default class SecretEditor extends React.PureComponent {
                   )}
                 </div>
               )}
+            <div className="alert alert-warning">
+              Secrets starting with <code>garbage/</code> are visible to just
+              about everybody. Use them to experiment, but not for real secrets!
             </div>
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">Expires</label>
             <div className="col-md-10">
-              {editing ? (
-                <TimeInput
-                  value={new Date(expires)}
-                  onChange={this.onExpiresChange}
-                  className="form-control"
-                />
-              ) : (
                 <DateView date={expires} />
               )}
+            <TimeInput
+              value={new Date(expires)}
+              onChange={this.onExpiresChange}
+              className="form-control"
+            />
+            <br />
+            <div className="form-group">
+              <label className="control-label col-md-2">
+                Secret Value (YAML)
+              </label>
+              <div className="col-md-10">{this.renderValue()}</div>
             </div>
+            <ButtonToolbar>
+              <Button
+                bsStyle="success"
+                onClick={this.saveSecret}
+                disabled={invalid}>
+                <Glyphicon glyph="ok" />
+                {' Create Secret'}
+              </Button>
+            </ButtonToolbar>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
           </div>
           <div className="form-group">
             <label className="control-label col-md-2">
