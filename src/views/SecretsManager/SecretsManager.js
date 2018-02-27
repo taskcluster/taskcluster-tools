@@ -44,8 +44,7 @@ export default class SecretsManager extends React.PureComponent {
       const { secrets } = await props.secrets.list();
 
       this.setState({
-        secrets,
-        error: null
+        secrets
       });
     } catch (err) {
       this.setState({
@@ -60,7 +59,7 @@ export default class SecretsManager extends React.PureComponent {
   secretSearchTermChanged = e =>
     this.setState({ secretSearchTerm: e.target.value });
 
-  clearSecretSearchTerm = () => this.setState({ secretSearchTerm: '' });
+  clearSearchTerm = () => this.setState({ secretSearchTerm: '' });
 
   selectSecretId = (id = '') =>
     this.props.history.replace(
@@ -87,7 +86,7 @@ export default class SecretsManager extends React.PureComponent {
               onChange={this.secretSearchTermChanged}
             />
             <InputGroup.Button>
-              <Button onClick={this.clearSecretSearchTerm}>
+              <Button onClick={this.clearSearchTerm}>
                 <Glyphicon glyph="remove" /> Clear
               </Button>
             </InputGroup.Button>
