@@ -22,7 +22,7 @@ export default class SecretsManager extends React.PureComponent {
     this.state = {
       secrets: null,
       error: null,
-      secretSearchTerm: ''
+      searchTerm: ''
     };
   }
 
@@ -72,7 +72,7 @@ export default class SecretsManager extends React.PureComponent {
   renderSecrets() {
     const filterSecrets = [...new Set(this.state.secrets)]
       .sort()
-      .filter(secret => secret.includes(this.state.secretSearchTerm));
+      .filter(secret => secret.includes(this.state.searchTerm));
 
     return (
       <Row>
@@ -83,7 +83,7 @@ export default class SecretsManager extends React.PureComponent {
             </InputGroup.Addon>
             <FormControl
               type="text"
-              value={this.state.secretSearchTerm}
+              value={this.state.searchTerm}
               onChange={this.secretSearchTermChanged}
             />
             <InputGroup.Button>
