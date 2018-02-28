@@ -222,10 +222,16 @@ export default class WorkerManager extends React.PureComponent {
                   <Icon name="th" />&nbsp;&nbsp;Table
                 </ToggleButton>
               </ToggleButtonGroup>
+              &nbsp;&nbsp;
+              <div>
+                <Button
+                  onClick={this.handleRefresh}
+                  bsSize="sm"
+                  bsStyle="primary">
+                  &nbsp;&nbsp;Refresh
+                </Button>
+              </div>
             </ButtonToolbar>
-            <Button onClick={this.handleRefresh} bsSize="sm">
-              &nbsp;&nbsp;Refresh
-            </Button>
           </div>
         )}
         {provisionerId && (
