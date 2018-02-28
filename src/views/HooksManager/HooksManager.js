@@ -140,9 +140,9 @@ export default class HooksManager extends React.PureComponent {
 
   render() {
     const { hookGroupId, hookId, hooks } = this.props;
-    const creating = !hookGroupId && !hookId;
+    const viewHooks = !hookGroupId && !hookId;
 
-    return creating
+    return viewHooks
       ? this.renderHooks()
       : this.renderHookEditView(hookGroupId, hookId, hooks);
   }
