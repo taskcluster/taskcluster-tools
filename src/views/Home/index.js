@@ -32,7 +32,7 @@ export default class Home extends React.PureComponent {
               A collection of tools for Taskcluster components and elements in
               the Taskcluster ecosystem. Here you will find tools to manage
               Taskcluster, as well as run, debug, inspect and view tasks,
-              task-graphs, and other Taskcluster related entities.
+              task groups, and other Taskcluster related entities.
             </p>
           </Col>
         </Row>
