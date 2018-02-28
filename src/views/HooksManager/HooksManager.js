@@ -79,16 +79,12 @@ export default class HooksManager extends React.PureComponent {
 
   handleLoadHooksList = loadedGroup => {
     this.setState({
-      groupsLoaded: [...this.state.groupsLoaded, loadedGroup]
+      groupsLoaded: [...new Set([...this.state.groupsLoaded, loadedGroup])]
     });
   };
 
-  groupsReady = () => {
-    const { groups } = this.state;
-    const groupsLoadedSet = new Set(this.state.groupsLoaded);
-
-    return groups.every(group => groupsLoadedSet.has(group));
-  };
+  groupsReady = () =>
+    this.state.groups.every(group => this.state.groupsLoaded.includes(group));
 
   renderGroups() {
     const { hooks, hookGroupId, hookId } = this.props;
