@@ -40,6 +40,10 @@ export default class ModalItem extends React.PureComponent {
       e.preventDefault();
     }
 
+    if (this.state.error) {
+      this.setState({ error: null });
+    }
+
     this.setState({ show: true });
   };
 
