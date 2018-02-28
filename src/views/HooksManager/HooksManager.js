@@ -106,7 +106,7 @@ export default class HooksManager extends React.PureComponent {
     );
   }
 
-  renderDefault() {
+  renderHooks() {
     return (
       <div>
         <HelmetTitle title="Hooks Manager" />
@@ -143,7 +143,7 @@ export default class HooksManager extends React.PureComponent {
     const creating = !hookGroupId && !hookId;
 
     return creating
-      ? this.renderDefault(creating)
+      ? this.renderHooks()
       : this.renderHookEditView(hookGroupId, hookId, hooks);
   }
 }
