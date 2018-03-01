@@ -1,6 +1,6 @@
 import React from 'react';
 import { string } from 'prop-types';
-import { Row, Col, ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
+import { ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -67,12 +67,14 @@ export default class HooksManager extends React.PureComponent {
       hookId = encodeURIComponent(hookId); // eslint-disable-line no-param-reassign
     }
 
+    const { history } = this.props;
+
     if (hookGroupId && hookId) {
-      this.props.history.replace(`/hooks/${hookGroupId}/${hookId}`);
+      history.push(`/hooks/${hookGroupId}/${hookId}`);
     } else if (hookGroupId) {
-      this.props.history.replace(`/hooks/${hookGroupId}`);
-    } else {
-      this.props.history.replace('/hooks');
+      history.push(`/hooks/${hookGroupId}`);
+    } else if (!hookGroupId && !hookId) {
+      history.push('/hooks/create');
     }
   };
 
@@ -104,40 +106,44 @@ export default class HooksManager extends React.PureComponent {
     );
   }
 
+  renderHooks() {
+    return (
+      <div>
+        <HelmetTitle title="Hooks Manager" />
+        <h4>Hooks Manager</h4>
+        <hr />
+        {this.renderGroups()}
+        <hr />
+        <ButtonToolbar>
+          <Button bsStyle="primary" onClick={() => this.selectHook(null, null)}>
+            <Glyphicon glyph="plus" /> New Hook
+          </Button>
+          <Button bsStyle="success" onClick={this.loadGroups}>
+            <Glyphicon glyph="refresh" /> Refresh
+          </Button>
+        </ButtonToolbar>
+      </div>
+    );
+  }
+
+  renderHookEditView(hookGroupId, hookId, hooks) {
+    return (
+      <HookEditView
+        hooks={hooks}
+        hookGroupId={hookGroupId}
+        hookId={hookId}
+        refreshHookList={this.loadGroups}
+        selectHook={this.selectHook}
+      />
+    );
+  }
+
   render() {
     const { hookGroupId, hookId, hooks } = this.props;
-    const creating = !hookGroupId && !hookId;
+    const viewHooks = !hookGroupId && !hookId;
 
-    return (
-      <Row>
-        <HelmetTitle title="Hooks Manager" />
-        <Col md={4}>
-          <h4>Hooks Manager</h4>
-          <hr />
-          {this.renderGroups()}
-          <hr />
-          <ButtonToolbar>
-            <Button
-              bsStyle="primary"
-              disabled={creating}
-              onClick={() => this.selectHook(null, null)}>
-              <Glyphicon glyph="plus" /> New Hook
-            </Button>
-            <Button bsStyle="success" onClick={this.loadGroups}>
-              <Glyphicon glyph="refresh" /> Refresh
-            </Button>
-          </ButtonToolbar>
-        </Col>
-        <Col md={8}>
-          <HookEditView
-            hooks={hooks}
-            hookGroupId={hookGroupId}
-            hookId={hookId}
-            refreshHookList={this.loadGroups}
-            selectHook={this.selectHook}
-          />
-        </Col>
-      </Row>
-    );
+    return viewHooks
+      ? this.renderHooks()
+      : this.renderHookEditView(hookGroupId, hookId, hooks);
   }
 }
