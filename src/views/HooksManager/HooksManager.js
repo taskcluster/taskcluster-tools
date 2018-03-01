@@ -20,6 +20,7 @@ export default class HooksManager extends React.PureComponent {
 
     this.state = {
       groups: null,
+      groupsLoaded: [],
       error: null
     };
   }
@@ -45,7 +46,7 @@ export default class HooksManager extends React.PureComponent {
   }
 
   loadGroups = () => {
-    this.setState({ groups: [] }, async () => {
+    this.setState({ groups: [], groupsLoaded: [] }, async () => {
       try {
         const { groups } = await this.props.hooks.listHookGroups();
 
@@ -78,6 +79,15 @@ export default class HooksManager extends React.PureComponent {
     }
   };
 
+  handleLoadHooksList = loadedGroup => {
+    this.setState({
+      groupsLoaded: [...new Set([...this.state.groupsLoaded, loadedGroup])]
+    });
+  };
+
+  groupsReady = () =>
+    this.state.groups.every(group => this.state.groupsLoaded.includes(group));
+
   renderGroups() {
     const { hooks, hookGroupId, hookId } = this.props;
     const { error, groups } = this.state;
@@ -86,12 +96,11 @@ export default class HooksManager extends React.PureComponent {
       return <Error error={error} />;
     }
 
-    if (!groups) {
-      return <Spinner />;
-    }
+    const groupsReady = this.groupsReady();
 
     return (
       <div>
+        {!groups || !groupsReady ? <Spinner /> : null}
         {groups.map(group => (
           <HookBrowser
             key={group}
@@ -99,6 +108,8 @@ export default class HooksManager extends React.PureComponent {
             group={group}
             selectHook={this.selectHook}
             hookGroupId={hookGroupId}
+            onLoadHooksList={this.handleLoadHooksList}
+            showList={groupsReady}
             hookId={hookId}
           />
         ))}
