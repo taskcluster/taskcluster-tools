@@ -299,7 +299,7 @@ export default class ScopeGrants extends React.PureComponent {
           onComplete={this.handleReload}
           body={
             <span>
-              Are you sure you want to <strong>remove scope grants</strong>
+              Are you sure you want to <strong>remove scope grants </strong>
               from role?
               <br />
               <br />
