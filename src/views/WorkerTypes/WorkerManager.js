@@ -11,7 +11,6 @@ import {
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { parse, stringify } from 'qs';
-import { number } from 'prop-types';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
@@ -33,7 +32,7 @@ export default class WorkerManager extends React.PureComponent {
       orderBy: null,
       actions: [],
       error: null,
-      refreshId: number,
+      refreshId: 0,
       ...this.getSettingsFromProps(props)
     };
   }
