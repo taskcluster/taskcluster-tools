@@ -8,7 +8,7 @@ import {
   Label
 } from 'react-bootstrap';
 import moment from 'moment';
-import { func, string, bool, object } from 'prop-types';
+import { func, string, bool, object, number } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { sentenceCase } from 'change-case';
 import { find, propEq } from 'ramda';
@@ -29,7 +29,8 @@ export default class WorkerTypeTable extends React.PureComponent {
     provisionerId: string,
     orderBy: string,
     searchTerm: string,
-    lastActive: bool
+    lastActive: bool,
+    refreshId: number
   };
 
   constructor(props) {
@@ -56,8 +57,9 @@ export default class WorkerTypeTable extends React.PureComponent {
 
   componentWillReceiveProps(nextProps) {
     if (
-      this.props.provisionerId &&
-      this.props.provisionerId !== nextProps.provisionerId
+      (this.props.provisionerId &&
+        this.props.provisionerId !== nextProps.provisionerId) ||
+      this.props.refreshId !== nextProps.refreshId
     ) {
       this.readWorkerTypes(nextProps);
     }

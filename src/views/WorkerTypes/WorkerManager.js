@@ -32,6 +32,7 @@ export default class WorkerManager extends React.PureComponent {
       orderBy: null,
       actions: [],
       error: null,
+      refreshId: 0,
       ...this.getSettingsFromProps(props)
     };
   }
@@ -81,6 +82,10 @@ export default class WorkerManager extends React.PureComponent {
 
   handleLayoutChange = () =>
     this.setQuery({ layout: this.state.layout === 'grid' ? 'table' : 'grid' });
+
+  handleRefresh = () => {
+    this.setState({ refreshId: this.state.refreshId + 1 });
+  };
 
   handleLastActiveClick = () =>
     this.setQuery({ lastActive: !this.state.lastActive, orderBy: null });
@@ -217,6 +222,15 @@ export default class WorkerManager extends React.PureComponent {
                   <Icon name="th" />&nbsp;&nbsp;Table
                 </ToggleButton>
               </ToggleButtonGroup>
+              &nbsp;&nbsp;
+              <div>
+                <Button
+                  onClick={this.handleRefresh}
+                  bsSize="sm"
+                  bsStyle="primary">
+                  &nbsp;&nbsp;Refresh
+                </Button>
+              </div>
             </ButtonToolbar>
           </div>
         )}
@@ -230,6 +244,7 @@ export default class WorkerManager extends React.PureComponent {
             orderBy={this.state.orderBy}
             layout={this.state.layout}
             searchTerm={this.state.search}
+            refreshId={this.state.refreshId}
           />
         )}
       </div>
