@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { parse, stringify } from 'qs';
+import { number } from 'prop-types';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
 import Breadcrumb from '../../components/Breadcrumb';
@@ -32,7 +33,7 @@ export default class WorkerManager extends React.PureComponent {
       orderBy: null,
       actions: [],
       error: null,
-      clickState: false,
+      refreshId: number,
       ...this.getSettingsFromProps(props)
     };
   }
@@ -84,7 +85,7 @@ export default class WorkerManager extends React.PureComponent {
     this.setQuery({ layout: this.state.layout === 'grid' ? 'table' : 'grid' });
 
   handleRefresh = () => {
-    this.setState({ clickState: !this.state.clickState });
+    this.setState({ refreshId: this.state.refreshId + 1 });
   };
 
   handleLastActiveClick = () =>
@@ -244,7 +245,7 @@ export default class WorkerManager extends React.PureComponent {
             orderBy={this.state.orderBy}
             layout={this.state.layout}
             searchTerm={this.state.search}
-            clickState={this.state.clickState}
+            refreshId={this.state.refreshId}
           />
         )}
       </div>

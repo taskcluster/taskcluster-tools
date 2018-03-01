@@ -59,7 +59,7 @@ export default class WorkerTypeTable extends React.PureComponent {
     if (
       (this.props.provisionerId &&
         this.props.provisionerId !== nextProps.provisionerId) ||
-      this.props.clickState !== nextProps.clickState
+      this.props.refreshId !== nextProps.refreshId
     ) {
       this.readWorkerTypes(nextProps);
     }
