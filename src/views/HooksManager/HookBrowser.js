@@ -64,34 +64,33 @@ export default class HookBrowser extends Component {
       return <Error error={error} />;
     }
 
-    if (!showList || !hooksList) {
-      return null;
-    }
-
     // For nodeLabel: forward clicks on the label on to the TreeView's handleClick (undocumented..)
     return (
-      <TreeView
-        key={group}
-        nodeLabel={<code onClick={this.handleLabelClick}>{group}</code>}
-        ref={this.registerChild}
-        defaultCollapsed={false}
-        onClick={this.handleClick}>
-        {hooksList.map(({ hookId }) => (
-          <div
-            key={hookId}
-            style={{ cursor: 'pointer' }}
-            className={
-              group === hookGroupId && hookId === this.props.hookId
-                ? 'bg-info'
-                : null
-            }
-            onClick={() => this.props.selectHook(group, hookId)}>
-            <code>
-              {group}/{hookId}
-            </code>
-          </div>
-        ))}
-      </TreeView>
+      showList &&
+      hooksList && (
+        <TreeView
+          key={group}
+          nodeLabel={<code onClick={this.handleLabelClick}>{group}</code>}
+          ref={this.registerChild}
+          defaultCollapsed={false}
+          onClick={this.handleClick}>
+          {hooksList.map(({ hookId }) => (
+            <div
+              key={hookId}
+              style={{ cursor: 'pointer' }}
+              className={
+                group === hookGroupId && hookId === this.props.hookId
+                  ? 'bg-info'
+                  : null
+              }
+              onClick={() => this.props.selectHook(group, hookId)}>
+              <code>
+                {group}/{hookId}
+              </code>
+            </div>
+          ))}
+        </TreeView>
+      )
     );
   }
 }
