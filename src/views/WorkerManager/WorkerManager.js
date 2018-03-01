@@ -17,6 +17,7 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
+import UserSession from '../../auth/UserSession';
 import SearchForm from './SearchForm';
 import WorkerTable from './WorkerTable';
 import styles from './styles.css';
@@ -49,6 +50,14 @@ export default class WorkerManager extends React.PureComponent {
     }
 
     this.loadProvisioners();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      UserSession.userChanged(this.props.userSession, nextProps.userSession)
+    ) {
+      this.setState({ error: null });
+    }
   }
 
   async loadProvisioners(token) {
