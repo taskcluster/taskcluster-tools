@@ -35,7 +35,7 @@ export default class HookEditView extends PureComponent {
       nextProps.hookId !== this.props.hookId
     ) {
       this.loadHook(nextProps);
-    }
+    } else this.dismissError();
   }
 
   async loadHook({ hookGroupId, hookId, hooks }) {
