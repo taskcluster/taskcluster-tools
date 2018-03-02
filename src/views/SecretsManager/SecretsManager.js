@@ -96,30 +96,38 @@ export default class SecretsManager extends React.PureComponent {
     );
   }
 
-  render() {
+  renderSecrets() {
     const { secretId } = this.props;
     const { secrets } = this.state;
 
     return (
-      <Row>
+      <div>
         <HelmetTitle title="Secrets Manager" />
-        <Col md={5}>
-          {this.renderSecretsTable()}
-          <ButtonToolbar>
-            <Button
-              bsStyle="primary"
-              onClick={this.reloadSecrets}
-              disabled={!secretId}>
-              <Glyphicon glyph="plus" /> Add Secret
-            </Button>
-            <Button
-              bsStyle="success"
-              onClick={() => this.loadSecrets(this.props)}
-              disabled={!secrets}>
-              <Glyphicon glyph="refresh" /> Refresh
-            </Button>
-          </ButtonToolbar>
-        </Col>
+        {this.renderSecretsTable()}
+        <ButtonToolbar>
+          <Button
+            bsStyle="primary"
+            onClick={this.reloadSecrets}
+            disabled={!secretId}>
+            <Glyphicon glyph="plus" /> Add Secret
+          </Button>
+          <Button
+            bsStyle="success"
+            onClick={() => this.loadSecrets(this.props)}
+            disabled={!secrets}>
+            <Glyphicon glyph="refresh" /> Refresh
+          </Button>
+        </ButtonToolbar>
+      </div>
+    );
+  }
+
+  render() {
+    const { secretId } = this.props;
+
+    return (
+      <Row>
+        {this.renderSecrets()}
         <Col md={7}>
           <SecretEditor
             userSession={this.props.userSession}
