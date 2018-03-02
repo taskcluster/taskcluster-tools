@@ -168,6 +168,20 @@ export default class TaskDetails extends PureComponent {
             </tr>
 
             <tr>
+              <td>Deadline</td>
+              <td>
+                <DateView date={task.deadline} since={task.created} />
+              </td>
+            </tr>
+
+            <tr>
+              <td>Expires</td>
+              <td>
+                <DateView date={task.expires} />
+              </td>
+            </tr>
+
+            <tr>
               <td>Priority</td>
               <td>
                 <code>{task.priority}</code>
