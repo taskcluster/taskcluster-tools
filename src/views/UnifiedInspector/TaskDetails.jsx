@@ -215,7 +215,7 @@ export default class TaskDetails extends PureComponent {
             </tr>
 
             <tr>
-              <td>ClientId</td>
+              <td>Created by ClientId</td>
               <td>{task.clientId}</td>
             </tr>
 
