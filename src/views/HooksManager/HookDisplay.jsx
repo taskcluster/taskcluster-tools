@@ -84,13 +84,13 @@ export default class HookDisplay extends PureComponent {
               target="_blank"
               rel="noopener noreferrer">
               JSON-e
-            </a>
+            </a>{' '}
             to create the the task definition. See{' '}
             <a
               href="https://docs.taskcluster.net/reference/core/taskcluster-hooks/docs/firing-hooks"
               target="_blank"
               rel="noopener noreferrer">
-              &dquot;firing hooks&dquot;
+              {'"'}firing hooks{'"'}
             </a>{' '}
             for more information.
           </dd>
