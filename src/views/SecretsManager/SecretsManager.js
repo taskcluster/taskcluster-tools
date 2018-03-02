@@ -13,6 +13,7 @@ export default class SecretsManager extends React.PureComponent {
 
     this.state = {
       secrets: null,
+      secretsLoaded: [],
       error: null
     };
   }
@@ -30,20 +31,22 @@ export default class SecretsManager extends React.PureComponent {
     }
   }
 
-  loadSecrets = async (props = this.props) => {
-    try {
-      const { secrets } = await props.secrets.list();
+  loadSecrets = () => {
+    this.setState({ secrets: [], secretsLoaded: [] }, async () => {
+      try {
+        const { secrets } = await this.props.secrets.list();
 
-      this.setState({
-        secrets,
-        error: null
-      });
-    } catch (err) {
-      this.setState({
-        secrets: null,
-        error: err
-      });
-    }
+        this.setState({
+          secrets,
+          error: null
+        });
+      } catch (err) {
+        this.setState({
+          secrets: null,
+          error: err
+        });
+      }
+    });
   };
 
   selectSecretId = (id = '') =>
@@ -101,7 +104,7 @@ export default class SecretsManager extends React.PureComponent {
           <Button
             bsStyle="primary"
             onClick={this.reloadSecrets}
-            disabled={!secretId}>
+            disabled={secretId}>
             <Glyphicon glyph="plus" /> Add Secret
           </Button>
           <Button
