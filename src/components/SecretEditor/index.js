@@ -4,12 +4,12 @@ import { safeLoad, safeDump } from 'js-yaml';
 import { Alert, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { fromNow } from 'taskcluster-client-web';
 import Icon from 'react-fontawesome';
-import Spinner from '../../components/Spinner';
-import Error from '../../components/Error';
-import TimeInput from '../../components/TimeInput';
-import DateView from '../../components/DateView';
-import CodeEditor from '../../components/CodeEditor';
-import ModalItem from '../../components/ModalItem';
+import Spinner from '../Spinner';
+import Error from '../Error';
+import TimeInput from '../TimeInput';
+import DateView from '../DateView';
+import CodeEditor from '../CodeEditor';
+import ModalItem from '../ModalItem';
 import UserSession from '../../auth/UserSession';
 
 const safeDumpOpts = { noCompatMode: true, noRefs: true };
@@ -174,16 +174,120 @@ export default class SecretEditor extends React.PureComponent {
     return <em>none</em>;
   }
 
+  renderError() {
+    const { error } = this.state;
+
+    if (!error) {
+      return null;
+    }
+
+    return (
+      <Alert bsStyle="danger" onDismiss={this.dismissError}>
+        <strong>Error executing operation</strong>
+        <br />
+        {error.toString()}
+      </Alert>
+    );
+  }
+
+  renderCreate() {
+    const { expires, invalid, secretNameValue } = this.state;
+
+    return (
+      <div className="form-group">
+        <label className="control-label col-md-2">Secret Name</label>
+        <div className="col-md-10">
+          <div>
+            <input
+              type="text"
+              className="form-control"
+              required={true}
+              value={secretNameValue}
+              onChange={this.handleSecretNameChange}
+              placeholder="garbage/<ircnick>/my-secret"
+            />
+            <br />
+            <div className="alert alert-warning">
+              Secrets starting with <code>garbage/</code> are visible to just
+              about everybody. Use them to experiment, but not for real secrets!
+            </div>
+            <TimeInput
+              value={new Date(expires)}
+              onChange={this.onExpiresChange}
+              className="form-control"
+            />
+            <br />
+            <div className="form-group">
+              <label className="control-label col-md-2">
+                Secret Value (YAML)
+              </label>
+              <div className="col-md-10">{this.renderValue()}</div>
+            </div>
+            <ButtonToolbar>
+              <Button
+                bsStyle="success"
+                onClick={this.saveSecret}
+                disabled={invalid}>
+                <Glyphicon glyph="ok" />
+                {' Create Secret'}
+              </Button>
+            </ButtonToolbar>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderEdit() {
+    const { secretId } = this.props;
+    const { expires } = this.state;
+
+    return (
+      <div className="form-group">
+        <label className="control-label col-md-2">Secret Name</label>
+        <div className="col-md-10">
+          <div className="form-control-static">
+            {secretId}
+            {secretId.startsWith('garbage/') && (
+              <div className="alert alert-warning">
+                This is a &quot;garbage&quot; secret and is visible to just
+                about everybody. Do not put any real secrets here!
+              </div>
+            )}
+          </div>
+          <DateView date={expires} />
+          <br />
+          <div className="form-group">
+            <label className="control-label col-md-2">
+              Secret Value (YAML)
+            </label>
+            <div className="col-md-10">{this.renderValue()}</div>
+          </div>
+          <ButtonToolbar>
+            <Button bsStyle="success" onClick={this.startEditing}>
+              <Glyphicon glyph="pencil" /> Edit Secret
+            </Button>
+            <ModalItem
+              button={true}
+              bsStyle="danger"
+              onSubmit={this.deleteSecret}
+              onComplete={this.props.reloadSecrets}
+              body={
+                <span>
+                  Are you sure you want to delete secret <code>{secretId}</code>?
+                </span>
+              }>
+              <Icon name="trash" /> Delete Secret
+            </ModalItem>
+          </ButtonToolbar>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const { secretId } = this.props;
-    const {
-      error,
-      expires,
-      editing,
-      invalid,
-      loading,
-      secretNameValue
-    } = this.state;
+    const { error, editing, loading } = this.state;
 
     if (error) {
       return <Error error={error} />;
@@ -196,102 +300,8 @@ export default class SecretEditor extends React.PureComponent {
     const isCreating = editing && !secretId;
 
     return (
-      <div>
-        {error && (
-          <Alert bsStyle="danger" onDismiss={this.dismissError}>
-            <strong>Error executing operation</strong>
-            <br />
-            {error.toString()}
-          </Alert>
-        )}
-        <div className="form-horizontal">
-          <div className="form-group">
-            <label className="control-label col-md-2">Secret Name</label>
-            <div className="col-md-10">
-              {isCreating ? (
-                <div>
-                  <input
-                    type="text"
-                    className="form-control"
-                    required={true}
-                    value={secretNameValue}
-                    onChange={this.handleSecretNameChange}
-                    placeholder="garbage/<ircnick>/my-secret"
-                  />
-                  <br />
-                  <div className="alert alert-warning">
-                    Secrets starting with <code>garbage/</code> are visible to
-                    just about everybody. Use them to experiment, but not for
-                    real secrets!
-                  </div>
-                </div>
-              ) : (
-                <div className="form-control-static">
-                  {secretId}
-                  {secretId.startsWith('garbage/') && (
-                    <div className="alert alert-warning">
-                      This is a &quot;garbage&quot; secret and is visible to
-                      just about everybody. Do not put any real secrets here!
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="control-label col-md-2">Expires</label>
-            <div className="col-md-10">
-              {editing ? (
-                <TimeInput
-                  value={new Date(expires)}
-                  onChange={this.onExpiresChange}
-                  className="form-control"
-                />
-              ) : (
-                <DateView date={expires} />
-              )}
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="control-label col-md-2">
-              Secret Value (YAML)
-            </label>
-            <div className="col-md-10">{this.renderValue()}</div>
-          </div>
-        </div>
-        {editing ? (
-          <ButtonToolbar>
-            <Button
-              bsStyle="success"
-              onClick={this.saveSecret}
-              disabled={invalid}>
-              <Glyphicon glyph="ok" />{' '}
-              {isCreating ? 'Create Secret' : 'Save Changes'}
-            </Button>
-            &nbsp;&nbsp;
-            {!isCreating && (
-              <ModalItem
-                button={true}
-                bsStyle="danger"
-                onSubmit={this.deleteSecret}
-                onComplete={this.props.reloadSecrets}
-                body={
-                  <span>
-                    Are you sure you want to delete secret{' '}
-                    <code>{secretId}</code>?
-                  </span>
-                }>
-                <Icon name="trash" /> Delete Secret
-              </ModalItem>
-            )}
-          </ButtonToolbar>
-        ) : (
-          <ButtonToolbar>
-            <Button bsStyle="success" onClick={this.startEditing}>
-              <Glyphicon glyph="pencil" /> Edit Secret
-            </Button>
-          </ButtonToolbar>
-        )}
+      <div className="form-horizontal">
+        {isCreating ? this.renderCreate() : this.renderEdit()}
       </div>
     );
   }
