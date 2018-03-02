@@ -63,12 +63,6 @@ export default class HookDisplay extends PureComponent {
             )}
           </dd>
         </dl>
-        <dl className="dl-horizontal">
-          <dt>Task Expires</dt>
-          <dd>{hook.expires} after creation</dd>
-          <dt>Task Deadline</dt>
-          <dd>{hook.deadline} after creation</dd>
-        </dl>
         <HookStatusDisplay
           hookGroupId={hookGroupId}
           hookId={hookId}

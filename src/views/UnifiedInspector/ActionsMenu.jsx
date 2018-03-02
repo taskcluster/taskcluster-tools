@@ -142,14 +142,11 @@ export default class ActionsMenu extends PureComponent {
     const { task, queue } = this.props;
     const taskId = nice();
     const now = Date.now();
-    const created = Date.parse(task.created);
 
     await queue.createTask(
       taskId,
       merge(omit(['dependencies'], clone(task)), {
         retries: 0,
-        deadline: new Date(now + Date.parse(task.deadline) - created).toJSON(),
-        expires: new Date(now + Date.parse(task.expires) - created).toJSON(),
         created: new Date(now).toJSON()
       })
     );

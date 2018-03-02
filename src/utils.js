@@ -78,9 +78,7 @@ export const parameterizeTask = task =>
     ),
     {
       retries: 0,
-      deadline: fromNowJSON('12 hours'),
       created: fromNowJSON(),
-      expires: fromNowJSON('7 days'),
       scopes: task.scopes.filter(scope => !/^docker-worker:cache:/.test(scope)), // Delete cache scopes
       payload: merge(omit(['artifacts', 'cache'], task.payload || {}), {
         maxRunTime: Math.max(
