@@ -121,9 +121,6 @@ export default class EntryView extends PureComponent {
           <dd>
             <Link to={`/tasks/${task.taskId}`}>{this.state.task.taskId}</Link>
           </dd>
-
-          <dt>ClientId</dt>
-          <dd>{this.state.task.ClientId}</dd>
         </dl>
         <dl className="dl-horizontal">
           <dt>Data</dt>
