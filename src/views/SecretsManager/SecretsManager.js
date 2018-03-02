@@ -130,11 +130,8 @@ export default class SecretsManager extends React.PureComponent {
   }
 
   render() {
-    return (
-      <div>
-        {this.renderSecrets()}
-        {this.renderSecretEditor()}
-      </div>
-    );
+    const { secretId } = this.props;
+
+    return !secretId ? this.renderSecrets() : this.renderSecretEditor();
   }
 }
