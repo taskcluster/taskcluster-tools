@@ -12,7 +12,7 @@ import {
   ControlLabel,
   FormControl
 } from 'react-bootstrap';
-import R from 'ramda';
+import { equals, uniq, merge, without, unnest } from 'ramda';
 import Icon from 'react-fontawesome';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -115,7 +115,7 @@ export default class ScopeGrants extends PureComponent {
                       key={`args-${index}`}
                       style={{ cursor: 'pointer' }}
                       className={
-                        R.equals(args, this.state.selected) ? 'info' : null
+                        equals(args, this.state.selected) ? 'info' : null
                       }
                       onClick={() => this.setState({ selected: args })}>
                       {params.map((param, index) => (
@@ -161,7 +161,7 @@ export default class ScopeGrants extends PureComponent {
 
     await Promise.all([
       ...toCreate.map(role =>
-        this.props.auth.createRole(role, {
+        this.props.auth.handleCreateRole(role, {
           description: '',
           scopes: instance[role]
         })
@@ -173,7 +173,7 @@ export default class ScopeGrants extends PureComponent {
 
         return this.props.auth.updateRole(role, {
           description,
-          scopes: R.uniq([...scopes, ...instance[role]])
+          scopes: uniq([...scopes, ...instance[role]])
         });
       })
     ]);
@@ -189,7 +189,7 @@ export default class ScopeGrants extends PureComponent {
 
   handleParamChanged = (param, e) => {
     this.setState({
-      args: R.merge(this.state.args, { [param]: e.target.value })
+      args: merge(this.state.args, { [param]: e.target.value })
     });
   };
 
@@ -266,7 +266,7 @@ export default class ScopeGrants extends PureComponent {
         .map(({ roleId, description, scopes }) =>
           this.props.auth.updateRole(roleId, {
             description,
-            scopes: R.without(instance[roleId], scopes)
+            scopes: without(instance[roleId], scopes)
           })
         )
     );
@@ -279,7 +279,7 @@ export default class ScopeGrants extends PureComponent {
       <span>
         <h3>Selected Parameters</h3>
         <dl className="dl-horizontal">
-          {R.unnest(
+          {unnest(
             params.map((param, index) => [
               <dt key={`key-${index}`}>{param}</dt>,
               <dd key={`val-${index}`}>
