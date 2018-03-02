@@ -32,8 +32,15 @@ export default class ManualModal extends React.PureComponent {
     };
   }
 
+  handleSubmit = event => {
+    const { onSubmit } = this.props;
+
+    event.preventDefault();
+    onSubmit(this.state);
+  };
+
   render() {
-    const { onSubmit, onClose } = this.props;
+    const { onClose } = this.props;
     const { clientId, accessToken, certificate } = this.state;
     const isValid = clientId && accessToken && certificateIsValid(certificate);
     const onClick = e => {
@@ -43,7 +50,7 @@ export default class ManualModal extends React.PureComponent {
 
     return (
       <Modal show={true}>
-        <form className="login-form" onSubmit={() => onSubmit(this.state)}>
+        <form className="login-form" onSubmit={this.handleSubmit}>
           <Modal.Header>
             <h4>Manual Sign-In</h4>
           </Modal.Header>
