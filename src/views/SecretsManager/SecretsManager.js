@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Row,
-  Col,
-  ButtonToolbar,
-  Button,
-  Glyphicon,
-  Table
-} from 'react-bootstrap';
+import { ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -122,22 +115,26 @@ export default class SecretsManager extends React.PureComponent {
     );
   }
 
-  render() {
+  renderSecretEditor() {
     const { secretId } = this.props;
 
     return (
-      <Row>
+      <SecretEditor
+        userSession={this.props.userSession}
+        secretId={secretId}
+        secrets={this.props.secrets}
+        reloadSecrets={this.reloadSecrets}
+        selectSecretId={this.selectSecretId}
+      />
+    );
+  }
+
+  render() {
+    return (
+      <div>
         {this.renderSecrets()}
-        <Col md={7}>
-          <SecretEditor
-            userSession={this.props.userSession}
-            secretId={secretId}
-            secrets={this.props.secrets}
-            reloadSecrets={this.reloadSecrets}
-            selectSecretId={this.selectSecretId}
-          />
-        </Col>
-      </Row>
+        {this.renderSecretEditor()}
+      </div>
     );
   }
 }
