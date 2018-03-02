@@ -3,7 +3,6 @@ import { string, func, object } from 'prop-types';
 import TreeView from 'react-treeview';
 import 'react-treeview/react-treeview.css';
 import Error from '../../components/Error';
-import Spinner from '../../components/Spinner';
 
 export default class HookBrowser extends Component {
   static propTypes = {
@@ -28,12 +27,12 @@ export default class HookBrowser extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if (nextProps.group !== this.props.group) {
-    this.loadHooksList(nextProps);
-    // }
+    if (nextProps.group !== this.props.group) {
+      this.loadHooksList(nextProps);
+    }
   }
 
-  async loadHooksList({ hooks, group }) {
+  async loadHooksList({ hooks, group, onLoadHooksList }) {
     const { hooks: hooksList } = await hooks.listHooks(group);
 
     try {
@@ -47,6 +46,8 @@ export default class HookBrowser extends Component {
         error: err
       });
     }
+
+    onLoadHooksList(group);
   }
 
   registerChild = ref => (this.treeView = ref);
@@ -56,41 +57,40 @@ export default class HookBrowser extends Component {
   handleClick = () => this.loadHooksList(this.props);
 
   render() {
-    const { group, hookGroupId } = this.props;
+    const { group, hookGroupId, showList } = this.props;
     const { hooksList, error } = this.state;
 
     if (error) {
       return <Error error={error} />;
     }
 
-    if (!hooksList) {
-      return <Spinner />;
-    }
-
     // For nodeLabel: forward clicks on the label on to the TreeView's handleClick (undocumented..)
     return (
-      <TreeView
-        key={group}
-        nodeLabel={<code onClick={this.handleLabelClick}>{group}</code>}
-        ref={this.registerChild}
-        defaultCollapsed={false}
-        onClick={this.handleClick}>
-        {hooksList.map(({ hookId }) => (
-          <div
-            key={hookId}
-            style={{ cursor: 'pointer' }}
-            className={
-              group === hookGroupId && hookId === this.props.hookId
-                ? 'bg-info'
-                : null
-            }
-            onClick={() => this.props.selectHook(group, hookId)}>
-            <code>
-              {group}/{hookId}
-            </code>
-          </div>
-        ))}
-      </TreeView>
+      showList &&
+      hooksList && (
+        <TreeView
+          key={group}
+          nodeLabel={<code onClick={this.handleLabelClick}>{group}</code>}
+          ref={this.registerChild}
+          defaultCollapsed={false}
+          onClick={this.handleClick}>
+          {hooksList.map(({ hookId }) => (
+            <div
+              key={hookId}
+              style={{ cursor: 'pointer' }}
+              className={
+                group === hookGroupId && hookId === this.props.hookId
+                  ? 'bg-info'
+                  : null
+              }
+              onClick={() => this.props.selectHook(group, hookId)}>
+              <code>
+                {group}/{hookId}
+              </code>
+            </div>
+          ))}
+        </TreeView>
+      )
     );
   }
 }

@@ -43,7 +43,7 @@ export default class ModalItem extends React.PureComponent {
     this.setState({ show: true });
   };
 
-  handleClose = () => this.setState({ show: false });
+  handleClose = () => this.setState({ show: false, error: null });
 
   handleSubmit = () => {
     this.setState({ executing: true }, async () => {
