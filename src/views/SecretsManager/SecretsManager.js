@@ -14,7 +14,8 @@ export default class SecretsManager extends React.PureComponent {
     this.state = {
       secrets: null,
       secretsLoaded: [],
-      error: null
+      error: null,
+      toggleButton: false
     };
   }
 
@@ -100,7 +101,7 @@ export default class SecretsManager extends React.PureComponent {
         <HelmetTitle title="Secrets Manager" />
         {this.renderSecretsTable()}
         <ButtonToolbar>
-          <Button bsStyle="primary" onClick={() => this.renderSecretCreator()}>
+          <Button bsStyle="primary" onClick={() => this.buttonClick()}>
             <Glyphicon glyph="plus" /> Add Secret
           </Button>
           <Button
@@ -112,6 +113,10 @@ export default class SecretsManager extends React.PureComponent {
         </ButtonToolbar>
       </div>
     );
+  }
+
+  buttonClick() {
+    this.setState({ toggleButton: !this.state.toggleButton });
   }
 
   renderSecretCreator() {
@@ -144,6 +149,11 @@ export default class SecretsManager extends React.PureComponent {
 
   render() {
     const { secretId } = this.props;
+    const { toggleButton } = this.state;
+
+    if (toggleButton) {
+      return this.renderSecretCreator();
+    }
 
     return !secretId ? this.renderSecrets() : this.renderSecretEditor();
   }
