@@ -100,7 +100,7 @@ export default class SecretsManager extends React.PureComponent {
         <HelmetTitle title="Secrets Manager" />
         {this.renderSecretsTable()}
         <ButtonToolbar>
-          <Button bsStyle="primary" onClick={this.reloadSecrets}>
+          <Button bsStyle="primary" onClick={() => this.renderSecretCreator()}>
             <Glyphicon glyph="plus" /> Add Secret
           </Button>
           <Button
@@ -111,6 +111,20 @@ export default class SecretsManager extends React.PureComponent {
           </Button>
         </ButtonToolbar>
       </div>
+    );
+  }
+
+  renderSecretCreator() {
+    const { secretId } = this.props;
+
+    return (
+      <SecretEditor
+        userSession={this.props.userSession}
+        secretId={secretId}
+        secrets={this.props.secrets}
+        reloadSecrets={this.reloadSecrets}
+        selectSecretId={this.selectSecretId}
+      />
     );
   }
 
