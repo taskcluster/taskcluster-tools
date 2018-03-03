@@ -119,20 +119,6 @@ export default class SecretsManager extends React.PureComponent {
     this.setState({ toggleButton: !this.state.toggleButton });
   }
 
-  renderSecretCreator() {
-    const { secretId } = this.props;
-
-    return (
-      <SecretEditor
-        userSession={this.props.userSession}
-        secretId={secretId}
-        secrets={this.props.secrets}
-        reloadSecrets={this.reloadSecrets}
-        selectSecretId={this.selectSecretId}
-      />
-    );
-  }
-
   renderSecretEditor() {
     const { secretId } = this.props;
 
@@ -152,7 +138,7 @@ export default class SecretsManager extends React.PureComponent {
     const { toggleButton } = this.state;
 
     if (toggleButton) {
-      return this.renderSecretCreator();
+      return this.renderSecretEditor();
     }
 
     return !secretId ? this.renderSecrets() : this.renderSecretEditor();
