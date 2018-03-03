@@ -287,9 +287,6 @@ export default class SecretEditor extends React.PureComponent {
           </ButtonToolbar>
         ) : (
           <ButtonToolbar>
-            <Button onClick={this.props.reloadSecrets}>
-              <Glyphicon glyph="chevron-left" /> Back to List
-            </Button>
             <Button bsStyle="success" onClick={this.startEditing}>
               <Glyphicon glyph="pencil" /> Edit Secret
             </Button>
