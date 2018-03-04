@@ -19,6 +19,7 @@ export default class RoleManager extends React.PureComponent {
 
     this.state = {
       roles: null,
+      workerTypeContains: '',
       error: null
     };
   }
@@ -89,10 +90,44 @@ export default class RoleManager extends React.PureComponent {
         </thead>
         <tbody>
           {this.state.roles
+            .filter(workerType =>
+              workerType.roleId.includes(this.state.workerTypeContains)
+            )
             .sort((a, b) => a.roleId.localeCompare(b.roleId))
             .map(this.renderRoleRow)}
         </tbody>
       </Table>
+    );
+  }
+
+  setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
+
+  enterWorkerType = e => {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      this.setWorkerType(e);
+    }
+  };
+
+  renderTypeInput() {
+    return (
+      <div className="form-group form-group-sm">
+        <div className="input-group">
+          <div className="input-group-addon text-sm">
+            <em>RoleIds containing</em>
+          </div>
+          <input
+            type="search"
+            className="form-control"
+            defaultValue={this.state.workerTypeContains}
+            onBlur={this.setWorkerType}
+            onKeyUp={this.enterWorkerType}
+          />
+          <div className="input-group-addon">
+            <Glyphicon glyph="search" />
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -101,6 +136,7 @@ export default class RoleManager extends React.PureComponent {
       <Row style={{ marginTop: 10 }}>
         <HelmetTitle title="Role Manager" />
         <Col md={5}>
+          {this.renderTypeInput()}
           {this.renderRolesTable()}
           <ButtonToolbar>
             <Button
