@@ -161,7 +161,7 @@ export default class ScopeGrants extends PureComponent {
 
     await Promise.all([
       ...toCreate.map(role =>
-        this.props.auth.handleCreateRole(role, {
+        this.props.auth.createRole(role, {
           description: '',
           scopes: instance[role]
         })
