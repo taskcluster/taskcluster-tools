@@ -68,19 +68,15 @@ export default class RoleManager extends PureComponent {
 
   handleDeleteRole = roleId => this.props.auth.deleteRole(roleId);
 
-  renderRoleRow = (role, index) => {
-    const isSelected = this.state.selectedRoleId === role.roleId;
-
-    return (
-      <tr key={index} className={isSelected ? 'info' : null}>
-        <td>
-          <Link to={`/auth/roles/${encodeURIComponent(role.roleId)}`}>
-            <code>{role.roleId}</code>
-          </Link>
-        </td>
-      </tr>
-    );
-  };
+  renderRoleRow = (role, index) => (
+    <tr key={index}>
+      <td>
+        <Link to={`/auth/roles/${encodeURIComponent(role.roleId)}`}>
+          <code>{role.roleId}</code>
+        </Link>
+      </td>
+    </tr>
+  );
 
   renderRolesTable() {
     const { roles } = this.state;
