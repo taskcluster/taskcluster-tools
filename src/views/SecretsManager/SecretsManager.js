@@ -120,13 +120,13 @@ export default class SecretsManager extends React.PureComponent {
   }
 
   renderSecretEditor() {
-    const { secretId } = this.props;
+    const { secretId, secrets, userSession } = this.props;
 
     return (
       <SecretEditor
-        userSession={this.props.userSession}
+        userSession={userSession}
         secretId={secretId}
-        secrets={this.props.secrets}
+        secrets={secrets}
         reloadSecrets={this.reloadSecrets}
         selectSecretId={this.selectSecretId}
       />
