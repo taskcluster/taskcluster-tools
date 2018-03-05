@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Row,
-  Col,
-  ButtonToolbar,
-  Button,
-  Glyphicon,
-  Table
-} from 'react-bootstrap';
+import { ButtonToolbar, Button, Glyphicon, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -20,7 +13,9 @@ export default class SecretsManager extends React.PureComponent {
 
     this.state = {
       secrets: null,
-      error: null
+      secretsLoaded: [],
+      error: null,
+      addNewSecret: false
     };
   }
 
@@ -37,20 +32,22 @@ export default class SecretsManager extends React.PureComponent {
     }
   }
 
-  loadSecrets = async (props = this.props) => {
-    try {
-      const { secrets } = await props.secrets.list();
+  loadSecrets = props => {
+    this.setState({ secrets: [], secretsLoaded: [] }, async () => {
+      try {
+        const { secrets } = await props.secrets.list();
 
-      this.setState({
-        secrets,
-        error: null
-      });
-    } catch (err) {
-      this.setState({
-        secrets: null,
-        error: err
-      });
-    }
+        this.setState({
+          secrets,
+          error: null
+        });
+      } catch (err) {
+        this.setState({
+          secrets: null,
+          error: err
+        });
+      }
+    });
   };
 
   selectSecretId = (id = '') =>
@@ -59,6 +56,10 @@ export default class SecretsManager extends React.PureComponent {
     );
 
   reloadSecrets = () => this.props.history.replace('/secrets');
+
+  handleAddSecret = () => {
+    this.setState({ addNewSecret: !this.state.addNewSecret });
+  };
 
   renderSecretsTable() {
     const { secretId } = this.props;
@@ -96,40 +97,50 @@ export default class SecretsManager extends React.PureComponent {
     );
   }
 
-  render() {
-    const { secretId } = this.props;
+  renderSecrets() {
     const { secrets } = this.state;
 
     return (
-      <Row>
+      <div>
         <HelmetTitle title="Secrets Manager" />
-        <Col md={5}>
-          {this.renderSecretsTable()}
-          <ButtonToolbar>
-            <Button
-              bsStyle="primary"
-              onClick={this.reloadSecrets}
-              disabled={!secretId}>
-              <Glyphicon glyph="plus" /> Add Secret
-            </Button>
-            <Button
-              bsStyle="success"
-              onClick={() => this.loadSecrets(this.props)}
-              disabled={!secrets}>
-              <Glyphicon glyph="refresh" /> Refresh
-            </Button>
-          </ButtonToolbar>
-        </Col>
-        <Col md={7}>
-          <SecretEditor
-            userSession={this.props.userSession}
-            secretId={secretId}
-            secrets={this.props.secrets}
-            reloadSecrets={this.reloadSecrets}
-            selectSecretId={this.selectSecretId}
-          />
-        </Col>
-      </Row>
+        {this.renderSecretsTable()}
+        <ButtonToolbar>
+          <Button bsStyle="primary" onClick={this.handleAddSecret}>
+            <Glyphicon glyph="plus" /> Add Secret
+          </Button>
+          <Button
+            bsStyle="success"
+            onClick={this.loadSecrets}
+            disabled={!secrets}>
+            <Glyphicon glyph="refresh" /> Refresh
+          </Button>
+        </ButtonToolbar>
+      </div>
     );
+  }
+
+  renderSecretEditor() {
+    const { secretId, secrets, userSession } = this.props;
+
+    return (
+      <SecretEditor
+        userSession={userSession}
+        secretId={secretId}
+        secrets={secrets}
+        reloadSecrets={this.reloadSecrets}
+        selectSecretId={this.selectSecretId}
+      />
+    );
+  }
+
+  render() {
+    const { secretId } = this.props;
+    const { addNewSecret } = this.state;
+
+    if (addNewSecret) {
+      return this.renderSecretEditor();
+    }
+
+    return !secretId ? this.renderSecrets() : this.renderSecretEditor();
   }
 }
