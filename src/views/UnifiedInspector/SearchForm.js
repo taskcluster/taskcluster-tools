@@ -61,11 +61,11 @@ export default class SearchForm extends React.PureComponent {
   };
 
   handleSubmit = e => {
-    e.preventDefault();
-
     const isValid = this.validate().form;
 
     if (!isValid) {
+      e.preventDefault();
+
       return;
     }
 
@@ -73,6 +73,11 @@ export default class SearchForm extends React.PureComponent {
       taskGroupId: this.state.taskGroupIdInput || '',
       taskId: this.state.taskIdInput || ''
     });
+  };
+  handleKeyPress = e => {
+    if (e.key === 'Enter') {
+      return this.handleSubmit();
+    }
   };
 
   validate() {
@@ -129,6 +134,7 @@ export default class SearchForm extends React.PureComponent {
                 type="text"
                 placeholder="Enter a task ID or choose one from Tasks"
                 value={taskIdInput}
+                onKeyPress={this.handleKeyPress}
                 onChange={this.handleTaskIdInputChange}
               />
             </InputGroup>
