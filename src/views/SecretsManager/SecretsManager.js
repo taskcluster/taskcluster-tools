@@ -32,10 +32,10 @@ export default class SecretsManager extends React.PureComponent {
     }
   }
 
-  loadSecrets = () => {
+  loadSecrets = props => {
     this.setState({ secrets: [], secretsLoaded: [] }, async () => {
       try {
-        const { secrets } = await this.props.secrets.list();
+        const { secrets } = await props.secrets.list();
 
         this.setState({
           secrets,
@@ -110,7 +110,7 @@ export default class SecretsManager extends React.PureComponent {
           </Button>
           <Button
             bsStyle="success"
-            onClick={() => this.loadSecrets(this.props)}
+            onClick={this.loadSecrets}
             disabled={!secrets}>
             <Glyphicon glyph="refresh" /> Refresh
           </Button>
