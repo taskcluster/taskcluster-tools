@@ -16,8 +16,6 @@ const initialHook = {
     emailOnError: true
   },
   schedule: [],
-  expires: { $fromNow: '3 months' },
-  deadline: { $fromNow: '6 hours' },
   task: {
     provisionerId: 'aws-provisioner-v1',
     workerType: 'tutorial',
