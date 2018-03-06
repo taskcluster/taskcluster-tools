@@ -8,7 +8,8 @@ import {
   FormControl,
   ButtonGroup,
   DropdownButton,
-  MenuItem
+  MenuItem,
+  Button
 } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Icon from 'react-fontawesome';
@@ -138,6 +139,13 @@ export default class SearchForm extends PureComponent {
 
         <Col lg={2} md={2} sm={4} style={{ padding: 0 }}>
           <ButtonGroup justified style={{ marginBottom: 15 }}>
+            <Button
+              type="submit"
+              style={{
+                visibility: 'hidden',
+                display: 'none'
+              }}
+            />
             <a
               onClick={valid.form ? this.handleSubmit : null}
               className={`btn btn-default${valid.form ? '' : ' btn-disabled'}`}>
