@@ -1,6 +1,5 @@
 const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
-const { basename, extname } = require('path');
 
 // Increment the version whenever you need a full invalidation
 // but hashes could remain the same
@@ -20,41 +19,21 @@ Object
 
 module.exports = {
   use: [
-    ['neutrino-preset-mozilla-rpweb', {
+    ['neutrino-preset-mozilla-frontend-infra', {
+      cacheVersion: CACHE_VERSION,
       eslint: {
-        baseConfig: {
-          extends: [
-            'eslint-config-prettier'
-          ]
-        },
-        plugins: ['eslint-plugin-prettier'],
         rules: {
-          'prettier/prettier': ['error', {
-            singleQuote: true,
-            trailingComma: 'none',
-            bracketSpacing: true,
-            jsxBracketSameLine: true
-          }],
-          'padding-line-between-statements': [
-            'error',
-            { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' },
-            { blankLine: 'never', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] },
-            { blankLine: 'always', prev: 'multiline-block-like', next: '*' },
-            { blankLine: 'always', prev: '*', next: ['if', 'do', 'for', 'switch', 'try', 'while'] },
-            { blankLine: 'always', prev: '*', next: 'return' }
-          ],
-          'consistent-return': 'off',
-          'no-unused-expressions': 'off',
-          'no-shadow': 'off',
-          'no-return-assign': 'off',
-          'babel/new-cap': 'off',
-          'no-mixed-operators': 'off',
-          'react/jsx-closing-bracket-location': 'off',
-          'react/jsx-indent': 'off'
-        }
+          // TODO: Too much work to convert right now
+          'react/no-array-index-key': 'off',
+          'jsx-a11y/label-has-for': 'off',
+          'jsx-a11y/alt-text': 'off'
+        },
       },
       react: {
-        hot: false,
+        minify: {
+          style: false,
+          image: false,
+        },
         devServer: {
           port: 9000,
           historyApiFallback: { disableDotRule: true }
@@ -77,29 +56,11 @@ module.exports = {
         }
       }
     }],
-    ['neutrino-middleware-env', Object.keys(envs)],
+    ['@neutrinojs/env', Object.keys(envs)],
     (neutrino) => {
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
-
-      neutrino.config.module
-        .rule('plain-style')
-          .test(/\.css$/)
-          .include
-            .add(neutrino.options.node_modules).end()
-          .use('style')
-            .loader(require.resolve('style-loader'))
-            .end()
-          .use('css')
-              .loader(require.resolve('css-loader'));
-
-      neutrino.config.module
-        .rule('style')
-          .exclude
-            .add(neutrino.options.node_modules).end()
-          .use('css')
-            .options({ modules: true });
 
       // The JSONStream module's main file has a Node.js shebang
       // which Webpack doesn't like loading as JS
@@ -147,38 +108,6 @@ module.exports = {
           'react-router-dom',
           'taskcluster-client-web'
         ]);
-
-      neutrino.config.when(neutrino.options.command === 'build', (config) => {
-        config
-          .output
-            .filename(`[name].[chunkhash].${CACHE_VERSION}.js`)
-            .chunkFilename(`[name].[chunkhash].${CACHE_VERSION}.js`)
-            .end()
-          .plugin('named-chunks')
-            .tap(([fn]) => [
-              chunk => {
-                if (chunk.name) {
-                  return chunk.name;
-                }
-
-                const filename = fn(chunk);
-                const ext = extname(filename);
-
-                return `${basename(filename, ext)}.${CACHE_VERSION}${ext}`;
-              }
-            ]);
-      });
     }
   ],
-  env: {
-    NODE_ENV: {
-      development: ({ config }) => config.devtool('eval-source-map'),
-      production: ({ config }) => {
-        config.when(process.env.CI === 'true' && process.env.TRAVIS_BRANCH !== 'master',
-          (config) => config.devtool(false),
-          (config) => config.devtool('source-map')
-        );
-      }
-    }
-  }
 };
