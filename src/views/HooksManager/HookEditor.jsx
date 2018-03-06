@@ -29,7 +29,9 @@ const initialHook = {
       description: 'Task Description',
       owner: 'name@example.com',
       source: 'https://tools.taskcluster.net/hooks'
-    }
+    },
+    expires: { $fromNow: '3 months' },
+    deadline: { $fromNow: '6 hours' }
   },
   triggerSchema: {
     type: 'object',
