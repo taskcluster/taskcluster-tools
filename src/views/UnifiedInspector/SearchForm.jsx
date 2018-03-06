@@ -184,3 +184,4 @@ export default class SearchForm extends React.PureComponent {
     );
   }
 }
+
