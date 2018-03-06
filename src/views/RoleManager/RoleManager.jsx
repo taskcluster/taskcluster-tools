@@ -54,9 +54,7 @@ export default class RoleManager extends PureComponent {
     this.load();
     const { history } = this.props;
 
-    history.push(
-      `/auth/roles/${roleId ? encodeURIComponent(roleId) : 'create'}`
-    );
+    history.push(`/auth/roles/${roleId ? encodeURIComponent(roleId) : ''}`);
   };
 
   handleDeleteRole = roleId => this.props.auth.deleteRole(roleId);
@@ -101,7 +99,9 @@ export default class RoleManager extends PureComponent {
         <Col md={12}>
           {this.renderRolesTable()}
           <ButtonToolbar>
-            <Button bsStyle="primary" onClick={() => this.navigate(null)}>
+            <Button
+              bsStyle="primary"
+              onClick={() => this.props.history.push(`/auth/roles/create`)}>
               <Glyphicon glyph="plus" /> Add Role
             </Button>
             <Button
