@@ -16,8 +16,6 @@ const initialHook = {
     emailOnError: true
   },
   schedule: [],
-  expires: '3 months',
-  deadline: '6 hours',
   task: {
     provisionerId: 'aws-provisioner-v1',
     workerType: 'tutorial',
@@ -31,7 +29,9 @@ const initialHook = {
       description: 'Task Description',
       owner: 'name@example.com',
       source: 'https://tools.taskcluster.net/hooks'
-    }
+    },
+    expires: { $fromNow: '3 months' },
+    deadline: { $fromNow: '6 hours' }
   },
   triggerSchema: {
     type: 'object',
@@ -94,7 +94,6 @@ export default class HookEditor extends PureComponent {
       hook.metadata.name &&
       hook.metadata.description &&
       hook.metadata.owner &&
-      hook.deadline &&
       this.state.hookValidJson &&
       this.state.triggerSchemaValidJson
     );
@@ -166,16 +165,6 @@ export default class HookEditor extends PureComponent {
       hook: assocPath(['scheduleText'], e.target.value, this.state.hook)
     });
 
-  handleExpiresChange = e =>
-    this.setState({
-      hook: assocPath(['expires'], e.target.value, this.state.hook)
-    });
-
-  handleDeadlineChange = e =>
-    this.setState({
-      hook: assocPath(['deadline'], e.target.value, this.state.hook)
-    });
-
   handleTaskChange = value => {
     try {
       this.setState({
@@ -213,8 +202,6 @@ export default class HookEditor extends PureComponent {
         emailOnError: hook.metadata.emailOnError
       },
       schedule: hook.schedule,
-      expires: hook.expires,
-      deadline: hook.deadline,
       task: hook.task,
       triggerSchema: hook.triggerSchema
     };
@@ -417,30 +404,6 @@ export default class HookEditor extends PureComponent {
                 </button>
               </span>
             </div>
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="control-label col-md-2">Expires</label>
-          <div className="col-md-10">
-            <input
-              type="text"
-              className="form-control"
-              defaultValue={hook.expires}
-              onChange={this.handleExpiresChange}
-              placeholder="Task expiration (relative)"
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="control-label col-md-2">Deadline</label>
-          <div className="col-md-10">
-            <input
-              type="text"
-              className="form-control"
-              defaultValue={hook.deadline}
-              onChange={this.handleDeadlineChange}
-              placeholder="Task deadline (relative)"
-            />
           </div>
         </div>
         <div className="form-group">
