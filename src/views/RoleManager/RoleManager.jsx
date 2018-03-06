@@ -50,26 +50,19 @@ export default class RoleManager extends PureComponent {
     }
   };
 
-<<<<<<< HEAD:src/views/RoleManager/RoleManager.jsx
-  handleNavigate = roleId => {
-    this.handleLoad();
-    this.props.history.replace(
-      `/auth/roles/${roleId ? encodeURIComponent(roleId) : ''}`
-=======
   navigate = roleId => {
     this.load();
     const { history } = this.props;
 
     history.push(
       `/auth/roles/${roleId ? encodeURIComponent(roleId) : 'create'}`
->>>>>>> 7075a24... Bug 1442896- make roles manager have multiple views:src/views/RoleManager/RoleManager.js
     );
   };
 
   handleDeleteRole = roleId => this.props.auth.deleteRole(roleId);
 
-  renderRoleRow = (role, index) => (
-    <tr key={index}>
+  renderRoleRow = (role, roleRow) => (
+    <tr key={`${roleRow}-${role.id}`}>
       <td>
         <Link to={`/auth/roles/${encodeURIComponent(role.roleId)}`}>
           <code>{role.roleId}</code>
@@ -108,14 +101,7 @@ export default class RoleManager extends PureComponent {
         <Col md={12}>
           {this.renderRolesTable()}
           <ButtonToolbar>
-<<<<<<< HEAD:src/views/RoleManager/RoleManager.jsx
-            <Button
-              bsStyle="primary"
-              href="/auth/roles"
-              disabled={this.props.roleId === ''}>
-=======
             <Button bsStyle="primary" onClick={() => this.navigate(null)}>
->>>>>>> 7075a24... Bug 1442896- make roles manager have multiple views:src/views/RoleManager/RoleManager.js
               <Glyphicon glyph="plus" /> Add Role
             </Button>
             <Button
@@ -126,18 +112,6 @@ export default class RoleManager extends PureComponent {
             </Button>
           </ButtonToolbar>
         </Col>
-<<<<<<< HEAD:src/views/RoleManager/RoleManager.jsx
-        <Col md={7}>
-          <RoleEditor
-            auth={this.props.auth}
-            history={this.props.history}
-            currentRoleId={this.props.roleId}
-            onDeleteRole={this.handleDeleteRole}
-            onNavigate={this.handleNavigate}
-          />
-        </Col>
-=======
->>>>>>> 7075a24... Bug 1442896- make roles manager have multiple views:src/views/RoleManager/RoleManager.js
       </Row>
     );
   }
@@ -148,13 +122,13 @@ export default class RoleManager extends PureComponent {
         auth={this.props.auth}
         history={this.props.history}
         currentRoleId={this.props.roleId === 'create' ? '' : this.props.roleId}
-        deleteRole={this.deleteRole}
+        onDeleteRole={this.handleDeleteRole}
         navigate={this.navigate}
       />
     );
   }
 
   render() {
-    return !this.props.roleId ? this.renderRoles() : this.renderRoleEditor();
+    return this.props.roleId ? this.renderRoleEditor() : this.renderRoles();
   }
 }
