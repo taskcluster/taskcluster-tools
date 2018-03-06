@@ -114,7 +114,7 @@ export default class AuthController {
       }
     } catch (err) {
       // instance where a new scope was added and is now required in order to be logged in
-      if (err.error === 'consent_required') {
+      if (err.error === 'consent_required' || err.error === 'login_required') {
         this.setUserSession(null);
       }
 
