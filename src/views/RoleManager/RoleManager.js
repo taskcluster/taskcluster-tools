@@ -19,8 +19,8 @@ export default class RoleManager extends React.PureComponent {
 
     this.state = {
       roles: null,
-      workerTypeContains: '',
-      error: null
+      error: null,
+      roleIdContains: ''
     };
   }
 
@@ -74,6 +74,15 @@ export default class RoleManager extends React.PureComponent {
     );
   };
 
+  setRoleId = e => this.setState({ roleIdContains: e.target.value });
+
+  enterRoleId = e => {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      this.setRoleId(e);
+    }
+  };
+
   renderRolesTable() {
     const { roles } = this.state;
 
@@ -90,9 +99,7 @@ export default class RoleManager extends React.PureComponent {
         </thead>
         <tbody>
           {this.state.roles
-            .filter(workerType =>
-              workerType.roleId.includes(this.state.workerTypeContains)
-            )
+            .filter(role => role.roleId.includes(this.state.roleIdContains))
             .sort((a, b) => a.roleId.localeCompare(b.roleId))
             .map(this.renderRoleRow)}
         </tbody>
@@ -100,28 +107,19 @@ export default class RoleManager extends React.PureComponent {
     );
   }
 
-  setWorkerType = e => this.setState({ workerTypeContains: e.target.value });
-
-  enterWorkerType = e => {
-    if (e.keyCode === 13) {
-      e.preventDefault();
-      this.setWorkerType(e);
-    }
-  };
-
   renderTypeInput() {
     return (
       <div className="form-group form-group-sm">
         <div className="input-group">
           <div className="input-group-addon text-sm">
-            <em>RoleIds containing</em>
+            <em>Role Id containing</em>
           </div>
           <input
             type="search"
             className="form-control"
-            defaultValue={this.state.workerTypeContains}
-            onBlur={this.setWorkerType}
-            onKeyUp={this.enterWorkerType}
+            defaultValue={this.state.roleIdContains}
+            onBlur={this.setRoleId}
+            onKeyUp={this.enterRoleId}
           />
           <div className="input-group-addon">
             <Glyphicon glyph="search" />
