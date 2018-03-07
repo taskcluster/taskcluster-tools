@@ -53,7 +53,7 @@ export default class ClientEditor extends PureComponent {
   handleSubmit = e => {
     e.preventDefault();
 
-    this.props.handleCreateClient(this.state.currentClient);
+    this.props.createClient(this.state.currentClient);
   };
 
   render() {
