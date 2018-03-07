@@ -67,8 +67,18 @@ export default class ScopeGrants extends PureComponent {
 
   handleGrantsRedirect = () => this.props.history.push(`/auth/grants`);
   handleNewGrant = () => this.setState({ selected: null, args: {} });
+  select = org => {
+    const { history, pattern } = this.props;
 
-  renderGrants() {
+    if (org === 'create') {
+      this.handleNewGrant();
+      history.push(`/auth/grants/${pattern}/create`);
+    } else {
+      history.push(`/auth/grants/${pattern}/${encodeURIComponent(org)}`);
+    }
+  };
+
+  renderGrants(pattern) {
     if (this.state.error) {
       return <Error error={this.state.error} />;
     }
@@ -77,7 +87,6 @@ export default class ScopeGrants extends PureComponent {
       return <Spinner />;
     }
 
-    const pattern = PATTERNS.find(p => p.name === this.props.pattern);
     const instantiatedArgs = instantiatedArguments(pattern, this.state.roles);
     const params = Object.keys(pattern.params);
 
@@ -100,7 +109,7 @@ export default class ScopeGrants extends PureComponent {
           </Row>
           <hr />
           <Row>
-            <Col md={6}>
+            <Col md={12}>
               <Table hover>
                 <thead>
                   <tr>
@@ -111,15 +120,14 @@ export default class ScopeGrants extends PureComponent {
                 </thead>
                 <tbody>
                   {instantiatedArgs.map((args, index) => (
-                    <tr
-                      key={`args-${index}`}
-                      style={{ cursor: 'pointer' }}
-                      className={
-                        equals(args, this.state.selected) ? 'info' : null
-                      }
-                      onClick={() => this.setState({ selected: args })}>
+                    <tr key={`args-${index}`} style={{ cursor: 'pointer' }}>
                       {params.map((param, index) => (
-                        <td key={`params-${index}`}>
+                        <td
+                          key={`params-${index}`}
+                          onClick={() => {
+                            this.setState({ selected: args });
+                            this.select(args[param]);
+                          }}>
                           <code>{args[param]}</code>
                         </td>
                       ))}
@@ -128,16 +136,11 @@ export default class ScopeGrants extends PureComponent {
                 </tbody>
               </Table>
               <hr />
-              <Button onClick={this.handleNewGrant}>
+              <Button onClick={() => this.select('create')}>
                 <Glyphicon glyph="plus" /> New Grant
               </Button>
               <br />
               <br />
-            </Col>
-            <Col md={6}>
-              {this.state.selected
-                ? this.renderPatternInstance(pattern, this.state.selected)
-                : this.renderCreateForm(pattern)}
             </Col>
           </Row>
         </Col>
@@ -375,6 +378,9 @@ export default class ScopeGrants extends PureComponent {
   }
 
   render() {
+    const pattern = PATTERNS.find(p => p.name === this.props.pattern);
+    const { organization } = this.props;
+
     if (
       !this.props.pattern ||
       !PATTERNS.some(p => p.name === this.props.pattern)
@@ -387,6 +393,14 @@ export default class ScopeGrants extends PureComponent {
       );
     }
 
-    return this.renderGrants();
+    if (organization) {
+      if (organization === 'create') {
+        return this.renderCreateForm(pattern);
+      }
+
+      return this.renderPatternInstance(pattern, this.state.selected);
+    }
+
+    return this.renderGrants(pattern);
   }
 }

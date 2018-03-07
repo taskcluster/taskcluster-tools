@@ -269,7 +269,7 @@ export default class App extends Component {
                   component={ScopeInspector}
                 />
                 <PropsRoute
-                  path="/auth/grants/:pattern?"
+                  path="/auth/grants/:pattern?/:organization?"
                   component={ScopeGrants}
                 />
                 <PropsRoute
