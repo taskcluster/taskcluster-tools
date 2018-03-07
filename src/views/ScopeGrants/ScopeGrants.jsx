@@ -67,12 +67,14 @@ export default class ScopeGrants extends PureComponent {
 
   handleGrantsRedirect = () => this.props.history.push(`/auth/grants`);
   handleNewGrant = () => this.setState({ selected: null, args: {} });
-  selectGrant = org => {
+  handleNavigate = org => {
     const { history, pattern } = this.props;
 
     if (org === 'create') {
       this.handleNewGrant();
       history.push(`/auth/grants/${pattern}/create`);
+    } else if (org === 'pattern') {
+      history.push(`/auth/grants/${pattern}`);
     } else {
       history.push(`/auth/grants/${pattern}/${encodeURIComponent(org)}`);
     }
@@ -127,7 +129,7 @@ export default class ScopeGrants extends PureComponent {
                           role="gridcell"
                           onClick={() => {
                             this.setState({ selected: args });
-                            this.selectGrant(args[param]);
+                            this.handleNavigate(args[param]);
                           }}>
                           <code>{args[param]}</code>
                         </td>
@@ -137,7 +139,7 @@ export default class ScopeGrants extends PureComponent {
                 </tbody>
               </Table>
               <hr />
-              <Button onClick={() => this.selectGrant('create')}>
+              <Button onClick={() => this.handleNavigate('create')}>
                 <Glyphicon glyph="plus" /> New Grant
               </Button>
               <br />
@@ -187,6 +189,7 @@ export default class ScopeGrants extends PureComponent {
     const { args } = this.state;
 
     this.setState({ selected: null, roles: null, args: {} });
+    this.handleNavigate('pattern');
     await this.load();
     this.setState({ selected: args });
   };
@@ -257,6 +260,7 @@ export default class ScopeGrants extends PureComponent {
 
   handleReload = () => {
     this.setState({ selected: null, roles: null });
+    this.handleNavigate('pattern');
     this.load();
   };
 
@@ -277,7 +281,7 @@ export default class ScopeGrants extends PureComponent {
   };
 
   renderPatternInstance(pattern, selected) {
-    let args = selected;
+    let arg = selected;
 
     if (this.state.error) {
       return <Error error={this.state.error} />;
@@ -290,11 +294,12 @@ export default class ScopeGrants extends PureComponent {
 
       const instantiatedArgs = instantiatedArguments(pattern, this.state.roles);
 
-      args = instantiatedArgs.find(
-        arg => arg.organization === this.props.organization
+      arg = instantiatedArgs.find(
+        element => element.organization === this.props.organization
       );
     }
 
+    const args = arg;
     const params = Object.keys(pattern.params);
 
     return (
