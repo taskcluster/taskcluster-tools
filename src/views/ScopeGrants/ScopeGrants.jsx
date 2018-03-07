@@ -281,6 +281,7 @@ export default class ScopeGrants extends PureComponent {
   };
 
   renderPatternInstance(pattern, selected) {
+    const params = Object.keys(pattern.params);
     let arg = selected;
 
     if (this.state.error) {
@@ -294,13 +295,15 @@ export default class ScopeGrants extends PureComponent {
 
       const instantiatedArgs = instantiatedArguments(pattern, this.state.roles);
 
-      arg = instantiatedArgs.find(
-        element => element.organization === this.props.organization
+      params.map(
+        org =>
+          (arg = instantiatedArgs.find(
+            ele => ele[org] === this.props.organization
+          ))
       );
     }
 
     const args = arg;
-    const params = Object.keys(pattern.params);
 
     return (
       <span>
