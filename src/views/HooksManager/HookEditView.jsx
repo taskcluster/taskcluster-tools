@@ -1,7 +1,6 @@
 import { PureComponent } from 'react';
 import { string, func } from 'prop-types';
 import { omit } from 'ramda';
-import { Alert } from 'react-bootstrap';
 import Spinner from '../../components/Spinner';
 import HookEditor from './HookEditor';
 import HookDisplay from './HookDisplay';
@@ -35,7 +34,9 @@ export default class HookEditView extends PureComponent {
       nextProps.hookId !== this.props.hookId
     ) {
       this.loadHook(nextProps);
-    } else this.dismissError();
+    } else {
+      this.handleDismissError();
+    }
   }
 
   async loadHook({ hookGroupId, hookId, hooks }) {
@@ -148,17 +149,7 @@ export default class HookEditView extends PureComponent {
 
   render() {
     const { hookGroupId, hookId } = this.props;
-    const { error, editing, hook, hookStatus } = this.state;
-
-    if (error) {
-      return (
-        <Alert bsStyle="danger" onDismiss={this.handleDismissError}>
-          <strong>Error executing operation</strong>
-          <br />
-          {error.toString()}
-        </Alert>
-      );
-    }
+    const { editing, hook, hookStatus } = this.state;
 
     if (!hook && (hookGroupId && hookId)) {
       return <Spinner />;
@@ -176,6 +167,8 @@ export default class HookEditView extends PureComponent {
           onCreateHook={this.handleCreateHook}
           onUpdateHook={this.handleUpdateHook}
           onDeleteHook={this.handleDeleteHook}
+          error={this.state.error}
+          onError={this.handleDismissError}
         />
       );
     }
