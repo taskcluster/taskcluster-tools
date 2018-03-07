@@ -12,6 +12,7 @@ import {
   ControlLabel,
   FormControl
 } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { uniq, merge, without, unnest } from 'ramda';
 import Icon from 'react-fontawesome';
 import Error from '../../components/Error';
@@ -65,21 +66,6 @@ export default class ScopeGrants extends PureComponent {
     }
   }
 
-  handleGrantsRedirect = () => this.props.history.push(`/auth/grants`);
-  handleNewGrant = () => this.setState({ selected: null, args: {} });
-  handleNavigate = org => {
-    const { history, pattern } = this.props;
-
-    if (org === 'create') {
-      this.handleNewGrant();
-      history.push(`/auth/grants/${pattern}/create`);
-    } else if (org === 'pattern') {
-      history.push(`/auth/grants/${pattern}`);
-    } else {
-      history.push(`/auth/grants/${pattern}/${encodeURIComponent(org)}`);
-    }
-  };
-
   renderGrants(pattern) {
     if (this.state.error) {
       return <Error error={this.state.error} />;
@@ -98,9 +84,11 @@ export default class ScopeGrants extends PureComponent {
           <HelmetTitle title={pattern.title} />
           <Row>
             <Col md={1}>
-              <Button onClick={this.handleGrantsRedirect}>
-                <Glyphicon glyph="chevron-left" /> Back
-              </Button>
+              <Link to="/auth/grants">
+                <Button>
+                  <Glyphicon glyph="chevron-left" /> Back
+                </Button>
+              </Link>
             </Col>
             <Col md={10}>
               <h2>
@@ -127,11 +115,13 @@ export default class ScopeGrants extends PureComponent {
                         <td
                           key={`params-${index}`}
                           role="gridcell"
-                          onClick={() => {
-                            this.setState({ selected: args });
-                            this.handleNavigate(args[param]);
-                          }}>
-                          <code>{args[param]}</code>
+                          onClick={() => this.setState({ selected: args })}>
+                          <Link
+                            to={`/auth/grants/${
+                              pattern.name
+                            }/${encodeURIComponent(args[param])}`}>
+                            <code>{args[param]}</code>
+                          </Link>
                         </td>
                       ))}
                     </tr>
@@ -139,9 +129,12 @@ export default class ScopeGrants extends PureComponent {
                 </tbody>
               </Table>
               <hr />
-              <Button onClick={() => this.handleNavigate('create')}>
-                <Glyphicon glyph="plus" /> New Grant
-              </Button>
+              <Link to={`/auth/grants/${pattern.name}/create`}>
+                <Button
+                  onClick={() => this.setState({ selected: null, args: {} })}>
+                  <Glyphicon glyph="plus" /> New Grant
+                </Button>
+              </Link>
               <br />
               <br />
             </Col>
@@ -189,7 +182,7 @@ export default class ScopeGrants extends PureComponent {
     const { args } = this.state;
 
     this.setState({ selected: null, roles: null, args: {} });
-    this.handleNavigate('pattern');
+    this.state.history.push(`/auth/grants/${this.props.pattern}`);
     await this.load();
     this.setState({ selected: args });
   };
@@ -260,7 +253,7 @@ export default class ScopeGrants extends PureComponent {
 
   handleReload = () => {
     this.setState({ selected: null, roles: null });
-    this.handleNavigate('pattern');
+    this.state.history.push(`/auth/grants/${this.props.pattern}`);
     this.load();
   };
 
