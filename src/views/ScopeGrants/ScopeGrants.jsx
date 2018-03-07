@@ -12,7 +12,7 @@ import {
   ControlLabel,
   FormControl
 } from 'react-bootstrap';
-import { equals, uniq, merge, without, unnest } from 'ramda';
+import { uniq, merge, without, unnest } from 'ramda';
 import Icon from 'react-fontawesome';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -110,7 +110,7 @@ export default class ScopeGrants extends PureComponent {
           <hr />
           <Row>
             <Col md={12}>
-              <Table hover>
+              <Table hover role="grid">
                 <thead>
                   <tr>
                     {params.map((param, index) => (
@@ -124,6 +124,7 @@ export default class ScopeGrants extends PureComponent {
                       {params.map((param, index) => (
                         <td
                           key={`params-${index}`}
+                          role="gridcell"
                           onClick={() => {
                             this.setState({ selected: args });
                             this.selectGrant(args[param]);
