@@ -263,7 +263,7 @@ export default class ClientEditor extends PureComponent {
 
   /** Determine if clientId is valid */
   validClientId = () =>
-    /^[A-Za-z0-9@/:._-]+$/.test(this.state.client.clientId || '');
+    /^[A-Za-z0-9!@/:.+|_-]+$/.test(this.state.client.clientId || '');
 
   /** Render editing toolbar */
   renderEditingToolbar() {
