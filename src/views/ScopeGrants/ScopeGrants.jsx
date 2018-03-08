@@ -12,7 +12,7 @@ import {
   ControlLabel,
   FormControl
 } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { LinkContainer } from 'react-router-bootstrap';
 import { uniq, merge, without, unnest } from 'ramda';
 import Icon from 'react-fontawesome';
 import Error from '../../components/Error';
@@ -84,11 +84,11 @@ export default class ScopeGrants extends PureComponent {
           <HelmetTitle title={pattern.title} />
           <Row>
             <Col md={1}>
-              <Link to="/auth/grants">
+              <LinkContainer exact to="/auth/grants">
                 <Button>
                   <Glyphicon glyph="chevron-left" /> Back
                 </Button>
-              </Link>
+              </LinkContainer>
             </Col>
             <Col md={10}>
               <h2>
@@ -112,28 +112,31 @@ export default class ScopeGrants extends PureComponent {
                   {instantiatedArgs.map((args, index) => (
                     <tr key={`args-${index}`} style={{ cursor: 'pointer' }}>
                       {params.map((param, index) => (
-                        <td key={`params-${index}`} role="gridcell">
-                          <Link
-                            to={`/auth/grants/${
-                              pattern.name
-                            }/${encodeURIComponent(args[param])}`}
-                            onClick={() => this.setState({ selected: args })}>
+                        <LinkContainer
+                          key={`params-${index}`}
+                          exact
+                          to={`/auth/grants/${
+                            pattern.name
+                          }/${encodeURIComponent(args[param])}`}
+                          onClick={() => this.setState({ selected: args })}>
+                          <td role="gridcell">
                             <code>{args[param]}</code>
-                          </Link>
-                        </td>
+                          </td>
+                        </LinkContainer>
                       ))}
                     </tr>
                   ))}
                 </tbody>
               </Table>
               <hr />
-              <Link
+              <LinkContainer
+                exact
                 to={`/auth/grants/${pattern.name}/create`}
                 onClick={() => this.setState({ selected: null, args: {} })}>
                 <Button>
                   <Glyphicon glyph="plus" /> New Grant
                 </Button>
-              </Link>
+              </LinkContainer>
               <br />
               <br />
             </Col>
@@ -380,12 +383,11 @@ export default class ScopeGrants extends PureComponent {
         <br />
         <ListGroup>
           {PATTERNS.map(({ name, title, icon, description }, index) => (
-            <Link
+            <LinkContainer
+              exact
               to={`/auth/grants/${name}`}
-              key={`pattern-${index}`}
-              style={{ textDecoration: 'none', color: 'inherit' }}>
+              key={`pattern-${index}`}>
               <ListGroupItem
-                // key={`pattern-${index}`}
                 header={
                   <h3>
                     <Icon name={icon} /> {title}
@@ -393,7 +395,7 @@ export default class ScopeGrants extends PureComponent {
                 }>
                 <Markdown>{description}</Markdown>
               </ListGroupItem>
-            </Link>
+            </LinkContainer>
           ))}
         </ListGroup>
       </Col>
