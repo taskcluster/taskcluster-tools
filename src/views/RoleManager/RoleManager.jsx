@@ -99,11 +99,11 @@ export default class RoleManager extends PureComponent {
         <Col md={12}>
           {this.renderRolesTable()}
           <ButtonToolbar>
-            <Button
-              bsStyle="primary"
-              onClick={() => this.props.history.push(`/auth/roles/create`)}>
-              <Glyphicon glyph="plus" /> Add Role
-            </Button>
+            <Link to="/auth/roles/create">
+              <Button bsStyle="primary">
+                <Glyphicon glyph="plus" /> Add Role
+              </Button>
+            </Link>
             <Button
               bsStyle="success"
               onClick={this.handleLoad}
