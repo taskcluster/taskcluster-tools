@@ -112,14 +112,12 @@ export default class ScopeGrants extends PureComponent {
                   {instantiatedArgs.map((args, index) => (
                     <tr key={`args-${index}`} style={{ cursor: 'pointer' }}>
                       {params.map((param, index) => (
-                        <td
-                          key={`params-${index}`}
-                          role="gridcell"
-                          onClick={() => this.setState({ selected: args })}>
+                        <td key={`params-${index}`} role="gridcell">
                           <Link
                             to={`/auth/grants/${
                               pattern.name
-                            }/${encodeURIComponent(args[param])}`}>
+                            }/${encodeURIComponent(args[param])}`}
+                            onClick={() => this.setState({ selected: args })}>
                             <code>{args[param]}</code>
                           </Link>
                         </td>
@@ -129,9 +127,10 @@ export default class ScopeGrants extends PureComponent {
                 </tbody>
               </Table>
               <hr />
-              <Link to={`/auth/grants/${pattern.name}/create`}>
-                <Button
-                  onClick={() => this.setState({ selected: null, args: {} })}>
+              <Link
+                to={`/auth/grants/${pattern.name}/create`}
+                onClick={() => this.setState({ selected: null, args: {} })}>
+                <Button>
                   <Glyphicon glyph="plus" /> New Grant
                 </Button>
               </Link>
@@ -361,8 +360,6 @@ export default class ScopeGrants extends PureComponent {
     );
   }
 
-  handleOpenPattern = name => this.props.history.push(`/auth/grants/${name}`);
-
   renderPatternSelector() {
     return (
       <Col smOffset={1} sm={10}>
@@ -381,16 +378,20 @@ export default class ScopeGrants extends PureComponent {
         <br />
         <ListGroup>
           {PATTERNS.map(({ name, title, icon, description }, index) => (
-            <ListGroupItem
+            <Link
+              to={`/auth/grants/${name}`}
               key={`pattern-${index}`}
-              header={
-                <h3>
-                  <Icon name={icon} /> {title}
-                </h3>
-              }
-              onClick={() => this.handleOpenPattern(name)}>
-              <Markdown>{description}</Markdown>
-            </ListGroupItem>
+              style={{ textDecoration: 'none', color: 'inherit' }}>
+              <ListGroupItem
+                key={`pattern-${index}`}
+                header={
+                  <h3>
+                    <Icon name={icon} /> {title}
+                  </h3>
+                }>
+                <Markdown>{description}</Markdown>
+              </ListGroupItem>
+            </Link>
           ))}
         </ListGroup>
       </Col>
