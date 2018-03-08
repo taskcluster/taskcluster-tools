@@ -24,7 +24,7 @@ export default class ClientEditor extends PureComponent {
   }
 
   validClientId = () =>
-    /^[A-Za-z0-9@/:._-]+$/.test(this.state.currentClient.clientId || '');
+    /^[A-Za-z0-9!@/:.+|_-]+$/.test(this.state.currentClient.clientId || '');
 
   handleClientIdChange = e =>
     this.setState({
