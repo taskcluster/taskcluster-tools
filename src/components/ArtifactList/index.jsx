@@ -126,10 +126,10 @@ export default class ArtifactList extends PureComponent {
   render() {
     const { menu, style } = this.props;
     const { artifacts, error } = this.state;
-    const pubtooltip = (
+    const publicTooltip = (
       <Tooltip id="public-tooltip">This artifact is public.</Tooltip>
     );
-    const pritooltip = (
+    const privateTooltip = (
       <Tooltip id="private-tooltip">
         This artifact is private and requires privileges to download.
       </Tooltip>
@@ -165,7 +165,7 @@ export default class ArtifactList extends PureComponent {
         {artifacts.map(({ name, locked, icon, url }, index) => (
           <div key={`runs-menu-artifacts-${index}`} style={{ marginBottom: 8 }}>
             {locked && (
-              <OverlayTrigger placement="bottom" overlay={pritooltip}>
+              <OverlayTrigger placement="bottom" overlay={privateTooltip}>
                 <i className="fa fa-lock" style={{ marginRight: 5 }} />
               </OverlayTrigger>
             )}
@@ -173,7 +173,7 @@ export default class ArtifactList extends PureComponent {
               <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
             )}
             {!locked && (
-              <OverlayTrigger placement="bottom" overlay={pubtooltip}>
+              <OverlayTrigger placement="bottom" overlay={publicTooltip}>
                 <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
               </OverlayTrigger>
             )}
