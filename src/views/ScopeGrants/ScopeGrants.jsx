@@ -184,7 +184,7 @@ export default class ScopeGrants extends PureComponent {
     const { args } = this.state;
 
     this.setState({ selected: null, roles: null, args: {} });
-    this.state.history.replace(
+    this.props.history.replace(
       `/auth/grants/${this.props.pattern}/${this.props.organization}`
     );
     await this.load();
@@ -257,7 +257,7 @@ export default class ScopeGrants extends PureComponent {
 
   handleReload = () => {
     this.setState({ selected: null, roles: null });
-    this.state.history.replace(`/auth/grants/${this.props.pattern}`);
+    this.props.history.replace(`/auth/grants/${this.props.pattern}`);
     this.load();
   };
 
