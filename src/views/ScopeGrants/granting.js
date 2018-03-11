@@ -1,4 +1,4 @@
-import R from 'ramda';
+import { reduce, pipe, xprod, map, unnest, toPairs, uniq } from 'ramda';
 
 const assert = (condition, message) => {
   if (!condition) {
@@ -8,7 +8,7 @@ const assert = (condition, message) => {
 
 // cartesian product of multiple lists
 // xproduct([[a, b], [1, 2], [C]]) == [[a, 1, C], [a, 2, C], [b, 1, C], [b, 2, C]]
-const xproduct = R.reduce(R.pipe(R.xprod, R.map(R.unnest)), [[]]);
+const xproduct = reduce(pipe(xprod, map(unnest)), [[]]);
 // escape string for save usage in regular expression
 const escapeRegex = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 // Extract regular expression without ^ and $, and assert that it doesn't contain
@@ -139,33 +139,33 @@ export const instantiatedArguments = ({ params, grants }, roles = []) => {
   // For each {rolePattern: [...scopePatterns]} in grants (key/value pair in grants)
   // we find the possible set of arguments: {param: value, ...}, for which the
   // scopes matching scopePatterns have been granted to a role matching rolePattern
-  const rolePatternArgSets = R.toPairs(
-    grants
-  ).map(([rolePattern, scopePatterns]) => {
-    // Construct a function that will match rolePattern, by replacing <param>
-    // with the regular expression for the param. The matcher will return the
-    // arguments used in the string matched on the form: {param: value, ...}
-    const roleMatch = makeMatcher(rolePattern);
-    const scopeMatchers = scopePatterns.map(makeMatcher);
+  const rolePatternArgSets = toPairs(grants).map(
+    ([rolePattern, scopePatterns]) => {
+      // Construct a function that will match rolePattern, by replacing <param>
+      // with the regular expression for the param. The matcher will return the
+      // arguments used in the string matched on the form: {param: value, ...}
+      const roleMatch = makeMatcher(rolePattern);
+      const scopeMatchers = scopePatterns.map(makeMatcher);
 
-    return roles
-      .filter(({ roleId }) => roleMatch(roleId))
-      .map(({ roleId, scopes }) => {
-        // Find a list of satisfied args for each scope pattern
-        const scopePatternArgSets = scopeMatchers.map(m =>
-          R.uniq(scopes.map(m).filter(a => a))
-        );
+      return roles
+        .filter(({ roleId }) => roleMatch(roleId))
+        .map(({ roleId, scopes }) => {
+          // Find a list of satisfied args for each scope pattern
+          const scopePatternArgSets = scopeMatchers.map(m =>
+            uniq(scopes.map(m).filter(a => a))
+          );
 
-        // We must satisfy one args for each scope pattern, as we have a
-        // list of args per scope-pattern, this becomes cartesian product
-        return xproduct([
-          [roleMatch(roleId)], // args required by role pattern
-          ...scopePatternArgSets // Array with args for each scope pattern
-        ])
-          .map(mergeArgumentSets)
-          .filter(a => a);
-      });
-  });
+          // We must satisfy one args for each scope pattern, as we have a
+          // list of args per scope-pattern, this becomes cartesian product
+          return xproduct([
+            [roleMatch(roleId)], // args required by role pattern
+            ...scopePatternArgSets // Array with args for each scope pattern
+          ])
+            .map(mergeArgumentSets)
+            .filter(a => a);
+        });
+    }
+  );
 
   // Find the arguments for which all {rolePattern: [...scopePatterns]} pairs
   // in grants have been instantiated. We have a list of arguments for each

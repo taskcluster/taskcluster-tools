@@ -18,7 +18,7 @@ after_failure:
 - yarn build -- --inspect
 script:
 - yarn lint
-- yarn build
+- travis_wait yarn build
 deploy:
   app: taskcluster-tools
   provider: heroku
