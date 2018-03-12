@@ -1,6 +1,6 @@
 import { PureComponent } from 'react';
 import { string, bool, object, func } from 'prop-types';
-import { Button, Glyphicon, ButtonToolbar } from 'react-bootstrap';
+import { Alert, Button, Glyphicon, ButtonToolbar } from 'react-bootstrap';
 import clone from 'lodash.clonedeep';
 import equal from 'deep-equal';
 import { assocPath } from 'ramda';
@@ -45,10 +45,12 @@ export default class HookEditor extends PureComponent {
     currentHookId: string,
     currentHookGroupId: string,
     hook: object,
+    error: object,
     isCreating: bool,
     onCreateHook: func.isRequired,
     onUpdateHook: func.isRequired,
-    onDeleteHook: func.isRequired
+    onDeleteHook: func.isRequired,
+    onError: func.isRequired
   };
 
   constructor(props) {
@@ -266,6 +268,16 @@ export default class HookEditor extends PureComponent {
   render() {
     const { isCreating, hookGroupId, hookId } = this.props;
     const { hook } = this.state;
+
+    if (this.props.error) {
+      return (
+        <Alert bsStyle="danger" onDismiss={this.props.onError}>
+          <strong>Error executing operation</strong>
+          <br />
+          {this.props.error.toString()}
+        </Alert>
+      );
+    }
 
     if (!hook) {
       return null;
