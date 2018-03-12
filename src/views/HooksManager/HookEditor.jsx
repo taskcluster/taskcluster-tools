@@ -218,8 +218,7 @@ export default class HookEditor extends PureComponent {
     );
   };
 
-  handleUpdateHook = () =>
-    this.props.onUpdateHook(this.getHookDefinition());
+  handleUpdateHook = () => this.props.onUpdateHook(this.getHookDefinition());
 
   renderButtonBar() {
     const { isCreating, hookGroupId, hookId } = this.props;
