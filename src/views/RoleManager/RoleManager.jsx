@@ -54,7 +54,7 @@ export default class RoleManager extends PureComponent {
     this.load();
     const { history } = this.props;
 
-    history.push(`/auth/roles/${roleId ? encodeURIComponent(roleId) : ''}`);
+    history.push(`/auth/roles${roleId ? `/encodeURIComponent(roleId)` : ''}`);
   };
 
   handleDeleteRole = roleId => this.props.auth.deleteRole(roleId);
