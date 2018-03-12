@@ -215,6 +215,11 @@ export default class TaskDetails extends PureComponent {
             </tr>
 
             <tr>
+              <td>Created by `clientId`</td>
+              <td>{task.clientId}</td>
+            </tr>
+
+            <tr>
               <td>Dependencies</td>
               <td>
                 {!isEmpty(this.state.dependencies) ? (
