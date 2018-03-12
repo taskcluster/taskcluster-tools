@@ -4,7 +4,7 @@ import WithUserSession from '../../components/WithUserSession';
 import RoleManager from './RoleManager';
 
 const View = ({ history, match }) => {
-  const roleId = window.location.hash.slice(1);
+  const [roleId] = window.location.hash.slice(1).split('/');
 
   if (roleId) {
     return <Redirect to={`/auth/roles/${roleId}`} />;

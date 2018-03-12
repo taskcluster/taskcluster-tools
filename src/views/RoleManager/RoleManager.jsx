@@ -50,28 +50,24 @@ export default class RoleManager extends PureComponent {
     }
   };
 
-  handleNavigate = roleId => {
-    this.handleLoad();
-    this.props.history.replace(
-      `/auth/roles/${roleId ? encodeURIComponent(roleId) : ''}`
-    );
+  navigate = roleId => {
+    this.load();
+    const { history } = this.props;
+
+    history.push(`/auth/roles${roleId ? `/encodeURIComponent(roleId)` : ''}`);
   };
 
   handleDeleteRole = roleId => this.props.auth.deleteRole(roleId);
 
-  renderRoleRow = (role, index) => {
-    const isSelected = this.state.selectedRoleId === role.roleId;
-
-    return (
-      <tr key={index} className={isSelected ? 'info' : null}>
-        <td>
-          <Link to={`/auth/roles/${encodeURIComponent(role.roleId)}`}>
-            <code>{role.roleId}</code>
-          </Link>
-        </td>
-      </tr>
-    );
-  };
+  renderRoleRow = (role, roleRow) => (
+    <tr key={`${roleRow}-${role.id}`}>
+      <td>
+        <Link to={`/auth/roles/${encodeURIComponent(role.roleId)}`}>
+          <code>{role.roleId}</code>
+        </Link>
+      </td>
+    </tr>
+  );
 
   renderRolesTable() {
     const { roles } = this.state;
@@ -96,19 +92,18 @@ export default class RoleManager extends PureComponent {
     );
   }
 
-  render() {
+  renderRoles() {
     return (
       <Row style={{ marginTop: 10 }}>
         <HelmetTitle title="Role Manager" />
-        <Col md={5}>
+        <Col md={12}>
           {this.renderRolesTable()}
           <ButtonToolbar>
-            <Button
-              bsStyle="primary"
-              href="/auth/roles"
-              disabled={this.props.roleId === ''}>
-              <Glyphicon glyph="plus" /> Add Role
-            </Button>
+            <Link to="/auth/roles/create">
+              <Button bsStyle="primary">
+                <Glyphicon glyph="plus" /> Add Role
+              </Button>
+            </Link>
             <Button
               bsStyle="success"
               onClick={this.handleLoad}
@@ -117,16 +112,23 @@ export default class RoleManager extends PureComponent {
             </Button>
           </ButtonToolbar>
         </Col>
-        <Col md={7}>
-          <RoleEditor
-            auth={this.props.auth}
-            history={this.props.history}
-            currentRoleId={this.props.roleId}
-            onDeleteRole={this.handleDeleteRole}
-            onNavigate={this.handleNavigate}
-          />
-        </Col>
       </Row>
     );
+  }
+
+  renderRoleEditor() {
+    return (
+      <RoleEditor
+        auth={this.props.auth}
+        history={this.props.history}
+        currentRoleId={this.props.roleId === 'create' ? '' : this.props.roleId}
+        onDeleteRole={this.handleDeleteRole}
+        navigate={this.navigate}
+      />
+    );
+  }
+
+  render() {
+    return this.props.roleId ? this.renderRoleEditor() : this.renderRoles();
   }
 }
