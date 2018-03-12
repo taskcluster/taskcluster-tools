@@ -2,5 +2,5 @@ build
 node_modules
 *.swp
 .idea/
-.log
+*.log
 .Rhistory
