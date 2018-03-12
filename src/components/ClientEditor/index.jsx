@@ -25,13 +25,12 @@ export default class ClientEditor extends PureComponent {
   static propTypes = {
     // Method to reload a client in the parent
     onNavigate: func.isRequired,
-    onDeleteClient: func
+    onDeleteClient: func.isRequired
   };
 
   static defaultProps = {
     // '' implies. "Create Client"
-    currentClientId: '',
-    onDeleteClient: null
+    currentClientId: ''
   };
 
   constructor(props) {
