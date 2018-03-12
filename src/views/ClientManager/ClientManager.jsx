@@ -40,7 +40,7 @@ export default class ClientManager extends Component {
     }
   }
 
-  deleteClient = clientId => this.props.auth.deleteClient(clientId);
+  handleDeleteClient = clientId => this.props.auth.deleteClient(clientId);
 
   async loadClientPrefix() {
     if (this.state.clientPrefixLoaded) {
@@ -228,7 +228,7 @@ export default class ClientManager extends Component {
               auth={this.props.auth}
               clientPrefix={clientPrefix}
               currentClientId={this.props.clientId}
-              deleteClient={this.deleteClient}
+              onDeleteClient={this.handleDeleteClient}
               onNavigate={this.handleNavigate}
             />
           ) : (
