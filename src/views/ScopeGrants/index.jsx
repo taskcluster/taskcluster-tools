@@ -4,6 +4,7 @@ import ScopeGrants from './ScopeGrants';
 
 const View = ({ match, history }) => {
   const pattern = decodeURIComponent(match.params.pattern || '');
+  const organization = decodeURIComponent(match.params.organization || '');
 
   return (
     <WithUserSession>
@@ -15,6 +16,7 @@ const View = ({ match, history }) => {
               history={history}
               userSession={userSession}
               pattern={pattern}
+              organization={organization}
             />
           )}
         </WithClients>

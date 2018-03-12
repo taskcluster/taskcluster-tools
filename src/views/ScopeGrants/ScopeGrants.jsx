@@ -12,7 +12,8 @@ import {
   ControlLabel,
   FormControl
 } from 'react-bootstrap';
-import { equals, uniq, merge, without, unnest } from 'ramda';
+import { LinkContainer } from 'react-router-bootstrap';
+import { uniq, merge, without, unnest } from 'ramda';
 import Icon from 'react-fontawesome';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
@@ -65,10 +66,7 @@ export default class ScopeGrants extends PureComponent {
     }
   }
 
-  handleGrantsRedirect = () => this.props.history.push(`/auth/grants`);
-  handleNewGrant = () => this.setState({ selected: null, args: {} });
-
-  renderGrants() {
+  renderGrants(pattern) {
     if (this.state.error) {
       return <Error error={this.state.error} />;
     }
@@ -77,7 +75,6 @@ export default class ScopeGrants extends PureComponent {
       return <Spinner />;
     }
 
-    const pattern = PATTERNS.find(p => p.name === this.props.pattern);
     const instantiatedArgs = instantiatedArguments(pattern, this.state.roles);
     const params = Object.keys(pattern.params);
 
@@ -87,9 +84,11 @@ export default class ScopeGrants extends PureComponent {
           <HelmetTitle title={pattern.title} />
           <Row>
             <Col md={1}>
-              <Button onClick={this.handleGrantsRedirect}>
-                <Glyphicon glyph="chevron-left" /> Back
-              </Button>
+              <LinkContainer exact to="/auth/grants">
+                <Button>
+                  <Glyphicon glyph="chevron-left" /> Back
+                </Button>
+              </LinkContainer>
             </Col>
             <Col md={10}>
               <h2>
@@ -100,8 +99,8 @@ export default class ScopeGrants extends PureComponent {
           </Row>
           <hr />
           <Row>
-            <Col md={6}>
-              <Table hover>
+            <Col md={12}>
+              <Table hover role="grid">
                 <thead>
                   <tr>
                     {params.map((param, index) => (
@@ -111,33 +110,35 @@ export default class ScopeGrants extends PureComponent {
                 </thead>
                 <tbody>
                   {instantiatedArgs.map((args, index) => (
-                    <tr
-                      key={`args-${index}`}
-                      style={{ cursor: 'pointer' }}
-                      className={
-                        equals(args, this.state.selected) ? 'info' : null
-                      }
-                      onClick={() => this.setState({ selected: args })}>
+                    <tr key={`args-${index}`} style={{ cursor: 'pointer' }}>
                       {params.map((param, index) => (
-                        <td key={`params-${index}`}>
-                          <code>{args[param]}</code>
-                        </td>
+                        <LinkContainer
+                          key={`params-${index}`}
+                          exact
+                          to={`/auth/grants/${
+                            pattern.name
+                          }/${encodeURIComponent(args[param])}`}
+                          onClick={() => this.setState({ selected: args })}>
+                          <td role="gridcell">
+                            <code>{args[param]}</code>
+                          </td>
+                        </LinkContainer>
                       ))}
                     </tr>
                   ))}
                 </tbody>
               </Table>
               <hr />
-              <Button onClick={this.handleNewGrant}>
-                <Glyphicon glyph="plus" /> New Grant
-              </Button>
+              <LinkContainer
+                exact
+                to={`/auth/grants/${pattern.name}/create`}
+                onClick={() => this.setState({ selected: null, args: {} })}>
+                <Button>
+                  <Glyphicon glyph="plus" /> New Grant
+                </Button>
+              </LinkContainer>
               <br />
               <br />
-            </Col>
-            <Col md={6}>
-              {this.state.selected
-                ? this.renderPatternInstance(pattern, this.state.selected)
-                : this.renderCreateForm(pattern)}
             </Col>
           </Row>
         </Col>
@@ -183,6 +184,9 @@ export default class ScopeGrants extends PureComponent {
     const { args } = this.state;
 
     this.setState({ selected: null, roles: null, args: {} });
+    this.props.history.replace(
+      `/auth/grants/${this.props.pattern}/${this.props.organization}`
+    );
     await this.load();
     this.setState({ selected: args });
   };
@@ -253,6 +257,7 @@ export default class ScopeGrants extends PureComponent {
 
   handleReload = () => {
     this.setState({ selected: null, roles: null });
+    this.props.history.replace(`/auth/grants/${this.props.pattern}`);
     this.load();
   };
 
@@ -272,8 +277,30 @@ export default class ScopeGrants extends PureComponent {
     );
   };
 
-  renderPatternInstance(pattern, args) {
+  renderPatternInstance(pattern, selected) {
     const params = Object.keys(pattern.params);
+    let arg = selected;
+
+    if (this.state.error) {
+      return <Error error={this.state.error} />;
+    }
+
+    if (!selected) {
+      if (!this.state.roles) {
+        return <Spinner />;
+      }
+
+      const instantiatedArgs = instantiatedArguments(pattern, this.state.roles);
+
+      params.map(
+        org =>
+          (arg = instantiatedArgs.find(
+            ele => ele[org] === this.props.organization
+          ))
+      );
+    }
+
+    const args = arg;
 
     return (
       <span>
@@ -338,8 +365,6 @@ export default class ScopeGrants extends PureComponent {
     );
   }
 
-  handleOpenPattern = name => this.props.history.push(`/auth/grants/${name}`);
-
   renderPatternSelector() {
     return (
       <Col smOffset={1} sm={10}>
@@ -358,16 +383,19 @@ export default class ScopeGrants extends PureComponent {
         <br />
         <ListGroup>
           {PATTERNS.map(({ name, title, icon, description }, index) => (
-            <ListGroupItem
-              key={`pattern-${index}`}
-              header={
-                <h3>
-                  <Icon name={icon} /> {title}
-                </h3>
-              }
-              onClick={() => this.handleOpenPattern(name)}>
-              <Markdown>{description}</Markdown>
-            </ListGroupItem>
+            <LinkContainer
+              exact
+              to={`/auth/grants/${name}`}
+              key={`pattern-${index}`}>
+              <ListGroupItem
+                header={
+                  <h3>
+                    <Icon name={icon} /> {title}
+                  </h3>
+                }>
+                <Markdown>{description}</Markdown>
+              </ListGroupItem>
+            </LinkContainer>
           ))}
         </ListGroup>
       </Col>
@@ -375,6 +403,9 @@ export default class ScopeGrants extends PureComponent {
   }
 
   render() {
+    const pattern = PATTERNS.find(p => p.name === this.props.pattern);
+    const { organization } = this.props;
+
     if (
       !this.props.pattern ||
       !PATTERNS.some(p => p.name === this.props.pattern)
@@ -387,6 +418,14 @@ export default class ScopeGrants extends PureComponent {
       );
     }
 
-    return this.renderGrants();
+    if (organization) {
+      if (organization === 'create') {
+        return this.renderCreateForm(pattern);
+      }
+
+      return this.renderPatternInstance(pattern, this.state.selected);
+    }
+
+    return this.renderGrants(pattern);
   }
 }
