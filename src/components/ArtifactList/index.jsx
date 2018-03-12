@@ -1,6 +1,12 @@
 import { PureComponent } from 'react';
 import { array, bool, oneOfType, number, string, object } from 'prop-types';
-import { MenuItem, NavItem, NavDropdown } from 'react-bootstrap';
+import {
+  MenuItem,
+  NavItem,
+  NavDropdown,
+  OverlayTrigger,
+  Tooltip
+} from 'react-bootstrap';
 import { isNil } from 'ramda';
 import Error from '../../components/Error';
 import { getIconFromMime } from '../../utils';
@@ -120,6 +126,14 @@ export default class ArtifactList extends PureComponent {
   render() {
     const { menu, style } = this.props;
     const { artifacts, error } = this.state;
+    const publicTooltip = (
+      <Tooltip id="public-tooltip">This artifact is public.</Tooltip>
+    );
+    const privateTooltip = (
+      <Tooltip id="private-tooltip">
+        This artifact is private and requires privileges to download.
+      </Tooltip>
+    );
 
     if (error) {
       return <Error error={error} />;
@@ -141,7 +155,8 @@ export default class ArtifactList extends PureComponent {
             target="_blank"
             rel="noopener noreferrer"
             key={`runs-menu-artifacts-${index}`}>
-            <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} /> {name}
+            <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
+            {name}
           </MenuItem>
         ))}
       </NavDropdown>
@@ -149,8 +164,19 @@ export default class ArtifactList extends PureComponent {
       <div style={{ fontSize: 14, ...style }}>
         {artifacts.map(({ name, locked, icon, url }, index) => (
           <div key={`runs-menu-artifacts-${index}`} style={{ marginBottom: 8 }}>
-            {locked && <i className="fa fa-lock" style={{ marginRight: 5 }} />}
-            <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
+            {locked && (
+              <OverlayTrigger placement="bottom" overlay={privateTooltip}>
+                <i className="fa fa-lock" style={{ marginRight: 5 }} />
+              </OverlayTrigger>
+            )}
+            {locked && (
+              <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
+            )}
+            {!locked && (
+              <OverlayTrigger placement="bottom" overlay={publicTooltip}>
+                <i className={`fa fa-${icon}`} style={{ marginRight: 5 }} />
+              </OverlayTrigger>
+            )}
             <a href={url} target="_blank" rel="noopener noreferrer">
               {name}
             </a>
