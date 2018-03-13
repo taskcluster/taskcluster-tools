@@ -12,6 +12,7 @@ import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
 import HelmetTitle from '../../components/HelmetTitle';
+import SearchForm from './SearchForm';
 
 export default class RoleManager extends PureComponent {
   constructor(props) {
@@ -74,14 +75,7 @@ export default class RoleManager extends PureComponent {
     );
   };
 
-  setRoleId = e => this.setState({ roleIdContains: e.target.value });
-
-  enterRoleId = e => {
-    if (e.keyCode === 13) {
-      e.preventDefault();
-      this.setRoleId(e);
-    }
-  };
+  handleSetRoleId = value => this.setState({ roleIdContains: value });
 
   renderRolesTable() {
     const { roles } = this.state;
@@ -109,23 +103,10 @@ export default class RoleManager extends PureComponent {
 
   renderTypeInput() {
     return (
-      <div className="form-group form-group-sm">
-        <div className="input-group">
-          <div className="input-group-addon text-sm">
-            <em>Role Id containing</em>
-          </div>
-          <input
-            type="search"
-            className="form-control"
-            defaultValue={this.state.roleIdContains}
-            onBlur={this.setRoleId}
-            onKeyUp={this.enterRoleId}
-          />
-          <div className="input-group-addon">
-            <Glyphicon glyph="search" />
-          </div>
-        </div>
-      </div>
+      <SearchForm
+        default={this.state.roleIdContains}
+        onSearch={this.handleSetRoleId}
+      />
     );
   }
 
