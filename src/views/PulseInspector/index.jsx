@@ -12,6 +12,7 @@ import {
   ControlLabel
 } from 'react-bootstrap';
 import { WebListener } from 'taskcluster-client-web';
+import { Link } from 'react-router-dom';
 import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
@@ -277,13 +278,9 @@ export default class PulseInspector extends PureComponent {
             This tool lets you listen to Pulse messages from any exchange and
             routing key. When messages are received you can inspect the
             messages. This is useful for debugging and development when
-            consuming from undocumented exchanges. A list of Pulse exchanges is
-            maintained on the project Wiki, see&nbsp;
-            <a href="https://wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges">
-              wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
-            </a>. Notice that all exchanges from Taskcluster is formally
-            documented on{' '}
-            <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
+            consuming from undocumented exchanges. Notice that all exchanges
+            from {process.env.APPLICATION_NAME} is
+            <Link to="/docs">formally documented</Link>.
           </p>
           <hr />
           {this.renderForm()}

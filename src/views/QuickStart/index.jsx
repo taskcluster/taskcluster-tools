@@ -260,8 +260,8 @@ export default class YamlCreator extends Component {
             </p>
             <hr />
             <h5>
-              For organization members: Check if your repository already has
-              Taskcluster
+              For organization members: Check if your repository already has the
+              Taskcluster-GitHub integration installed.
             </h5>
             <Form onSubmit={this.handleInstalledStatus} inline>
               <FormGroup

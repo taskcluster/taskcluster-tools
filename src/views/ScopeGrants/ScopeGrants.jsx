@@ -347,7 +347,7 @@ export default class ScopeGrants extends PureComponent {
         <p>
           This <em>scope grant</em> tool is an administrative utility for
           granting scopes by creating or updating roles following predefined
-          patterns. These patterns are declared in the taskcluster-tools
+          patterns. These patterns are declared in this web application{`'`}s
           repository. Each pattern takes a set of parameters that is used to
           instantiate scope patterns which are then granted to instantiated role
           patterns. Below is a list of supported patterns. After selecting a

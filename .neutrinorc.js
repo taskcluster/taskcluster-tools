@@ -2,24 +2,11 @@ const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
 
-const gitRevisionPlugin = new GitRevisionPlugin();
-
 // Increment the version whenever you need a full invalidation
 // but hashes could remain the same
 const CACHE_VERSION = 'v1';
 
-const envs = {
-  AUTH0_DOMAIN: 'auth.mozilla.auth0.com',
-  AUTH0_CLIENT_ID: 'TBD',
-  AUTH0_AUDIENCE: 'login.taskcluster.net',
-  SIGN_IN_METHODS: process.env.NODE_ENV === 'development' ? 'development' : 'auth0 manual',
-  COMMITHASH: gitRevisionPlugin.commithash()
-};
-
-// Set environment variables to their default values if not defined
-Object
-  .keys(envs)
-  .forEach(env => !(env in process.env) && (process.env[env] = envs[env]));
+process.env.COMMIT_HASH = new GitRevisionPlugin().commithash()
 
 module.exports = {
   use: [
@@ -60,7 +47,15 @@ module.exports = {
         }
       }
     }],
-    ['@neutrinojs/env', Object.keys(envs)],
+    ['@neutrinojs/env', [
+      'NODE_ENV',
+      'APPLICATION_NAME',
+      'AUTH0_DOMAIN',
+      'AUTH0_CLIENT_ID',
+      'AUTH0_AUDIENCE',
+      'SIGN_IN_METHODS',
+      'COMMIT_HASH'
+    ]],
     (neutrino) => {
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
@@ -113,5 +108,5 @@ module.exports = {
           'taskcluster-client-web'
         ]);
     }
-  ]
+  ],
 };

@@ -5,11 +5,7 @@ import WorkerManager from './WorkerManager';
 const View = ({ history, match, location }) => (
   <WithUserSession>
     {userSession => (
-      <WithClients
-        Queue
-        AwsProvisioner={{
-          baseUrl: 'https://aws-provisioner.taskcluster.net/v1'
-        }}>
+      <WithClients Queue AwsProvisioner>
         {clients => (
           <WorkerManager
             {...clients}
