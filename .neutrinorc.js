@@ -47,11 +47,18 @@ module.exports = {
     }],
     ['@neutrinojs/env', [
       'NODE_ENV',
+      'ALGOLIA_APP_ID',
+      'ALGOLIA_API_KEY',
+      'ALGOLIA_INDEX_NAME',
       'APPLICATION_NAME',
       'AUTH0_DOMAIN',
       'AUTH0_CLIENT_ID',
       'AUTH0_AUDIENCE',
-      'SIGN_IN_METHODS'
+      'AUTH0_SCOPE',
+      'AUTH0_RESPONSE_TYPE',
+      'BASE_URL',
+      'OIDC_PROVIDER',
+      'SIGN_IN_METHODS',
     ]],
     (neutrino) => {
       // Fix issue with nested routes e.g /index/garbage
