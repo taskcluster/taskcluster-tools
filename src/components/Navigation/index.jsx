@@ -15,23 +15,9 @@ import docsearch from 'docsearch.js/dist/cdn/docsearch';
 import 'docsearch.js/dist/cdn/docsearch.css';
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
-import { navigation, docsSearchContainer } from './styles.module.css';
+import { navigation } from './styles.module.css';
 
 export default class Navigation extends PureComponent {
-  search = null;
-
-  componentDidMount() {
-    this.search = docsearch({
-      apiKey: process.env.ALGOLIA_API_KEY,
-      indexName: process.env.ALGOLIA_INDEX_NAME,
-      inputSelector: '#docs-search',
-      autocompleteOptions: {
-        autoselect: true,
-        openOnFocus: true
-      }
-    });
-  }
-
   render() {
     const commit = (
       <Tooltip id="commit-tooltip">
