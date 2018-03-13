@@ -11,21 +11,36 @@ import {
   Tooltip,
   OverlayTrigger
 } from 'react-bootstrap';
+import docsearch from 'docsearch.js/dist/cdn/docsearch';
+import 'docsearch.js/dist/cdn/docsearch.css';
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
-import { navigation } from './styles.module.css';
+import { navigation, docsSearchContainer } from './styles.module.css';
 
 export default class Navigation extends PureComponent {
+  search = null;
+
+  componentDidMount() {
+    this.search = docsearch({
+      apiKey: process.env.ALGOLIA_API_KEY,
+      indexName: process.env.ALGOLIA_INDEX_NAME,
+      inputSelector: '#docs-search',
+      autocompleteOptions: {
+        autoselect: true,
+        openOnFocus: true
+      }
+    });
+  }
+
   render() {
-    // const hash = process.env.COMMITHASH;
     const commit = (
       <Tooltip id="commit-tooltip">
-        View the source of commit {process.env.COMMITHASH.substr(0, 12)} on
+        View the source of commit {process.env.COMMIT_HASH.substr(0, 12)} on
         GitHub.
       </Tooltip>
     );
     const sourcelink = `https://github.com/taskcluster/taskcluster-tools/tree/${
-      process.env.COMMITHASH
+      process.env.COMMIT_HASH
     }`;
 
     return (
@@ -45,6 +60,14 @@ export default class Navigation extends PureComponent {
                 <Icon name="code-fork" size="lg" />
               </NavItem>
             </OverlayTrigger>
+            <NavItem className={docsSearchContainer}>
+              <FormControl
+                type="text"
+                id="docs-search"
+                placeholder="Search docs..."
+                bsSize="sm"
+              />
+            </NavItem>
             <NavDropdown key={1} title="Tools" id="tools">
               {links.map(
                 ({ title, link, icon }) =>
