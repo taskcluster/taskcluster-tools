@@ -39,3 +39,21 @@
   display: inline;
   margin-top: -3px;
 }
+
+.docsSearchContainer,
+.docsSearchContainer:hover {
+  background-color: transparent !important;
+}
+
+.docsSearchContainer a {
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-left: 10px;
+  padding: 0 !important;
+}
+
+@media (max-width: 884px) and (min-width: 768px) {
+  .docsSearchContainer input[type=text] {
+    width: 100px;
+  }
+}
