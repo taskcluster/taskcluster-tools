@@ -312,7 +312,7 @@ export default class TaskDetails extends PureComponent {
               <td>Task Definition</td>
               <td>
                 <a
-                  href={`https://queue.taskcluster.net/v1/task/${
+                  href={`${process.env.BASE_URL}/queue/v1/task/${
                     status.taskId
                   }`}
                   target="_blank"

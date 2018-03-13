@@ -17,7 +17,6 @@ import successFavIcon from '../../images/taskcluster-group-success.png';
 import pendingFavIcon from '../../images/taskcluster-group-pending.png';
 import failedFavIcon from '../../images/taskcluster-group-failed.png';
 import { loadable } from '../../utils';
-import iconUrl from '../../taskcluster.png';
 import UserSession from '../../auth/UserSession';
 
 const GroupProgress = loadable(() =>
@@ -564,8 +563,7 @@ export default class Inspector extends PureComponent {
       return;
     }
 
-    return new Notification('Taskcluster', {
-      icon: iconUrl,
+    return new Notification(process.env.APPLICATION_NAME, {
       body: message
     });
   }

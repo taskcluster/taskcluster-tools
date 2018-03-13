@@ -1,5 +1,5 @@
 import { PureComponent } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { Button, ButtonToolbar, Glyphicon, Col } from 'react-bootstrap';
 import { safeLoad, safeDump } from 'js-yaml';
 import { nice } from 'slugid';
@@ -31,7 +31,7 @@ const defaultTask = {
     name: 'Example Task',
     description: 'Markdown description of **what** this task does',
     owner: 'name@example.com',
-    source: 'https://tools.taskcluster.net/task-creator/'
+    source: `${process.env.BASE_URL}/tasks/create`
   }
 };
 
@@ -218,14 +218,10 @@ export default class TaskCreator extends PureComponent {
         />
         <h4>{interactive ? 'Create Interactive Task' : 'Create Task'}</h4>
         <p>
-          Write and submit a task to Taskcluster. For details on what you can
-          write, refer to the&nbsp;
-          <a
-            href="https://docs.taskcluster.net"
-            target="_blank"
-            rel="noopener noreferrer">
-            documentation
-          </a>. When you submit a task here, you will be taken to{' '}
+          Write and submit a task to {process.env.APPLICATION_NAME}. For details
+          on what you can write, refer to the{' '}
+          <Link to="/docs">documentation</Link>. When you submit a task here,
+          you will be taken to{' '}
           {interactive
             ? 'connect to the interactive task'
             : 'inspect the created task'}. Your task will be saved so you can

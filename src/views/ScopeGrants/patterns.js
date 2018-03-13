@@ -35,14 +35,16 @@ export default [
     icon: 'github',
     title: 'Authorize Github Organizations',
     description: `
-Authorize **all** repositories under a github organization to use taskcluster.
+Authorize **all** repositories under a GitHub organization to use ${
+      process.env.APPLICATION_NAME
+    } CI.
 
-By default any the tascluster-github application can be installed on any github
-organization/repository. However, github repositories are not granted any scopes
+By default any Taskcluster-GitHub application can be installed on any GitHub
+organization/repository. However, GitHub repositories are not granted any scopes
 by default, so even if the repository contains have a \`.taskcluster.yml\`,
 tasks won't be triggered.
 
-To make it easy to get started with a new github organization, this pattern
+To make it easy to get started with a new GitHub organization, add the pattern
 grants \`assume:project:taskcluster:mozilla-github-repository\` to all
 repositories under a given organization. This role grants the repositories a
 reasonable set of low-privileged scopes to get people started.

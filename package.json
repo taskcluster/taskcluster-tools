@@ -3,13 +3,13 @@
   "version": "0.0.0-private",
   "private": true,
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=8.0.0"
   },
   "scripts": {
-    "start": "neutrino start",
+    "start": "neutrino start --require dotenv/config",
     "lint": "neutrino lint",
-    "debug": "node --inspect ./node_modules/.bin/neutrino start",
-    "build": "neutrino build",
+    "debug": "node --inspect ./node_modules/.bin/neutrino start --require dotenv/config",
+    "build": "neutrino build --require dotenv/config",
     "precommit": "lint-staged"
   },
   "lint-staged": {
@@ -31,6 +31,7 @@
     "deep-equal": "^1.0.1",
     "deepmerge": "^1.5.2",
     "docker-exec-websocket-server": "^1.3.1",
+    "dotenv": "^5.0.1",
     "font-awesome": "^4.7.0",
     "font-awesome-svg-png": "^1.1.5",
     "fscreen": "^1.0.2",

@@ -10,10 +10,10 @@ export default class DevelopmentLoginMenuItem extends PureComponent {
     query.set('name', 'tools-devel');
     query.set(
       'description',
-      'Temporary client for developing and testing taskcluster-tools'
+      'Temporary client for developing and testing this repository'
     );
     window.open(
-      `https://tools.taskcluster.net/auth/clients/new?${query.toString()}`,
+      `${process.env.BASE_URL}/auth/clients/new?${query.toString()}`,
       '_blank'
     );
   }

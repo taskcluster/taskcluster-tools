@@ -1,11 +1,11 @@
 export default [
   {
-    title: 'Provisioner Explorer',
-    link: '/provisioners',
-    icon: 'wpexplorer',
-    description: `List worker-types for provisioners and see relevant information.
-      List workers for a worker-type and see relevant information. Drill down into a
-      specific worker and perform actions against it or see recent tasks it has claimed.`
+    title: 'Documentation',
+    link: '/docs',
+    icon: 'book',
+    description: `Visit the documentation for all ${
+      process.env.APPLICATION_NAME
+    } APIs and Pulse exchanges.`
   },
   {
     title: 'Task & Group Inspector',
@@ -19,15 +19,23 @@ export default [
     title: 'Task Creator',
     link: '/tasks/create',
     icon: 'pencil-square-o',
-    description: `Create and submit tasks to Taskcluster. Created tasks will be saved so you can come back and
+    description: `Create and submit tasks. Created tasks will be saved so you can come back and
       experiment with variations.`
+  },
+  {
+    title: 'Provisioner Explorer',
+    link: '/provisioners',
+    icon: 'wpexplorer',
+    description: `List worker-types for provisioners and see relevant information.
+      List workers for a worker-type and see relevant information. Drill down into a
+      specific worker and perform actions against it or see recent tasks it has claimed.`
   },
   {
     title: 'GitHub Quick-Start',
     link: '/quickstart',
     icon: 'github',
     description:
-      'Create a `.taskcluster.yml` configuration file and plug Taskcluster into your repository.'
+      'Create a `.taskcluster.yml` configuration file and plug the CI into your repository.'
   },
   {
     title: 'AWS Provisioner',
@@ -40,21 +48,21 @@ export default [
     title: 'Client Manager',
     link: '/auth/clients/',
     icon: 'users',
-    description: `Manage clients on \`auth.taskcluster.net\`. This tool allows you to create, modify
+    description: `Manage clients on the Auth service. This tool allows you to create, modify,
       and delete clients. You can also reset \`accessToken\` and explore indirect scopes.`
   },
   {
     title: 'Role Manager',
     link: '/auth/roles/',
     icon: 'shield',
-    description: `Manage roles on \`auth.taskcluster.net\`. This tool allows you to create, modify
+    description: `Manage roles on Auth service. This tool allows you to create, modify,
       and delete roles. You can also manage scopes and explore indirect scopes.`
   },
   {
     title: 'Scope Inspector',
     link: '/auth/scopes/',
     icon: 'graduation-cap',
-    description: `Explore scopes on \`auth.taskcluster.net\`. This tool allows you to find roles and
+    description: `Explore scopes on the Auth service. This tool allows you to find roles and
       clients with a given scope. This is effectively reverse client and role lookup.`
   },
   {
@@ -97,7 +105,7 @@ export default [
     link: '/hooks',
     icon: 'repeat',
     description:
-      'Manage hooks: tasks that are created in response to events within Taskcluster.'
+      'Manage hooks: tasks that are created in response to events within CI.'
   },
   {
     title: 'Secrets Manager',
@@ -105,28 +113,6 @@ export default [
     icon: 'user-secret',
     description:
       'Manage secrets: values that can only be retrieved with the appropriate scopes.'
-  },
-  {
-    title: 'Documentation',
-    link: 'https://docs.taskcluster.net',
-    icon: 'book',
-    description:
-      'Visit the documentation site with documentation for all Taskcluster APIs and Pulse exchanges.'
-  },
-  {
-    title: 'GitHub Repository',
-    link: 'https://github.com/taskcluster/taskcluster-tools',
-    icon: 'github',
-    description: `Go to the source code repository for these tools. This site is completely static
-      and you can implement any changes and run it locally, or push it to any static site hosting.`
-  },
-  {
-    title: 'Bugzilla Product',
-    link:
-      'https://bugzilla.mozilla.org/buglist.cgi?product=Taskcluster&bug_status=__open__',
-    icon: 'bug',
-    description: `Visit the Taskcluster Bugzilla product to view open bugs, participate in
-      discussions or report new bugs in Taskcluster.`
   },
   {
     title: 'Diagnostics',
