@@ -68,7 +68,9 @@ export default class ArtifactList extends PureComponent {
             return {
               icon,
               name,
-              url: `https://index.taskcluster.net/v1/task/${namespace}/artifacts/${name}`
+              url: `${
+                process.env.BASE_URL
+              }/index/v1/task/${namespace}/artifacts/${name}`
             };
           }
 
@@ -80,14 +82,18 @@ export default class ArtifactList extends PureComponent {
             return {
               icon,
               name,
-              url: `https://queue.taskcluster.net/v1/task/${taskId}/runs/${runId}/artifacts/${name}`
+              url: `${
+                process.env.BASE_URL
+              }/queue/v1/task/${taskId}/runs/${runId}/artifacts/${name}`
             };
           }
 
           return {
             icon,
             name,
-            url: `https://queue.taskcluster.net/v1/task/${taskId}/artifacts/${name}`
+            url: `${
+              process.env.BASE_URL
+            }/queue/v1/task/${taskId}/artifacts/${name}`
           };
         }
 

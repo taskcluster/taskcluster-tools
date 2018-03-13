@@ -12,6 +12,7 @@ import {
   Glyphicon,
   Radio
 } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { safeDump } from 'js-yaml';
 import { Github } from 'taskcluster-client-web';
 import CodeEditor from '../../components/CodeEditor';
@@ -260,8 +261,8 @@ export default class YamlCreator extends Component {
             </p>
             <hr />
             <h5>
-              For organization members: Check if your repository already has
-              Taskcluster
+              For organization members: Check if your repository already has the
+              Taskcluster-GitHub integration installed.
             </h5>
             <Form onSubmit={this.handleInstalledStatus} inline>
               <FormGroup
@@ -317,13 +318,10 @@ export default class YamlCreator extends Component {
             </ul>
             <p>
               Optionally, after you create your file, you can edit it here or in
-              you favorite editor to add more functionality. Please refer to the{' '}
-              <a
-                href="https://docs.taskcluster.net/reference/integrations/github/docs/usage"
-                target="_blank"
-                rel="noopener noreferrer">
+              you favorite editor to add more functionality. Please refer to the
+              <Link to="/docs/reference/integrations/github/docs/usage">
                 full documentation on our configuration files
-              </a>.
+              </Link>.
             </p>
             <hr />
           </Col>

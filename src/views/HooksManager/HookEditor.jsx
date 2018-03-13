@@ -1,5 +1,6 @@
 import { PureComponent } from 'react';
 import { string, bool, object, func } from 'prop-types';
+import { Link } from 'react-router-dom';
 import { Button, Glyphicon, ButtonToolbar } from 'react-bootstrap';
 import clone from 'lodash.clonedeep';
 import equal from 'deep-equal';
@@ -28,7 +29,7 @@ const initialHook = {
       name: 'Hook Task',
       description: 'Task Description',
       owner: 'name@example.com',
-      source: 'https://tools.taskcluster.net/hooks'
+      source: `${process.env.BASE_URL}/hooks`
     },
     expires: { $fromNow: '3 months' },
     deadline: { $fromNow: '6 hours' }
@@ -351,12 +352,9 @@ export default class HookEditor extends PureComponent {
             <span className="text-info">
               Email the owner when an error occurs while creating a task. Note:
               to be notified of tasks that fail once created, use{' '}
-              <a
-                href="https://docs.taskcluster.net/reference/core/taskcluster-notify"
-                target="_blank"
-                rel="noopener noreferrer">
+              <Link to="/docs/reference/core/taskcluster-notify">
                 notify routes
-              </a>.
+              </Link>.
             </span>
           </div>
         </div>

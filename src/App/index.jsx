@@ -1,14 +1,12 @@
 import { Component } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { object } from 'prop-types';
-import { Helmet, link } from 'react-helmet';
 import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
 import Navigation from '../components/Navigation';
 import NotFound from '../components/NotFound';
 import { loadable } from '../utils';
 import './styles.css';
-import iconUrl from '../taskcluster.png';
 import LegacyRedirect from './LegacyRedirect';
 import Spinner from '../components/Spinner';
 import AuthController from '../auth/AuthController';
@@ -72,9 +70,6 @@ const HooksManager = loadable(() =>
 );
 const SecretsManager = loadable(() =>
   import(/* webpackChunkName: 'SecretsManager' */ '../views/SecretsManager')
-);
-const Diagnostics = loadable(() =>
-  import(/* webpackChunkName: 'Diagnostics' */ '../views/Diagnostics')
 );
 const CredentialsManager = loadable(() =>
   import(/* webpackChunkName: 'CredentialsManager' */ '../views/CredentialsManager')
@@ -164,9 +159,6 @@ export default class App extends Component {
     return (
       <BrowserRouter>
         <div>
-          <Helmet>
-            <link rel="shortcut icon" type="image/png" href={iconUrl} />
-          </Helmet>
           <PropsRoute component={Navigation} />
           <Grid fluid id="container">
             {authReady ? (
@@ -219,16 +211,12 @@ export default class App extends Component {
                 <PropsRoute
                   path="/aws-provisioner/:workerType?/:currentTab?"
                   component={AwsProvisioner}
-                  baseUrl="https://aws-provisioner.taskcluster.net/v1"
-                  ec2BaseUrl="https://ec2-manager.taskcluster.net/v1"
                   provisionerId="aws-provisioner-v1"
                   routeRoot="/aws-provisioner"
                 />
                 <PropsRoute
                   path="/aws-provisioner-staging/:workerType?/:currentTab?"
                   component={AwsProvisioner}
-                  baseUrl="https://provisioner-staging.herokuapp.com/v1"
-                  ec2BaseUrl="https://ec2-manager-staging.taskcluster.net/v1"
                   provisionerId="staging-aws"
                   routeRoot="/aws-provisioner-staging"
                 />
@@ -292,7 +280,6 @@ export default class App extends Component {
                   path="/secrets/:secretId?"
                   component={SecretsManager}
                 />
-                <PropsRoute path="/diagnostics" component={Diagnostics} />
                 <PropsRoute
                   path="/credentials"
                   component={CredentialsManager}

@@ -1,5 +1,6 @@
 import { PureComponent } from 'react';
 import { string, object, func } from 'prop-types';
+import { Link } from 'react-router-dom';
 import { ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import HookStatusDisplay from './HookStatusDisplay';
 import Code from '../../components/Code';
@@ -80,12 +81,9 @@ export default class HookDisplay extends PureComponent {
               JSON-e
             </a>{' '}
             to create the the task definition. See{' '}
-            <a
-              href="https://docs.taskcluster.net/reference/core/taskcluster-hooks/docs/firing-hooks"
-              target="_blank"
-              rel="noopener noreferrer">
+            <Link to="/docs/reference/core/taskcluster-hooks/docs/firing-hooks">
               {'"'}firing hooks{'"'}
-            </a>{' '}
+            </Link>{' '}
             for more information.
           </dd>
         </dl>

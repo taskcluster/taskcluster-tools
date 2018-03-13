@@ -6,7 +6,6 @@ import { Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap';
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
 import { navigation } from './styles.module.css';
-import logoUrl from '../../taskcluster.png';
 
 export default class Navigation extends PureComponent {
   render() {
@@ -15,9 +14,7 @@ export default class Navigation extends PureComponent {
         <Navbar fluid inverse staticTop collapseOnSelect>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link to="/">
-                <img src={logoUrl} width="26" height="26" /> Taskcluster Tools
-              </Link>
+              <Link to="/">{process.env.APPLICATION_NAME}</Link>
             </Navbar.Brand>
           </Navbar.Header>
           <Nav pullRight>

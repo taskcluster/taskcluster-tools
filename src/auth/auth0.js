@@ -7,13 +7,13 @@ export const webAuth = new WebAuth({
   clientID: process.env.AUTH0_CLIENT_ID,
   audience: process.env.AUTH0_AUDIENCE,
   redirectUri: new URL('/login/auth0', window.location).href,
-  responseType: 'token id_token',
-  scope: 'taskcluster-credentials openid profile'
+  responseType: process.env.AUTH0_RESPONSE_TYPE,
+  scope: process.env.AUTH0_SCOPE
 });
 
 export function userSessionFromAuthResult(authResult) {
   return UserSession.fromOIDC({
-    oidcProvider: 'mozilla-auth0',
+    oidcProvider: process.env.OIDC_PROVIDER,
     accessToken: authResult.accessToken,
     fullName: authResult.idTokenPayload.nickname,
     picture: authResult.idTokenPayload.picture,
@@ -27,7 +27,7 @@ export async function renew({ userSession, authController }) {
   if (
     !userSession ||
     userSession.type !== 'oidc' ||
-    userSession.oidcProvider !== 'mozilla-auth0'
+    userSession.oidcProvider !== process.env.OIDC_PROVIDER
   ) {
     return;
   }
