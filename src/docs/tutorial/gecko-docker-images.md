@@ -1,9 +1,9 @@
-import ReactMarkdown from 'react-markdown';
-import nextSteps from '../components/nextSteps';
+---
+title: Docker Image Generation
+---
 
-const view = `
 The docker images used to run Gecko tasks on Linux are defined in [taskcluster/docker](https://dxr.mozilla.org/mozilla-central/source/taskcluster/docker/).
-Each directory represents a different image, and contains a \`Dockerfile\` describing the image itself.
+Each directory represents a different image, and contains a `Dockerfile` describing the image itself.
 These Dockerfiles are a bit more flexible than usual -- see [the Gecko documentation](https://firefox-source-docs.mozilla.org/taskcluster/taskcluster/docker-images.html) for details.
 
 ## Modifying Docker Images
@@ -13,17 +13,7 @@ All tasks using the resulting image are configured to depend on this docker-imag
 
 The result is that anyone with try access can create new docker images and run tasks in those images with a single try push!
 
-${nextSteps([
-  {
-    label: 'How is the decision task defined?',
-    path: '/tutorial/gecko-decision-task'
-  },
-  {
-    label: 'How is the task-graph generated?',
-    path: '/tutorial/gecko-task-graph'
-  }
-])}
-`;
-const GeckoDockerimages = props => <ReactMarkdown source={view} {...props} />;
+## Next Steps
 
-export default GeckoDockerimages;
+- [How is the decision task defined?](gecko-decision-task)
+- [How is the task-graph generated?](gecko-task-graph)

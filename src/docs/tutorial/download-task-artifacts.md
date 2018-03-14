@@ -1,32 +1,32 @@
-import ReactMarkdown from 'react-markdown';
-import nextSteps from '../components/nextSteps';
+---
+title: Download task artifacts via API
+---
 
-const view = `
 Once the task is resolved, we can list artifacts from
-runs of the task. A convenience method \`queue.listLatestArtifacts\` will list
+runs of the task. A convenience method `queue.listLatestArtifacts` will list
 artifacts from the latest run. But you can also specify the exact run to
 list artifacts from, or download the status structure to find the latest run.
 
-In the example below we list artifacts from the latest run. \`runId\` always
-starts from zero and the highest \`runId\` is always the latest. As we don't want to
+In the example below we list artifacts from the latest run. `runId` always
+starts from zero and the highest `runId` is always the latest. As we don't want to
 fetch the task status structure first we use
-\`queue.listLatestArtifacts(taskId)\` instead of
-\`queue.listArtifacts(taskId, runId)\`. Again, no credentials are required to
+`queue.listLatestArtifacts(taskId)` instead of
+`queue.listArtifacts(taskId, runId)`. Again, no credentials are required to
 inspect the list of artifacts.
 
-In the list, we should see artifacts named \`public/logs/live.log\` and
-\`public/passwd.txt\`. The \`public/logs/live.log\` contains the task log, and is
+In the list, we should see artifacts named `public/logs/live.log` and
+`public/passwd.txt`. The `public/logs/live.log` contains the task log, and is
 streamed live directly from the worker while the task is running. After the
-task is completed the \`public/logs/live.log\` will redirect to a file on S3.
-The \`public/passwd.txt\` is the \`/etc/passwd\` file as exported from the docker
+task is completed the `public/logs/live.log` will redirect to a file on S3.
+The `public/passwd.txt` is the `/etc/passwd` file as exported from the docker
 container after task execution.
 
 In the example below we list all artifacts, constructing URLs from which they
-can be downloaded. Then we download the \`public/passwd.txt\` artifact and
-print it.  It should be noted that artifacts prefixed \`public/\` are public and
+can be downloaded. Then we download the `public/passwd.txt` artifact and
+print it.  It should be noted that artifacts prefixed `public/` are public and
 downloading them doesn't require any credentials.
 
-\`\`\`
+```
 let taskcluster = require('taskcluster-client');
 let request     = require('superagent');
 
@@ -63,7 +63,7 @@ let runTask = async () => {
   let queue = new taskcluster.Queue();    
   let result = await queue.createTask(taskId, task);    
     
-  console.log("Created task:\\n" + JSON.stringify(result.status, null, 2));    
+  console.log("Created task:\n" + JSON.stringify(result.status, null, 2));    
   console.log("Inspect it at:");    
   console.log("https://tools.taskcluster.net/task-inspector/#" + taskId);    
     
@@ -94,27 +94,18 @@ let runTask = async () => {
 };
 
 runTask().catch(console.error);
-\`\`\`
+```
 
-The auxiliary method \`queue.buildUrl\` (not an API call) constructs a URL for
+The auxiliary method `queue.buildUrl` (not an API call) constructs a URL for
 the API method given as first parameter with URL parameters given. This is
 useful if you want to create a URL that can be passed around to other HTTP
 clients.
 
-If the artifact was private (ie. didn't start with \`public/\`) we could have
-constructed the \`queue\` object with credentials and used the auxiliary method
-\`queue.buildSignedUrl\` which works like \`queue.buildUrl\`, with the only
+If the artifact was private (ie. didn't start with `public/`) we could have
+constructed the `queue` object with credentials and used the auxiliary method
+`queue.buildSignedUrl` which works like `queue.buildUrl`, with the only
 difference that includes a signature in the query-string for the URL.
 
-${nextSteps([
-  {
-    label: 'API documentation for all Taskcluster services',
-    path: '/docs/tutorial/reference'
-  }
-])}
-`;
-const DownloadTaskArtifacts = props => (
-  <ReactMarkdown source={view} {...props} />
-);
+## Next Steps
 
-export default DownloadTaskArtifacts;
+- [API documentation for all Taskcluster services](/docs/reference)

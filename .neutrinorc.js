@@ -58,6 +58,14 @@ module.exports = {
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
 
+      neutrino.config.module.rule('markdown')
+        .test(/\.mdx?$/)
+          .use('babel')
+            .loader(require.resolve('babel-loader'))
+            .end()
+          .use('mdx')
+            .loader(require.resolve('mdx-loader'));
+
       // The JSONStream module's main file has a Node.js shebang
       // which Webpack doesn't like loading as JS
       neutrino.config.module

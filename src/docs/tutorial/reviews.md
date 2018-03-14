@@ -1,6 +1,7 @@
-import ReactMarkdown from 'react-markdown';
+---
+title: Taskcluster Reviews
+---
 
-const view = `
 Taskcluster reviews aim to ensure that code we deploy is maintainable,
 understandable, resilient and fast. We’ve developed a review process that
 works really well for us. It is modeled on the general Mozilla review policy.
@@ -34,7 +35,3 @@ Every member of the team writes code with their own style. The purpose of our
 code reviews and style-checking tools is not to force a single style for
 everything, rather to make sure that the style used is clear, concise and
 readable.
-`;
-const Reviews = props => <ReactMarkdown source={view} {...props} />;
-
-export default Reviews;
