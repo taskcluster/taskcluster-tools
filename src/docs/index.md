@@ -26,4 +26,4 @@ Refer to the [reference documentation](reference/) for the technical details of 
 
 ### <span className="glyphicon glyphicon-link" aria-hidden="true"></span> Resources
 
-See [resources](resources/) such as presentations, external services, and useful links used by and for Taskcluster.
+See [resources](resources) such as presentations, external services, and useful links used by and for Taskcluster.
