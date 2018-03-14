@@ -15,6 +15,7 @@ import docsearch from 'docsearch.js/dist/cdn/docsearch';
 import 'docsearch.js/dist/cdn/docsearch.css';
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
+import docsLinks from '../../docs-links';
 import { navigation } from './styles.module.css';
 
 export default class Navigation extends PureComponent {
@@ -38,6 +39,29 @@ export default class Navigation extends PureComponent {
             </Navbar.Brand>
           </Navbar.Header>
           <Nav pullRight>
+            <NavDropdown key={2} title="Docs" id="docs">
+              {docsLinks.map(({ section, links }, index) => [
+                <MenuItem header key={`navigation-header-${section}`}>
+                  {section}
+                </MenuItem>,
+                ...links.map(({ title, link }) => (
+                  <LinkContainer
+                    exact
+                    to={link}
+                    key={`navigation-docs-link-${link}`}>
+                    <MenuItem>{title}</MenuItem>
+                  </LinkContainer>
+                )),
+                ...(index === docsLinks.length - 1
+                  ? []
+                  : [
+                      <MenuItem
+                        divider
+                        key={`navigation-header-divider-${section}`}
+                      />
+                    ])
+              ])}
+            </NavDropdown>
             <OverlayTrigger placement="bottom" overlay={commit}>
               <NavItem
                 href={sourcelink}
