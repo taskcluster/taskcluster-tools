@@ -43,7 +43,7 @@ timestamps for this.
 Let's get started with a JavaScript script to create a task, starting with just
 the task definition:
 
-```
+```js
 let taskcluster = require('taskcluster-client');
 
 let payload = {}; // worker specific payload - we'll add it later
@@ -74,7 +74,7 @@ console.log(JSON.stringify(task, null, 2));
 To run this, you will need `taskcluster-client` installed.  Let's install a few
 other libraries too, that will be useful later:
 
-```
+```bash
 npm install taskcluster-client superagent
 ```
 
@@ -118,7 +118,7 @@ should show us a little of what the image contains. Add the following payload
 to the script:
 to add a payload to the task definition from before.
 
-```
+```js
 let payload = {
   // Properties required by docker-worker
   image:            'ubuntu:latest',
@@ -161,7 +161,7 @@ used by another task, it is most likely a problem with your retry logic that
 fails to make idempotent requests, or you accidentally reused the `taskId`. The
 example below shows how to generate a random slugid for use as `taskId`.
 
-```
+```js
 let taskcluster = require('taskcluster-client');
 
 // Generate a new taskId
@@ -177,7 +177,7 @@ construct a `taskcluster.Queue` client, using the temporary credentials stored
 in environment variables in the last step, and finally create a new task using
 the `queue.createTask(taskId, payload)` method.
 
-```
+```js
 let taskcluster = require('taskcluster-client');
 
 let payload = {

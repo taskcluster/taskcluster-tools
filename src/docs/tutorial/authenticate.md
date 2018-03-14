@@ -20,7 +20,7 @@ When you create the client, the site will give you an accessToken. Copy that
 and set it in your shell session, along with the clientId you chose. Something
 like this:
 
-```
+```bash
 export TASKCLUSTER_CLIENT_ID=email/you@yourdomain.com/tutorial
 export TASKCLUSTER_ACCESS_TOKEN=9dTvVYdzMxAb6qnMPccfQhSzfrMZ1WQ46DgsL_I75S-w
 ```
@@ -30,7 +30,7 @@ export TASKCLUSTER_ACCESS_TOKEN=9dTvVYdzMxAb6qnMPccfQhSzfrMZ1WQ46DgsL_I75S-w
 The [taskcluster-cli](https://github.com/taskcluster/taskcluster-cli) project
 provides a tool that can do all of the above for you.
 
-```
+```bash
 $ eval `taskcluster signin --scope queue:create-task:aws-provisioner-v1/tutorial`
 Starting
 Listening for a callback on: http://localhost:37885
@@ -40,9 +40,11 @@ Credentials output as environment variables
 
 You can test the results with the same tool:
 
-```
+```bash
 $ ./taskcluster api auth currentScopes
+```
 
+```json
 {
   "scopes": [
     "queue:create-task:aws-provisioner-v1/tutorial"

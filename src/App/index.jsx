@@ -188,7 +188,7 @@ export default class App extends Component {
                 <PropsRoute path="/task-creator" component={LegacyRedirect} />
 
                 <PropsRoute path="/" exact component={Home} />
-                <PropsRoute path="/docs" component={Documentation} />
+                <PropsRoute path="/docs/:path*" component={Documentation} />
                 <PropsRoute
                   path="/tasks/create/interactive"
                   component={TaskCreator}
