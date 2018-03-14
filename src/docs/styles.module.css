@@ -1,0 +1,17 @@
+.container {
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 40px 120px;
+}
+
+@media (max-width: 990px) {
+  .container {
+    padding: 40px 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 40px;
+  }
+}

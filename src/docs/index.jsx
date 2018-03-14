@@ -4,6 +4,7 @@ import resolve from 'resolve-pathname';
 import 'prismjs/themes/prism.css';
 import HelmetTitle from '../components/HelmetTitle';
 import Error from '../components/Error';
+import { container } from './styles.module.css';
 
 export default class Documentation extends Component {
   state = {
@@ -78,7 +79,7 @@ export default class Documentation extends Component {
     }
 
     return (
-      <div>
+      <div className={container}>
         {meta.title && <HelmetTitle title={meta.title} />}
         <Document
           factories={{
