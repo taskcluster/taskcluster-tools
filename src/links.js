@@ -1,7 +1,7 @@
 export default [
   {
     title: 'Documentation',
-    link: '/docs',
+    link: '/docs/',
     icon: 'book',
     description: `Visit the documentation for all ${
       process.env.APPLICATION_NAME

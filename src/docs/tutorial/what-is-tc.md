@@ -1,6 +1,7 @@
-import ReactMarkdown from 'react-markdown';
+---
+title: What is Taskcluster?
+---
 
-const view = `
 *Taskcluster* is a set of components that manages task queuing, scheduling,
 execution and provisioning of resources. It was designed to run automated
 builds and tests at Mozilla.
@@ -32,7 +33,7 @@ While we have built some Mozilla-specific integrations, the platform and many of
 However, the platform is not presently designed to be easily redeployed.
 While it is by no means impossible to set up a second instance of Taskcluster outside of Mozilla, neither is it a turnkey installation.
 We hope to address this soon, once we have demonstrated the usefulness of the platform.
-`;
-const WhatIsTc = props => <ReactMarkdown source={view} {...props} />;
 
-export default WhatIsTc;
+## Next Steps
+
+- [Create a task to see Taskcluster in action!](hello-world)

@@ -1,46 +1,21 @@
 import { Component } from 'react';
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { object } from 'prop-types';
 import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
 import Navigation from '../components/Navigation';
 import NotFound from '../components/NotFound';
-import SchemaTable from '../components/SchemaTable';
 import { loadable } from '../utils';
 import './styles.css';
 import LegacyRedirect from './LegacyRedirect';
 import Spinner from '../components/Spinner';
 import AuthController from '../auth/AuthController';
 
-const markdownProps = {
-  renderers: {
-    link: function RouterLink(props) {
-      return props.href.match(/^(https?:)?\/\//) ? (
-        <a href={props.href}>{props.children}</a>
-      ) : (
-        <Link to={props.href}>{props.children}</Link>
-      );
-    },
-    html: function HtmlFormatter(props) {
-      const parser = new DOMParser();
-      const tree = parser.parseFromString(props.value, 'text/html');
-      const node = tree.querySelector('div[data-render-schema]');
-
-      if (node) {
-        const url = node.dataset.renderSchema;
-
-        return <SchemaTable url={url} />;
-      }
-
-      return props.value;
-    }
-  }
-};
-/*
-* Tools
-*/
 const Home = loadable(() =>
   import(/* webpackChunkName: 'Home' */ '../views/Home')
+);
+const Documentation = loadable(() =>
+  import(/* webpackChunkName: 'Documentation' */ '../docs')
 );
 const TaskCreator = loadable(() =>
   import(/* webpackChunkName: 'TaskCreator' */ '../views/TaskCreator')
@@ -122,63 +97,6 @@ const ManualLogin = loadable(() =>
 );
 const ClientCreator = loadable(() =>
   import(/* webpackChunkName: 'ClientCreator' */ '../views/ClientCreator')
-);
-/*
-* Docs
-*/
-const Api = loadable(() =>
-  import(/* webpackChunkName: 'Api' */ '../docs/tutorial/apis')
-);
-const Authenticate = loadable(() =>
-  import(/* webpackChunkName: 'Authenticate' */ '../docs/tutorial/authenticate')
-);
-const CreateTaskViaApi = loadable(() =>
-  import(/* webpackChunkName: 'CreateTaskViaApi' */ '../docs/tutorial/create-task-via-api')
-);
-const DebugTask = loadable(() =>
-  import(/* webpackChunkName: 'DebugTask' */ '../docs/tutorial/debug-task')
-);
-const DownloadTaskArtifacts = loadable(() =>
-  import(/* webpackChunkName: 'DownloadTaskArtifacts' */ '../docs/tutorial/download-task-artifacts')
-);
-const FindingTasks = loadable(() =>
-  import(/* webpackChunkName: 'FindingTasks' */ '../docs/tutorial/finding-tasks')
-);
-const GeckoDecisionTask = loadable(() =>
-  import(/* webpackChunkName: 'GeckoDecisionTask' */ '../docs/tutorial/gecko-decision-task')
-);
-const GeckoDockerImages = loadable(() =>
-  import(/* webpackChunkName: 'GeckoDockerImages' */ '../docs/tutorial/gecko-docker-images')
-);
-const GeckoNewJob = loadable(() =>
-  import(/* webpackChunkName: 'GeckoNewJob' */ '../docs/tutorial/gecko-new-job')
-);
-const GeckoTaskGraph = loadable(() =>
-  import(/* webpackChunkName: 'GeckoTaskGraph' */ '../docs/tutorial/gecko-task-graph')
-);
-const GeckoTaskGraphHowTo = loadable(() =>
-  import(/* webpackChunkName: 'GeckoTaskGraphHowTo' */ '../docs/tutorial/gecko-task-graph-howto')
-);
-const GeckoTasks = loadable(() =>
-  import(/* webpackChunkName: 'GeckoTasks' */ '../docs/tutorial/gecko-tasks')
-);
-const HackTc = loadable(() =>
-  import(/* webpackChunkName: 'HackTc' */ '../docs/tutorial/hack-tc')
-);
-const HelloWorld = loadable(() =>
-  import(/* webpackChunkName: 'HelloWorld' */ '../docs/tutorial/hello-world')
-);
-const MonitorTaskStatus = loadable(() =>
-  import(/* webpackChunkName: 'MonitorTaskStatus' */ '../docs/tutorial/monitor-task-status')
-);
-const Reviews = loadable(() =>
-  import(/* webpackChunkName: 'Reviews' */ '../docs/tutorial/reviews')
-);
-const WhatIsTc = loadable(() =>
-  import(/* webpackChunkName: 'WhatIsTc' */ '../docs/tutorial/what-is-tc')
-);
-const Tutorial = loadable(() =>
-  import(/* webpackChunkName: 'Tutorial' */ '../docs/tutorial')
 );
 
 export default class App extends Component {
@@ -270,6 +188,7 @@ export default class App extends Component {
                 <PropsRoute path="/task-creator" component={LegacyRedirect} />
 
                 <PropsRoute path="/" exact component={Home} />
+                <PropsRoute path="/docs/:path*" component={Documentation} />
                 <PropsRoute
                   path="/tasks/create/interactive"
                   component={TaskCreator}
@@ -392,96 +311,6 @@ export default class App extends Component {
                     setUserSession={authController.setUserSession}
                   />
                 )}
-                <PropsRoute
-                  path="/docs/tutorial/apis"
-                  component={Api}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/authenticate"
-                  component={Authenticate}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/create-task-via-api"
-                  component={CreateTaskViaApi}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/debug-task"
-                  component={DebugTask}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/download-task-artifacts"
-                  component={DownloadTaskArtifacts}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/finding-tasks"
-                  component={FindingTasks}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/gecko-decision-task"
-                  component={GeckoDecisionTask}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/gecko-docker-images"
-                  component={GeckoDockerImages}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/gecko-new-job"
-                  component={GeckoNewJob}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/gecko-task-graph"
-                  component={GeckoTaskGraph}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/gecko-task-graph-howto"
-                  component={GeckoTaskGraphHowTo}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/gecko-tasks"
-                  component={GeckoTasks}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/hack-tc"
-                  component={HackTc}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/hello-world"
-                  component={HelloWorld}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/monitor-task-status"
-                  component={MonitorTaskStatus}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/reviews"
-                  component={Reviews}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial/what-is-tc"
-                  component={WhatIsTc}
-                  {...markdownProps}
-                />
-                <PropsRoute
-                  path="/docs/tutorial"
-                  component={Tutorial}
-                  {...markdownProps}
-                />
                 <Route component={NotFound} />
               </Switch>
             ) : (
