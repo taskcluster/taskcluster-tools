@@ -5,6 +5,7 @@ import Icon from 'react-fontawesome';
 import { Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap';
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
+import docsLinks from '../../docs-links';
 import { navigation } from './styles.module.css';
 
 export default class Navigation extends PureComponent {
@@ -18,6 +19,29 @@ export default class Navigation extends PureComponent {
             </Navbar.Brand>
           </Navbar.Header>
           <Nav pullRight>
+            <NavDropdown key={2} title="Docs" id="docs">
+              {docsLinks.map(({ section, links }, index) => [
+                <MenuItem header key={`navigation-header-${section}`}>
+                  {section}
+                </MenuItem>,
+                ...links.map(({ title, link }) => (
+                  <LinkContainer
+                    exact
+                    to={link}
+                    key={`navigation-docs-link-${link}`}>
+                    <MenuItem>{title}</MenuItem>
+                  </LinkContainer>
+                )),
+                ...(index === docsLinks.length - 1
+                  ? []
+                  : [
+                      <MenuItem
+                        divider
+                        key={`navigation-header-divider-${section}`}
+                      />
+                    ])
+              ])}
+            </NavDropdown>
             <NavDropdown key={1} title="Tools" id="tools">
               {links.map(
                 ({ title, link, icon }) =>
