@@ -12,6 +12,7 @@ import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
 import HelmetTitle from '../../components/HelmetTitle';
+import SearchForm from './SearchForm';
 
 export default class RoleManager extends PureComponent {
   constructor(props) {
@@ -19,7 +20,8 @@ export default class RoleManager extends PureComponent {
 
     this.state = {
       roles: null,
-      error: null
+      error: null,
+      roleIdContains: ''
     };
   }
 
@@ -73,6 +75,8 @@ export default class RoleManager extends PureComponent {
     );
   };
 
+  handleSetRoleId = value => this.setState({ roleIdContains: value });
+
   renderRolesTable() {
     const { roles } = this.state;
 
@@ -89,10 +93,20 @@ export default class RoleManager extends PureComponent {
         </thead>
         <tbody>
           {this.state.roles
+            .filter(role => role.roleId.includes(this.state.roleIdContains))
             .sort((a, b) => a.roleId.localeCompare(b.roleId))
             .map(this.renderRoleRow)}
         </tbody>
       </Table>
+    );
+  }
+
+  renderTypeInput() {
+    return (
+      <SearchForm
+        default={this.state.roleIdContains}
+        onSearch={this.handleSetRoleId}
+      />
     );
   }
 
@@ -101,6 +115,7 @@ export default class RoleManager extends PureComponent {
       <Row style={{ marginTop: 10 }}>
         <HelmetTitle title="Role Manager" />
         <Col md={5}>
+          {this.renderTypeInput()}
           {this.renderRolesTable()}
           <ButtonToolbar>
             <Button
