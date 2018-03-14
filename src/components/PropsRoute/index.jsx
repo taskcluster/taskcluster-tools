@@ -1,13 +1,27 @@
-import { createElement } from 'react';
+import { Component } from 'react';
 import { Route } from 'react-router-dom';
 
-const PropsRoute = ({ component, render, ...props }) => (
-  <Route
-    {...props}
-    render={routeProps =>
-      createElement(component, Object.assign({}, routeProps, props))
-    }
-  />
-);
+export default class PropRoute extends Component {
+  render() {
+    const {
+      component: Component,
+      path,
+      exact,
+      strict,
+      location,
+      sensitive,
+      ...props
+    } = this.props;
 
-export default PropsRoute;
+    return (
+      <Route
+        path={path}
+        exact={exact}
+        strict={strict}
+        location={location}
+        sensitive={sensitive}
+        render={renderProps => <Component {...renderProps} {...props} />}
+      />
+    );
+  }
+}
