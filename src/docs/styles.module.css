@@ -1,11 +1,31 @@
 .container {
   font-size: 16px;
   line-height: 1.6;
-  padding: 40px 80px;
 }
 
-@media (max-width: 768px) {
+.iconBar {
+  background: #000;
+  display: block;
+  width: 22px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.iconBar + .iconBar {
+  margin-top: 4px;
+}
+
+.menuButton {
+  margin-bottom: 16px;
+  height: 38px;
+}
+
+.page {
+  max-width: 60em;
+}
+
+@media (min-width: 768px) {
   .container {
-    padding: 40px;
+    padding-top: 15px;
   }
 }

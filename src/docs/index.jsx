@@ -1,19 +1,21 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
 import resolve from 'resolve-pathname';
+import { Grid, Row, Col, Button, Collapse } from 'react-bootstrap';
 import 'prismjs/themes/prism.css';
 import HelmetTitle from '../components/HelmetTitle';
 import Error from '../components/Error';
 import ManualSidebar from './ManualSidebar';
 import ReferenceSidebar from './ReferenceSidebar';
-import { container } from './styles.module.css';
+import { container, menuButton, iconBar, page } from './styles.module.css';
 import './globals.css';
 
 export default class Documentation extends Component {
   state = {
     error: null,
     Document: null,
-    meta: null
+    meta: null,
+    showSidebar: true
   };
 
   componentWillMount() {
@@ -61,13 +63,43 @@ export default class Documentation extends Component {
     );
   };
 
+  handleMenuClick = () =>
+    this.setState({ showSidebar: !this.state.showSidebar });
+
   renderSidebar() {
     const { pathname } = this.props.location;
+    let TableOfContent;
 
     if (pathname.includes('/docs/manual')) {
-      return <ManualSidebar />;
+      TableOfContent = ManualSidebar;
     } else if (pathname.includes('/docs/reference')) {
-      return <ReferenceSidebar />;
+      TableOfContent = ReferenceSidebar;
+    }
+
+    if (TableOfContent) {
+      return (
+        <div>
+          <Row>
+            <Col mdHidden lgHidden>
+              <Button className={menuButton} onClick={this.handleMenuClick}>
+                <span className="sr-only">Toggle menu</span>
+                <span className={iconBar} />
+                <span className={iconBar} />
+                <span className={iconBar} />
+              </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Collapse in={this.state.showSidebar}>
+                <div>
+                  <TableOfContent />
+                </div>
+              </Collapse>
+            </Col>
+          </Row>
+        </div>
+      );
     }
 
     return null;
@@ -84,16 +116,29 @@ export default class Documentation extends Component {
       return null;
     }
 
+    const Page = (
+      <Document
+        factories={{
+          a: this.anchorFactory
+        }}
+      />
+    );
+    const Sidebar = this.renderSidebar();
+
     return (
-      <div className={container}>
+      <Grid fluid className={container}>
         {meta.title && <HelmetTitle title={meta.title} />}
-        {this.renderSidebar()}
-        <Document
-          factories={{
-            a: this.anchorFactory
-          }}
-        />
-      </div>
+        {Sidebar ? (
+          <Row>
+            <Col md={3}>{Sidebar}</Col>
+            <Col className={page} md={9}>
+              {Page}
+            </Col>
+          </Row>
+        ) : (
+          Page
+        )}
+      </Grid>
     );
   }
 }
