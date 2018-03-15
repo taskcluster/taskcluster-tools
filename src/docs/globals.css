@@ -1,0 +1,89 @@
+@media screen and (max-width: 767px) {
+  #sidebar.collapse.in {
+    display: block !important;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  #sidebar.collapse, #sidebar.collapse.in {
+    display: block !important;
+  }
+}
+
+ul.main-menu {
+  width: 305px;
+  float: left;
+  margin-right: 40px;
+}
+
+ul.main-menu, ul.main-menu ul {
+  list-style-type: none;
+  padding: 0;
+  font-size: 14px;
+}
+
+ul.main-menu > li > a {
+  color: #337ab7;
+  font-weight: bold;
+}
+
+ul.main-menu .active {
+  font-weight: bold;
+  border-left: 3px inset #337ab7;
+  color: #000;
+}
+
+ul.main-menu a,
+ul.main-menu span,
+ul.main-menu ul {
+  padding: 0 4px 0 20px;
+}
+
+ul.main-menu a, ul.main-menu span {
+  display: inline-block;
+  color: #999;
+  border-left: 3px inset transparent;
+}
+
+ul.main-menu a:hover {
+  color: #0097b2;
+  text-decoration: none;
+  background-color: transparent;
+  border-left: 3px inset #337ab7;
+}
+
+ul.main-menu ul a {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  font-size: 13px;
+}
+
+.inline-navs {
+  display: inline-block;
+}
+
+ul.main-menu .inline-navs .active {
+  font-weight: bold;
+  border-left: none;
+  color: #000;
+}
+
+ul.main-menu .inline-navs a, ul.main-menu .inline-navs span {
+  display: inline-block;
+  color: #999;
+  border-left: none;
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
+ul.main-menu .inline-navs a:hover {
+  color: #337ab7;
+  text-decoration: none;
+  border-left: none;
+  background-color: transparent;
+}
+
+ul.main-menu .inline-navs .active {
+  font-weight: bold;
+  color: #000;
+}
