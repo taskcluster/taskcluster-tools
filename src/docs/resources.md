@@ -3,12 +3,6 @@ title: Resources
 noAnchors: true
 ---
 
-### <span className="glyphicon glyphicon-blackboard" aria-hidden="true"></span> Presentations
-
-[View videos, screencasts, and slides](/docs/presentations) given about Taskcluster.
-
----
-
 ### <span className="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Blog
 
 [The official blog](http://planet.mozilla.org/taskcluster), with articles syndicated from various authors related to Taskcluster.
