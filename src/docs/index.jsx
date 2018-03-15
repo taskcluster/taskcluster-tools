@@ -4,7 +4,9 @@ import resolve from 'resolve-pathname';
 import 'prismjs/themes/prism.css';
 import HelmetTitle from '../components/HelmetTitle';
 import Error from '../components/Error';
+import ManualSidebar from './ManualSidebar';
 import { container } from './styles.module.css';
+import './globals.css';
 
 export default class Documentation extends Component {
   state = {
@@ -59,13 +61,15 @@ export default class Documentation extends Component {
     );
   };
 
-  /* eslint-disable react/no-danger */
-  codeBlockFactory = (props, children) => (
-    <pre {...props}>
-      <code dangerouslySetInnerHTML={{ __html: children }} />
-    </pre>
-  );
-  /* eslint-enable react/no-danger */
+  renderSidebar() {
+    const { pathname } = this.props.location;
+
+    if (pathname.includes('/manual')) {
+      return <ManualSidebar />;
+    }
+
+    return null;
+  }
 
   render() {
     const { error, Document, meta } = this.state;
@@ -81,10 +85,10 @@ export default class Documentation extends Component {
     return (
       <div className={container}>
         {meta.title && <HelmetTitle title={meta.title} />}
+        {this.renderSidebar()}
         <Document
           factories={{
-            a: this.anchorFactory,
-            codeBlock: this.codeBlockFactory
+            a: this.anchorFactory
           }}
         />
       </div>
