@@ -5,6 +5,7 @@ import 'prismjs/themes/prism.css';
 import HelmetTitle from '../components/HelmetTitle';
 import Error from '../components/Error';
 import ManualSidebar from './ManualSidebar';
+import ReferenceSidebar from './ReferenceSidebar';
 import { container } from './styles.module.css';
 import './globals.css';
 
@@ -31,10 +32,9 @@ export default class Documentation extends Component {
 
   handleLoadDocument = async ({ match }) => {
     try {
-      const doc = match.params.path
-        ? match.params.path.replace('docs', '')
-        : '';
-      const { default: Document, meta } = await this.handleImport(doc);
+      const { default: Document, meta } = await this.handleImport(
+        match.params.path
+      );
 
       this.setState({ Document, meta, error: null });
     } catch (error) {
@@ -64,8 +64,10 @@ export default class Documentation extends Component {
   renderSidebar() {
     const { pathname } = this.props.location;
 
-    if (pathname.includes('/manual')) {
+    if (pathname.includes('/docs/manual')) {
       return <ManualSidebar />;
+    } else if (pathname.includes('/docs/reference')) {
+      return <ReferenceSidebar />;
     }
 
     return null;
