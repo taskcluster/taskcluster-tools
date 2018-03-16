@@ -7,7 +7,14 @@ import WorkerTypeRow from './WorkerTypeRow';
 import Spinner from '../../components/Spinner';
 import Error from '../../components/Error';
 import HelmetTitle from '../../components/HelmetTitle';
-import { workerTypes } from './styles.module.css';
+import {
+  workerTypes,
+  workerTypeViewContainer,
+  workerTypeCreatorContainer,
+  stateTable,
+  createWorkerTypeButton,
+  recentErrorsButton
+} from './styles.module.css';
 import UserSession from '../../auth/UserSession';
 
 const defaultWorkerType = {
@@ -167,7 +174,7 @@ export default class WorkerTypeTable extends PureComponent {
     }
 
     return (
-      <div style={{ marginBottom: 40 }}>
+      <div className={workerTypeViewContainer}>
         <h4>
           Worker Type: <code>{this.props.workerType}</code>
         </h4>
@@ -190,7 +197,7 @@ export default class WorkerTypeTable extends PureComponent {
 
   renderWorkerTypeCreator() {
     return (
-      <div style={{ marginBottom: 50 }}>
+      <div className={workerTypeCreatorContainer}>
         <hr />
         <h2>Create New WorkerType</h2>
         <WorkerTypeEditor
@@ -215,7 +222,7 @@ export default class WorkerTypeTable extends PureComponent {
       <div>
         <h4>Worker Types</h4>
         {this.renderTypeInput()}
-        <Table style={{ marginTop: 20 }}>
+        <Table className={stateTable}>
           <thead>
             <tr>
               <th className="col-xs-2">WorkerType</th>
@@ -246,6 +253,13 @@ export default class WorkerTypeTable extends PureComponent {
     );
   }
 
+  handleRecentErrorsClick = () => {
+    const { push, location } = this.props.history;
+    const normalize = path => path.replace('//', '/');
+
+    push(normalize(`${location.pathname}/recent-errors`));
+  };
+
   render() {
     return (
       <div className={workerTypes}>
@@ -257,9 +271,17 @@ export default class WorkerTypeTable extends PureComponent {
           <Button
             bsStyle="primary"
             bsSize="sm"
-            onClick={() => this.setSelected('create:worker-type')}
-            style={{ marginTop: -10, padding: '3px 12px' }}>
+            className={createWorkerTypeButton}
+            onClick={() => this.setSelected('create:worker-type')}>
             <Glyphicon glyph="plus" /> Create WorkerType
+          </Button>
+          <Button
+            title={`Recent errors in ${this.props.provisionerId}`}
+            onClick={this.handleRecentErrorsClick}
+            bsStyle="primary"
+            bsSize="sm"
+            className={recentErrorsButton}>
+            <Glyphicon glyph="exclamation-sign" /> Recent Errors
           </Button>
         </ButtonToolbar>
         <div>{this.renderState()}</div>

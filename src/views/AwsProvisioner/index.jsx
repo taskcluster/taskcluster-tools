@@ -23,7 +23,10 @@ const View = ({
   return (
     <WithUserSession>
       {userSession => (
-        <WithClients Queue AwsProvisioner={{ baseUrl }}>
+        <WithClients
+          Queue
+          AwsProvisioner={{ baseUrl }}
+          EC2Manager={{ baseUrl: ec2BaseUrl }}>
           {clients => (
             <WorkerTypeTable
               {...clients}

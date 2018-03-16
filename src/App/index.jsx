@@ -31,6 +31,9 @@ const QuickStart = loadable(() =>
 const AwsProvisioner = loadable(() =>
   import(/* webpackChunkName: 'AwsProvisioner' */ '../views/AwsProvisioner')
 );
+const AwsProvisionerErrors = loadable(() =>
+  import(/* webpackChunkName: 'AwsProvisionerErrors' */ '../views/AwsProvisionerErrors')
+);
 const WorkerTypes = loadable(() =>
   import(/* webpackChunkName: 'WorkerTypes' */ '../views/WorkerTypes')
 );
@@ -216,6 +219,18 @@ export default class App extends Component {
                   component={UnifiedInspector}
                 />
                 <PropsRoute path="/quickstart" component={QuickStart} />
+                <PropsRoute
+                  path="/aws-provisioner/recent-errors"
+                  component={AwsProvisionerErrors}
+                  provisionerId="aws-provisioner-v1"
+                  ec2BaseUrl="https://ec2-manager.taskcluster.net/v1"
+                />
+                <PropsRoute
+                  path="/aws-provisioner-staging/recent-errors"
+                  component={AwsProvisionerErrors}
+                  provisionerId="aws-provisioner-v1"
+                  ec2BaseUrl="https://ec2-manager-staging.taskcluster.net/v1"
+                />
                 <PropsRoute
                   path="/aws-provisioner/:workerType?/:currentTab?"
                   component={AwsProvisioner}
