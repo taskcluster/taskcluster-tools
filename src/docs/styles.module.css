@@ -3,23 +3,6 @@
   line-height: 1.6;
 }
 
-.iconBar {
-  background: #000;
-  display: block;
-  width: 22px;
-  height: 2px;
-  border-radius: 1px;
-}
-
-.iconBar + .iconBar {
-  margin-top: 4px;
-}
-
-.menuButton {
-  margin-bottom: 16px;
-  height: 38px;
-}
-
 .page {
   max-width: 60em;
 }

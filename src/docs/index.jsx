@@ -1,21 +1,19 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
 import resolve from 'resolve-pathname';
-import { Grid, Row, Col, Button, Collapse } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
 import 'prismjs/themes/prism.css';
 import HelmetTitle from '../components/HelmetTitle';
 import Error from '../components/Error';
-import ManualSidebar from './ManualSidebar';
-import ReferenceSidebar from './ReferenceSidebar';
-import { container, menuButton, iconBar, page } from './styles.module.css';
+import TableOfContents from '../components/TableOfContents';
+import { container, page } from './styles.module.css';
 import './globals.css';
 
 export default class Documentation extends Component {
   state = {
     error: null,
     Document: null,
-    meta: null,
-    showSidebar: true
+    meta: null
   };
 
   componentWillMount() {
@@ -63,46 +61,10 @@ export default class Documentation extends Component {
     );
   };
 
-  handleMenuClick = () =>
-    this.setState({ showSidebar: !this.state.showSidebar });
-
-  renderSidebar() {
-    const { pathname } = this.props.location;
-    let TableOfContent;
-
-    if (pathname.includes('/docs/manual')) {
-      TableOfContent = ManualSidebar;
-    } else if (pathname.includes('/docs/reference')) {
-      TableOfContent = ReferenceSidebar;
-    }
-
-    if (TableOfContent) {
-      return (
-        <div>
-          <Row>
-            <Col mdHidden lgHidden>
-              <Button className={menuButton} onClick={this.handleMenuClick}>
-                <span className="sr-only">Toggle menu</span>
-                <span className={iconBar} />
-                <span className={iconBar} />
-                <span className={iconBar} />
-              </Button>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Collapse in={this.state.showSidebar}>
-                <div>
-                  <TableOfContent />
-                </div>
-              </Collapse>
-            </Col>
-          </Row>
-        </div>
-      );
-    }
-
-    return null;
+  pageHasSidebar() {
+    return ['/docs/manual', '/docs/reference'].some(path =>
+      this.props.location.pathname.includes(path)
+    );
   }
 
   render() {
@@ -123,14 +85,15 @@ export default class Documentation extends Component {
         }}
       />
     );
-    const Sidebar = this.renderSidebar();
 
     return (
       <Grid fluid className={container}>
         {meta.title && <HelmetTitle title={meta.title} />}
-        {Sidebar ? (
+        {this.pageHasSidebar() ? (
           <Row>
-            <Col md={3}>{Sidebar}</Col>
+            <Col md={3}>
+              <TableOfContents pathname={this.props.location.pathname} />
+            </Col>
             <Col className={page} md={9}>
               {Page}
             </Col>
