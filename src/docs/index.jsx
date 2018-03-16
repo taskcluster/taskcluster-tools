@@ -1,12 +1,12 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
 import resolve from 'resolve-pathname';
+import { Grid, Row, Col } from 'react-bootstrap';
 import 'prismjs/themes/prism.css';
 import HelmetTitle from '../components/HelmetTitle';
 import Error from '../components/Error';
-import ManualSidebar from './ManualSidebar';
-import ReferenceSidebar from './ReferenceSidebar';
-import { container } from './styles.module.css';
+import TableOfContents from '../components/TableOfContents';
+import { container, page } from './styles.module.css';
 import './globals.css';
 
 export default class Documentation extends Component {
@@ -61,16 +61,10 @@ export default class Documentation extends Component {
     );
   };
 
-  renderSidebar() {
-    const { pathname } = this.props.location;
-
-    if (pathname.includes('/docs/manual')) {
-      return <ManualSidebar />;
-    } else if (pathname.includes('/docs/reference')) {
-      return <ReferenceSidebar />;
-    }
-
-    return null;
+  pageHasSidebar() {
+    return ['/docs/manual', '/docs/reference'].some(path =>
+      this.props.location.pathname.includes(path)
+    );
   }
 
   render() {
@@ -84,16 +78,30 @@ export default class Documentation extends Component {
       return null;
     }
 
+    const Page = (
+      <Document
+        factories={{
+          a: this.anchorFactory
+        }}
+      />
+    );
+
     return (
-      <div className={container}>
+      <Grid fluid className={container}>
         {meta.title && <HelmetTitle title={meta.title} />}
-        {this.renderSidebar()}
-        <Document
-          factories={{
-            a: this.anchorFactory
-          }}
-        />
-      </div>
+        {this.pageHasSidebar() ? (
+          <Row>
+            <Col md={3}>
+              <TableOfContents pathname={this.props.location.pathname} />
+            </Col>
+            <Col className={page} md={9}>
+              {Page}
+            </Col>
+          </Row>
+        ) : (
+          Page
+        )}
+      </Grid>
     );
   }
 }
