@@ -1,4 +1,4 @@
-import { PureComponent } from 'react';
+import { Component } from 'react';
 import {
   Row,
   Col,
@@ -12,9 +12,9 @@ import equal from 'deep-equal';
 import Spinner from '../../components/Spinner';
 import RoleEditor from '../../components/RoleEditor';
 import HelmetTitle from '../../components/HelmetTitle';
-import SearchForm from './SearchForm';
+import SearchForm from '../../components/SearchForm';
 
-export default class RoleManager extends PureComponent {
+export default class RoleManager extends Component {
   constructor(props) {
     super(props);
 
@@ -101,21 +101,15 @@ export default class RoleManager extends PureComponent {
     );
   }
 
-  renderTypeInput() {
-    return (
-      <SearchForm
-        default={this.state.roleIdContains}
-        onSearch={this.handleSetRoleId}
-      />
-    );
-  }
-
   render() {
     return (
       <Row style={{ marginTop: 10 }}>
         <HelmetTitle title="Role Manager" />
         <Col md={5}>
-          {this.renderTypeInput()}
+          <SearchForm
+            label="Role Id Containing"
+            onSearch={this.handleSetRoleId}
+          />
           {this.renderRolesTable()}
           <ButtonToolbar>
             <Button
