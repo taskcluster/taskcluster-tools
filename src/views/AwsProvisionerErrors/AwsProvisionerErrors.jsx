@@ -49,9 +49,9 @@ export default class AwsProvisionerErrors extends PureComponent {
     return a[camelCase(sortBy)].localeCompare(b[camelCase(sortBy)]);
   };
 
-  renderRecentError(error, key) {
+  renderRecentError(error) {
     return (
-      <tr key={`recent-error-${key}`}>
+      <tr key={`${error.type}:${error.workerType}:${error.time}`}>
         <td className={columnNoWrap}>{error.az}</td>
         <td className={columnNoWrap}>{error.type}</td>
         <td className={columnNoWrap}>{error.instanceType}</td>
@@ -122,8 +122,7 @@ export default class AwsProvisionerErrors extends PureComponent {
             </tr>
           </thead>
           <tbody>
-            {recentErrors &&
-              recentErrors.sort(this.sort).map(this.renderRecentError)}
+            {recentErrors.sort(this.sort).map(this.renderRecentError)}
           </tbody>
         </Table>
       </div>

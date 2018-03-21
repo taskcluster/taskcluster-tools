@@ -255,9 +255,8 @@ export default class WorkerTypeTable extends PureComponent {
 
   handleRecentErrorsClick = () => {
     const { push, location } = this.props.history;
-    const normalize = path => path.replace('//', '/');
 
-    push(normalize(`${location.pathname}/recent-errors`));
+    push(`${location.pathname.replace('//', '/')}/recent-errors`);
   };
 
   render() {
