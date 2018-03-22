@@ -43,7 +43,7 @@ export default class LogView extends PureComponent {
     fscreen.addEventListener(
       'fullscreenchange',
       this.handleFullscreenChange,
-      true
+      false
     );
     window.addEventListener('resize', this.handleLazyViewerHeight);
   }
@@ -69,10 +69,8 @@ export default class LogView extends PureComponent {
         this.props.log &&
         nextProps.log.name !== this.props.log.name)
     ) {
-      // const streaming = this.isStreaming(nextProps.status);
-
       this.setState({
-        follow: this.prefersFollow(),
+        follow: true,
         isFullscreen: false
       });
     }
@@ -133,9 +131,8 @@ export default class LogView extends PureComponent {
   handleLazyViewerHeight = () => {
     if (this.lazylog) {
       const lazyViewerHeight =
-        window.scrollHeight -
-          Math.round(this.lazylog.getBoundingClientRect().top) ===
-        window.clientHeight;
+        window.innerHeight -
+        Math.round(this.lazylog.getBoundingClientRect().top);
 
       if (lazyViewerHeight > VIEWER_HEIGHT_MIN) {
         this.setState({ lazyViewerHeight });
