@@ -9,3 +9,24 @@
 .actions > label {
   margin-right: 10px;
 }
+
+.workerTypeViewContainer {
+  margin-bottom: 40px;
+}
+
+.workerTypeCreatorContainer {
+  margin-bottom: 50px;
+}
+
+.stateTable {
+  margin-top: 20px;
+}
+
+.createWorkerTypeButton {
+  margin-top: -10px;
+  margin-right: 5px;
+}
+
+.recentErrorsButton {
+  margin-top: -10px;
+}
