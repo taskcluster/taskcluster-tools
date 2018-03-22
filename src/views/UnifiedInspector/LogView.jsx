@@ -39,12 +39,11 @@ export default class LogView extends PureComponent {
       lineNumber: ''
     };
   }
-
   componentWillMount() {
     fscreen.addEventListener(
       'fullscreenchange',
       this.handleFullscreenChange,
-      false
+      true
     );
     window.addEventListener('resize', this.handleLazyViewerHeight);
   }
@@ -70,11 +69,10 @@ export default class LogView extends PureComponent {
         this.props.log &&
         nextProps.log.name !== this.props.log.name)
     ) {
-      const streaming = this.isStreaming(nextProps.status);
+      // const streaming = this.isStreaming(nextProps.status);
 
       this.setState({
-        streaming,
-        follow: streaming || this.prefersFollow(),
+        follow: this.prefersFollow(),
         isFullscreen: false
       });
     }
@@ -115,6 +113,11 @@ export default class LogView extends PureComponent {
   handleScroll = ({ scrollTop, scrollHeight, clientHeight }) => {
     if (this.state.follow && scrollHeight - scrollTop !== clientHeight) {
       this.setState({ follow: false });
+    } else if (
+      !this.state.follow &&
+      scrollHeight - scrollTop === clientHeight
+    ) {
+      this.setState({ follow: true });
     }
   };
 
@@ -130,8 +133,9 @@ export default class LogView extends PureComponent {
   handleLazyViewerHeight = () => {
     if (this.lazylog) {
       const lazyViewerHeight =
-        window.innerHeight -
-        Math.round(this.lazylog.getBoundingClientRect().top);
+        window.scrollHeight -
+          Math.round(this.lazylog.getBoundingClientRect().top) ===
+        window.clientHeight;
 
       if (lazyViewerHeight > VIEWER_HEIGHT_MIN) {
         this.setState({ lazyViewerHeight });
