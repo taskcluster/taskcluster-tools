@@ -8,21 +8,52 @@ export default class DateView extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      didCopy: false,
       id: v4()
     };
   }
 
+  registerChild = ref => {
+    this.textareaRef = ref;
+  };
+
+  handleMouseLeave = () => {
+    if (this.state.didCopy) {
+      this.setState({ didCopy: false });
+    }
+  };
+
+  handleCopyToClipboard = () => {
+    const textarea = this.textareaRef;
+
+    textarea.select();
+    document.execCommand('copy');
+    this.setState({ didCopy: true });
+  };
+
   render() {
-    const { date, since, placement, format } = this.props;
+    const { date, since, placement } = this.props;
     const tooltip = (
-      <Tooltip id={this.state.id}>{moment(date).format(format)}</Tooltip>
+      <Tooltip id={this.state.id}>
+        {moment(date).toISOString()}
+        <br />
+        {this.state.didCopy ? '(Copied!)' : '(Click to copy)'}
+      </Tooltip>
     );
 
     return (
       <OverlayTrigger placement={placement} overlay={tooltip}>
-        <span id={this.state.id}>
+        <span
+          id={this.state.id}
+          onClick={this.handleCopyToClipboard}
+          onMouseLeave={this.handleMouseLeave}>
           {moment(date).fromNow()}{' '}
           {since && `(${moment(date).from(since, true)} later)`}
+          <textarea
+            ref={this.registerChild}
+            style={{ width: 0, height: 0, opacity: 0 }}>
+            {moment(date).toISOString()}
+          </textarea>
         </span>
       </OverlayTrigger>
     );
@@ -37,6 +68,5 @@ DateView.propTypes = {
 };
 
 DateView.defaultProps = {
-  format: 'Do of MMMM YYYY, H:mm:ss',
   placement: 'top'
 };
