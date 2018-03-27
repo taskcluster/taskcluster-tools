@@ -39,6 +39,7 @@ export default class LogView extends PureComponent {
       lineNumber: ''
     };
   }
+
   componentWillMount() {
     fscreen.addEventListener(
       'fullscreenchange',
@@ -69,8 +70,11 @@ export default class LogView extends PureComponent {
         this.props.log &&
         nextProps.log.name !== this.props.log.name)
     ) {
+      const streaming = this.isStreaming(nextProps.status);
+
       this.setState({
-        follow: true,
+        streaming,
+        follow: streaming || this.prefersFollow(),
         isFullscreen: false
       });
     }
@@ -83,10 +87,15 @@ export default class LogView extends PureComponent {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ jump: false });
     }
+
+    if (this.state.follow) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ follow: true });
+    }
   }
 
   prefersFollow() {
-    return localStorage.getItem('follow-log') === 'true';
+    return localStorage.getItem('follow-log') === 'true' ? ' ' : 'true';
   }
 
   handleJump = () => {
@@ -111,11 +120,6 @@ export default class LogView extends PureComponent {
   handleScroll = ({ scrollTop, scrollHeight, clientHeight }) => {
     if (this.state.follow && scrollHeight - scrollTop !== clientHeight) {
       this.setState({ follow: false });
-    } else if (
-      !this.state.follow &&
-      scrollHeight - scrollTop === clientHeight
-    ) {
-      this.setState({ follow: true });
     }
   };
 
