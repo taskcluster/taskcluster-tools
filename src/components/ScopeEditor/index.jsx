@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
 import equal from 'deep-equal';
-import Diff from 'react-diff';
 import { Link } from 'react-router-dom';
 import 'codemirror/addon/display/placeholder';
 import 'codemirror/addon/lint/lint.css';
@@ -9,6 +8,7 @@ import 'codemirror/addon/mode/simple';
 import CodeEditor from '../CodeEditor';
 import './scopemode';
 import './styles.css';
+import Diff from '../../../custom_modules/react-diff-custom';
 
 export default class ScopeEditor extends Component {
   static propTypes = {

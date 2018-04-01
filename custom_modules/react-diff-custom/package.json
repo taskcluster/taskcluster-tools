@@ -1,0 +1,61 @@
+{
+  "_from": "react-diff@0.0.7",
+  "_id": "react-diff@0.0.7",
+  "_inBundle": false,
+  "_integrity": "sha1-TlVw0ohSm2/sPduk4awY1x5aSZY=",
+  "_location": "/react-diff",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "react-diff@0.0.7",
+    "name": "react-diff",
+    "escapedName": "react-diff",
+    "rawSpec": "0.0.7",
+    "saveSpec": null,
+    "fetchSpec": "0.0.7"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/react-diff/-/react-diff-0.0.7.tgz",
+  "_shasum": "4e5570d288529b6fec3ddba4e1ac18d71e5a4996",
+  "_spec": "react-diff@0.0.7",
+  "_where": "/Users/Mynah/GIT/Outreachy/taskcluster-tools",
+  "author": {
+    "name": "Cezary Wojtkowski",
+    "email": "cezary@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/cezary/react-diff/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "diff": "^1.2.0"
+  },
+  "deprecated": false,
+  "description": "Highlight differences between inputs",
+  "devDependencies": {
+    "babel": "^5.1.10"
+  },
+  "homepage": "https://github.com/cezary/react-diff",
+  "keywords": [
+    "react",
+    "diff"
+  ],
+  "license": "MIT",
+  "main": "dist/react-diff.js",
+  "name": "react-diff",
+  "peerDependencies": {
+    "react": ">=0.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cezary/react-diff.git"
+  },
+  "scripts": {
+    "build": "babel lib/react-diff.js > dist/react-diff.js"
+  },
+  "version": "0.0.7"
+}
