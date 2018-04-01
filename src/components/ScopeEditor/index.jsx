@@ -91,7 +91,7 @@ export default class ScopeEditor extends Component {
       <Diff
         inputA={this.state.oldScopes.join('\n')}
         inputB={this.state.scopeText}
-        type="words"
+        type="lines"
       />
     );
   }
