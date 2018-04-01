@@ -87,12 +87,10 @@ export default class ScopeEditor extends Component {
   }
 
   renderDiff() {
-    const newScopes = this.state.scopeText.split(/[\r\n]+/).map(s => s.trim());
-
     return (
       <Diff
         inputA={this.state.oldScopes.join('\n')}
-        inputB={newScopes.join('\n')}
+        inputB={this.state.scopeText}
         type="words"
       />
     );
