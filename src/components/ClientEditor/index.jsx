@@ -44,7 +44,8 @@ export default class ClientEditor extends PureComponent {
       // Operation details, if currently doing anything
       working: false,
       error: null,
-      showModal: true
+      showModal: true,
+      review: false
     };
   }
 
@@ -260,6 +261,8 @@ export default class ClientEditor extends PureComponent {
     }
   };
 
+  handleViewDiff = () => this.setState({ review: !this.state.review });
+
   /** Determine if clientId is valid */
   validClientId = () =>
     /^[A-Za-z0-9!@/:.+|_-]+$/.test(this.state.client.clientId || '');
@@ -268,6 +271,21 @@ export default class ClientEditor extends PureComponent {
   renderEditingToolbar() {
     return (
       <ButtonToolbar>
+        {this.state.review ? (
+          <Button
+            bsStyle="success"
+            onClick={this.handleViewDiff}
+            disabled={!this.state.review}>
+            <Glyphicon glyph="pencil" /> Edit Scopes
+          </Button>
+        ) : (
+          <Button
+            bsStyle="success"
+            onClick={this.handleViewDiff}
+            disabled={this.state.review}>
+            <Icon name="question" /> Review Changes
+          </Button>
+        )}
         <Button
           bsStyle="success"
           onClick={this.handleSaveClient}
@@ -532,6 +550,7 @@ export default class ClientEditor extends PureComponent {
                 editing={isEditing}
                 scopes={this.state.client.scopes}
                 onScopesUpdated={this.handleScopesUpdated}
+                review={this.state.review}
               />
             </div>
           </div>

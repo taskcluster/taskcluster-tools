@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { arrayOf, bool, func, string } from 'prop-types';
 import equal from 'deep-equal';
+import Diff from 'react-diff';
 import { Link } from 'react-router-dom';
 import 'codemirror/addon/display/placeholder';
 import 'codemirror/addon/lint/lint.css';
@@ -14,6 +15,7 @@ export default class ScopeEditor extends Component {
     // true to display the editor; expandedScopes can just display
     // by leaving this unset
     editing: bool,
+    review: bool,
     scopes: arrayOf(string).isRequired,
     // called when scopes have changed
     onScopesUpdated: func
@@ -23,7 +25,8 @@ export default class ScopeEditor extends Component {
     super(props);
 
     this.state = {
-      scopeText: props.scopes.join('\n')
+      scopeText: props.scopes.join('\n'),
+      oldScopes: props.scopes
     };
   }
 
@@ -83,6 +86,18 @@ export default class ScopeEditor extends Component {
     );
   }
 
+  renderDiff() {
+    const newScopes = this.state.scopeText.split(/[\r\n]+/).map(s => s.trim());
+
+    return (
+      <Diff
+        inputA={this.state.oldScopes.join('\n')}
+        inputB={newScopes.join('\n')}
+        type="words"
+      />
+    );
+  }
+
   /** Render a list of scopes */
   renderScopes() {
     const { scopes } = this.props;
@@ -101,6 +116,12 @@ export default class ScopeEditor extends Component {
   }
 
   render() {
-    return this.props.editing ? this.renderScopeEditor() : this.renderScopes();
+    if (this.props.review) {
+      return this.renderDiff();
+    } else if (this.props.editing) {
+      return this.renderScopeEditor();
+    }
+
+    return this.renderScopes();
   }
 }
