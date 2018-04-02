@@ -3,6 +3,7 @@
 var React = require('react');
 var jsdiff = require('diff');
 
+// Add a new 'lines' type to fnMap that was not present in the original module.
 var fnMap = {
   'chars': jsdiff.diffChars,
   'words': jsdiff.diffWords,
@@ -31,10 +32,13 @@ module.exports = React.createClass({
   render: function render() {
     var diff = fnMap[this.props.type](this.props.inputA, this.props.inputB);
 
+    /** If the type equals our new 'lines' type, change the 'diff' assignement
+    to pass an option to InputB. */
     if (this.props.propTypes === 'lines') {
       diff = fnMap[this.props.type](this.props.inputA, this.props.inputB[{ newlineIsToken: true }]);
     }
-    
+
+    // Change the original styling.
     var result = diff.map(function (part, index) {
       var spanStyle = {
         color: part.added ? 'seagreen' : part.removed ? 'red' : 'grey',
