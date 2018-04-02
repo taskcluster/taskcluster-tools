@@ -273,17 +273,17 @@ export default class ClientEditor extends PureComponent {
       <ButtonToolbar>
         {this.state.review ? (
           <Button
-            bsStyle="success"
+            bsStyle="info"
             onClick={this.handleViewDiff}
             disabled={!this.state.review}>
             <Glyphicon glyph="pencil" /> Edit Scopes
           </Button>
         ) : (
           <Button
-            bsStyle="success"
+            bsStyle="info"
             onClick={this.handleViewDiff}
             disabled={this.state.review}>
-            <Icon name="question" /> Review Changes
+            <Icon name="question-circle" /> Review Changes
           </Button>
         )}
         <Button
