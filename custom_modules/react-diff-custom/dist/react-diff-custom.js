@@ -42,7 +42,7 @@ module.exports = React.createClass({
     var result = diff.map(function (part, index) {
       var spanStyle = {
         color: part.added ? 'seagreen' : part.removed ? 'red' : 'grey',
-        backgroundColor: part.added ? 'springgreen' : part.removed ? 'mistyrose' : null
+        backgroundColor: part.added ? 'palegreen' : part.removed ? 'mistyrose' : null
       };
       return React.createElement(
         'span',
