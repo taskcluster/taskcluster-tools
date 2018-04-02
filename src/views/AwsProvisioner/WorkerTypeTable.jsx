@@ -190,6 +190,7 @@ export default class WorkerTypeTable extends PureComponent {
           updateSummary={this.updateSummary}
           userSession={this.props.userSession}
           ec2BaseUrl={this.props.ec2BaseUrl}
+          ec2Manager={this.props.ec2Manager}
         />
       </div>
     );
@@ -253,10 +254,11 @@ export default class WorkerTypeTable extends PureComponent {
     );
   }
 
-  handleRecentErrorsClick = () => {
+  handlePageTransitionClick = page => {
     const { push, location } = this.props.history;
+    const isStaging = location.pathname.startsWith('/aws-provisioner-staging');
 
-    push(`${location.pathname.replace('//', '/')}/recent-errors`);
+    push(`/aws-provisioner${isStaging ? '-staging' : ''}/${page}`);
   };
 
   render() {
@@ -276,11 +278,19 @@ export default class WorkerTypeTable extends PureComponent {
           </Button>
           <Button
             title={`Recent errors in ${this.props.provisionerId}`}
-            onClick={this.handleRecentErrorsClick}
+            onClick={() => this.handlePageTransitionClick('recent-errors')}
             bsStyle="primary"
             bsSize="sm"
             className={recentErrorsButton}>
             <Glyphicon glyph="exclamation-sign" /> Recent Errors
+          </Button>
+          <Button
+            title="Health of each region/az/instanceType"
+            onClick={() => this.handlePageTransitionClick('health')}
+            bsStyle="primary"
+            bsSize="sm"
+            className={recentErrorsButton}>
+            <Glyphicon glyph="heart-empty" /> Health
           </Button>
         </ButtonToolbar>
         <div>{this.renderState()}</div>

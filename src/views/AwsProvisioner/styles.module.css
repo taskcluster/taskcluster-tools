@@ -18,6 +18,12 @@
   margin-bottom: 50px;
 }
 
+.workerTypeHealthItem {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
 .stateTable {
   margin-top: 20px;
 }
