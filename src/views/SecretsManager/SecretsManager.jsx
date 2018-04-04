@@ -99,7 +99,6 @@ export default class SecretsManager extends Component {
       </Table>
     );
   }
-t
   handleSearchChange = value => this.setState({ secretIdContains: value });
 
   render() {

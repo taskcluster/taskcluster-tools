@@ -29,7 +29,7 @@ export default class SearchForm extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.handleSearchChange();
+    this.handleSearch();
   };
 
   render() {
