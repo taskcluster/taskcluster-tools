@@ -1,5 +1,5 @@
-import { PureComponent } from 'react';
-import { func } from 'prop-types';
+import { Component } from 'react';
+import { func, string } from 'prop-types';
 import {
   Glyphicon,
   FormGroup,
@@ -7,45 +7,41 @@ import {
   FormControl,
   Form
 } from 'react-bootstrap';
-import styles from './styles.module.css';
+import { typeInput } from './styles.module.css';
 
-export default class SearchForm extends PureComponent {
+export default class SearchForm extends Component {
   static propTypes = {
-    onSearch: func.isRequired
+    onSearch: func.isRequired,
+    label: string
   };
 
-  constructor(props) {
-    super(props);
+  static defaultProps = {
+    label: 'Value Containing'
+  };
 
-    this.state = { value: '' };
-  }
+  state = { value: '' };
 
-  componentWillMount() {
-    if (this.props.default) {
-      this.setState({ value: this.props.default });
-    }
-  }
-
-  handleChange = e => this.setState({ value: e.target.value });
+  handleSearchChange = e => {
+    this.setState({ value: e.target.value });
+  };
 
   handleSearch = () => this.props.onSearch(this.state.value);
 
   handleSubmit = e => {
     e.preventDefault();
-
     this.handleSearch();
   };
 
   render() {
     return (
       <div>
-        <Form onSubmit={this.handleSubmit} className={styles.typeInput}>
+        <Form onSubmit={this.handleSubmit} className={typeInput}>
           <FormGroup>
             <InputGroup bsSize="sm">
-              <InputGroup.Addon>Role Id Containing</InputGroup.Addon>
+              <InputGroup.Addon>{this.props.label}</InputGroup.Addon>
               <FormControl
-                onChange={this.handleChange}
                 value={this.state.value}
+                onChange={this.handleSearchChange}
                 type="text"
               />
               <InputGroup.Addon onClick={this.handleSearch} role="button">
