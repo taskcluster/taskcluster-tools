@@ -99,8 +99,8 @@ export default class SecretsManager extends Component {
       </Table>
     );
   }
-
-  handleSetSecretId = value => this.setState({ secretIdContains: value });
+t
+  handleSearchChange = value => this.setState({ secretIdContains: value });
 
   render() {
     const { secretId } = this.props;
@@ -112,7 +112,7 @@ export default class SecretsManager extends Component {
         <Col md={5}>
           <SearchForm
             label="Secret Id Containing"
-            onSearch={this.handleSetSecretId}
+            onSearch={this.handleSearchChange}
           />
           {this.renderSecretsTable()}
           <ButtonToolbar>
