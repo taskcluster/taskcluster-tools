@@ -75,7 +75,7 @@ export default class RoleManager extends Component {
     );
   };
 
-  handleSetRoleId = value => this.setState({ roleIdContains: value });
+  handleSearchChange = value => this.setState({ roleIdContains: value });
 
   renderRolesTable() {
     const { roles } = this.state;
@@ -108,7 +108,7 @@ export default class RoleManager extends Component {
         <Col md={5}>
           <SearchForm
             label="Role Id Containing"
-            onSearch={this.handleSetRoleId}
+            onSearch={this.handleSearchChange}
           />
           {this.renderRolesTable()}
           <ButtonToolbar>
