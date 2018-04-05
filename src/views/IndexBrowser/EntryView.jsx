@@ -107,11 +107,6 @@ export default class EntryView extends PureComponent {
           <dt>Rank</dt>
           <dd>{this.state.task.rank}</dd>
 
-          <dt>Created</dt>
-          <dd>
-            <DateView date={this.state.task.created} />
-          </dd>
-
           <dt>Expires</dt>
           <dd>
             <DateView date={this.state.task.expires} />
