@@ -47,14 +47,14 @@ export default class EntryView extends PureComponent {
       return this.setState({ error: null, task: {} });
     }
 
-    const task = await props.index.findTask(
-      props.namespaceTaskId
-        ? `${props.namespace}.${props.namespaceTaskId}`
-        : props.namespace
-    );
-    const taskDetail = await props.queue.task(task.taskId);
-
     try {
+      const task = await props.index.findTask(
+        props.namespaceTaskId
+          ? `${props.namespace}.${props.namespaceTaskId}`
+          : props.namespace
+      );
+      const taskDetail = await props.queue.task(task.taskId);
+
       this.setState({
         task,
         error: null,
@@ -83,8 +83,6 @@ export default class EntryView extends PureComponent {
     const { error, task, taskDetail } = this.state;
 
     if (error && error.response.status === 404) {
-      console.log(error);
-
       return (
         <div className="alert alert-warning" role="alert">
           <strong>Task not found!</strong>&nbsp; No task is indexed under{' '}
