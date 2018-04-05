@@ -235,12 +235,12 @@ export default class App extends Component {
                   ec2BaseUrl="https://ec2-manager-staging.taskcluster.net/v1"
                 />
                 <PropsRoute
-                  path="/aws-provisioner/health"
+                  path="/aws-provisioner/aws-health"
                   component={AwsProvisionerHealth}
                   ec2BaseUrl="https://ec2-manager.taskcluster.net/v1"
                 />
                 <PropsRoute
-                  path="/aws-provisioner-staging/health"
+                  path="/aws-provisioner-staging/aws-health"
                   component={AwsProvisionerHealth}
                   ec2BaseUrl="https://ec2-manager-staging.taskcluster.net/v1"
                 />

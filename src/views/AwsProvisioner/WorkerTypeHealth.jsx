@@ -37,16 +37,19 @@ export default class WorkerTypeHealth extends PureComponent {
   }
 
   async loadHealth() {
+    const { ec2Manager, workerType } = this.props;
+
     this.setState({ loading: true });
 
     try {
+      const [errors, health] = await Promise.all([
+        ec2Manager.workerTypeErrors(workerType).then(({ errors }) => errors),
+        ec2Manager.workerTypeHealth(workerType)
+      ]);
+
       this.setState({
-        workerTypeErrors: (await this.props.ec2Manager.workerTypeErrors(
-          this.props.workerType
-        )).errors,
-        workerTypeHealth: await this.props.ec2Manager.workerTypeHealth(
-          this.props.workerType
-        ),
+        workerTypeErrors: errors,
+        workerTypeHealth: health,
         loading: false,
         error: null
       });

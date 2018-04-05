@@ -8,9 +8,8 @@ import {
   Tooltip
 } from 'react-bootstrap';
 import { snakeCase, camelCase } from 'change-case';
-import { or, isEmpty } from 'ramda';
+import { isEmpty, defaultTo } from 'ramda';
 import { object } from 'prop-types';
-import Spinner from '../Spinner';
 import { buttonGroup, columnNoWrap, tooltip } from './styles.module.css';
 
 export default class AwsProvisionerHealthTable extends PureComponent {
@@ -18,24 +17,13 @@ export default class AwsProvisionerHealthTable extends PureComponent {
     healthData: object.isRequired
   };
 
-  state = {
-    sortBy: null,
-    healthSummary: null,
-    loading: true
-  };
+  state = { sortBy: null };
 
-  componentWillMount() {
-    this.setHealthSummary();
-  }
-
-  componentWillReceiveProps() {
-    this.setState({ loading: true }, this.setHealthSummary);
-  }
-
-  setHealthSummary() {
+  getHealthSummary() {
     const healthSummary = {};
     const { requestHealth, terminationHealth, running } = this.props.healthData;
     const identifier = item => `${item.az}-${item.region}-${item.instanceType}`;
+    const or0 = defaultTo(0);
 
     requestHealth &&
       requestHealth.forEach(item => {
@@ -61,21 +49,19 @@ export default class AwsProvisionerHealthTable extends PureComponent {
 
     Object.entries(healthSummary).forEach(([key, item]) => {
       healthSummary[key].healthy =
-        or(item.successful, 0) +
-        or(item.clean_shutdown, 0) +
-        or(item.running, 0);
+        or0(item.successful) + or0(item.clean_shutdown) + or0(item.running);
       healthSummary[key].unhealthy =
-        or(item.failed, 0) +
-        or(item.spot_kill, 0) +
-        or(item.insufficient_capacity, 0) +
-        or(item.volume_limit_exceeded, 0) +
-        or(item.missing_ami, 0) +
-        or(item.startup_failed, 0) +
-        or(item.unknown_codes, 0) +
-        or(item.no_code, 0);
+        or0(item.failed) +
+        or0(item.spot_kill) +
+        or0(item.insufficient_capacity) +
+        or0(item.volume_limit_exceeded) +
+        or0(item.missing_ami) +
+        or0(item.startup_failed) +
+        or0(item.unknown_codes) +
+        or0(item.no_code);
     });
 
-    this.setState({ healthSummary, loading: false });
+    return healthSummary;
   }
 
   sort = (a, b) => {
@@ -101,25 +87,24 @@ export default class AwsProvisionerHealthTable extends PureComponent {
   };
 
   renderRow(item) {
+    const or0 = defaultTo(0);
     const identifier = `${item.az}-${item.region}-${item.instanceType}`;
     const healthyTooltip = (
       <Tooltip className={tooltip} id={`${identifier}-healthy`}>
-        {`Successful Requests: ${or(item.successful, 0)}\nClean Shutdown: ${or(
-          item.clean_shutdown,
-          0
-        )}\nRunning: ${or(item.running, 0)}`}
+        {`Successful Requests: ${or0(item.successful)}\nClean Shutdown: ${or0(
+          item.clean_shutdown
+        )}\nRunning: ${or0(item.running)}`}
       </Tooltip>
     );
     const unhealthyTooltip = (
       <Tooltip className={tooltip} id={`${identifier}-unhealthy`}>
-        {`Failed Requests: ${or(item.failed, 0)}\nSpot Kill: ${or(
-          item.spot_kill,
-          0
-        )}\nInsufficient Capacity: ${or(
-          item.insufficient_capacity,
-          0
-        )}\nVolume Limit Exceeded: ${(or(item.volume_limit_exceeded),
-        0)}\nMissing AMI: ${item.missing_ami}\nStartup Failed: ${
+        {`Failed Requests: ${or0(item.failed)}\nSpot Kill: ${or0(
+          item.spot_kill
+        )}\nInsufficient Capacity: ${or0(
+          item.insufficient_capacity
+        )}\nVolume Limit Exceeded: ${or0(
+          item.volume_limit_exceeded
+        )}\nMissing AMI: ${item.missing_ami}\nStartup Failed: ${
           item.startup_failed
         }\nUnknown Codes: ${item.unknown_codes}\nNo Codes: ${item.no_code}`}
       </Tooltip>
@@ -149,11 +134,8 @@ export default class AwsProvisionerHealthTable extends PureComponent {
   };
 
   render() {
-    const { sortBy, healthSummary, loading } = this.state;
-
-    if (loading) {
-      return <Spinner />;
-    }
+    const { sortBy } = this.state;
+    const healthSummary = this.getHealthSummary();
 
     if (isEmpty(healthSummary)) {
       return <div>Health stats not available</div>;

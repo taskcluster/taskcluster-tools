@@ -286,7 +286,7 @@ export default class WorkerTypeTable extends PureComponent {
           </Button>
           <Button
             title="Health of each region/az/instanceType"
-            onClick={() => this.handlePageTransitionClick('health')}
+            onClick={() => this.handlePageTransitionClick('aws-health')}
             bsStyle="primary"
             bsSize="sm"
             className={recentErrorsButton}>

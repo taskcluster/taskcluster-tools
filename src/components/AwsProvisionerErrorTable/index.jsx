@@ -29,24 +29,6 @@ export default class AwsProvisionerErrorTable extends PureComponent {
     return a[camelCase(sortBy)].localeCompare(b[camelCase(sortBy)]);
   };
 
-  renderRow(item) {
-    return (
-      <tr key={`${item.type}:${item.workerType}:${item.time}`}>
-        <td className={columnNoWrap}>{item.az}</td>
-        <td className={columnNoWrap}>{item.type}</td>
-        <td className={columnNoWrap}>{item.instanceType}</td>
-        <td className={columnNoWrap}>
-          <code>{item.code}</code>
-        </td>
-        <td className={columnNoWrap}>{item.region}</td>
-        <td className={columnNoWrap}>
-          <DateView date={item.time} />
-        </td>
-        <td>{item.message}</td>
-      </tr>
-    );
-  }
-
   handleSortSelect = sortBy => {
     this.setState({ sortBy });
   };
@@ -89,7 +71,24 @@ export default class AwsProvisionerErrorTable extends PureComponent {
               <th>Message</th>
             </tr>
           </thead>
-          <tbody>{errorData.sort(this.sort).map(this.renderRow)}</tbody>
+          <tbody>
+            {errorData.sort(this.sort).map(item => (
+              <tr
+                key={`${item.type}:${item.az}:${item.workerType}:${item.time}`}>
+                <td className={columnNoWrap}>{item.az}</td>
+                <td className={columnNoWrap}>{item.type}</td>
+                <td className={columnNoWrap}>{item.instanceType}</td>
+                <td className={columnNoWrap}>
+                  <code>{item.code}</code>
+                </td>
+                <td className={columnNoWrap}>{item.region}</td>
+                <td className={columnNoWrap}>
+                  <DateView date={item.time} />
+                </td>
+                <td>{item.message}</td>
+              </tr>
+            ))}
+          </tbody>
         </Table>
       </div>
     );
