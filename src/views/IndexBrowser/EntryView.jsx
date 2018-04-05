@@ -47,19 +47,24 @@ export default class EntryView extends PureComponent {
       return this.setState({ error: null, task: {} });
     }
 
+    const task = await props.index.findTask(
+      props.namespaceTaskId
+        ? `${props.namespace}.${props.namespaceTaskId}`
+        : props.namespace
+    );
+    const taskDetail = await props.queue.task(task.taskId);
+
     try {
       this.setState({
-        task: await props.index.findTask(
-          props.namespaceTaskId
-            ? `${props.namespace}.${props.namespaceTaskId}`
-            : props.namespace
-        ),
-        error: null
+        task,
+        error: null,
+        taskDetail
       });
     } catch (err) {
       this.setState({
         task: null,
-        error: err
+        error: err,
+        taskDetail: null
       });
     }
   }
@@ -75,9 +80,11 @@ export default class EntryView extends PureComponent {
   }
 
   renderTask() {
-    const { error, task } = this.state;
+    const { error, task, taskDetail } = this.state;
 
     if (error && error.response.status === 404) {
+      console.log(error);
+
       return (
         <div className="alert alert-warning" role="alert">
           <strong>Task not found!</strong>&nbsp; No task is indexed under{' '}
@@ -86,7 +93,7 @@ export default class EntryView extends PureComponent {
       );
     }
 
-    if (!task) {
+    if (!task || !taskDetail) {
       return <Spinner />;
     }
 
@@ -107,6 +114,11 @@ export default class EntryView extends PureComponent {
           <dt>Rank</dt>
           <dd>{this.state.task.rank}</dd>
 
+          <dt>Created</dt>
+          <dd>
+            <DateView date={this.state.taskDetail.created} />
+          </dd>
+
           <dt>Expires</dt>
           <dd>
             <DateView date={this.state.task.expires} />
@@ -123,7 +135,6 @@ export default class EntryView extends PureComponent {
             <JsonInspector data={this.state.task.data} />
           </dd>
         </dl>
-
         <dl className="dl-horizontal">
           <dt>Latest Artifacts</dt>
           <dd>
