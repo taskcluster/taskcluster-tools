@@ -58,9 +58,7 @@ export default class WorkerTypeStatus extends Component {
     ];
 
     if (!availabilityZones.length) {
-      return (
-        <div className={emptyStatusTab}>Availability zones not available</div>
-      );
+      return <div className={emptyStatusTab}>No running instances</div>;
     }
 
     return (
