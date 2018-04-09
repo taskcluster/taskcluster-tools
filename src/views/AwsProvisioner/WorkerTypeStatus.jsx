@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { object, shape, arrayOf } from 'prop-types';
 import { Table } from 'react-bootstrap';
+import { emptyStatusTab } from './styles.module.css';
 
 export default class WorkerTypeStatus extends Component {
   static propTypes = {
@@ -26,10 +27,6 @@ export default class WorkerTypeStatus extends Component {
         inst.zone === availabilityZone
     ).length;
 
-    if (running + pending === 0) {
-      return;
-    }
-
     return (
       <tr key={`${instTypeDef.instanceType}:${availabilityZone}`}>
         <td>
@@ -39,10 +36,14 @@ export default class WorkerTypeStatus extends Component {
           <code>{availabilityZone}</code>
         </td>
         <td>
-          {running * instTypeDef.capacity} ({running} instances)
+          {running
+            ? `${running * instTypeDef.capacity} (${running} instances)`
+            : 0}
         </td>
         <td>
-          {pending * instTypeDef.capacity} ({pending} instances)
+          {pending
+            ? `${pending * instTypeDef.capacity} (${pending} instances)`
+            : 0}
         </td>
       </tr>
     );
@@ -55,6 +56,12 @@ export default class WorkerTypeStatus extends Component {
         ...this.props.awsState.requests.map(({ zone }) => zone)
       ])
     ];
+
+    if (!availabilityZones.length) {
+      return (
+        <div className={emptyStatusTab}>Availability zones not available</div>
+      );
+    }
 
     return (
       <Table>
