@@ -50,6 +50,8 @@ export default class ScopeInspector extends PureComponent {
   load = async () => {
     try {
       const clientResponse = await this.props.auth.listClients();
+      // the new listClients API schema changes response schema,
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=1436212
       const clients =
         clientResponse && clientResponse.clients
           ? clientResponse.clients
@@ -86,6 +88,8 @@ export default class ScopeInspector extends PureComponent {
   loadClients = async () => {
     try {
       const clientResponse = await this.props.auth.listClients();
+      // the new listClients API schema changes response schema,
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=1436212
       const clients =
         clientResponse && clientResponse.clients
           ? clientResponse.clients

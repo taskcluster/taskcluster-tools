@@ -71,6 +71,8 @@ export default class ClientManager extends Component {
       try {
         await this.loadClientPrefix();
         const { clientPrefix } = this.state;
+        // the new listClients API schema changes response schema,
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=1436212
         const clientResponse = await this.props.auth.listClients(
           clientPrefix ? { prefix: clientPrefix } : null
         );
