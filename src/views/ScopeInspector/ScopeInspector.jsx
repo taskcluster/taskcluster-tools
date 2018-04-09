@@ -49,9 +49,15 @@ export default class ScopeInspector extends PureComponent {
 
   load = async () => {
     try {
+      const clientResponse = await this.props.auth.listClients();
+      const clients =
+        clientResponse && clientResponse.clients
+          ? clientResponse.clients
+          : clientResponse;
+
       this.setState({
         roles: await this.props.auth.listRoles(),
-        clients: await this.props.auth.listClients(),
+        clients,
         error: null
       });
     } catch (err) {
@@ -79,10 +85,13 @@ export default class ScopeInspector extends PureComponent {
 
   loadClients = async () => {
     try {
-      this.setState({
-        clients: await this.props.auth.listClients(),
-        error: null
-      });
+      const clientResponse = await this.props.auth.listClients();
+      const clients =
+        clientResponse && clientResponse.clients
+          ? clientResponse.clients
+          : clientResponse;
+
+      this.setState({ clients, error: null });
     } catch (err) {
       this.setState({
         clients: null,
