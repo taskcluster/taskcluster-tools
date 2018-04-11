@@ -319,7 +319,7 @@ export default class YamlCreator extends Component {
               Optionally, after you create your file, you can edit it here or in
               you favorite editor to add more functionality. Please refer to the{' '}
               <a
-                href="https://docs.taskcluster.net/reference/integrations/github/docs/usage"
+                href="https://docs.taskcluster.net/reference/integrations/taskcluster-github/docs/taskcluster-yml-v0"
                 target="_blank"
                 rel="noopener noreferrer">
                 full documentation on our configuration files
