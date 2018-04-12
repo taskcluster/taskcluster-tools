@@ -1,5 +1,6 @@
 import { PureComponent } from 'react';
 import { string, bool, object, func } from 'prop-types';
+import { safeLoad, safeDump } from 'js-yaml';
 import { Button, Glyphicon, ButtonToolbar } from 'react-bootstrap';
 import clone from 'lodash.clonedeep';
 import equal from 'deep-equal';
@@ -39,6 +40,7 @@ const initialHook = {
     additionalProperties: false
   }
 };
+const safeDumpOpts = { noCompatMode: true, noRefs: true };
 
 export default class HookEditor extends PureComponent {
   static propTypes = {
@@ -51,16 +53,12 @@ export default class HookEditor extends PureComponent {
     onDeleteHook: func.isRequired
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      newScheduleValue: '',
-      hook: null,
-      hookValidJson: false,
-      triggerSchemaValidJson: false
-    };
-  }
+  state = {
+    newScheduleValue: '',
+    hook: null,
+    hookValidJson: false,
+    triggerSchemaValidJson: false
+  };
 
   componentWillMount() {
     this.setState({
@@ -167,8 +165,9 @@ export default class HookEditor extends PureComponent {
 
   handleTaskChange = value => {
     try {
+      safeLoad(value);
       this.setState({
-        hook: assocPath(['task'], JSON.parse(value), this.state.hook),
+        hook: assocPath(['task'], value, this.state.hook),
         hookValidJson: true
       });
     } catch (err) {
@@ -180,8 +179,9 @@ export default class HookEditor extends PureComponent {
 
   handleTriggerSchemaChange = value => {
     try {
+      safeLoad(value);
       this.setState({
-        hook: assocPath(['triggerSchema'], JSON.parse(value), this.state.hook),
+        hook: assocPath(['triggerSchema'], value, this.state.hook),
         triggerSchemaValidJson: true
       });
     } catch (err) {
@@ -409,8 +409,10 @@ export default class HookEditor extends PureComponent {
           <label className="control-label col-md-2">Task Template</label>
           <div className="col-md-10">
             <CodeEditor
-              mode="json"
-              value={JSON.stringify(hook.task, null, 2)}
+              gutters={['CodeMirror-lint-markers']}
+              lint
+              mode="yaml"
+              value={safeDump(hook.task, safeDumpOpts)}
               onChange={this.handleTaskChange}
             />
           </div>
@@ -419,8 +421,10 @@ export default class HookEditor extends PureComponent {
           <label className="control-label col-md-2">Trigger Schema</label>
           <div className="col-md-10">
             <CodeEditor
-              mode="json"
-              value={JSON.stringify(hook.triggerSchema, null, 2)}
+              gutters={['CodeMirror-lint-markers']}
+              lint
+              mode="yaml"
+              value={safeDump(hook.triggerSchema, safeDumpOpts)}
               onChange={this.handleTriggerSchemaChange}
             />
           </div>
