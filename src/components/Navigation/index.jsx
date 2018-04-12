@@ -18,13 +18,16 @@ import logoUrl from '../../taskcluster.png';
 
 export default class Navigation extends PureComponent {
   render() {
+    // const hash = process.env.COMMITHASH;
     const commit = (
       <Tooltip id="commit-tooltip">
-        View the source of commit {process.env.COMMITHASH} on GitHub.
+        View the source of commit {process.env.COMMITHASH.substr(0, 12)} on
+        GitHub.
       </Tooltip>
     );
-    const sourcelink = `https://github.com/taskcluster/taskcluster-tools/tree/
-${process.env.COMMITHASH}`;
+    const sourcelink = `https://github.com/taskcluster/taskcluster-tools/tree/${
+      process.env.COMMITHASH
+    }`;
 
     return (
       <div className={navigation}>
@@ -42,7 +45,7 @@ ${process.env.COMMITHASH}`;
                 href={sourcelink}
                 target="_blank"
                 rel="noopener noreferrer">
-                <Icon className="fa-code-fork" name="fork" />
+                <Icon name="code-fork" size="lg" />
               </NavItem>
             </OverlayTrigger>
             <NavDropdown key={1} title="Tools" id="tools">

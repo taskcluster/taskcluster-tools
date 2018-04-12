@@ -1,7 +1,8 @@
 const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
-const GitRevisionPlugin = require('git-revision-webpack-plugin'); 
-const gitRevisionPlugin = new GitRevisionPlugin()
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
+
+const gitRevisionPlugin = new GitRevisionPlugin();
 
 // Increment the version whenever you need a full invalidation
 // but hashes could remain the same
