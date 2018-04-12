@@ -8,7 +8,7 @@ import 'codemirror/addon/mode/simple';
 import CodeEditor from '../CodeEditor';
 import './scopemode';
 import './styles.css';
-import Diff from '../../../custom_modules/react-diff-custom';
+import Diff from './react-diff-custom';
 
 export default class ScopeEditor extends Component {
   static propTypes = {
