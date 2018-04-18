@@ -2,7 +2,15 @@ import { PureComponent } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
-import { Navbar, Nav, NavDropdown, MenuItem } from 'react-bootstrap';
+import {
+  Navbar,
+  Nav,
+  NavDropdown,
+  MenuItem,
+  NavItem,
+  Tooltip,
+  OverlayTrigger
+} from 'react-bootstrap';
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
 import { navigation } from './styles.module.css';
@@ -10,6 +18,17 @@ import logoUrl from '../../taskcluster.png';
 
 export default class Navigation extends PureComponent {
   render() {
+    // const hash = process.env.COMMITHASH;
+    const commit = (
+      <Tooltip id="commit-tooltip">
+        View the source of commit {process.env.COMMITHASH.substr(0, 12)} on
+        GitHub.
+      </Tooltip>
+    );
+    const sourcelink = `https://github.com/taskcluster/taskcluster-tools/tree/${
+      process.env.COMMITHASH
+    }`;
+
     return (
       <div className={navigation}>
         <Navbar fluid inverse staticTop collapseOnSelect>
@@ -21,6 +40,14 @@ export default class Navigation extends PureComponent {
             </Navbar.Brand>
           </Navbar.Header>
           <Nav pullRight>
+            <OverlayTrigger placement="bottom" overlay={commit}>
+              <NavItem
+                href={sourcelink}
+                target="_blank"
+                rel="noopener noreferrer">
+                <Icon name="code-fork" size="lg" />
+              </NavItem>
+            </OverlayTrigger>
             <NavDropdown key={1} title="Tools" id="tools">
               {links.map(
                 ({ title, link, icon }) =>
