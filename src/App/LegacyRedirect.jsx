@@ -33,7 +33,9 @@ const LegacyRedirect = props => {
     }
 
     case '/task-inspector': {
-      return <Redirect to={`/tasks/${props.location.hash.slice(1)}`} />;
+      const taskId = props.location.hash.slice(1);
+
+      return <Redirect to={taskId ? `/tasks/${taskId}` : '/groups'} />;
     }
 
     case '/task-creator': {
