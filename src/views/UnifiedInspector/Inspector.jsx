@@ -157,7 +157,8 @@ export default class Inspector extends PureComponent {
             queue.getLatestArtifact,
             taskGroupId,
             'public/actions.json'
-          )
+          ),
+          { retries: 1 }
         )
       ]);
 
@@ -171,7 +172,7 @@ export default class Inspector extends PureComponent {
     }
   }
 
-  async loadTasks(props, token) {
+  async loadTasks(props, token, skipActions) {
     const { taskGroupId, queue } = props;
 
     if (!taskGroupId) {
@@ -191,7 +192,9 @@ export default class Inspector extends PureComponent {
         { decision, actions },
         { tasks, continuationToken }
       ] = await Promise.all([
-        token ? Promise.resolve(this.state) : this.getActions(props),
+        token || skipActions
+          ? Promise.resolve(this.state)
+          : this.getActions(props),
         queue.listTaskGroup(
           taskGroupId,
           token ? { continuationToken: token, limit: 200 } : { limit: 20 }
@@ -306,7 +309,7 @@ export default class Inspector extends PureComponent {
       'taskException'
     ].map(binding => listener.bind(queueEvents[binding](routingKey)));
     listener.on('message', this.handleGroupMessage);
-    listener.on('reconnect', () => this.loadTasks(this.props));
+    listener.on('reconnect', () => this.loadTasks(this.props, null, true));
     listener.connect();
 
     return listener;
