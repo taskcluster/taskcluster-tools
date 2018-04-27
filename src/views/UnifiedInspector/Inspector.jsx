@@ -581,7 +581,9 @@ export default class Inspector extends PureComponent {
     const {
       taskGroupId,
       taskId,
+      auth,
       queue,
+      hooks,
       purgeCache,
       url,
       runId,
@@ -629,7 +631,9 @@ export default class Inspector extends PureComponent {
               <NavItem>Task Details</NavItem>
             </LinkContainer>
             <ActionsMenu
+              auth={auth}
               queue={queue}
+              hooks={hooks}
               purgeCache={purgeCache}
               taskGroupId={taskGroupId}
               taskId={trackedTaskId}

@@ -12,7 +12,7 @@ const View = ({ match, history, location }) => {
   return (
     <WithUserSession>
       {userSession => (
-        <WithClients Queue QueueEvents PurgeCache>
+        <WithClients Auth Queue Hooks QueueEvents PurgeCache>
           {clients => (
             <Inspector
               {...clients}

@@ -10,6 +10,7 @@ import merge from 'deepmerge';
 import clone from 'lodash.clonedeep';
 import jsonSchemaDefaults from 'json-schema-defaults';
 import { safeLoad, safeDump } from 'js-yaml';
+import { satisfiesExpression } from 'taskcluster-lib-scopes';
 import ModalItem from '../../components/ModalItem';
 import Markdown from '../../components/Markdown';
 import CodeEditor from '../../components/CodeEditor';
@@ -18,7 +19,9 @@ import { parameterizeTask } from '../../utils';
 
 export default class ActionsMenu extends PureComponent {
   static propTypes = {
+    auth: object,
     queue: object,
+    hooks: object,
     userSession: object,
     purgeCache: object,
     taskGroupId: string,
@@ -70,6 +73,7 @@ export default class ActionsMenu extends PureComponent {
       const groupActions = [];
       const actionInputs = {};
       const actionData = {};
+      const knownKinds = ['task', 'hook'];
 
       if (actions && actions.actions) {
         actions.actions.forEach(action => {
@@ -83,6 +87,10 @@ export default class ActionsMenu extends PureComponent {
             action,
             validate
           };
+
+          if (!knownKinds.includes(action.kind)) {
+            return;
+          }
 
           if (!action.context.length) {
             groupActions.push(action.name);
@@ -369,7 +377,14 @@ export default class ActionsMenu extends PureComponent {
     return (
       <div>
         <Markdown>{action.description}</Markdown>
-        <br />
+        {action.kind === 'hook' && (
+          <div>
+            This action trigers hook{' '}
+            <code>
+              {action.hookGroupId}/{action.hookId}
+            </code>.
+          </div>
+        )}
         {action.schema && (
           <Row>
             <Col lg={6} md={6} sm={12}>
@@ -407,33 +422,57 @@ export default class ActionsMenu extends PureComponent {
       throw new Error(this.ajv.errorsText(validate.errors));
     }
 
-    const ownTaskId = nice();
-    const newTask = jsone(
-      action.task,
-      merge(
-        {
-          taskGroupId,
-          taskId,
-          task,
-          input,
-          ownTaskId
-        },
-        actions.variables
-      )
-    );
-
     if (!this.props.decision) {
       throw new Error('no action task found'); // .. how did we find an action, then?
     }
 
-    // call the queue with the decision task's scopes, as directed by the action spec
-    const actionsQueue = this.props.queue.use({
-      authorizedScopes: this.props.decision.scopes || []
+    const context = merge(
+      {
+        taskGroupId,
+        taskId,
+        task,
+        input
+      },
+      actions.variables
+    );
+
+    if (action.kind === 'task') {
+      const ownTaskId = nice();
+
+      context.ownTaskId = ownTaskId;
+      const newTask = jsone(action.task, context);
+      // call the queue with the decision task's scopes, as directed by the action spec
+      const actionsQueue = this.props.queue.use({
+        authorizedScopes: this.props.decision.scopes || []
+      });
+
+      await actionsQueue.createTask(ownTaskId, newTask);
+
+      return ownTaskId;
+    }
+
+    // action.kind === 'hook'
+    const hookPayload = jsone(action.hookPayload, context);
+    const { hookId, hookGroupId } = action;
+    // verify that the decision task has the appropriate in-tree:action-hook:.. scope
+    const expansion = await this.props.auth.expandScopes({
+      scopes: this.props.decision.scopes
     });
+    const expression = `in-tree:hook-action:${hookGroupId}/${hookId}`;
 
-    await actionsQueue.createTask(ownTaskId, newTask);
+    if (!satisfiesExpression(expansion.scopes, expression)) {
+      throw new Error(
+        `Action is misconfigured: decision task's scopes do not satisfy ${expression}`
+      );
+    }
 
-    return ownTaskId;
+    const result = await this.props.hooks.triggerHook(
+      hookGroupId,
+      hookId,
+      hookPayload
+    );
+
+    return result.status.taskId;
   };
 
   render() {
