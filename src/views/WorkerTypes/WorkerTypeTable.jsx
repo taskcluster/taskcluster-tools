@@ -45,7 +45,13 @@ export default class WorkerTypeTable extends PureComponent {
   }
 
   readWorkerTypes(props) {
-    this.setState({ workerTypes: [], loading: true, error: null });
+    this.setState({
+      workerTypes: [],
+      workerTypeSummaries: [],
+      loading: true,
+      error: null
+    });
+
     this.loadWorkerTypes(props);
   }
 
