@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Table, Label } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { isEmpty } from 'ramda';
+import deepSortObject from 'deep-sort-object';
 import BarSpinner from '../../components/BarSpinner';
 import Markdown from '../../components/Markdown';
 import Code from '../../components/Code';
@@ -93,21 +94,17 @@ export default class TaskDetails extends PureComponent {
     ));
   }
 
-  sortPayload(payload) {
-    if (!payload) return
-    let sortedObj = {};
-    Object.keys(payload).sort().forEach(el => sortedObj[el] = payload[el]);
-    return sortedObj;
-  }
-
   render() {
     const { status, task } = this.props;
+
     if (!status || !task) {
       return null;
     }
-    const { error } = this.state;
-    const { metadata, payload } = task;
 
+    const { error } = this.state;
+    const { metadata } = task;
+    const payload = deepSortObject(task.payload);
+    const extra = deepSortObject(task.extra);
     const shortSource =
       metadata.source.length > 90
         ? `...${metadata.source.substr(8 - 90)}`
@@ -147,8 +144,8 @@ export default class TaskDetails extends PureComponent {
                     <span>{shortSource}</span>
                   </a>
                 ) : (
-                    <span>{shortSource}</span>
-                  )}
+                  <span>{shortSource}</span>
+                )}
               </td>
             </tr>
 
@@ -207,7 +204,7 @@ export default class TaskDetails extends PureComponent {
                 <Link
                   to={`/provisioners/${task.provisionerId}/worker-types/${
                     task.workerType
-                    }`}>
+                  }`}>
                   {task.workerType}
                 </Link>
               </td>
@@ -235,8 +232,8 @@ export default class TaskDetails extends PureComponent {
                     <tbody>{this.renderDependencies()}</tbody>
                   </Table>
                 ) : (
-                    '-'
-                  )}
+                  '-'
+                )}
               </td>
             </tr>
 
@@ -280,11 +277,11 @@ export default class TaskDetails extends PureComponent {
                     <code>all-completed</code> successfully.
                   </span>
                 ) : (
-                    <span>
-                      {' '}
-                      <code>all-resolved</code> with any resolution.
+                  <span>
+                    {' '}
+                    <code>all-resolved</code> with any resolution.
                   </span>
-                  )}
+                )}
               </td>
             </tr>
 
@@ -293,10 +290,10 @@ export default class TaskDetails extends PureComponent {
               <td>
                 {task.scopes.length
                   ? task.scopes.map((scope, key) => (
-                    <div key={`task-scopes-${key}`}>
-                      <code>{scope}</code>
-                    </div>
-                  ))
+                      <div key={`task-scopes-${key}`}>
+                        <code>{scope}</code>
+                      </div>
+                    ))
                   : '-'}
               </td>
             </tr>
@@ -306,10 +303,10 @@ export default class TaskDetails extends PureComponent {
               <td>
                 {task.routes.length
                   ? task.routes.map((route, key) => (
-                    <div key={`task-routes-${key}`}>
-                      <code>{route}</code>
-                    </div>
-                  ))
+                      <div key={`task-routes-${key}`}>
+                        <code>{route}</code>
+                      </div>
+                    ))
                   : '-'}
               </td>
             </tr>
@@ -320,7 +317,7 @@ export default class TaskDetails extends PureComponent {
                 <a
                   href={`https://queue.taskcluster.net/v1/task/${
                     status.taskId
-                    }`}
+                  }`}
                   target="_blank"
                   rel="noopener noreferrer">
                   {status.taskId} <Icon name="external-link" />
@@ -331,9 +328,7 @@ export default class TaskDetails extends PureComponent {
             <tr>
               <td>Payload</td>
               <td>
-                <Code language="json">
-                  {JSON.stringify(this.sortPayload(payload), null, 2)}
-                </Code>
+                <Code language="json">{JSON.stringify(payload, null, 2)}</Code>
               </td>
             </tr>
 
@@ -341,9 +336,7 @@ export default class TaskDetails extends PureComponent {
               <tr>
                 <td>Extra</td>
                 <td>
-                  <Code language="json">
-                    {JSON.stringify(this.sortPayload(task.extra), null, 2)}
-                  </Code>
+                  <Code language="json">{JSON.stringify(extra, null, 2)}</Code>
                 </td>
               </tr>
             ) : null}
