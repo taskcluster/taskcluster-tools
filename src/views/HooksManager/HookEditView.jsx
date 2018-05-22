@@ -5,6 +5,7 @@ import { Alert } from 'react-bootstrap';
 import Spinner from '../../components/Spinner';
 import HookEditor from './HookEditor';
 import HookDisplay from './HookDisplay';
+import Markdown from '../../components/Markdown';
 
 export default class HookEditView extends PureComponent {
   static propTypes = {
@@ -155,7 +156,7 @@ export default class HookEditView extends PureComponent {
         <Alert bsStyle="danger" onDismiss={this.handleDismissError}>
           <strong>Error executing operation</strong>
           <br />
-          {error.toString()}
+          <Markdown>{error.message}</Markdown>
         </Alert>
       );
     }

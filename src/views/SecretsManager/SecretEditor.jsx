@@ -11,6 +11,7 @@ import DateView from '../../components/DateView';
 import CodeEditor from '../../components/CodeEditor';
 import ModalItem from '../../components/ModalItem';
 import UserSession from '../../auth/UserSession';
+import Markdown from '../../components/Markdown';
 
 const safeDumpOpts = { noCompatMode: true, noRefs: true };
 
@@ -201,7 +202,7 @@ export default class SecretEditor extends PureComponent {
           <Alert bsStyle="danger" onDismiss={this.handleDismissError}>
             <strong>Error executing operation</strong>
             <br />
-            {error.toString()}
+            <Markdown>{error.message}</Markdown>
           </Alert>
         )}
         <div className="form-horizontal">
