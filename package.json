@@ -45,18 +45,14 @@
     "js-yaml": "^3.10.0",
     "json-e": "^2.5.0",
     "json-schema-defaults": "^0.3.0",
-    "json-schema-ref-parser": "^4.1.1",
     "lint-staged": "^4.2.3",
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
     "markdown-it": "^8.4.0",
-    "mdx-loader": "^1.1.0",
-    "mdxc": "^1.1.1",
     "mitt": "^1.1.2",
     "moment": "^2.15.0",
     "neutrino": "^8.1.2",
     "neutrino-preset-mozilla-frontend-infra": "^1.0.4",
-    "prismjs": "^1.12.2",
     "prop-types": "^15.6.0",
     "qs": "^6.5.1",
     "ramda": "^0.24.1",
@@ -72,14 +68,11 @@
     "react-json-inspector": "^7.1.0",
     "react-lazylog": "2.2.0",
     "react-loadable": "^4.0.5",
-    "react-markdown": "^3.3.0",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.2.2",
-    "react-schema-viewer": "^2.3.2",
     "react-tooltip": "^3.1.8",
     "react-treeview": "^0.4.7",
     "react-vnc-display": "^1.1.0",
-    "resolve-pathname": "^2.2.0",
     "shebang-loader": "0.0.1",
     "slugid": "^1.1.0",
     "taskcluster-client-web": "^7.0.0",
@@ -90,7 +83,7 @@
     "xml2js": "^0.4.19"
   },
   "optionalDependencies": {
-    "bufferutil": "^3.0.2",
-    "utf-8-validate": "^3.0.3"
+    "bufferutil": "^3.0.5",
+    "utf-8-validate": "^4.0.2"
   }
 }

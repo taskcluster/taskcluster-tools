@@ -50,9 +50,6 @@ module.exports = {
     }],
     ['@neutrinojs/env', [
       'NODE_ENV',
-      'ALGOLIA_APP_ID',
-      'ALGOLIA_API_KEY',
-      'ALGOLIA_INDEX_NAME',
       'APPLICATION_NAME',
       'AUTH0_DOMAIN',
       'AUTH0_CLIENT_ID',
@@ -68,14 +65,6 @@ module.exports = {
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
       neutrino.config.node.set('Buffer', true);
-
-      neutrino.config.module.rule('markdown')
-        .test(/\.mdx?$/)
-          .use('babel')
-            .loader(require.resolve('babel-loader'))
-            .end()
-          .use('mdx')
-            .loader(require.resolve('mdx-loader'));
 
       // The JSONStream module's main file has a Node.js shebang
       // which Webpack doesn't like loading as JS
