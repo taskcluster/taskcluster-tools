@@ -1,5 +1,5 @@
 import { PureComponent } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { Button, ButtonToolbar, Glyphicon, Col } from 'react-bootstrap';
 import { safeLoad, safeDump } from 'js-yaml';
 import { nice } from 'slugid';
@@ -8,6 +8,7 @@ import Error from '../../components/Error';
 import CodeEditor from '../../components/CodeEditor';
 import HelmetTitle from '../../components/HelmetTitle';
 import UserSession from '../../auth/UserSession';
+import { urls } from '../../utils';
 
 const localStorageKey = 'tasks:create';
 const defaultTask = {
@@ -220,8 +221,9 @@ export default class TaskCreator extends PureComponent {
         <p>
           Write and submit a task to {process.env.APPLICATION_NAME}. For details
           on what you can write, refer to the{' '}
-          <Link to="/docs">documentation</Link>. When you submit a task here,
-          you will be taken to{' '}
+          <a href={urls.docs('/')} target="_blank" rel="noopener noreferrer">
+            documentation
+          </a>. When you submit a task here, you will be taken to{' '}
           {interactive
             ? 'connect to the interactive task'
             : 'inspect the created task'}. Your task will be saved so you can
