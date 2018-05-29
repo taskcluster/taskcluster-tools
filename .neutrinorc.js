@@ -6,7 +6,7 @@ const GitRevisionPlugin = require('git-revision-webpack-plugin');
 // but hashes could remain the same
 const CACHE_VERSION = 'v1';
 
-process.env.COMMIT_HASH = new GitRevisionPlugin().commithash()
+process.env.COMMIT_HASH = new GitRevisionPlugin().commithash();
 
 module.exports = {
   use: [
@@ -59,7 +59,7 @@ module.exports = {
       'AUTH0_AUDIENCE',
       'AUTH0_SCOPE',
       'AUTH0_RESPONSE_TYPE',
-      'BASE_URL',
+      'TASKCLUSTER_ROOT_URL',
       'OIDC_PROVIDER',
       'SIGN_IN_METHODS',
       'COMMIT_HASH'

@@ -12,10 +12,7 @@ export default class DevelopmentLoginMenuItem extends PureComponent {
       'description',
       'Temporary client for developing and testing this repository'
     );
-    window.open(
-      `${process.env.BASE_URL}/auth/clients/new?${query.toString()}`,
-      '_blank'
-    );
+    window.open(`/auth/clients/new?${query.toString()}`, '_blank');
   }
 
   render() {

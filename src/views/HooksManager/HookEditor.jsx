@@ -1,6 +1,5 @@
 import { PureComponent } from 'react';
 import { string, bool, object, func } from 'prop-types';
-import { Link } from 'react-router-dom';
 import { Button, Glyphicon, ButtonToolbar } from 'react-bootstrap';
 import clone from 'lodash.clonedeep';
 import equal from 'deep-equal';
@@ -8,6 +7,7 @@ import { assocPath } from 'ramda';
 import Icon from 'react-fontawesome';
 import ModalItem from '../../components/ModalItem';
 import CodeEditor from '../../components/CodeEditor';
+import { urls } from '../../utils';
 
 const initialHook = {
   metadata: {
@@ -29,7 +29,7 @@ const initialHook = {
       name: 'Hook Task',
       description: 'Task Description',
       owner: 'name@example.com',
-      source: `${process.env.BASE_URL}/hooks`
+      source: `${window.location.origin}/hooks`
     },
     expires: { $fromNow: '3 months' },
     deadline: { $fromNow: '6 hours' }
@@ -352,9 +352,12 @@ export default class HookEditor extends PureComponent {
             <span className="text-info">
               Email the owner when an error occurs while creating a task. Note:
               to be notified of tasks that fail once created, use{' '}
-              <Link to="/docs/reference/core/taskcluster-notify">
+              <a
+                href={urls.docs('/reference/core/taskcluster-notify')}
+                target="_blank"
+                rel="noopener noreferrer">
                 notify routes
-              </Link>.
+              </a>.
             </span>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { fromNowJSON } from 'taskcluster-client-web';
+import { withRootUrl } from 'taskcluster-lib-urls';
 import { omit, identity, of, T, cond } from 'ramda';
 import merge from 'deepmerge';
 import cloneDeep from 'lodash.clonedeep';
@@ -120,3 +121,5 @@ export const loadable = loader =>
     loading: Loading,
     loader
   });
+
+export const urls = withRootUrl(process.env.TASKCLUSTER_ROOT_URL);

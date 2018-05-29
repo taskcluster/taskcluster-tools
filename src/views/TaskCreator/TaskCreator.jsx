@@ -31,7 +31,7 @@ const defaultTask = {
     name: 'Example Task',
     description: 'Markdown description of **what** this task does',
     owner: 'name@example.com',
-    source: `${process.env.BASE_URL}/tasks/create`
+    source: `${window.location.origin}/tasks/create`
   }
 };
 

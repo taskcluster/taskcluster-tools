@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { Route } from 'react-router-dom';
 
-export default class PropRoute extends Component {
+export default class PropsRoute extends Component {
   render() {
     const {
       component: Component,

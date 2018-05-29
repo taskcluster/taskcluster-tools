@@ -11,11 +11,8 @@ import {
   Tooltip,
   OverlayTrigger
 } from 'react-bootstrap';
-import docsearch from 'docsearch.js/dist/cdn/docsearch';
-import 'docsearch.js/dist/cdn/docsearch.css';
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
-import docsLinks from '../../docs-links';
 import { navigation } from './styles.module.css';
 
 export default class Navigation extends PureComponent {
@@ -26,7 +23,7 @@ export default class Navigation extends PureComponent {
         GitHub.
       </Tooltip>
     );
-    const sourcelink = `https://github.com/taskcluster/taskcluster-tools/tree/${
+    const sourceLink = `https://github.com/taskcluster/taskcluster-tools/tree/${
       process.env.COMMIT_HASH
     }`;
 
@@ -39,45 +36,14 @@ export default class Navigation extends PureComponent {
             </Navbar.Brand>
           </Navbar.Header>
           <Nav pullRight>
-            <NavDropdown key={2} title="Docs" id="docs">
-              {docsLinks.map(({ section, links }, index) => [
-                <MenuItem header key={`navigation-header-${section}`}>
-                  {section}
-                </MenuItem>,
-                ...links.map(({ title, link }) => (
-                  <LinkContainer
-                    exact
-                    to={link}
-                    key={`navigation-docs-link-${link}`}>
-                    <MenuItem>{title}</MenuItem>
-                  </LinkContainer>
-                )),
-                ...(index === docsLinks.length - 1
-                  ? []
-                  : [
-                      <MenuItem
-                        divider
-                        key={`navigation-header-divider-${section}`}
-                      />
-                    ])
-              ])}
-            </NavDropdown>
             <OverlayTrigger placement="bottom" overlay={commit}>
               <NavItem
-                href={sourcelink}
+                href={sourceLink}
                 target="_blank"
                 rel="noopener noreferrer">
                 <Icon name="code-fork" size="lg" />
               </NavItem>
             </OverlayTrigger>
-            <NavItem className={docsSearchContainer}>
-              <FormControl
-                type="text"
-                id="docs-search"
-                placeholder="Search docs..."
-                bsSize="sm"
-              />
-            </NavItem>
             <NavDropdown key={1} title="Tools" id="tools">
               {links.map(
                 ({ title, link, icon }) =>

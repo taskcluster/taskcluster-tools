@@ -12,12 +12,12 @@ import {
   ControlLabel
 } from 'react-bootstrap';
 import { WebListener } from 'taskcluster-client-web';
-import { Link } from 'react-router-dom';
 import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
 import MessageRow from './MessageRow';
 import HelmetTitle from '../../components/HelmetTitle';
+import { urls } from '../../utils';
 
 export default class PulseInspector extends PureComponent {
   static defaultProps = {
@@ -279,8 +279,10 @@ export default class PulseInspector extends PureComponent {
             routing key. When messages are received you can inspect the
             messages. This is useful for debugging and development when
             consuming from undocumented exchanges. Notice that all exchanges
-            from {process.env.APPLICATION_NAME} is
-            <Link to="/docs">formally documented</Link>.
+            from {process.env.APPLICATION_NAME} are formally documented on{' '}
+            <a href={urls.docs('/')} target="_blank" rel="noopener noreferrer">
+              {urls.docs('/')}
+            </a>.
           </p>
           <hr />
           {this.renderForm()}

@@ -1,11 +1,11 @@
 import { PureComponent } from 'react';
 import { string, object, func } from 'prop-types';
-import { Link } from 'react-router-dom';
 import { ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
 import HookStatusDisplay from './HookStatusDisplay';
 import Code from '../../components/Code';
 import Markdown from '../../components/Markdown';
 import TriggerButton from './TriggerButton';
+import { urls } from '../../utils';
 
 export default class HookDisplay extends PureComponent {
   static propTypes = {
@@ -81,9 +81,14 @@ export default class HookDisplay extends PureComponent {
               JSON-e
             </a>{' '}
             to create the the task definition. See{' '}
-            <Link to="/docs/reference/core/taskcluster-hooks/docs/firing-hooks">
+            <a
+              href={urls.docs(
+                '/reference/core/taskcluster-hooks/docs/firing-hooks'
+              )}
+              target="_blank"
+              rel="noopener noreferrer">
               {'"'}firing hooks{'"'}
-            </Link>{' '}
+            </a>{' '}
             for more information.
           </dd>
         </dl>

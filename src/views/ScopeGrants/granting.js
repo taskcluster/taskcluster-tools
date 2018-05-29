@@ -8,7 +8,13 @@ const assert = (condition, message) => {
 
 // cartesian product of multiple lists
 // xproduct([[a, b], [1, 2], [C]]) == [[a, 1, C], [a, 2, C], [b, 1, C], [b, 2, C]]
-const xproduct = reduce(pipe(xprod, map(unnest)), [[]]);
+const xproduct = reduce(
+  pipe(
+    xprod,
+    map(unnest)
+  ),
+  [[]]
+);
 // escape string for save usage in regular expression
 const escapeRegex = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 // Extract regular expression without ^ and $, and assert that it doesn't contain

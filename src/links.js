@@ -1,12 +1,6 @@
+import { urls } from './utils';
+
 export default [
-  {
-    title: 'Documentation',
-    link: '/docs/',
-    icon: 'book',
-    description: `Visit the documentation for all ${
-      process.env.APPLICATION_NAME
-    } APIs and Pulse exchanges.`
-  },
   {
     title: 'Task & Group Inspector',
     link: '/groups',
@@ -113,6 +107,13 @@ export default [
     icon: 'user-secret',
     description:
       'Manage secrets: values that can only be retrieved with the appropriate scopes.'
+  },
+  {
+    title: 'Documentation',
+    link: urls.docs('/'),
+    icon: 'book',
+    description:
+      'Visit the documentation site with documentation for all Taskcluster APIs and Pulse exchanges.'
   },
   {
     title: 'Diagnostics',
