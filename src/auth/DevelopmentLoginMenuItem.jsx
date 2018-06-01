@@ -1,5 +1,6 @@
 import { PureComponent } from 'react';
 import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
+import { urls } from '../utils';
 
 export default class DevelopmentLoginMenuItem extends PureComponent {
   handleSelect() {
@@ -12,7 +13,7 @@ export default class DevelopmentLoginMenuItem extends PureComponent {
       'description',
       'Temporary client for developing and testing this repository'
     );
-    window.open(`/auth/clients/new?${query.toString()}`, '_blank');
+    window.open(urls.ui(`/auth/clients/new?${query.toString()}`), '_blank');
   }
 
   render() {
