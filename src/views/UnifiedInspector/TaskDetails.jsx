@@ -10,7 +10,7 @@ import Markdown from '../../components/Markdown';
 import Code from '../../components/Code';
 import DateView from '../../components/DateView';
 import Error from '../../components/Error';
-import { labels } from '../../utils';
+import { labels, urls } from '../../utils';
 
 export default class TaskDetails extends PureComponent {
   static propTypes = {
@@ -315,9 +315,7 @@ export default class TaskDetails extends PureComponent {
               <td>Task Definition</td>
               <td>
                 <a
-                  href={`https://queue.taskcluster.net/v1/task/${
-                    status.taskId
-                  }`}
+                  href={urls.api('queue', 'v1', `task/${status.taskId}`)}
                   target="_blank"
                   rel="noopener noreferrer">
                   {status.taskId} <Icon name="external-link" />

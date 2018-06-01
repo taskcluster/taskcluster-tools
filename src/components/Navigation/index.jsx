@@ -14,19 +14,17 @@ import {
 import CredentialsMenu from '../CredentialsMenu';
 import links from '../../links';
 import { navigation } from './styles.module.css';
-import logoUrl from '../../taskcluster.png';
 
 export default class Navigation extends PureComponent {
   render() {
-    // const hash = process.env.COMMITHASH;
     const commit = (
       <Tooltip id="commit-tooltip">
-        View the source of commit {process.env.COMMITHASH.substr(0, 12)} on
+        View the source of commit {process.env.COMMIT_HASH.substr(0, 12)} on
         GitHub.
       </Tooltip>
     );
-    const sourcelink = `https://github.com/taskcluster/taskcluster-tools/tree/${
-      process.env.COMMITHASH
+    const sourceLink = `https://github.com/taskcluster/taskcluster-tools/tree/${
+      process.env.COMMIT_HASH
     }`;
 
     return (
@@ -34,15 +32,13 @@ export default class Navigation extends PureComponent {
         <Navbar fluid inverse staticTop collapseOnSelect>
           <Navbar.Header>
             <Navbar.Brand>
-              <Link to="/">
-                <img src={logoUrl} width="26" height="26" /> Taskcluster Tools
-              </Link>
+              <Link to="/">{process.env.APPLICATION_NAME}</Link>
             </Navbar.Brand>
           </Navbar.Header>
           <Nav pullRight>
             <OverlayTrigger placement="bottom" overlay={commit}>
               <NavItem
-                href={sourcelink}
+                href={sourceLink}
                 target="_blank"
                 rel="noopener noreferrer">
                 <Icon name="code-fork" size="lg" />

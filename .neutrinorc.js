@@ -2,24 +2,11 @@ const merge = require('deepmerge');
 const { ProvidePlugin } = require('webpack');
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
 
-const gitRevisionPlugin = new GitRevisionPlugin();
-
 // Increment the version whenever you need a full invalidation
 // but hashes could remain the same
 const CACHE_VERSION = 'v1';
 
-const envs = {
-  AUTH0_DOMAIN: 'auth.mozilla.auth0.com',
-  AUTH0_CLIENT_ID: 'TBD',
-  AUTH0_AUDIENCE: 'login.taskcluster.net',
-  SIGN_IN_METHODS: process.env.NODE_ENV === 'development' ? 'development' : 'auth0 manual',
-  COMMITHASH: gitRevisionPlugin.commithash()
-};
-
-// Set environment variables to their default values if not defined
-Object
-  .keys(envs)
-  .forEach(env => !(env in process.env) && (process.env[env] = envs[env]));
+process.env.COMMIT_HASH = new GitRevisionPlugin().commithash();
 
 module.exports = {
   use: [
@@ -39,28 +26,41 @@ module.exports = {
           image: false,
         },
         devServer: {
-          port: 9000,
+          port: +process.env.PORT,
           historyApiFallback: { disableDotRule: true }
         },
         html: {
-          title: 'Taskcluster Tools',
+          title: process.env.APPLICATION_NAME,
           mobile: true,
           meta: [
             {
               name: 'description',
-              content: `A collection of tools for Taskcluster components and elements in the Taskcluster ecosystem. Here
-                you'll find tools to manage Taskcluster as well as run, debug, inspect, and view tasks, task groups, and
-                other Taskcluster related entities.`
+              content: `A collection of tools for ${process.env.APPLICATION_NAME} components and elements in the 
+                ${process.env.APPLICATION_NAME} ecosystem. Here you'll find tools to manage
+                ${process.env.APPLICATION_NAME} services as well as run, debug, inspect, and view tasks, task groups,
+                and other ${process.env.APPLICATION_NAME} related entities.`
             },
             {
               name: 'author',
-              content: 'Mozilla Taskcluster Team'
+              content: process.env.APPLICATION_NAME
             }
           ]
         }
       }
     }],
-    ['@neutrinojs/env', Object.keys(envs)],
+    ['@neutrinojs/env', [
+      'NODE_ENV',
+      'APPLICATION_NAME',
+      'AUTH0_DOMAIN',
+      'AUTH0_CLIENT_ID',
+      'AUTH0_AUDIENCE',
+      'AUTH0_SCOPE',
+      'AUTH0_RESPONSE_TYPE',
+      'TASKCLUSTER_ROOT_URL',
+      'OIDC_PROVIDER',
+      'SIGN_IN_METHODS',
+      'COMMIT_HASH'
+    ]],
     (neutrino) => {
       // Fix issue with nested routes e.g /index/garbage
       neutrino.config.output.publicPath('/');
@@ -113,5 +113,5 @@ module.exports = {
           'taskcluster-client-web'
         ]);
     }
-  ]
+  ],
 };

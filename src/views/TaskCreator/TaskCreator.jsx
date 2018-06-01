@@ -8,6 +8,7 @@ import Error from '../../components/Error';
 import CodeEditor from '../../components/CodeEditor';
 import HelmetTitle from '../../components/HelmetTitle';
 import UserSession from '../../auth/UserSession';
+import { urls } from '../../utils';
 
 const localStorageKey = 'tasks:create';
 const defaultTask = {
@@ -31,7 +32,7 @@ const defaultTask = {
     name: 'Example Task',
     description: 'Markdown description of **what** this task does',
     owner: 'name@example.com',
-    source: 'https://tools.taskcluster.net/task-creator/'
+    source: `${window.location.origin}/tasks/create`
   }
 };
 
@@ -218,12 +219,9 @@ export default class TaskCreator extends PureComponent {
         />
         <h4>{interactive ? 'Create Interactive Task' : 'Create Task'}</h4>
         <p>
-          Write and submit a task to Taskcluster. For details on what you can
-          write, refer to the&nbsp;
-          <a
-            href="https://docs.taskcluster.net"
-            target="_blank"
-            rel="noopener noreferrer">
+          Write and submit a task to {process.env.APPLICATION_NAME}. For details
+          on what you can write, refer to the{' '}
+          <a href={urls.docs('/')} target="_blank" rel="noopener noreferrer">
             documentation
           </a>. When you submit a task here, you will be taken to{' '}
           {interactive
