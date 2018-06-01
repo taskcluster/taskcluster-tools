@@ -491,6 +491,8 @@ export default class ActionsMenu extends PureComponent {
     const isResolved = status
       ? ['completed', 'failed', 'exception'].includes(status.state)
       : false;
+    const showDefaultRetrigger =
+      !taskActions || !taskActions.includes('retrigger');
 
     return (
       <NavDropdown title="Actions" id="task-view-actions">
@@ -501,13 +503,15 @@ export default class ActionsMenu extends PureComponent {
           <Icon name="calendar-check-o" /> Schedule Task
         </ModalItem>
 
-        <ModalItem
-          onSubmit={this.handleCreateTask}
-          onComplete={onRetrigger}
-          disabled={!(queue && task && task.payload)}
-          body={this.retriggerTaskModal()}>
-          <Icon name="refresh" /> Retrigger Task
-        </ModalItem>
+        {showDefaultRetrigger && (
+          <ModalItem
+            onSubmit={this.handleCreateTask}
+            onComplete={onRetrigger}
+            disabled={!(queue && task && task.payload)}
+            body={this.retriggerTaskModal()}>
+            <Icon name="refresh" /> Retrigger Task
+          </ModalItem>
+        )}
 
         <ModalItem
           disabled={isResolved || !(queue && task)}
