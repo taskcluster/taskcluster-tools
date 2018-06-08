@@ -115,7 +115,9 @@ export default class InteractiveConnect extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener();
+    const listener = new WebListener({
+      rootUrl: process.env.TASKCLUSTER_ROOT_URL
+    });
     const routingKey = { taskId };
 
     [

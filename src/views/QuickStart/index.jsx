@@ -88,7 +88,7 @@ const cmdDirectory = (type, org = '<YOUR_ORG>', repo = '<YOUR_REPO>') =>
       ].join(' && ')
     ]
   }[type]);
-const githubClient = new Github({});
+const githubClient = new Github({ rootUrl: process.env.TASKCLUSTER_ROOT_URL });
 
 export default class YamlCreator extends Component {
   static initialState = {

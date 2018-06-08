@@ -40,8 +40,15 @@ export default class WithClients extends PureComponent {
         ...reduction,
         [camelCase(key)]:
           value === true
-            ? new taskcluster[key]({ ...clientArgs })
-            : new taskcluster[key]({ ...clientArgs, ...value })
+            ? new taskcluster[key]({
+                rootUrl: process.env.TASKCLUSTER_ROOT_URL,
+                ...clientArgs
+              })
+            : new taskcluster[key]({
+                rootUrl: process.env.TASKCLUSTER_ROOT_URL,
+                ...clientArgs,
+                ...value
+              })
       }),
       {}
     );

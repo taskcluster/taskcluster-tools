@@ -83,7 +83,9 @@ export default class PulseInspector extends PureComponent {
     }
 
     try {
-      const listener = new WebListener();
+      const listener = new WebListener({
+        rootUrl: process.env.TASKCLUSTER_ROOT_URL
+      });
 
       bindings.map(binding => listener.bind(binding));
 
