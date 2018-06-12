@@ -39,7 +39,7 @@ export default class Home extends PureComponent {
             <p>
               A collection of tools for {process.env.APPLICATION_NAME}{' '}
               components and elements in the {process.env.APPLICATION_NAME}{' '}
-              ecosystem. Here you will find tools to manage
+              ecosystem. Here you will find tools to manage{' '}
               {process.env.APPLICATION_NAME} services, as well as run, debug,
               inspect and view tasks, task groups, and other{' '}
               {process.env.APPLICATION_NAME} related entities.

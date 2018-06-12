@@ -75,7 +75,7 @@
     "react-vnc-display": "^1.1.0",
     "shebang-loader": "0.0.1",
     "slugid": "^1.1.0",
-    "taskcluster-client-web": "^7.0.0",
+    "taskcluster-client-web": "^8.0.0",
     "taskcluster-lib-scopes": "^1.9.0",
     "taskcluster-lib-urls": "^10.0.0",
     "ws-shell": "0.1.5",

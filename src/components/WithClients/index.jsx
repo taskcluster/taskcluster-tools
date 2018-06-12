@@ -34,14 +34,15 @@ export default class WithClients extends PureComponent {
     const { children, ...clients } = this.props;
     const userSession = this.context.authController.getUserSession();
     const clientArgs = userSession ? userSession.clientArgs : null;
+    const rootUrl = process.env.TASKCLUSTER_ROOT_URL;
 
     return Object.entries(clients).reduce(
       (reduction, [key, value]) => ({
         ...reduction,
         [camelCase(key)]:
           value === true
-            ? new taskcluster[key]({ ...clientArgs })
-            : new taskcluster[key]({ ...clientArgs, ...value })
+            ? new taskcluster[key]({ rootUrl, ...clientArgs })
+            : new taskcluster[key]({ rootUrl, ...clientArgs, ...value })
       }),
       {}
     );
