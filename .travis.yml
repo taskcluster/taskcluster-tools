@@ -2,13 +2,18 @@ dist: trusty
 language: node_js
 cache: yarn
 node_js:
-- '8'
+- '10'
 env:
   global:
+  - APPLICATION_NAME="Taskcluster"
   - AUTH0_AUDIENCE="login.taskcluster.net"
   - AUTH0_CLIENT_ID="M9OoQEQVR0M1qtyGvPql3ZDi4T7XMQEA"
   - AUTH0_DOMAIN="auth.mozilla.auth0.com"
+  - AUTH0_RESPONSE_TYPE="token id_token"
+  - AUTH0_SCOPE="taskcluster-credentials openid profile"
+  - OIDC_PROVIDER="mozilla-auth0"
   - SIGN_IN_METHODS="auth0 manual"
+  - TASKCLUSTER_ROOT_URL="https://taskcluster.net"
 install:
 - yarn install --frozen-lockfile
 before_install:
