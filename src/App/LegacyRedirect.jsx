@@ -2,7 +2,7 @@ import { Redirect } from 'react-router-dom';
 import NotFound from '../components/NotFound';
 
 const LegacyRedirect = props => {
-  switch (props.path) {
+  switch (props.match.path) {
     case '/task-graph-inspector': {
       const [groupId, taskId] = props.location.hash.slice(1).split('/');
 
