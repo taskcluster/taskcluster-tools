@@ -189,7 +189,6 @@ export default class WorkerTypeTable extends PureComponent {
           reload={this.setSelected}
           updateSummary={this.updateSummary}
           userSession={this.props.userSession}
-          ec2BaseUrl={this.props.ec2BaseUrl}
           ec2Manager={this.props.ec2Manager}
         />
       </div>

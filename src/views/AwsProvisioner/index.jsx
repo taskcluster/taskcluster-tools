@@ -3,15 +3,7 @@ import WithUserSession from '../../components/WithUserSession';
 import WithClients from '../../components/WithClients';
 import WorkerTypeTable from './WorkerTypeTable';
 
-const View = ({
-  match,
-  history,
-  location,
-  baseUrl,
-  ec2BaseUrl,
-  provisionerId,
-  routeRoot
-}) => {
+const View = ({ match, history, location, provisionerId, routeRoot }) => {
   const [worker, tab] = location.hash.slice(1).split('/');
 
   if (worker && tab) {
@@ -23,10 +15,7 @@ const View = ({
   return (
     <WithUserSession>
       {userSession => (
-        <WithClients
-          Queue
-          AwsProvisioner={{ baseUrl }}
-          EC2Manager={{ baseUrl: ec2BaseUrl }}>
+        <WithClients Queue AwsProvisioner EC2Manager>
           {clients => (
             <WorkerTypeTable
               {...clients}
@@ -36,7 +25,6 @@ const View = ({
               provisionerId={provisionerId}
               workerType={match.params.workerType}
               currentTab={match.params.currentTab}
-              ec2BaseUrl={ec2BaseUrl}
             />
           )}
         </WithClients>

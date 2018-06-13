@@ -295,7 +295,9 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener();
+    const listener = new WebListener({
+      rootUrl: process.env.TASKCLUSTER_ROOT_URL
+    });
     const routingKey = { taskGroupId };
 
     this.groupListener = listener;

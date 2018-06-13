@@ -104,7 +104,6 @@ export default class WorkerTypeView extends PureComponent {
           workerType={workerType}
           awsState={awsState}
           queue={this.props.queue}
-          ec2BaseUrl={this.props.ec2BaseUrl}
         />
       ) : (
         <Spinner />

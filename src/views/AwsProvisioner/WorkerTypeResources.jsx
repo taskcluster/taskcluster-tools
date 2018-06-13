@@ -8,6 +8,7 @@ import DateView from '../../components/DateView';
 import Snackbar from '../../components/Snackbar';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner/index';
+import { urls } from '../../utils';
 import styles from './styles.module.css';
 
 const awsUrl = 'https://console.aws.amazon.com/ec2/v2/home';
@@ -66,14 +67,17 @@ export default class WorkerTypeResources extends PureComponent {
       const credentials = await this.props.userSession.getCredentials();
 
       try {
-        await request(
-          `${this.props.ec2BaseUrl}/region/${region}/instance/${instanceId}`,
-          {
-            extra: this.props.queue.buildExtraData(credentials),
-            method: 'DELETE',
-            credentials
-          }
+        const url = urls.api(
+          'ec2-manager',
+          'v1',
+          `/region/${region}/instance/${instanceId}`
         );
+
+        await request(url, {
+          extra: this.props.queue.buildExtraData(credentials),
+          method: 'DELETE',
+          credentials
+        });
 
         const toast = {
           text: 'Terminate',
@@ -97,14 +101,17 @@ export default class WorkerTypeResources extends PureComponent {
       const credentials = await this.props.userSession.getCredentials();
 
       try {
-        await request(
-          `${this.props.ec2BaseUrl}/worker-types/${workerType}/resources`,
-          {
-            extra: this.props.queue.buildExtraData(credentials),
-            method: 'DELETE',
-            credentials
-          }
+        const url = urls.api(
+          'ec2-manager',
+          'v1',
+          `/worker-types/${workerType}/resources`
         );
+
+        await request(url, {
+          extra: this.props.queue.buildExtraData(credentials),
+          method: 'DELETE',
+          credentials
+        });
 
         const toast = {
           text: 'Terminate All',
