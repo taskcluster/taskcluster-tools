@@ -475,6 +475,9 @@ export default class ActionsMenu extends PureComponent {
     return result.status.taskId;
   };
 
+  isDefaultActionVisible = name =>
+    !this.state.taskActions || !this.state.taskActions.includes(name);
+
   render() {
     const { caches, actionData, taskActions, groupActions } = this.state;
     const {
@@ -494,34 +497,39 @@ export default class ActionsMenu extends PureComponent {
 
     return (
       <NavDropdown title="Actions" id="task-view-actions">
-        <ModalItem
-          disabled={!(queue && task)}
-          onSubmit={this.handleScheduleTask}
-          body={this.scheduleTaskModal()}>
-          <Icon name="calendar-check-o" /> Schedule Task
-        </ModalItem>
-
-        <ModalItem
-          onSubmit={this.handleCreateTask}
-          onComplete={onRetrigger}
-          disabled={!(queue && task && task.payload)}
-          body={this.retriggerTaskModal()}>
-          <Icon name="refresh" /> Retrigger Task
-        </ModalItem>
-
-        <ModalItem
-          disabled={isResolved || !(queue && task)}
-          onSubmit={this.handleCancelTask}
-          body={this.cancelTaskModal()}>
-          <Icon name="calendar-check-o" /> Cancel Task
-        </ModalItem>
-
-        <ModalItem
-          onSubmit={this.handlePurge}
-          disabled={!(purgeCache && task && caches.length)}
-          body={this.purgeCacheModal()}>
-          <Icon name="refresh" /> Purge Worker Cache
-        </ModalItem>
+        {this.isDefaultActionVisible('schedule') && (
+          <ModalItem
+            disabled={!(queue && task)}
+            onSubmit={this.handleScheduleTask}
+            body={this.scheduleTaskModal()}>
+            <Icon name="calendar-check-o" /> Schedule Task
+          </ModalItem>
+        )}
+        {this.isDefaultActionVisible('retrigger') && (
+          <ModalItem
+            onSubmit={this.handleCreateTask}
+            onComplete={onRetrigger}
+            disabled={!(queue && task && task.payload)}
+            body={this.retriggerTaskModal()}>
+            <Icon name="refresh" /> Retrigger Task
+          </ModalItem>
+        )}
+        {this.isDefaultActionVisible('cancel') && (
+          <ModalItem
+            disabled={isResolved || !(queue && task)}
+            onSubmit={this.handleCancelTask}
+            body={this.cancelTaskModal()}>
+            <Icon name="calendar-check-o" /> Cancel Task
+          </ModalItem>
+        )}
+        {this.isDefaultActionVisible('purge') && (
+          <ModalItem
+            onSubmit={this.handlePurge}
+            disabled={!(purgeCache && task && caches.length)}
+            body={this.purgeCacheModal()}>
+            <Icon name="refresh" /> Purge Worker Cache
+          </ModalItem>
+        )}
 
         <MenuItem divider />
         <MenuItem header>Debug</MenuItem>
