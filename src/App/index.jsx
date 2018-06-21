@@ -58,9 +58,6 @@ const RoleManager = loadable(() =>
 const ScopeInspector = loadable(() =>
   import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector')
 );
-const ScopeGrants = loadable(() =>
-  import(/* webpackChunkName: 'ScopeGrants' */ '../views/ScopeGrants')
-);
 const ScopesetExpander = loadable(() =>
   import(/* webpackChunkName: 'ScopesetExpander' */ '../views/ScopesetExpander')
 );
@@ -272,10 +269,6 @@ export default class App extends Component {
                 <PropsRoute
                   path="/auth/scopes/:selectedScope?/:selectedEntity?"
                   component={ScopeInspector}
-                />
-                <PropsRoute
-                  path="/auth/grants/:pattern?"
-                  component={ScopeGrants}
                 />
                 <PropsRoute
                   path="/pulse-inspector"
