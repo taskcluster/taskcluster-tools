@@ -60,13 +60,6 @@ export default [
       clients with a given scope. This is effectively reverse client and role lookup.`
   },
   {
-    title: 'Scope Grants',
-    link: '/auth/grants/',
-    icon: 'check',
-    description: `Grant scopes following predefined patterns for how scopes can be granted to
-      roles associated with entities like a repository, hook, user, etc.`
-  },
-  {
     title: 'Scopeset Expander',
     link: '/auth/scopes/expansions',
     icon: 'expand',
