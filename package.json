@@ -11,7 +11,9 @@
     "lint": "neutrino lint",
     "debug": "node --inspect ./node_modules/.bin/neutrino start --require dotenv/config",
     "build": "neutrino build --require dotenv/config",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "lint-staged": {
     "*.js*": [
@@ -80,10 +82,12 @@
     "taskcluster-lib-urls": "^10.0.0",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "snyk": "^1.85.0"
   },
   "optionalDependencies": {
     "bufferutil": "^3.0.5",
     "utf-8-validate": "^4.0.2"
-  }
+  },
+  "snyk": true
 }
