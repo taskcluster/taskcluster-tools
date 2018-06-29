@@ -267,71 +267,72 @@ export default class WorkerManager extends PureComponent {
           <tbody>
             {!loading &&
               workers &&
-              workers.workers.map(
-                (worker, index) =>
-                  worker.state && (
-                    <tr key={`worker-${index}`}>
-                      <td>{worker.workerGroup}</td>
-                      <td>
-                        <Link
-                          to={`/provisioners/${provisionerId}/worker-types/${workerType}/workers/${
-                            worker.workerGroup
-                          }/${worker.workerId}`}>
-                          {worker.workerId}
-                        </Link>
-                      </td>
-                      <td>
-                        {worker.latestTask ? (
-                          <Link
-                            to={`/groups/${worker.taskGroupId}/tasks/${
-                              worker.latestTask.taskId
-                            }/runs/${worker.latestTask.runId}`}>
-                            {worker.latestTask.taskId}
-                          </Link>
-                        ) : (
-                          '-'
-                        )}
-                      </td>
-                      <td>
-                        <Label bsSize="sm" bsStyle={labels[worker.state]}>
-                          {worker.state}
-                        </Label>
-                      </td>
-                      <td>
-                        {worker.lastClaimStarted ? (
-                          <DateView date={worker.lastClaimStarted} />
-                        ) : (
-                          '-'
-                        )}
-                      </td>
-                      <td>
-                        {worker.lastClaimResolved ? (
-                          <DateView
-                            date={worker.lastClaimResolved}
-                            since={worker.lastClaimStarted}
-                          />
-                        ) : (
-                          '-'
-                        )}
-                      </td>
-                      <td>
-                        {worker.firstClaim ? (
-                          <DateView date={worker.firstClaim} />
-                        ) : (
-                          '-'
-                        )}
-                      </td>
-                      <td>
-                        {worker.quarantineUntil
-                          ? `${moment(worker.quarantineUntil).diff(
-                              moment(),
-                              'days'
-                            )} days`
-                          : '-'}
-                      </td>
-                    </tr>
-                  )
-              )}
+              workers.workers.map((worker, index) => (
+                <tr key={`worker-${index}`}>
+                  <td>{worker.workerGroup}</td>
+                  <td>
+                    <Link
+                      to={`/provisioners/${provisionerId}/worker-types/${workerType}/workers/${
+                        worker.workerGroup
+                      }/${worker.workerId}`}>
+                      {worker.workerId}
+                    </Link>
+                  </td>
+                  <td>
+                    {worker.latestTask ? (
+                      <Link
+                        to={`/groups/${worker.taskGroupId}/tasks/${
+                          worker.latestTask.taskId
+                        }/runs/${worker.latestTask.runId}`}>
+                        {worker.latestTask.taskId}
+                      </Link>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    {worker.state ? (
+                      <Label bsSize="sm" bsStyle={labels[worker.state]}>
+                        {worker.state}
+                      </Label>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    {worker.lastClaimStarted ? (
+                      <DateView date={worker.lastClaimStarted} />
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    {worker.lastClaimResolved ? (
+                      <DateView
+                        date={worker.lastClaimResolved}
+                        since={worker.lastClaimStarted}
+                      />
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    {worker.firstClaim ? (
+                      <DateView date={worker.firstClaim} />
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td>
+                    {worker.quarantineUntil
+                      ? `${moment(worker.quarantineUntil).diff(
+                          moment(),
+                          'days'
+                        )} days`
+                      : '-'}
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </Table>
         {workers &&
