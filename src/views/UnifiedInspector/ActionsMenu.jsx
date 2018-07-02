@@ -319,7 +319,8 @@ export default class ActionsMenu extends PureComponent {
             <code>TASKCLUSTER_INTERACTIVE=true</code>
           </li>
         </ul>
-        Note: this may not work with all tasks.
+        Note: this may not work with all tasks. You may not have the scopes
+        required to create the task.
       </span>
     );
   }
@@ -348,7 +349,8 @@ export default class ActionsMenu extends PureComponent {
             <code>TASKCLUSTER_INTERACTIVE=true</code>
           </li>
         </ul>
-        Note: this may not work with all tasks.
+        Note: this may not work with all tasks. You may not have the scopes
+        required to create the task.
       </span>
     );
   }
@@ -497,6 +499,8 @@ export default class ActionsMenu extends PureComponent {
 
     return (
       <NavDropdown title="Actions" id="task-view-actions">
+        <MenuItem header>Built-In Actions</MenuItem>
+
         {this.isDefaultActionVisible('schedule') && (
           <ModalItem
             disabled={!(queue && task)}
@@ -522,7 +526,7 @@ export default class ActionsMenu extends PureComponent {
             <Icon name="calendar-check-o" /> Cancel Task
           </ModalItem>
         )}
-        {this.isDefaultActionVisible('purge') && (
+        {this.isDefaultActionVisible('purge-cache') && (
           <ModalItem
             onSubmit={this.handlePurge}
             disabled={!(purgeCache && task && caches.length)}
@@ -531,8 +535,15 @@ export default class ActionsMenu extends PureComponent {
           </ModalItem>
         )}
 
-        <MenuItem divider />
-        <MenuItem header>Debug</MenuItem>
+        {this.isDefaultActionVisible('create-interactive') && (
+          <ModalItem
+            disabled={!this.isValidTask()}
+            onSubmit={this.handleCreateLoaner}
+            onComplete={onCreateInteractive}
+            body={this.createInteractiveModal()}>
+            <Icon name="terminal" /> Create Interactive Task
+          </ModalItem>
+        )}
 
         <ModalItem
           onSubmit={this.handleCloneTask}
@@ -540,14 +551,6 @@ export default class ActionsMenu extends PureComponent {
           disabled={!task}
           body={this.editTaskModal()}>
           <Icon name="edit" /> Edit Task
-        </ModalItem>
-
-        <ModalItem
-          disabled={!this.isValidTask()}
-          onSubmit={this.handleCreateLoaner}
-          onComplete={onCreateInteractive}
-          body={this.createInteractiveModal()}>
-          <Icon name="terminal" /> Create Interactive Task
         </ModalItem>
 
         <ModalItem
