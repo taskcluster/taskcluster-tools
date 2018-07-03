@@ -56,7 +56,7 @@ export default class RoleEditor extends PureComponent {
       this.setState({ error: null });
     }
 
-    if (!nextProps.currentRoleId !== this.props.currentRoleId) {
+    if (nextProps.currentRoleId !== this.props.currentRoleId) {
       this.load(nextProps);
     }
   }
