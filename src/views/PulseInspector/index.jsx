@@ -11,10 +11,11 @@ import {
   FormControl,
   ControlLabel
 } from 'react-bootstrap';
-import { WebListener } from 'taskcluster-client-web';
 import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
+import { encode } from 'urlencode';
+import EventSource from 'eventsource';
 import MessageRow from './MessageRow';
 import HelmetTitle from '../../components/HelmetTitle';
 import { urls } from '../../utils';
@@ -46,8 +47,6 @@ export default class PulseInspector extends PureComponent {
       bindings,
       listening: false
     });
-
-    this.createListener(bindings);
   }
 
   componentWillUnmount() {
@@ -62,7 +61,6 @@ export default class PulseInspector extends PureComponent {
       const bindings = this.getBindingsFromProps(nextProps);
 
       this.setState({ bindings, listening: false });
-      this.createListener(bindings);
     }
   }
 
@@ -83,13 +81,14 @@ export default class PulseInspector extends PureComponent {
     }
 
     try {
-      const listener = new WebListener({
-        rootUrl: process.env.TASKCLUSTER_ROOT_URL
+      const jsonBindings = encode(JSON.stringify({ bindings }));
+      const evtUrl = `http://taskcluster-events-staging.herokuapp.com/api/events/v1/connect/?bindings=${jsonBindings}`;
+      const listener = new EventSource(evtUrl);
+
+      listener.addEventListener('message', this.handleListenerMessage);
+      listener.addEventListener('error', e => {
+        throw new Error(e.data);
       });
-
-      bindings.map(binding => listener.bind(binding));
-
-      listener.on('message', this.handleListenerMessage);
 
       this.listener = listener;
 
@@ -147,7 +146,7 @@ export default class PulseInspector extends PureComponent {
 
   handleStartListening = () => {
     this.setState({ listening: true });
-    this.listener.connect();
+    this.createListener(this.state.bindings);
   };
 
   /** Set expanded message, note we rely on object reference comparison here */
