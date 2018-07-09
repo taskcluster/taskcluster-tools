@@ -77,6 +77,29 @@ export default class ActionsMenu extends PureComponent {
 
       if (actions && actions.actions) {
         actions.actions.forEach(action => {
+          if (!knownKinds.includes(action.kind)) {
+            return;
+          }
+
+          // if an action with this name has already been selected,
+          // don't consider this version
+          if (actionData[action.name]) {
+            return;
+          }
+
+          // add the action if it is a match; otherwise bail out
+          if (!action.context.length) {
+            groupActions.push(action.name);
+          } else if (
+            task &&
+            task.tags &&
+            this.taskInContext(action.context, task.tags)
+          ) {
+            taskActions.push(action.name);
+          } else {
+            return;
+          }
+
           const schema = action.schema || {};
           const validate = this.ajv.compile(schema);
 
@@ -87,20 +110,6 @@ export default class ActionsMenu extends PureComponent {
             action,
             validate
           };
-
-          if (!knownKinds.includes(action.kind)) {
-            return;
-          }
-
-          if (!action.context.length) {
-            groupActions.push(action.name);
-          } else if (
-            task &&
-            task.tags &&
-            this.taskInContext(action.context, task.tags)
-          ) {
-            taskActions.push(action.name);
-          }
         });
       }
 
