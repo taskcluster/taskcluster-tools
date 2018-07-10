@@ -79,7 +79,6 @@
     "taskcluster-client-web": "^8.0.4",
     "taskcluster-lib-scopes": "^1.9.0",
     "taskcluster-lib-urls": "^10.0.0",
-    "urlencode": "^1.1.0",
     "ws-shell": "0.1.5",
     "www-authenticate": "0.6.2",
     "xml2js": "^0.4.19"

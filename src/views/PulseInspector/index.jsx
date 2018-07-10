@@ -14,7 +14,6 @@ import {
 import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
-import { encode } from 'urlencode';
 import EventSource from 'eventsource';
 import MessageRow from './MessageRow';
 import HelmetTitle from '../../components/HelmetTitle';
@@ -81,7 +80,7 @@ export default class PulseInspector extends PureComponent {
     }
 
     try {
-      const jsonBindings = encode(JSON.stringify({ bindings }));
+      const jsonBindings = encodeURIComponent(JSON.stringify({ bindings }));
       const evtUrl = `http://taskcluster-events-staging.herokuapp.com/api/events/v1/connect/?bindings=${jsonBindings}`;
       const listener = new EventSource(evtUrl);
 
@@ -98,7 +97,8 @@ export default class PulseInspector extends PureComponent {
     }
   }
 
-  handleListenerMessage = message => {
+  handleListenerMessage = msg => {
+    const message = JSON.parse(msg.data);
     const messages = [
       { ...message, _idForInspector: nice() },
       ...this.state.messages
