@@ -129,7 +129,6 @@ export default class GroupProgress extends PureComponent {
                   : labels[group]
               }
               style={group === 'unscheduled' ? { background: '#777' } : null}
-              active={group === 'running'}
               now={(percents[group] / weightedTotal) * 100}
               label={
                 tasks.length
