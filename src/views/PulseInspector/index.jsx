@@ -14,7 +14,6 @@ import {
 import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
-import EventSource from 'eventsource';
 import MessageRow from './MessageRow';
 import HelmetTitle from '../../components/HelmetTitle';
 import { urls } from '../../utils';
