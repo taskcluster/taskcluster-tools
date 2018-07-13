@@ -80,12 +80,12 @@ export default class PulseInspector extends PureComponent {
 
     try {
       const jsonBindings = encodeURIComponent(JSON.stringify({ bindings }));
-      const evtUrl = `http://taskcluster-events-staging.herokuapp.com/api/events/v1/connect/?bindings=${jsonBindings}`;
+      const evtUrl = `https://taskcluster-events-staging.herokuapp.com/api/events/v1/connect/?bindings=${jsonBindings}`;
       const listener = new EventSource(evtUrl);
 
       listener.addEventListener('message', this.handleListenerMessage);
-      listener.addEventListener('error', e => {
-        throw new Error(e.data);
+      listener.addEventListener('error', err => {
+        throw new Error(err.data);
       });
 
       this.listener = listener;
