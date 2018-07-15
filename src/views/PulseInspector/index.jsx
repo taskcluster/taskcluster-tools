@@ -84,15 +84,16 @@ export default class PulseInspector extends PureComponent {
       const listener = new EventSource(evtUrl);
 
       listener.addEventListener('message', this.handleListenerMessage);
-      listener.addEventListener('error', err => {
-        throw new Error(err.data);
-      });
+      listener.onerror = err => {
+        this.setState({ listeningError: err.data });
+        this.handleStopListening();
+      };
 
       this.listener = listener;
 
       return listener;
     } catch (err) {
-      this.setState({ listeningError: err });
+      // this.setState({ listeningError: err });
     }
   }
 
@@ -145,6 +146,7 @@ export default class PulseInspector extends PureComponent {
 
   handleStartListening = () => {
     this.setState({ listening: true });
+    this.setState({ listeningError: null });
     this.createListener(this.state.bindings);
   };
 
@@ -233,7 +235,7 @@ export default class PulseInspector extends PureComponent {
   renderListeningError() {
     return (
       <Alert bsStyle="danger" onDismiss={this.handleDismissListeningError}>
-        <strong>Listening Error:</strong> {this.state.listeningError.message}
+        <strong>Listening Error:</strong> {this.state.listeningError}
       </Alert>
     );
   }
