@@ -78,23 +78,19 @@ export default class PulseInspector extends PureComponent {
       return;
     }
 
-    try {
-      const jsonBindings = encodeURIComponent(JSON.stringify({ bindings }));
-      const evtUrl = `https://taskcluster-events-staging.herokuapp.com/api/events/v1/connect/?bindings=${jsonBindings}`;
-      const listener = new EventSource(evtUrl);
+    const jsonBindings = encodeURIComponent(JSON.stringify({ bindings }));
+    const eventsUrl = `https://taskcluster-events-staging.herokuapp.com/api/events/v1/connect/?bindings=${jsonBindings}`;
+    const listener = new EventSource(eventsUrl);
 
-      listener.addEventListener('message', this.handleListenerMessage);
-      listener.onerror = err => {
-        this.setState({ listeningError: err.data });
-        this.handleStopListening();
-      };
+    listener.addEventListener('message', this.handleListenerMessage);
+    listener.onerror = err => {
+      this.setState({ listeningError: err.data });
+      this.handleStopListening();
+    };
 
-      this.listener = listener;
+    this.listener = listener;
 
-      return listener;
-    } catch (err) {
-      // this.setState({ listeningError: err });
-    }
+    return listener;
   }
 
   handleListenerMessage = msg => {
@@ -145,8 +141,7 @@ export default class PulseInspector extends PureComponent {
   };
 
   handleStartListening = () => {
-    this.setState({ listening: true });
-    this.setState({ listeningError: null });
+    this.setState({ listening: true, listeningError: null });
     this.createListener(this.state.bindings);
   };
 
