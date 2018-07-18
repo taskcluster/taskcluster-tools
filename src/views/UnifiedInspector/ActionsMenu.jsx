@@ -4,7 +4,7 @@ import jsone from 'json-e';
 import { object, string, func } from 'prop-types';
 import { Row, Col, NavDropdown, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { omit, pathOr } from 'ramda';
+import { omit, pathOr, isEmpty } from 'ramda';
 import { nice } from 'slugid';
 import merge from 'deepmerge';
 import clone from 'lodash.clonedeep';
@@ -88,7 +88,7 @@ export default class ActionsMenu extends PureComponent {
           }
 
           // add the action if it is a match; otherwise bail out
-          if (!action.context.length) {
+          if (isEmpty(action.context)) {
             groupActions.push(action.name);
           } else if (
             task &&
