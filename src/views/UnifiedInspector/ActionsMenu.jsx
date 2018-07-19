@@ -11,12 +11,11 @@ import clone from 'lodash.clonedeep';
 import jsonSchemaDefaults from 'json-schema-defaults';
 import { safeLoad, safeDump } from 'js-yaml';
 import { satisfiesExpression } from 'taskcluster-lib-scopes';
-import libUrls from 'taskcluster-lib-urls';
 import ModalItem from '../../components/ModalItem';
 import Markdown from '../../components/Markdown';
 import CodeEditor from '../../components/CodeEditor';
 import Code from '../../components/Code';
-import { parameterizeTask } from '../../utils';
+import { parameterizeTask, urls } from '../../utils';
 
 export default class ActionsMenu extends PureComponent {
   static propTypes = {
@@ -54,11 +53,7 @@ export default class ActionsMenu extends PureComponent {
 
   async componentDidMount() {
     const actionsJsonSchemaResponse = await fetch(
-      libUrls.schema(
-        'https://taskcluster.net',
-        'common',
-        'action-schema-v1.json'
-      )
+      urls.schema('common', 'action-schema-v1.json')
     );
 
     this.validateActionsJson = this.ajv.compile(
