@@ -11,6 +11,7 @@ import clone from 'lodash.clonedeep';
 import jsonSchemaDefaults from 'json-schema-defaults';
 import { safeLoad, safeDump } from 'js-yaml';
 import { satisfiesExpression } from 'taskcluster-lib-scopes';
+import libUrls from 'taskcluster-lib-urls';
 import ModalItem from '../../components/ModalItem';
 import Markdown from '../../components/Markdown';
 import CodeEditor from '../../components/CodeEditor';
@@ -49,6 +50,20 @@ export default class ActionsMenu extends PureComponent {
       taskActions: null,
       groupActions: null
     };
+  }
+
+  async componentDidMount() {
+    const actionsJsonSchemaResponse = await fetch(
+      libUrls.schema(
+        'https://taskcluster.net',
+        'common',
+        'action-schema-v1.json'
+      )
+    );
+
+    this.validateActionsJson = this.ajv.compile(
+      await actionsJsonSchemaResponse.json()
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -428,6 +443,11 @@ export default class ActionsMenu extends PureComponent {
     const { validate, action } = actionData[name];
     const input = safeLoad(form);
     const valid = validate(input);
+    const validActionsJson = this.validateActionsJson(actions);
+
+    if (!validActionsJson) {
+      throw new Error(this.ajv.errorsText(this.validateActionsJson.errors));
+    }
 
     if (!valid) {
       throw new Error(this.ajv.errorsText(validate.errors));
