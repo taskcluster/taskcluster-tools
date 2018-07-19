@@ -28,7 +28,8 @@ export default class Home extends PureComponent {
           <Col md={8} mdOffset={2} sm={10} smOffset={1}>
             <div className={header}>
               <h2>
-                Welcome to <span className={logo}>Taskcluster Tools</span>
+                Welcome to{' '}
+                <span className={logo}>{process.env.APPLICATION_NAME}</span>
               </h2>
             </div>
           </Col>
@@ -36,10 +37,12 @@ export default class Home extends PureComponent {
         <Row className={description}>
           <Col sm={12}>
             <p>
-              A collection of tools for Taskcluster components and elements in
-              the Taskcluster ecosystem. Here you will find tools to manage
-              Taskcluster, as well as run, debug, inspect and view tasks, task
-              groups, and other Taskcluster related entities.
+              A collection of tools for {process.env.APPLICATION_NAME}{' '}
+              components and elements in the {process.env.APPLICATION_NAME}{' '}
+              ecosystem. Here you will find tools to manage
+              {process.env.APPLICATION_NAME} services, as well as run, debug,
+              inspect and view tasks, task groups, and other{' '}
+              {process.env.APPLICATION_NAME} related entities.
             </p>
           </Col>
         </Row>

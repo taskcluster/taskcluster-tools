@@ -1,0 +1,11 @@
+.buttonGroup {
+  margin-bottom: 20px;
+}
+
+.columnNoWrap {
+  white-space: nowrap;
+}
+
+.tooltip {
+  white-space: pre-wrap;
+}

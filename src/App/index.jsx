@@ -34,6 +34,9 @@ const AwsProvisioner = loadable(() =>
 const AwsProvisionerErrors = loadable(() =>
   import(/* webpackChunkName: 'AwsProvisionerErrors' */ '../views/AwsProvisionerErrors')
 );
+const AwsProvisionerHealth = loadable(() =>
+  import(/* webpackChunkName: 'AwsProvisionerHealth' */ '../views/AwsProvisionerHealth')
+);
 const WorkerTypes = loadable(() =>
   import(/* webpackChunkName: 'WorkerTypes' */ '../views/WorkerTypes')
 );
@@ -54,9 +57,6 @@ const RoleManager = loadable(() =>
 );
 const ScopeInspector = loadable(() =>
   import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector')
-);
-const ScopeGrants = loadable(() =>
-  import(/* webpackChunkName: 'ScopeGrants' */ '../views/ScopeGrants')
 );
 const ScopesetExpander = loadable(() =>
   import(/* webpackChunkName: 'ScopesetExpander' */ '../views/ScopesetExpander')
@@ -223,29 +223,16 @@ export default class App extends Component {
                   path="/aws-provisioner/recent-errors"
                   component={AwsProvisionerErrors}
                   provisionerId="aws-provisioner-v1"
-                  ec2BaseUrl="https://ec2-manager.taskcluster.net/v1"
                 />
                 <PropsRoute
-                  path="/aws-provisioner-staging/recent-errors"
-                  component={AwsProvisionerErrors}
-                  provisionerId="aws-provisioner-v1"
-                  ec2BaseUrl="https://ec2-manager-staging.taskcluster.net/v1"
+                  path="/aws-provisioner/aws-health"
+                  component={AwsProvisionerHealth}
                 />
                 <PropsRoute
                   path="/aws-provisioner/:workerType?/:currentTab?"
                   component={AwsProvisioner}
-                  baseUrl="https://aws-provisioner.taskcluster.net/v1"
-                  ec2BaseUrl="https://ec2-manager.taskcluster.net/v1"
                   provisionerId="aws-provisioner-v1"
                   routeRoot="/aws-provisioner"
-                />
-                <PropsRoute
-                  path="/aws-provisioner-staging/:workerType?/:currentTab?"
-                  component={AwsProvisioner}
-                  baseUrl="https://provisioner-staging.herokuapp.com/v1"
-                  ec2BaseUrl="https://ec2-manager-staging.taskcluster.net/v1"
-                  provisionerId="staging-aws"
-                  routeRoot="/aws-provisioner-staging"
                 />
                 <PropsRoute
                   path="/provisioners/:provisionerId/worker-types/:workerType/workers/:workerGroup?/:workerId?"
@@ -282,10 +269,6 @@ export default class App extends Component {
                 <PropsRoute
                   path="/auth/scopes/:selectedScope?/:selectedEntity?"
                   component={ScopeInspector}
-                />
-                <PropsRoute
-                  path="/auth/grants/:pattern?"
-                  component={ScopeGrants}
                 />
                 <PropsRoute
                   path="/pulse-inspector"

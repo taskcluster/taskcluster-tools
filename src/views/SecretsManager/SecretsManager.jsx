@@ -1,4 +1,4 @@
-import { PureComponent } from 'react';
+import { Component } from 'react';
 import {
   Row,
   Col,
@@ -13,14 +13,16 @@ import Spinner from '../../components/Spinner';
 import HelmetTitle from '../../components/HelmetTitle';
 import SecretEditor from './SecretEditor';
 import UserSession from '../../auth/UserSession';
+import SearchForm from '../../components/SearchForm';
 
-export default class SecretsManager extends PureComponent {
+export default class SecretsManager extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       secrets: null,
-      error: null
+      error: null,
+      secretIdContains: ''
     };
   }
 
@@ -80,21 +82,24 @@ export default class SecretsManager extends PureComponent {
           </tr>
         </thead>
         <tbody>
-          {secrets.map((id, index) => (
-            <tr
-              key={`secret-row-${index}`}
-              className={secretId === id ? 'info' : null}>
-              <td>
-                <Link to={`/secrets/${encodeURIComponent(id)}`}>
-                  <code>{id}</code>
-                </Link>
-              </td>
-            </tr>
-          ))}
+          {secrets
+            .filter(id => id.includes(this.state.secretIdContains))
+            .map(id => (
+              <tr
+                key={`secret-row-${id}`}
+                className={secretId === id ? 'info' : null}>
+                <td>
+                  <Link to={`/secrets/${encodeURIComponent(id)}`}>
+                    <code>{id}</code>
+                  </Link>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </Table>
     );
   }
+  handleSearchChange = value => this.setState({ secretIdContains: value });
 
   render() {
     const { secretId } = this.props;
@@ -104,6 +109,10 @@ export default class SecretsManager extends PureComponent {
       <Row>
         <HelmetTitle title="Secrets Manager" />
         <Col md={5}>
+          <SearchForm
+            label="Secret Id Containing"
+            onSearch={this.handleSearchChange}
+          />
           {this.renderSecretsTable()}
           <ButtonToolbar>
             <Button

@@ -7,6 +7,7 @@ import { assocPath } from 'ramda';
 import Icon from 'react-fontawesome';
 import ModalItem from '../../components/ModalItem';
 import CodeEditor from '../../components/CodeEditor';
+import { urls } from '../../utils';
 
 const initialHook = {
   metadata: {
@@ -28,7 +29,7 @@ const initialHook = {
       name: 'Hook Task',
       description: 'Task Description',
       owner: 'name@example.com',
-      source: 'https://tools.taskcluster.net/hooks'
+      source: `${window.location.origin}/hooks`
     },
     expires: { $fromNow: '3 months' },
     deadline: { $fromNow: '6 hours' }
@@ -352,7 +353,7 @@ export default class HookEditor extends PureComponent {
               Email the owner when an error occurs while creating a task. Note:
               to be notified of tasks that fail once created, use{' '}
               <a
-                href="https://docs.taskcluster.net/reference/core/taskcluster-notify"
+                href={urls.docs('/reference/core/taskcluster-notify')}
                 target="_blank"
                 rel="noopener noreferrer">
                 notify routes

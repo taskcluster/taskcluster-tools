@@ -91,7 +91,7 @@ export default class GroupProgress extends PureComponent {
     return Object.entries(groupings).reduce(
       (percents, [group, tasks]) => ({
         ...percents,
-        [group]: Math.max(5, tasks.length / total * 100)
+        [group]: Math.max(5, (tasks.length / total) * 100)
       }),
       {}
     );
@@ -129,8 +129,7 @@ export default class GroupProgress extends PureComponent {
                   : labels[group]
               }
               style={group === 'unscheduled' ? { background: '#777' } : null}
-              active={group === 'running'}
-              now={percents[group] / weightedTotal * 100}
+              now={(percents[group] / weightedTotal) * 100}
               label={
                 tasks.length
                   ? `${group[0].toUpperCase()}(${tasks.length})`

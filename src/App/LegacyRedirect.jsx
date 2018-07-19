@@ -2,7 +2,7 @@ import { Redirect } from 'react-router-dom';
 import NotFound from '../components/NotFound';
 
 const LegacyRedirect = props => {
-  switch (props.path) {
+  switch (props.match.path) {
     case '/task-graph-inspector': {
       const [groupId, taskId] = props.location.hash.slice(1).split('/');
 
@@ -33,7 +33,9 @@ const LegacyRedirect = props => {
     }
 
     case '/task-inspector': {
-      return <Redirect to={`/tasks/${props.location.hash.slice(1)}`} />;
+      const taskId = props.location.hash.slice(1);
+
+      return <Redirect to={taskId ? `/tasks/${taskId}` : '/groups'} />;
     }
 
     case '/task-creator': {

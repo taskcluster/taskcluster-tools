@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom';
 import { Table, Label } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { isEmpty } from 'ramda';
+import deepSortObject from 'deep-sort-object';
 import BarSpinner from '../../components/BarSpinner';
 import Markdown from '../../components/Markdown';
 import Code from '../../components/Code';
 import DateView from '../../components/DateView';
 import Error from '../../components/Error';
-import { labels } from '../../utils';
+import { labels, urls } from '../../utils';
 
 export default class TaskDetails extends PureComponent {
   static propTypes = {
@@ -102,6 +103,8 @@ export default class TaskDetails extends PureComponent {
 
     const { error } = this.state;
     const { metadata } = task;
+    const payload = deepSortObject(task.payload);
+    const extra = deepSortObject(task.extra);
     const shortSource =
       metadata.source.length > 90
         ? `...${metadata.source.substr(8 - 90)}`
@@ -312,9 +315,7 @@ export default class TaskDetails extends PureComponent {
               <td>Task Definition</td>
               <td>
                 <a
-                  href={`https://queue.taskcluster.net/v1/task/${
-                    status.taskId
-                  }`}
+                  href={urls.api('queue', 'v1', `task/${status.taskId}`)}
                   target="_blank"
                   rel="noopener noreferrer">
                   {status.taskId} <Icon name="external-link" />
@@ -325,9 +326,7 @@ export default class TaskDetails extends PureComponent {
             <tr>
               <td>Payload</td>
               <td>
-                <Code language="json">
-                  {JSON.stringify(task.payload, null, 2)}
-                </Code>
+                <Code language="json">{JSON.stringify(payload, null, 2)}</Code>
               </td>
             </tr>
 
@@ -335,9 +334,7 @@ export default class TaskDetails extends PureComponent {
               <tr>
                 <td>Extra</td>
                 <td>
-                  <Code language="json">
-                    {JSON.stringify(task.extra, null, 2)}
-                  </Code>
+                  <Code language="json">{JSON.stringify(extra, null, 2)}</Code>
                 </td>
               </tr>
             ) : null}

@@ -3,14 +3,13 @@
 This repository contains a collection of useful tools for use with Taskcluster.
 Generally, we strive to not add UI to Taskcluster components, but instead offer
 well documented APIs that can be easily consumed using a client library for
-Taskcluster. See [Taskcluster documentation site](https://docs.taskcluster.net)
-for details.
+Taskcluster.
 
 ## Developing Taskcluster Tools
 
 ### Prerequisites for building Taskcluster Tools
 
-- Node version v6+
+- Node version v8+
 - [Yarn](https://www.npmjs.com/package/yarn)
 
 ### Building
@@ -33,7 +32,7 @@ yarn
 ### Tasks and Configuration
 
 Building this project uses [Neutrino](https://github.com/mozilla-neutrino/neutrino),
-[neutrino-preset-mozilla-rpweb](https://github.com/mozilla-rpweb/neutrino-preset-mozilla-rpweb) to:
+[neutrino-preset-frontend-infra](https://github.com/mozilla-frontend-infra/neutrino-preset-mozilla-frontend-infra) to:
 
 - Compile ES2015+ syntax to ES5-compatible JS
 - Compile React JSX to de-sugared JS

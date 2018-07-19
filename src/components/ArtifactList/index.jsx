@@ -9,7 +9,7 @@ import {
 } from 'react-bootstrap';
 import { isNil } from 'ramda';
 import Error from '../../components/Error';
-import { getIconFromMime } from '../../utils';
+import { getIconFromMime, urls } from '../../utils';
 
 export default class ArtifactList extends PureComponent {
   static propTypes = {
@@ -68,7 +68,11 @@ export default class ArtifactList extends PureComponent {
             return {
               icon,
               name,
-              url: `https://index.taskcluster.net/v1/task/${namespace}/artifacts/${name}`
+              url: urls.api(
+                'index',
+                'v1',
+                `task/${namespace}/artifacts/${name}`
+              )
             };
           }
 
@@ -80,14 +84,18 @@ export default class ArtifactList extends PureComponent {
             return {
               icon,
               name,
-              url: `https://queue.taskcluster.net/v1/task/${taskId}/runs/${runId}/artifacts/${name}`
+              url: urls.api(
+                'queue',
+                'v1',
+                `task/${taskId}/runs/${runId}/artifacts/${name}`
+              )
             };
           }
 
           return {
             icon,
             name,
-            url: `https://queue.taskcluster.net/v1/task/${taskId}/artifacts/${name}`
+            url: urls.api('queue', 'v1', `task/${taskId}/artifacts/${name}`)
           };
         }
 

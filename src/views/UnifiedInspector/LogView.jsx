@@ -251,6 +251,7 @@ export default class LogView extends PureComponent {
               highlight={highlight}
               onHighlight={onHighlight}
               onScroll={this.handleScroll}
+              extraLines={1}
             />
           )}
         </ScrollFollow>

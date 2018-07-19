@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
 import { WebListener, request } from 'taskcluster-client-web';
-import { isNil } from 'ramda';
+import { isNil, equals } from 'ramda';
 import Helmet from 'react-helmet';
 import PropsRoute from '../../components/PropsRoute';
 import Error from '../../components/Error';
@@ -17,7 +17,6 @@ import successFavIcon from '../../images/taskcluster-group-success.png';
 import pendingFavIcon from '../../images/taskcluster-group-pending.png';
 import failedFavIcon from '../../images/taskcluster-group-failed.png';
 import { loadable } from '../../utils';
-import iconUrl from '../../taskcluster.png';
 import UserSession from '../../auth/UserSession';
 
 const GroupProgress = loadable(() =>
@@ -157,7 +156,8 @@ export default class Inspector extends PureComponent {
             queue.getLatestArtifact,
             taskGroupId,
             'public/actions.json'
-          )
+          ),
+          { retries: 1 }
         )
       ]);
 
@@ -171,7 +171,7 @@ export default class Inspector extends PureComponent {
     }
   }
 
-  async loadTasks(props, token) {
+  async loadTasks(props, token, skipActions) {
     const { taskGroupId, queue } = props;
 
     if (!taskGroupId) {
@@ -191,7 +191,9 @@ export default class Inspector extends PureComponent {
         { decision, actions },
         { tasks, continuationToken }
       ] = await Promise.all([
-        token ? Promise.resolve(this.state) : this.getActions(props),
+        token || skipActions
+          ? Promise.resolve(this.state)
+          : this.getActions(props),
         queue.listTaskGroup(
           taskGroupId,
           token ? { continuationToken: token, limit: 200 } : { limit: 20 }
@@ -208,7 +210,9 @@ export default class Inspector extends PureComponent {
             );
 
             if (index > -1) {
-              reduction[index] = task; // eslint-disable-line no-param-reassign
+              if (!equals(reduction[index], task)) {
+                reduction[index] = task; // eslint-disable-line no-param-reassign
+              }
             } else {
               reduction.push(task);
             }
@@ -291,7 +295,9 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener();
+    const listener = new WebListener({
+      rootUrl: process.env.TASKCLUSTER_ROOT_URL
+    });
     const routingKey = { taskGroupId };
 
     this.groupListener = listener;
@@ -304,7 +310,7 @@ export default class Inspector extends PureComponent {
       'taskException'
     ].map(binding => listener.bind(queueEvents[binding](routingKey)));
     listener.on('message', this.handleGroupMessage);
-    listener.on('reconnect', () => this.loadTasks(this.props));
+    listener.on('reconnect', () => this.loadTasks(this.props, null, true));
     listener.connect();
 
     return listener;
@@ -564,8 +570,7 @@ export default class Inspector extends PureComponent {
       return;
     }
 
-    return new Notification('Taskcluster', {
-      icon: iconUrl,
+    return new Notification(process.env.APPLICATION_NAME, {
       body: message
     });
   }
@@ -576,7 +581,9 @@ export default class Inspector extends PureComponent {
     const {
       taskGroupId,
       taskId,
+      auth,
       queue,
+      hooks,
       purgeCache,
       url,
       runId,
@@ -624,7 +631,9 @@ export default class Inspector extends PureComponent {
               <NavItem>Task Details</NavItem>
             </LinkContainer>
             <ActionsMenu
+              auth={auth}
               queue={queue}
+              hooks={hooks}
               purgeCache={purgeCache}
               taskGroupId={taskGroupId}
               taskId={trackedTaskId}

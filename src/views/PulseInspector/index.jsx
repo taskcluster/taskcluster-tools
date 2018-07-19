@@ -17,6 +17,7 @@ import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
 import MessageRow from './MessageRow';
 import HelmetTitle from '../../components/HelmetTitle';
+import { urls } from '../../utils';
 
 export default class PulseInspector extends PureComponent {
   static defaultProps = {
@@ -82,7 +83,9 @@ export default class PulseInspector extends PureComponent {
     }
 
     try {
-      const listener = new WebListener();
+      const listener = new WebListener({
+        rootUrl: process.env.TASKCLUSTER_ROOT_URL
+      });
 
       bindings.map(binding => listener.bind(binding));
 
@@ -277,13 +280,11 @@ export default class PulseInspector extends PureComponent {
             This tool lets you listen to Pulse messages from any exchange and
             routing key. When messages are received you can inspect the
             messages. This is useful for debugging and development when
-            consuming from undocumented exchanges. A list of Pulse exchanges is
-            maintained on the project Wiki, see&nbsp;
-            <a href="https://wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges">
-              wiki.mozilla.org/Auto-tools/Projects/Pulse/Exchanges
-            </a>. Notice that all exchanges from Taskcluster is formally
-            documented on{' '}
-            <a href="https://docs.taskcluster.net">docs.taskcluster.net</a>.
+            consuming from undocumented exchanges. Notice that all exchanges
+            from {process.env.APPLICATION_NAME} are formally documented on{' '}
+            <a href={urls.docs('/')} target="_blank" rel="noopener noreferrer">
+              {urls.docs('/')}
+            </a>.
           </p>
           <hr />
           {this.renderForm()}

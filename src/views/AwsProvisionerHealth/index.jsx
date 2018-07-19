@@ -1,14 +1,12 @@
 import WithUserSession from '../../components/WithUserSession';
 import WithClients from '../../components/WithClients';
-import AwsProvisionerErrors from './AwsProvisionerErrors';
+import AwsProvisionerHealth from './AwsProvisionerHealth';
 
-const View = ({ provisionerId }) => (
+const View = () => (
   <WithUserSession>
     {() => (
       <WithClients EC2Manager>
-        {clients => (
-          <AwsProvisionerErrors {...clients} provisionerId={provisionerId} />
-        )}
+        {clients => <AwsProvisionerHealth {...clients} />}
       </WithClients>
     )}
   </WithUserSession>

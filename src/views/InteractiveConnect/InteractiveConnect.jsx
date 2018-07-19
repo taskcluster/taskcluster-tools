@@ -115,7 +115,9 @@ export default class InteractiveConnect extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener();
+    const listener = new WebListener({
+      rootUrl: process.env.TASKCLUSTER_ROOT_URL
+    });
     const routingKey = { taskId };
 
     [
@@ -190,7 +192,7 @@ export default class InteractiveConnect extends PureComponent {
       return;
     }
 
-    const notification = new Notification('Taskcluster', {
+    const notification = new Notification(process.env.APPLICATION_NAME, {
       icon: iconUrl,
       body:
         'Your interactive task is ready for connecting. Connect while the task is available.'

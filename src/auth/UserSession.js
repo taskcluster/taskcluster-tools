@@ -1,4 +1,5 @@
 import { OIDCCredentialAgent } from 'taskcluster-client-web';
+import { urls } from '../utils';
 
 /**
  * An object representing a user session.  Tools supports a variety of login methods,
@@ -38,7 +39,7 @@ export default class UserSession {
     if (this.accessToken) {
       this.credentialAgent = new OIDCCredentialAgent({
         accessToken: this.accessToken,
-        oidcProvider: this.oidcProvider
+        url: urls.api('login', 'v1', `/oidc-credentials/${this.oidcProvider}`)
       });
     }
   }

@@ -4,21 +4,24 @@ import jsone from 'json-e';
 import { object, string, func } from 'prop-types';
 import { Row, Col, NavDropdown, MenuItem } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { omit, pathOr } from 'ramda';
+import { omit, pathOr, isEmpty } from 'ramda';
 import { nice } from 'slugid';
 import merge from 'deepmerge';
 import clone from 'lodash.clonedeep';
 import jsonSchemaDefaults from 'json-schema-defaults';
 import { safeLoad, safeDump } from 'js-yaml';
+import { satisfiesExpression } from 'taskcluster-lib-scopes';
 import ModalItem from '../../components/ModalItem';
 import Markdown from '../../components/Markdown';
 import CodeEditor from '../../components/CodeEditor';
 import Code from '../../components/Code';
-import { parameterizeTask } from '../../utils';
+import { parameterizeTask, urls } from '../../utils';
 
 export default class ActionsMenu extends PureComponent {
   static propTypes = {
+    auth: object,
     queue: object,
+    hooks: object,
     userSession: object,
     purgeCache: object,
     taskGroupId: string,
@@ -48,6 +51,16 @@ export default class ActionsMenu extends PureComponent {
     };
   }
 
+  async componentDidMount() {
+    const actionsJsonSchemaResponse = await fetch(
+      urls.schema('common', 'action-schema-v1.json')
+    );
+
+    this.validateActionsJson = this.ajv.compile(
+      await actionsJsonSchemaResponse.json()
+    );
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.task !== this.props.task) {
       const caches = this.getCachesFromTask(nextProps.task);
@@ -70,9 +83,33 @@ export default class ActionsMenu extends PureComponent {
       const groupActions = [];
       const actionInputs = {};
       const actionData = {};
+      const knownKinds = ['task', 'hook'];
 
       if (actions && actions.actions) {
         actions.actions.forEach(action => {
+          if (!knownKinds.includes(action.kind)) {
+            return;
+          }
+
+          // if an action with this name has already been selected,
+          // don't consider this version
+          if (actionData[action.name]) {
+            return;
+          }
+
+          // add the action if it is a match; otherwise bail out
+          if (isEmpty(action.context)) {
+            groupActions.push(action.name);
+          } else if (
+            task &&
+            task.tags &&
+            this.taskInContext(action.context, task.tags)
+          ) {
+            taskActions.push(action.name);
+          } else {
+            return;
+          }
+
           const schema = action.schema || {};
           const validate = this.ajv.compile(schema);
 
@@ -83,16 +120,6 @@ export default class ActionsMenu extends PureComponent {
             action,
             validate
           };
-
-          if (!action.context.length) {
-            groupActions.push(action.name);
-          } else if (
-            task &&
-            task.tags &&
-            this.taskInContext(action.context, task.tags)
-          ) {
-            taskActions.push(action.name);
-          }
         });
       }
 
@@ -311,7 +338,8 @@ export default class ActionsMenu extends PureComponent {
             <code>TASKCLUSTER_INTERACTIVE=true</code>
           </li>
         </ul>
-        Note: this may not work with all tasks.
+        Note: this may not work with all tasks. You may not have the scopes
+        required to create the task.
       </span>
     );
   }
@@ -340,7 +368,8 @@ export default class ActionsMenu extends PureComponent {
             <code>TASKCLUSTER_INTERACTIVE=true</code>
           </li>
         </ul>
-        Note: this may not work with all tasks.
+        Note: this may not work with all tasks. You may not have the scopes
+        required to create the task.
       </span>
     );
   }
@@ -369,7 +398,14 @@ export default class ActionsMenu extends PureComponent {
     return (
       <div>
         <Markdown>{action.description}</Markdown>
-        <br />
+        {action.kind === 'hook' && (
+          <div>
+            This action trigers hook{' '}
+            <code>
+              {action.hookGroupId}/{action.hookId}
+            </code>.
+          </div>
+        )}
         {action.schema && (
           <Row>
             <Col lg={6} md={6} sm={12}>
@@ -402,39 +438,71 @@ export default class ActionsMenu extends PureComponent {
     const { validate, action } = actionData[name];
     const input = safeLoad(form);
     const valid = validate(input);
+    const validActionsJson = this.validateActionsJson(actions);
+
+    if (!validActionsJson) {
+      throw new Error(this.ajv.errorsText(this.validateActionsJson.errors));
+    }
 
     if (!valid) {
       throw new Error(this.ajv.errorsText(validate.errors));
     }
 
-    const ownTaskId = nice();
-    const newTask = jsone(
-      action.task,
-      merge(
-        {
-          taskGroupId,
-          taskId,
-          task,
-          input,
-          ownTaskId
-        },
-        actions.variables
-      )
-    );
-
     if (!this.props.decision) {
       throw new Error('no action task found'); // .. how did we find an action, then?
     }
 
-    // call the queue with the decision task's scopes, as directed by the action spec
-    const actionsQueue = this.props.queue.use({
-      authorizedScopes: this.props.decision.scopes || []
+    const context = merge(
+      {
+        taskGroupId,
+        taskId,
+        task,
+        input
+      },
+      actions.variables
+    );
+
+    if (action.kind === 'task') {
+      const ownTaskId = nice();
+
+      context.ownTaskId = ownTaskId;
+      const newTask = jsone(action.task, context);
+      // call the queue with the decision task's scopes, as directed by the action spec
+      const actionsQueue = this.props.queue.use({
+        authorizedScopes: this.props.decision.scopes || []
+      });
+
+      await actionsQueue.createTask(ownTaskId, newTask);
+
+      return ownTaskId;
+    }
+
+    // action.kind === 'hook'
+    const hookPayload = jsone(action.hookPayload, context);
+    const { hookId, hookGroupId } = action;
+    // verify that the decision task has the appropriate in-tree:action-hook:.. scope
+    const expansion = await this.props.auth.expandScopes({
+      scopes: this.props.decision.scopes
     });
+    const expression = `in-tree:hook-action:${hookGroupId}/${hookId}`;
 
-    await actionsQueue.createTask(ownTaskId, newTask);
+    if (!satisfiesExpression(expansion.scopes, expression)) {
+      throw new Error(
+        `Action is misconfigured: decision task's scopes do not satisfy ${expression}`
+      );
+    }
 
-    return ownTaskId;
+    const result = await this.props.hooks.triggerHook(
+      hookGroupId,
+      hookId,
+      hookPayload
+    );
+
+    return result.status.taskId;
   };
+
+  isDefaultActionVisible = name =>
+    !this.state.taskActions || !this.state.taskActions.includes(name);
 
   render() {
     const { caches, actionData, taskActions, groupActions } = this.state;
@@ -455,37 +523,51 @@ export default class ActionsMenu extends PureComponent {
 
     return (
       <NavDropdown title="Actions" id="task-view-actions">
-        <ModalItem
-          disabled={!(queue && task)}
-          onSubmit={this.handleScheduleTask}
-          body={this.scheduleTaskModal()}>
-          <Icon name="calendar-check-o" /> Schedule Task
-        </ModalItem>
+        <MenuItem header>Built-In Actions</MenuItem>
 
-        <ModalItem
-          onSubmit={this.handleCreateTask}
-          onComplete={onRetrigger}
-          disabled={!(queue && task && task.payload)}
-          body={this.retriggerTaskModal()}>
-          <Icon name="refresh" /> Retrigger Task
-        </ModalItem>
+        {this.isDefaultActionVisible('schedule') && (
+          <ModalItem
+            disabled={!(queue && task)}
+            onSubmit={this.handleScheduleTask}
+            body={this.scheduleTaskModal()}>
+            <Icon name="calendar-check-o" /> Schedule Task
+          </ModalItem>
+        )}
+        {this.isDefaultActionVisible('retrigger') && (
+          <ModalItem
+            onSubmit={this.handleCreateTask}
+            onComplete={onRetrigger}
+            disabled={!(queue && task && task.payload)}
+            body={this.retriggerTaskModal()}>
+            <Icon name="refresh" /> Retrigger Task
+          </ModalItem>
+        )}
+        {this.isDefaultActionVisible('cancel') && (
+          <ModalItem
+            disabled={isResolved || !(queue && task)}
+            onSubmit={this.handleCancelTask}
+            body={this.cancelTaskModal()}>
+            <Icon name="calendar-check-o" /> Cancel Task
+          </ModalItem>
+        )}
+        {this.isDefaultActionVisible('purge-cache') && (
+          <ModalItem
+            onSubmit={this.handlePurge}
+            disabled={!(purgeCache && task && caches.length)}
+            body={this.purgeCacheModal()}>
+            <Icon name="refresh" /> Purge Worker Cache
+          </ModalItem>
+        )}
 
-        <ModalItem
-          disabled={isResolved || !(queue && task)}
-          onSubmit={this.handleCancelTask}
-          body={this.cancelTaskModal()}>
-          <Icon name="calendar-check-o" /> Cancel Task
-        </ModalItem>
-
-        <ModalItem
-          onSubmit={this.handlePurge}
-          disabled={!(purgeCache && task && caches.length)}
-          body={this.purgeCacheModal()}>
-          <Icon name="refresh" /> Purge Worker Cache
-        </ModalItem>
-
-        <MenuItem divider />
-        <MenuItem header>Debug</MenuItem>
+        {this.isDefaultActionVisible('create-interactive') && (
+          <ModalItem
+            disabled={!this.isValidTask()}
+            onSubmit={this.handleCreateLoaner}
+            onComplete={onCreateInteractive}
+            body={this.createInteractiveModal()}>
+            <Icon name="terminal" /> Create Interactive Task
+          </ModalItem>
+        )}
 
         <ModalItem
           onSubmit={this.handleCloneTask}
@@ -493,14 +575,6 @@ export default class ActionsMenu extends PureComponent {
           disabled={!task}
           body={this.editTaskModal()}>
           <Icon name="edit" /> Edit Task
-        </ModalItem>
-
-        <ModalItem
-          disabled={!this.isValidTask()}
-          onSubmit={this.handleCreateLoaner}
-          onComplete={onCreateInteractive}
-          body={this.createInteractiveModal()}>
-          <Icon name="terminal" /> Create Interactive Task
         </ModalItem>
 
         <ModalItem

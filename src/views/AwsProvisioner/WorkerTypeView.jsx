@@ -8,6 +8,7 @@ import Code from '../../components/Code';
 import WorkerTypeEditor from './WorkerTypeEditor';
 import WorkerTypeResources from './WorkerTypeResources';
 import WorkerTypeStatus from './WorkerTypeStatus';
+import WorkerTypeHealth from './WorkerTypeHealth';
 import UserSession from '../../auth/UserSession';
 
 export default class WorkerTypeView extends PureComponent {
@@ -103,10 +104,18 @@ export default class WorkerTypeView extends PureComponent {
           workerType={workerType}
           awsState={awsState}
           queue={this.props.queue}
-          ec2BaseUrl={this.props.ec2BaseUrl}
         />
       ) : (
         <Spinner />
+      );
+    }
+
+    if (currentTab === 'health') {
+      return (
+        <WorkerTypeHealth
+          ec2Manager={this.props.ec2Manager}
+          workerType={this.props.workerType}
+        />
       );
     }
 
@@ -154,6 +163,9 @@ export default class WorkerTypeView extends PureComponent {
           </NavItem>
           <NavItem eventKey="resources" key="resources">
             EC2 Resources
+          </NavItem>
+          <NavItem eventKey="health" key="health">
+            Health
           </NavItem>
         </Nav>
         <div className="tab-content" style={{ minHeight: 400 }}>

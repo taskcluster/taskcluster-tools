@@ -55,7 +55,10 @@ export default class CredentialsManager extends PureComponent {
       return;
     }
 
-    return credentialInformation(await userSession.getCredentials());
+    return credentialInformation(
+      await userSession.getCredentials(),
+      process.env.TASKCLUSTER_ROOT_URL
+    );
   }
 
   renderSignin() {

@@ -1,5 +1,6 @@
 import { PureComponent } from 'react';
 import { OverlayTrigger, Tooltip, NavItem, Glyphicon } from 'react-bootstrap';
+import { urls } from '../utils';
 
 export default class DevelopmentLoginMenuItem extends PureComponent {
   handleSelect() {
@@ -10,12 +11,9 @@ export default class DevelopmentLoginMenuItem extends PureComponent {
     query.set('name', 'tools-devel');
     query.set(
       'description',
-      'Temporary client for developing and testing taskcluster-tools'
+      'Temporary client for developing and testing this repository'
     );
-    window.open(
-      `https://tools.taskcluster.net/auth/clients/new?${query.toString()}`,
-      '_blank'
-    );
+    window.open(urls.ui(`/auth/clients/new?${query.toString()}`), '_blank');
   }
 
   render() {

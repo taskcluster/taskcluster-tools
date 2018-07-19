@@ -1,9 +1,9 @@
-import { PureComponent } from 'react';
+import { Component } from 'react';
 import { bool, any } from 'prop-types';
 import Spinner from '../Spinner';
 import Error from '../Error';
 
-export default class Loading extends PureComponent {
+export default class Loading extends Component {
   static propTypes = {
     isLoading: bool,
     error: any,
