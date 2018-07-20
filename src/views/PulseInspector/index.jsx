@@ -11,7 +11,6 @@ import {
   FormControl,
   ControlLabel
 } from 'react-bootstrap';
-import { WebListener } from 'taskcluster-client-web';
 import { nice } from 'slugid';
 import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
@@ -46,8 +45,6 @@ export default class PulseInspector extends PureComponent {
       bindings,
       listening: false
     });
-
-    this.createListener(bindings);
   }
 
   componentWillUnmount() {
@@ -62,7 +59,6 @@ export default class PulseInspector extends PureComponent {
       const bindings = this.getBindingsFromProps(nextProps);
 
       this.setState({ bindings, listening: false });
-      this.createListener(bindings);
     }
   }
 
@@ -82,24 +78,24 @@ export default class PulseInspector extends PureComponent {
       return;
     }
 
-    try {
-      const listener = new WebListener({
-        rootUrl: process.env.TASKCLUSTER_ROOT_URL
-      });
+    const jsonBindings = encodeURIComponent(JSON.stringify({ bindings }));
+    const listener = new EventSource(
+      urls.api('events', 'v1', `connect/?bindings=${jsonBindings}`)
+    );
 
-      bindings.map(binding => listener.bind(binding));
+    listener.addEventListener('message', this.handleListenerMessage);
+    listener.addEventListener('error', ({ data }) => {
+      this.setState({ listeningError: data });
+      this.handleStopListening();
+    });
 
-      listener.on('message', this.handleListenerMessage);
+    this.listener = listener;
 
-      this.listener = listener;
-
-      return listener;
-    } catch (err) {
-      this.setState({ listeningError: err });
-    }
+    return listener;
   }
 
-  handleListenerMessage = message => {
+  handleListenerMessage = ({ data }) => {
+    const message = JSON.parse(data);
     const messages = [
       { ...message, _idForInspector: nice() },
       ...this.state.messages
@@ -146,8 +142,8 @@ export default class PulseInspector extends PureComponent {
   };
 
   handleStartListening = () => {
-    this.setState({ listening: true });
-    this.listener.connect();
+    this.setState({ listening: true, listeningError: null });
+    this.createListener(this.state.bindings);
   };
 
   /** Set expanded message, note we rely on object reference comparison here */
@@ -235,7 +231,7 @@ export default class PulseInspector extends PureComponent {
   renderListeningError() {
     return (
       <Alert bsStyle="danger" onDismiss={this.handleDismissListeningError}>
-        <strong>Listening Error:</strong> {this.state.listeningError.message}
+        <strong>Listening Error:</strong> {this.state.listeningError}
       </Alert>
     );
   }
