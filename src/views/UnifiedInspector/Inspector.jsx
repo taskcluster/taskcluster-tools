@@ -295,12 +295,9 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener({
-      rootUrl: process.env.TASKCLUSTER_ROOT_URL
-    });
     const routingKey = { taskGroupId };
+    const bindings = [];
 
-    this.groupListener = listener;
     [
       'taskDefined',
       'taskPending',
@@ -308,10 +305,25 @@ export default class Inspector extends PureComponent {
       'taskCompleted',
       'taskFailed',
       'taskException'
-    ].map(binding => listener.bind(queueEvents[binding](routingKey)));
-    listener.on('message', this.handleGroupMessage);
-    listener.on('reconnect', () => this.loadTasks(this.props, null, true));
-    listener.connect();
+    ].map(binding =>
+      bindings.push(
+        (({ exchange, routingKeyPattern }) => ({
+          exchange,
+          routingKeyPattern
+        }))(queueEvents[binding](routingKey))
+      )
+    );
+
+    const listener = new EventSource(`
+      https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
+        JSON.stringify({ bindings })
+      )}`);
+
+    listener.addEventListener('message', msg =>
+      this.handleGroupMessage(JSON.parse(msg.data))
+    );
+
+    this.groupListener = listener;
 
     return listener;
   }
