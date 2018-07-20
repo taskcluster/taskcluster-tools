@@ -3,7 +3,7 @@ import { Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { WebListener, request } from 'taskcluster-client-web';
+import { request } from 'taskcluster-client-web';
 import { isNil, equals } from 'ramda';
 import Helmet from 'react-helmet';
 import PropsRoute from '../../components/PropsRoute';
@@ -339,14 +339,21 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener();
     const routingKey = { taskId };
+    const { exchange, routingKeyPattern } = queueEvents.artifactCreated(
+      routingKey
+    );
+    const bindings = [{ exchange, routingKeyPattern }];
+    const listener = new EventSource(`
+      https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
+        JSON.stringify({ bindings })
+      )}`);
+
+    listener.addEventListener('message', msg =>
+      this.handleTaskMessage(JSON.parse(msg.data))
+    );
 
     this.taskListener = listener;
-    listener.bind(queueEvents.artifactCreated(routingKey));
-    listener.on('message', this.handleTaskMessage);
-    listener.on('reconnect', () => this.loadTask(this.props));
-    listener.connect();
 
     return listener;
   }
