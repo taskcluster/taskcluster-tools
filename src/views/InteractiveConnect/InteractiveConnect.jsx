@@ -3,7 +3,6 @@ import { Alert, Button, Label } from 'react-bootstrap';
 import Tooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
-import { WebListener } from 'taskcluster-client-web';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
@@ -115,24 +114,34 @@ export default class InteractiveConnect extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener({
-      rootUrl: process.env.TASKCLUSTER_ROOT_URL
-    });
     const routingKey = { taskId };
+    const bindings = [];
 
     [
       'taskDefined',
       'taskPending',
       'taskRunning',
-      'artifactCreated',
       'taskCompleted',
       'taskFailed',
       'taskException'
-    ].map(binding => listener.bind(queueEvents[binding](routingKey)));
+    ].map(binding =>
+      bindings.push(
+        (({ exchange, routingKeyPattern }) => ({
+          exchange,
+          routingKeyPattern
+        }))(queueEvents[binding](routingKey))
+      )
+    );
 
-    listener.on('message', this.handleTaskMessage);
-    listener.on('reconnect', () => this.load(this.props));
-    listener.connect();
+    const listener = new EventSource(`
+      https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
+        JSON.stringify({ bindings })
+      )}`);
+
+    listener.addEventListener('message', msg =>
+      this.handleTaskMessage(JSON.parse(msg.data))
+    );
+
     this.taskListener = listener;
 
     return listener;
