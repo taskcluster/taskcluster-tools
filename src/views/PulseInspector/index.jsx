@@ -80,12 +80,12 @@ export default class PulseInspector extends PureComponent {
 
     const jsonBindings = encodeURIComponent(JSON.stringify({ bindings }));
     const listener = new EventSource(
-      urls.api('events', 'v1', 'connect/?bindings=') + jsonBindings
+      urls.api('events', 'v1', `connect/?bindings=${jsonBindings}`)
     );
 
     listener.addEventListener('message', this.handleListenerMessage);
-    listener.addEventListener('error', err => {
-      this.setState({ listeningError: err.data });
+    listener.addEventListener('error', ({ data }) => {
+      this.setState({ listeningError: data });
       this.handleStopListening();
     });
 
@@ -94,8 +94,8 @@ export default class PulseInspector extends PureComponent {
     return listener;
   }
 
-  handleListenerMessage = msg => {
-    const message = JSON.parse(msg.data);
+  handleListenerMessage = ({ data }) => {
+    const message = JSON.parse(data);
     const messages = [
       { ...message, _idForInspector: nice() },
       ...this.state.messages
