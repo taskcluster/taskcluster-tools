@@ -6,9 +6,9 @@ import 'codemirror/addon/display/placeholder';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/mode/simple';
 import CodeEditor from '../CodeEditor';
+import Diff from '../Diff';
 import './scopemode';
 import './styles.css';
-import Diff from './react-diff-custom';
 
 export default class ScopeEditor extends Component {
   static propTypes = {
@@ -89,8 +89,8 @@ export default class ScopeEditor extends Component {
   renderDiff() {
     return (
       <Diff
-        inputA={this.state.oldScopes.join('\n')}
-        inputB={this.state.scopeText}
+        original={this.state.oldScopes.join('\n')}
+        updated={this.state.scopeText}
         type="lines"
       />
     );
