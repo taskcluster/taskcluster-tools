@@ -7,7 +7,7 @@ import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
 import HelmetTitle from '../../components/HelmetTitle';
-import { labels } from '../../utils';
+import { labels, createEventsListener } from '../../utils';
 import iconUrl from './terminal.png';
 import { connectLinkButton, connectLinkText } from './styles.module.css';
 import UserSession from '../../auth/UserSession';
@@ -115,28 +115,19 @@ export default class InteractiveConnect extends PureComponent {
 
     const { queueEvents } = this.props;
     const routingKey = { taskId };
-    const bindings = [];
-
-    [
+    const exchanges = [
       'taskDefined',
       'taskPending',
       'taskRunning',
       'taskCompleted',
       'taskFailed',
       'taskException'
-    ].map(binding =>
-      bindings.push(
-        (({ exchange, routingKeyPattern }) => ({
-          exchange,
-          routingKeyPattern
-        }))(queueEvents[binding](routingKey))
-      )
-    );
-
-    const listener = new EventSource(`
-      https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
-        JSON.stringify({ bindings })
-      )}`);
+    ];
+    const listener = createEventsListener({
+      queueEvents,
+      exchanges,
+      routingKey
+    });
 
     listener.addEventListener('message', msg =>
       this.handleTaskMessage(JSON.parse(msg.data))

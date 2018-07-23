@@ -98,6 +98,24 @@ export const parameterizeTask = task =>
     }
   );
 
+export const createEventsListener = options => {
+  const bindings = [];
+
+  options.exchanges.map(exchange =>
+    bindings.push(
+      (({ exchange, routingKeyPattern }) => ({
+        exchange,
+        routingKeyPattern
+      }))(options.queueEvents[exchange](options.routingKey))
+    )
+  );
+
+  return new EventSource(`
+    https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
+      JSON.stringify({ bindings })
+    )}`);
+};
+
 // toArray :: a -> Array
 export const toArray = cond([[Array.isArray, identity], [T, of]]);
 

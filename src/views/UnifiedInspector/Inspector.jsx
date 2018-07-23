@@ -16,7 +16,7 @@ import ArtifactList from '../../components/ArtifactList';
 import successFavIcon from '../../images/taskcluster-group-success.png';
 import pendingFavIcon from '../../images/taskcluster-group-pending.png';
 import failedFavIcon from '../../images/taskcluster-group-failed.png';
-import { loadable } from '../../utils';
+import { loadable, createEventsListener } from '../../utils';
 import UserSession from '../../auth/UserSession';
 
 const GroupProgress = loadable(() =>
@@ -296,28 +296,19 @@ export default class Inspector extends PureComponent {
 
     const { queueEvents } = this.props;
     const routingKey = { taskGroupId };
-    const bindings = [];
-
-    [
+    const exchanges = [
       'taskDefined',
       'taskPending',
       'taskRunning',
       'taskCompleted',
       'taskFailed',
       'taskException'
-    ].map(binding =>
-      bindings.push(
-        (({ exchange, routingKeyPattern }) => ({
-          exchange,
-          routingKeyPattern
-        }))(queueEvents[binding](routingKey))
-      )
-    );
-
-    const listener = new EventSource(`
-      https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
-        JSON.stringify({ bindings })
-      )}`);
+    ];
+    const listener = createEventsListener({
+      queueEvents,
+      exchanges,
+      routingKey
+    });
 
     listener.addEventListener('message', msg =>
       this.handleGroupMessage(JSON.parse(msg.data))
@@ -340,14 +331,12 @@ export default class Inspector extends PureComponent {
 
     const { queueEvents } = this.props;
     const routingKey = { taskId };
-    const { exchange, routingKeyPattern } = queueEvents.artifactCreated(
+    const exchanges = ['artifactCreated'];
+    const listener = createEventsListener({
+      queueEvents,
+      exchanges,
       routingKey
-    );
-    const bindings = [{ exchange, routingKeyPattern }];
-    const listener = new EventSource(`
-      https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
-        JSON.stringify({ bindings })
-      )}`);
+    });
 
     listener.addEventListener('message', msg =>
       this.handleTaskMessage(JSON.parse(msg.data))
