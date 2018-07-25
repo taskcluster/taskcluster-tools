@@ -20,22 +20,19 @@ export default class Auth0Login extends PureComponent {
       return;
     }
 
-    webAuth.parseHash(
-      { hash: window.location.hash },
-      (loginError, authResult) => {
-        if (loginError) {
-          return this.setState({ loginError });
-        }
-
-        this.props.setUserSession(userSessionFromAuthResult(authResult));
-
-        if (window.opener) {
-          window.close();
-        } else {
-          history.push('/');
-        }
+    webAuth.parseHash(window.location.hash, (loginError, authResult) => {
+      if (loginError) {
+        return this.setState({ loginError });
       }
-    );
+
+      this.props.setUserSession(userSessionFromAuthResult(authResult));
+
+      if (window.opener) {
+        window.close();
+      } else {
+        history.push('/');
+      }
+    });
   }
 
   render() {
