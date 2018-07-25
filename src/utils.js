@@ -99,15 +99,11 @@ export const parameterizeTask = task =>
   );
 
 export const createEventsListener = options => {
-  const bindings = [];
-
-  options.exchanges.map(exchange =>
-    bindings.push(
-      (({ exchange, routingKeyPattern }) => ({
-        exchange,
-        routingKeyPattern
-      }))(options.queueEvents[exchange](options.routingKey))
-    )
+  const bindings = options.exchanges.map(exchange =>
+    (({ exchange, routingKeyPattern }) => ({
+      exchange,
+      routingKeyPattern
+    }))(options.queueEvents[exchange](options.routingKey))
   );
 
   return new EventSource(`

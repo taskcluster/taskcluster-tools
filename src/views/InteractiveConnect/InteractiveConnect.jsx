@@ -114,19 +114,17 @@ export default class InteractiveConnect extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const routingKey = { taskId };
-    const exchanges = [
-      'taskDefined',
-      'taskPending',
-      'taskRunning',
-      'taskCompleted',
-      'taskFailed',
-      'taskException'
-    ];
     const listener = createEventsListener({
       queueEvents,
-      exchanges,
-      routingKey
+      exchanges: [
+        'taskDefined',
+        'taskPending',
+        'taskRunning',
+        'taskCompleted',
+        'taskFailed',
+        'taskException'
+      ],
+      routingKey: { taskId }
     });
 
     listener.addEventListener('message', msg =>

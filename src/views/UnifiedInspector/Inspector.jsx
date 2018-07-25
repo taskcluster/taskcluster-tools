@@ -295,19 +295,17 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const routingKey = { taskGroupId };
-    const exchanges = [
-      'taskDefined',
-      'taskPending',
-      'taskRunning',
-      'taskCompleted',
-      'taskFailed',
-      'taskException'
-    ];
     const listener = createEventsListener({
       queueEvents,
-      exchanges,
-      routingKey
+      exchanges: [
+        'taskDefined',
+        'taskPending',
+        'taskRunning',
+        'taskCompleted',
+        'taskFailed',
+        'taskException'
+      ],
+      routingKey: { taskGroupId }
     });
 
     listener.addEventListener('message', msg =>
@@ -330,12 +328,10 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const routingKey = { taskId };
-    const exchanges = ['artifactCreated'];
     const listener = createEventsListener({
       queueEvents,
-      exchanges,
-      routingKey
+      exchanges: ['artifactCreated'],
+      routingKey: { taskId }
     });
 
     listener.addEventListener('message', msg =>
