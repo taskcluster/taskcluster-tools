@@ -7,7 +7,7 @@ import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
 import HelmetTitle from '../../components/HelmetTitle';
-import { labels, createEventsListener } from '../../utils';
+import { labels, createListener } from '../../utils';
 import iconUrl from './terminal.png';
 import { connectLinkButton, connectLinkText } from './styles.module.css';
 import UserSession from '../../auth/UserSession';
@@ -114,7 +114,7 @@ export default class InteractiveConnect extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = createEventsListener({
+    const listener = createListener({
       queueEvents,
       exchanges: [
         'taskDefined',

@@ -16,7 +16,7 @@ import ArtifactList from '../../components/ArtifactList';
 import successFavIcon from '../../images/taskcluster-group-success.png';
 import pendingFavIcon from '../../images/taskcluster-group-pending.png';
 import failedFavIcon from '../../images/taskcluster-group-failed.png';
-import { loadable, createEventsListener } from '../../utils';
+import { loadable, createListener } from '../../utils';
 import UserSession from '../../auth/UserSession';
 
 const GroupProgress = loadable(() =>
@@ -295,7 +295,7 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = createEventsListener({
+    const listener = createListener({
       queueEvents,
       exchanges: [
         'taskDefined',
@@ -328,7 +328,7 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = createEventsListener({
+    const listener = createListener({
       queueEvents,
       exchanges: ['artifactCreated'],
       routingKey: { taskId }

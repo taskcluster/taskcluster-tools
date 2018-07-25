@@ -98,7 +98,7 @@ export const parameterizeTask = task =>
     }
   );
 
-export const createEventsListener = options => {
+export const createListener = options => {
   const bindings = options.exchanges.map(exchange =>
     (({ exchange, routingKeyPattern }) => ({
       exchange,
