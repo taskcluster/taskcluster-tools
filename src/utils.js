@@ -99,12 +99,16 @@ export const parameterizeTask = task =>
   );
 
 export const createListener = options => {
-  const bindings = options.exchanges.map(exchange =>
-    (({ exchange, routingKeyPattern }) => ({
-      exchange,
-      routingKeyPattern
-    }))(options.queueEvents[exchange](options.routingKey))
-  );
+  let { bindings } = options;
+
+  if (!bindings) {
+    bindings = options.exchanges.map(exchange =>
+      (({ exchange, routingKeyPattern }) => ({
+        exchange,
+        routingKeyPattern
+      }))(options.queueEvents[exchange](options.routingKey))
+    );
+  }
 
   return new EventSource(`
     https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(

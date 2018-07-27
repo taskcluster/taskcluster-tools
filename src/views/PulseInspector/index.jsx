@@ -16,7 +16,7 @@ import { pick } from 'ramda';
 import { parse, stringify } from 'qs';
 import MessageRow from './MessageRow';
 import HelmetTitle from '../../components/HelmetTitle';
-import { urls } from '../../utils';
+import { urls, createListener } from '../../utils';
 
 export default class PulseInspector extends PureComponent {
   static defaultProps = {
@@ -78,10 +78,7 @@ export default class PulseInspector extends PureComponent {
       return;
     }
 
-    const jsonBindings = encodeURIComponent(JSON.stringify({ bindings }));
-    const listener = new EventSource(
-      urls.api('events', 'v1', `connect/?bindings=${jsonBindings}`)
-    );
+    const listener = createListener({ bindings });
 
     listener.addEventListener('message', this.handleListenerMessage);
     listener.addEventListener('error', ({ data }) => {
