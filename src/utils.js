@@ -98,24 +98,6 @@ export const parameterizeTask = task =>
     }
   );
 
-export const createListener = options => {
-  let { bindings } = options;
-
-  if (!bindings) {
-    bindings = options.exchanges.map(exchange =>
-      (({ exchange, routingKeyPattern }) => ({
-        exchange,
-        routingKeyPattern
-      }))(options.queueEvents[exchange](options.routingKey))
-    );
-  }
-
-  return new EventSource(`
-    https://taskcluster-events-staging.herokuapp.com/v1/connect/?bindings=${encodeURIComponent(
-      JSON.stringify({ bindings })
-    )}`);
-};
-
 // toArray :: a -> Array
 export const toArray = cond([[Array.isArray, identity], [T, of]]);
 
@@ -141,3 +123,22 @@ export const loadable = loader =>
   });
 
 export const urls = withRootUrl(process.env.TASKCLUSTER_ROOT_URL);
+
+export const createListener = options => {
+  const bindings =
+    options.bindings ||
+    options.exchanges.map(exchange =>
+      (({ exchange, routingKeyPattern }) => ({
+        exchange,
+        routingKeyPattern
+      }))(options.queueEvents[exchange](options.routingKey))
+    );
+
+  return new EventSource(
+    urls.api(
+      'events',
+      'v1',
+      `connect/?bindings=${encodeURIComponent(JSON.stringify({ bindings }))}`
+    )
+  );
+};
