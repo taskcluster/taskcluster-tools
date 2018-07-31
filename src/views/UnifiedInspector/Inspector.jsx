@@ -3,7 +3,7 @@ import { Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
 import Icon from 'react-fontawesome';
-import { WebListener, request } from 'taskcluster-client-web';
+import { request } from 'taskcluster-client-web';
 import { isNil, equals } from 'ramda';
 import Helmet from 'react-helmet';
 import PropsRoute from '../../components/PropsRoute';
@@ -16,7 +16,7 @@ import ArtifactList from '../../components/ArtifactList';
 import successFavIcon from '../../images/taskcluster-group-success.png';
 import pendingFavIcon from '../../images/taskcluster-group-pending.png';
 import failedFavIcon from '../../images/taskcluster-group-failed.png';
-import { loadable } from '../../utils';
+import { loadable, createListener } from '../../utils';
 import UserSession from '../../auth/UserSession';
 
 const GroupProgress = loadable(() =>
@@ -295,23 +295,24 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener({
-      rootUrl: process.env.TASKCLUSTER_ROOT_URL
+    const listener = createListener({
+      queueEvents,
+      exchanges: [
+        'taskDefined',
+        'taskPending',
+        'taskRunning',
+        'taskCompleted',
+        'taskFailed',
+        'taskException'
+      ],
+      routingKey: { taskGroupId }
     });
-    const routingKey = { taskGroupId };
+
+    listener.addEventListener('message', msg =>
+      this.handleGroupMessage(JSON.parse(msg.data))
+    );
 
     this.groupListener = listener;
-    [
-      'taskDefined',
-      'taskPending',
-      'taskRunning',
-      'taskCompleted',
-      'taskFailed',
-      'taskException'
-    ].map(binding => listener.bind(queueEvents[binding](routingKey)));
-    listener.on('message', this.handleGroupMessage);
-    listener.on('reconnect', () => this.loadTasks(this.props, null, true));
-    listener.connect();
 
     return listener;
   }
@@ -327,14 +328,17 @@ export default class Inspector extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener();
-    const routingKey = { taskId };
+    const listener = createListener({
+      queueEvents,
+      exchanges: ['artifactCreated'],
+      routingKey: { taskId }
+    });
+
+    listener.addEventListener('message', msg =>
+      this.handleTaskMessage(JSON.parse(msg.data))
+    );
 
     this.taskListener = listener;
-    listener.bind(queueEvents.artifactCreated(routingKey));
-    listener.on('message', this.handleTaskMessage);
-    listener.on('reconnect', () => this.loadTask(this.props));
-    listener.connect();
 
     return listener;
   }

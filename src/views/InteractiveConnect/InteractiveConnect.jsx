@@ -3,12 +3,11 @@ import { Alert, Button, Label } from 'react-bootstrap';
 import Tooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import Icon from 'react-fontawesome';
-import { WebListener } from 'taskcluster-client-web';
 import Error from '../../components/Error';
 import Spinner from '../../components/Spinner';
 import Markdown from '../../components/Markdown';
 import HelmetTitle from '../../components/HelmetTitle';
-import { labels } from '../../utils';
+import { labels, createListener } from '../../utils';
 import iconUrl from './terminal.png';
 import { connectLinkButton, connectLinkText } from './styles.module.css';
 import UserSession from '../../auth/UserSession';
@@ -115,24 +114,23 @@ export default class InteractiveConnect extends PureComponent {
     }
 
     const { queueEvents } = this.props;
-    const listener = new WebListener({
-      rootUrl: process.env.TASKCLUSTER_ROOT_URL
+    const listener = createListener({
+      queueEvents,
+      exchanges: [
+        'taskDefined',
+        'taskPending',
+        'taskRunning',
+        'taskCompleted',
+        'taskFailed',
+        'taskException'
+      ],
+      routingKey: { taskId }
     });
-    const routingKey = { taskId };
 
-    [
-      'taskDefined',
-      'taskPending',
-      'taskRunning',
-      'artifactCreated',
-      'taskCompleted',
-      'taskFailed',
-      'taskException'
-    ].map(binding => listener.bind(queueEvents[binding](routingKey)));
+    listener.addEventListener('message', msg =>
+      this.handleTaskMessage(JSON.parse(msg.data))
+    );
 
-    listener.on('message', this.handleTaskMessage);
-    listener.on('reconnect', () => this.load(this.props));
-    listener.connect();
     this.taskListener = listener;
 
     return listener;
