@@ -60,7 +60,7 @@
     "react-addons-css-transition-group": "^15.6.2",
     "react-bootstrap": "^0.31.5",
     "react-datepicker": "^0.61.0",
-    "react-dom": "^15.5.4",
+    "react-dom": "^16.0.1",
     "react-fontawesome": "^1.6.1",
     "react-helmet": "^5.2.0",
     "react-hot-loader": "^3.0.0",
