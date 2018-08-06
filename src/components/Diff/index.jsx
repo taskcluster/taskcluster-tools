@@ -38,7 +38,6 @@ export default class Diff extends Component {
             this.props.updated[{ newlineIsToken: true }]
           )
         : fnMap[this.props.type](this.props.original, this.props.updated);
-    // Change the original styling.
     const result = diff.map((part, index) => {
       let spanStyle = unchanged;
 
