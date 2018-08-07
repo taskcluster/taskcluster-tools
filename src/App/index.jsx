@@ -55,6 +55,9 @@ const ClientManager = loadable(() =>
 const RoleManager = loadable(() =>
   import(/* webpackChunkName: 'RoleManager' */ '../views/RoleManager')
 );
+const ScopeInspector = loadable(() =>
+  import(/* webpackChunkName: 'ScopeInspector' */ '../views/ScopeInspector')
+);
 const ScopesetExpander = loadable(() =>
   import(/* webpackChunkName: 'ScopesetExpander' */ '../views/ScopesetExpander')
 );
@@ -262,6 +265,10 @@ export default class App extends Component {
                 <PropsRoute
                   path="/auth/scopes/expansions"
                   component={ScopesetExpander}
+                />
+                <PropsRoute
+                  path="/auth/scopes/:selectedScope?/:selectedEntity?"
+                  component={ScopeInspector}
                 />
                 <PropsRoute
                   path="/pulse-inspector"

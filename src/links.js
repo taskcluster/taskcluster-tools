@@ -53,6 +53,13 @@ export default [
       and delete roles. You can also manage scopes and explore indirect scopes.`
   },
   {
+    title: 'Scope Inspector',
+    link: '/auth/scopes/',
+    icon: 'graduation-cap',
+    description: `Explore scopes on the Auth service. This tool allows you to find roles and
+      clients with a given scope. This is effectively reverse client and role lookup.`
+  },
+  {
     title: 'Scopeset Expander',
     link: '/auth/scopes/expansions',
     icon: 'expand',

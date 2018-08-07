@@ -91,13 +91,9 @@ export default class ScopeEditor extends Component {
       <ul className="form-control-static" style={{ paddingLeft: 20 }}>
         {scopes.map(scope => (
           <li key={`scope-editor-${scope}`}>
-            {/^assume:.*[^*]$/.test(scope) ? (
-              <Link to={`/auth/roles/${encodeURIComponent(scope.slice(7))}`}>
-                <code>{scope}</code>
-              </Link>
-            ) : (
+            <Link to={`/auth/scopes/${encodeURIComponent(scope)}`}>
               <code>{scope}</code>
-            )}
+            </Link>
           </li>
         ))}
       </ul>
