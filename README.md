@@ -83,3 +83,18 @@ For using ngrok:
 - Run ngrok - `ngrok http 9000`
 
 <sup>Note: You have to run ngrok in a separate terminal/console.</sup>
+
+## Deployment
+
+Taskcluster uses Travis to automatically deploy the Heroku application after a successful build on master.
+This is done in `.travis.yml`:
+
+```yml
+deploy:
+  provider: heroku
+  api_key:
+    secure: "YOUR ENCRYPTED API KEY"
+```
+
+If a deployment results in the site throwing a 404, try updating the API key.
+A non valid key will not deploy properly.
