@@ -22,7 +22,7 @@
       "X-Content-Type-Options": "nosniff",
       "X-XSS-Protection": "1; mode=block",
       "Referrer-Policy": "origin",
-      "Content-Security-Policy": "default-src 'none'; connect-src 'self' https:; script-src 'self' 'unsafe-eval' https:; font-src 'self' data:; img-src 'self' https:; style-src https: 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'",
+      "Content-Security-Policy": "default-src 'none'; connect-src 'self' https:; script-src 'self' 'unsafe-eval' https:; font-src 'self' data:; img-src 'self' https: data:; style-src https: 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'",
       "Strict-Transport-Security": "max-age=31536000; includeSubDomains; always;"
     },
     "/*.*": {
@@ -31,7 +31,7 @@
       "X-Content-Type-Options": "nosniff",
       "X-XSS-Protection": "1; mode=block",
       "Referrer-Policy": "origin",
-      "Content-Security-Policy": "default-src 'none'; connect-src 'self' https:; script-src 'self' 'unsafe-eval' https:; font-src 'self' data:; img-src 'self' https:; style-src https: 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'",
+      "Content-Security-Policy": "default-src 'none'; connect-src 'self' https:; script-src 'self' 'unsafe-eval' https:; font-src 'self' data:; img-src 'self' https: data:; style-src https: 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'",
       "Strict-Transport-Security": "max-age=31536000; includeSubDomains; always;"
     },
     "/index.html": {
@@ -40,7 +40,7 @@
       "X-Content-Type-Options": "nosniff",
       "X-XSS-Protection": "1; mode=block",
       "Referrer-Policy": "origin",
-      "Content-Security-Policy": "default-src 'none'; connect-src 'self' https:; script-src 'self' 'unsafe-eval' https:; font-src 'self' data:; img-src 'self' https:; style-src https: 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'",
+      "Content-Security-Policy": "default-src 'none'; connect-src 'self' https:; script-src 'self' 'unsafe-eval' https:; font-src 'self' data:; img-src 'self' https: data:; style-src https: 'unsafe-inline'; object-src 'none'; frame-ancestors 'self'",
       "Strict-Transport-Security": "max-age=31536000; includeSubDomains; always;"
     }
   }
