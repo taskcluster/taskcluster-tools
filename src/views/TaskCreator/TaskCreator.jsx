@@ -19,7 +19,7 @@ const defaultTask = {
     .add(3, 'hours')
     .toISOString(),
   payload: {
-    image: 'ubuntu:13.10',
+    image: 'ubuntu:latest',
     command: [
       '/bin/bash',
       '-c',
