@@ -2893,6 +2893,10 @@ detect-node@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.3.tgz#a2033c09cc8e158d37748fbde7507832bd6ce127"
 
+diff@^1.2.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/diff/-/diff-1.4.0.tgz#7f28d2eb9ee7b15a97efd89ce63dcfdaa3ccbabf"
+
 diffie-hellman@^5.0.0:
   version "5.0.3"
   resolved "https://registry.yarnpkg.com/diffie-hellman/-/diffie-hellman-5.0.3.tgz#40e8ee98f55a2149607146921c63e1ae5f3d2875"
@@ -7481,6 +7485,12 @@ react-day-picker-themeable@^2.5.1:
 react-deep-force-update@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-2.1.1.tgz#8ea4263cd6455a050b37445b3f08fd839d86e909"
+
+react-diff@0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/react-diff/-/react-diff-0.0.7.tgz#4e5570d288529b6fec3ddba4e1ac18d71e5a4996"
+  dependencies:
+    diff "^1.2.0"
 
 react-dom@^15.5.4:
   version "15.6.2"

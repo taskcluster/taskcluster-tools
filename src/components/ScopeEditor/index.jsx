@@ -6,6 +6,7 @@ import 'codemirror/addon/display/placeholder';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/mode/simple';
 import CodeEditor from '../CodeEditor';
+import Diff from '../Diff';
 import './scopemode';
 import './styles.css';
 
@@ -14,6 +15,7 @@ export default class ScopeEditor extends Component {
     // true to display the editor; expandedScopes can just display
     // by leaving this unset
     editing: bool,
+    review: bool,
     scopes: arrayOf(string).isRequired,
     // called when scopes have changed
     onScopesUpdated: func
@@ -23,7 +25,8 @@ export default class ScopeEditor extends Component {
     super(props);
 
     this.state = {
-      scopeText: props.scopes.join('\n')
+      scopeText: props.scopes.join('\n'),
+      oldScopes: props.scopes
     };
   }
 
@@ -83,6 +86,16 @@ export default class ScopeEditor extends Component {
     );
   }
 
+  renderDiff() {
+    return (
+      <Diff
+        original={this.state.oldScopes.join('\n')}
+        updated={this.state.scopeText}
+        type="lines"
+      />
+    );
+  }
+
   /** Render a list of scopes */
   renderScopes() {
     const { scopes } = this.props;
@@ -101,6 +114,12 @@ export default class ScopeEditor extends Component {
   }
 
   render() {
-    return this.props.editing ? this.renderScopeEditor() : this.renderScopes();
+    if (this.props.review) {
+      return this.renderDiff();
+    } else if (this.props.editing) {
+      return this.renderScopeEditor();
+    }
+
+    return this.renderScopes();
   }
 }

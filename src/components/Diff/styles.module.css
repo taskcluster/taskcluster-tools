@@ -1,0 +1,15 @@
+/* Original styling: lightgreen, salmon, lightgrey */
+
+.addition {
+  color: seagreen;
+  background-color: palegreen;
+}
+
+.deletion {
+  color: red;
+  background-color: mistyrose;
+}
+
+.unchanged {
+  color: grey;
+}
