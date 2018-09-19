@@ -70,21 +70,36 @@ export default class ClientManager extends Component {
     this.setState({ clients: null }, async () => {
       try {
         await this.loadClientPrefix();
-        const { clientPrefix } = this.state;
+        const { clientPrefix, continuation } = this.state;
         // the new listClients API schema changes response schema,
         // https://bugzilla.mozilla.org/show_bug.cgi?id=1436212
+        const query = { prefix: clientPrefix };
+
+        if (continuation) {
+          query.continuationToken = continuation;
+        }
+
         const clientResponse = await this.props.auth.listClients(
-          clientPrefix ? { prefix: clientPrefix } : null
+          clientPrefix ? query : null
         );
         const clients =
           clientResponse && clientResponse.clients
             ? clientResponse.clients
             : clientResponse;
+        const continuationToken =
+          clientResponse && clientResponse.continuationToken
+            ? clientResponse.continuationToken
+            : undefined;
 
-        this.setState({ clients, error: null });
+        this.setState({
+          clients,
+          continuation: continuationToken,
+          error: null
+        });
       } catch (err) {
         this.setState({
           clients: null,
+          continuation: undefined,
           error: err
         });
       }
