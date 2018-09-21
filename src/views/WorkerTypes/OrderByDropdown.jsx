@@ -15,11 +15,11 @@ export default class OrderByDropdown extends PureComponent {
       <DropdownButton
         bsSize="sm"
         title={`Order by: ${
-          this.props.orderBy ? sentenceCase(this.props.orderBy) : 'None'
+          this.props.orderBy ? sentenceCase(this.props.orderBy) : 'Name'
         }`}
         id="order-by-worker-types-dropdown"
         onSelect={this.props.onSelect}>
-        <MenuItem eventKey="None">None</MenuItem>
+        <MenuItem eventKey="Name">Name</MenuItem>
         <MenuItem divider />
         {this.props.orderableProperties.map(prop => (
           <MenuItem
