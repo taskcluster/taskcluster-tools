@@ -87,10 +87,15 @@ export default class LogView extends PureComponent {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ jump: false });
     }
+
+    if (this.state.follow) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ follow: true });
+    }
   }
 
   prefersFollow() {
-    return localStorage.getItem('follow-log') === 'true';
+    return localStorage.getItem('follow-log') === 'true' ? ' ' : 'true';
   }
 
   handleJump = () => {
