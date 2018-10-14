@@ -37,6 +37,8 @@ export default class ClientManager extends Component {
       UserSession.userChanged(this.props.userSession, nextProps.userSession)
     ) {
       this.setState({ error: null });
+      this.setState({ clientPrefixLoaded: false });
+      this.handleLoadClients();
     }
   }
 
