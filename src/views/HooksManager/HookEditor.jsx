@@ -93,7 +93,7 @@ export default class HookEditor extends PureComponent {
 
     return (
       hook.metadata.name &&
-      hook.metadata.description &&
+      (hook.metadata.description || hook.metadata.description === '') &&
       hook.metadata.owner &&
       this.state.hookValidJson &&
       this.state.triggerSchemaValidJson
