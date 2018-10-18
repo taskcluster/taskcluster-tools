@@ -57,7 +57,7 @@ export default class TriggerButton extends Component {
       return this.setState({
         context: null,
         contextValid: false,
-        validityMessage: 'Trigger context is not valid YAML'
+        validityMessage: 'Trigger context is not valid'
       });
     }
   };
