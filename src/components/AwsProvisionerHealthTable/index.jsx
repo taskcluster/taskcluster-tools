@@ -10,7 +10,12 @@ import {
 import { snakeCase, camelCase } from 'change-case';
 import { isEmpty, defaultTo } from 'ramda';
 import { object } from 'prop-types';
-import { buttonGroup, columnNoWrap, tooltip } from './styles.module.css';
+import {
+  description,
+  buttonGroup,
+  columnNoWrap,
+  tooltip
+} from './styles.module.css';
 
 export default class AwsProvisionerHealthTable extends PureComponent {
   static propTypes = {
@@ -143,6 +148,11 @@ export default class AwsProvisionerHealthTable extends PureComponent {
 
     return (
       <div>
+        <div className={description}>
+          This is an overview of the health of aws requests in each Region, AZ
+          and Instance Type. The values are <strong>approximate</strong> stats
+          on the configuration.
+        </div>
         <div className={buttonGroup}>
           <DropdownButton
             id="sort-error-table-dropdown"

@@ -4,7 +4,7 @@ import { Table, DropdownButton, MenuItem } from 'react-bootstrap';
 import { camelCase } from 'change-case';
 import moment from 'moment';
 import DateView from '../../components/DateView';
-import { buttonGroup, columnNoWrap } from './styles.module.css';
+import { buttonGroup, columnNoWrap, description } from './styles.module.css';
 
 export default class AwsProvisionerErrorTable extends PureComponent {
   static propTypes = {
@@ -43,6 +43,9 @@ export default class AwsProvisionerErrorTable extends PureComponent {
 
     return (
       <div>
+        <div className={description}>
+          This shows the latest errors encountered.
+        </div>
         <div className={buttonGroup}>
           <DropdownButton
             id="sort-error-table-dropdown"

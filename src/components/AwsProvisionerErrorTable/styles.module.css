@@ -5,3 +5,7 @@
 .columnNoWrap {
   white-space: nowrap;
 }
+
+.description {
+  margin-bottom: 10px;
+}
