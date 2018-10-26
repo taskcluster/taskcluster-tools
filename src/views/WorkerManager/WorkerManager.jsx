@@ -128,13 +128,17 @@ export default class WorkerManager extends PureComponent {
           workerGroup,
           workerId
         );
+
+        // Display worker data while loading tasks.
+        this.setState({ worker, recentTasks: [{}] });
+
         const recentTasks = await this.handleLoadRecentTasks(
           worker.recentTasks
         );
 
-        this.setState({ worker, recentTasks, loading: false, error: null });
+        this.setState({ recentTasks, loading: false });
       } catch (error) {
-        this.setState({ worker: null, recentTasks: [], loading: false, error });
+        this.setState({ loading: false, error });
       }
     });
   };
@@ -143,8 +147,8 @@ export default class WorkerManager extends PureComponent {
     Promise.all(
       recentTasks.map(async ({ taskId, runId }) => {
         const [task, { status }] = await Promise.all([
-          this.props.queue.task(taskId),
-          this.props.queue.status(taskId)
+          this.props.queue.task(taskId).catch(() => taskId),
+          this.props.queue.status(taskId).catch(e => e)
         ]);
 
         return { task, status, runId };

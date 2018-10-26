@@ -54,6 +54,18 @@ export default class WorkerTable extends PureComponent {
   );
 
   renderTask = ({ task, status, runId }, index) => {
+    if (!status) {
+      return (
+        <tr key={`recent-task-${index}`}>
+          <td />
+          <td />
+          <td>{task}</td>
+          <td />
+          <td />
+        </tr>
+      );
+    }
+
     const run = status.runs[runId];
     const description = this.renderTaskDescription(task.metadata);
 
@@ -110,6 +122,10 @@ export default class WorkerTable extends PureComponent {
 
     const sort = tasks =>
       tasks.sort((a, b) => {
+        if (!a.status || !b.status) {
+          return 0;
+        }
+
         const diff = moment(a.status.runs[a.runId].started).diff(
           moment(b.status.runs[b.runId].started)
         );
@@ -124,7 +140,8 @@ export default class WorkerTable extends PureComponent {
     if (filterStatus !== 'all') {
       return sort(
         tasks.filter(
-          task => task.status.runs[task.runId].state === filterStatus
+          task =>
+            task.status && task.status.runs[task.runId].state === filterStatus
         )
       );
     }
