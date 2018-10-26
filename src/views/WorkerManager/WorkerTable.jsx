@@ -54,7 +54,7 @@ export default class WorkerTable extends PureComponent {
   );
 
   renderTask = ({ task, status, runId }, index) => {
-    if (status === undefined) {
+    if (!status) {
       return (
         <tr key={`recent-task-${index}`}>
           <td />
@@ -122,7 +122,7 @@ export default class WorkerTable extends PureComponent {
 
     const sort = tasks =>
       tasks.sort((a, b) => {
-        if (a.status === undefined || b.status === undefined) {
+        if (!a.status || !b.status) {
           return 0;
         }
 
@@ -141,8 +141,7 @@ export default class WorkerTable extends PureComponent {
       return sort(
         tasks.filter(
           task =>
-            task.status !== undefined &&
-            task.status.runs[task.runId].state === filterStatus
+            task.status && task.status.runs[task.runId].state === filterStatus
         )
       );
     }
