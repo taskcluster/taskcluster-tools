@@ -133,7 +133,7 @@ export default class WorkerManager extends PureComponent {
         this.setState({ worker, recentTasks: [{}] });
 
         const recentTasks = await this.handleLoadRecentTasks(
-          worker.recentTasks
+          worker.recentTasks.reverse()
         );
 
         this.setState({ recentTasks, loading: false });
