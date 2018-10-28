@@ -8,7 +8,7 @@ import Code from '../../components/Code';
 import WorkerTypeEditor from './WorkerTypeEditor';
 import WorkerTypeResources from './WorkerTypeResources';
 import WorkerTypeStatus from './WorkerTypeStatus';
-import WorkerTypeHealth from './WorkerTypeHealth';
+import WorkerTypeErrors from './WorkerTypeErrors';
 import UserSession from '../../auth/UserSession';
 
 export default class WorkerTypeView extends PureComponent {
@@ -110,9 +110,9 @@ export default class WorkerTypeView extends PureComponent {
       );
     }
 
-    if (currentTab === 'health') {
+    if (currentTab === 'errors') {
       return (
-        <WorkerTypeHealth
+        <WorkerTypeErrors
           ec2Manager={this.props.ec2Manager}
           workerType={this.props.workerType}
         />
@@ -164,8 +164,8 @@ export default class WorkerTypeView extends PureComponent {
           <NavItem eventKey="resources" key="resources">
             EC2 Resources
           </NavItem>
-          <NavItem eventKey="health" key="health">
-            Health
+          <NavItem eventKey="errors" key="errors">
+            Recent Provisioning Errors
           </NavItem>
         </Nav>
         <div className="tab-content" style={{ minHeight: 400 }}>

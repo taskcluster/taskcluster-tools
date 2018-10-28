@@ -4,7 +4,7 @@ import { Table, DropdownButton, MenuItem } from 'react-bootstrap';
 import { camelCase } from 'change-case';
 import moment from 'moment';
 import DateView from '../../components/DateView';
-import { buttonGroup, columnNoWrap, description } from './styles.module.css';
+import { buttonGroup, columnNoWrap } from './styles.module.css';
 
 export default class AwsProvisionerErrorTable extends PureComponent {
   static propTypes = {
@@ -33,6 +33,22 @@ export default class AwsProvisionerErrorTable extends PureComponent {
     this.setState({ sortBy });
   };
 
+  getErrorType = type => {
+    switch (type) {
+      case 'instance-request': {
+        return 'Error requesting new instance';
+      }
+
+      case 'termination': {
+        return 'Error while running instance';
+      }
+
+      default: {
+        return type;
+      }
+    }
+  };
+
   render() {
     const { errorData } = this.props;
     const { sortBy } = this.state;
@@ -43,9 +59,6 @@ export default class AwsProvisionerErrorTable extends PureComponent {
 
     return (
       <div>
-        <div className={description}>
-          This shows the latest errors encountered.
-        </div>
         <div className={buttonGroup}>
           <DropdownButton
             id="sort-error-table-dropdown"
@@ -79,7 +92,7 @@ export default class AwsProvisionerErrorTable extends PureComponent {
               <tr
                 key={`${item.type}:${item.az}:${item.workerType}:${item.time}`}>
                 <td className={columnNoWrap}>{item.az}</td>
-                <td className={columnNoWrap}>{item.type}</td>
+                <td className={columnNoWrap}>{this.getErrorType(item.type)}</td>
                 <td className={columnNoWrap}>{item.instanceType}</td>
                 <td className={columnNoWrap}>
                   <code>{item.code}</code>
