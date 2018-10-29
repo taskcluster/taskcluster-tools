@@ -51,7 +51,7 @@ export default class AwsProvisionerErrors extends PureComponent {
 
     return (
       <div>
-        <h4>Recent Errors</h4>
+        <h4>Recent Provisioning Errors</h4>
         <AwsProvisionerErrorTable errorData={recentErrors} />
       </div>
     );

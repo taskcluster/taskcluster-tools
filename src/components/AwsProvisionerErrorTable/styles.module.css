@@ -1,7 +1,11 @@
 .buttonGroup {
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
 .columnNoWrap {
   white-space: nowrap;
+}
+
+.description {
+  margin-bottom: 10px;
 }

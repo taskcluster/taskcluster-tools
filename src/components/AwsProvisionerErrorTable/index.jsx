@@ -33,6 +33,22 @@ export default class AwsProvisionerErrorTable extends PureComponent {
     this.setState({ sortBy });
   };
 
+  getErrorType = type => {
+    switch (type) {
+      case 'instance-request': {
+        return 'Error requesting new instance';
+      }
+
+      case 'termination': {
+        return 'Error while running instance';
+      }
+
+      default: {
+        return type;
+      }
+    }
+  };
+
   render() {
     const { errorData } = this.props;
     const { sortBy } = this.state;
@@ -76,7 +92,7 @@ export default class AwsProvisionerErrorTable extends PureComponent {
               <tr
                 key={`${item.type}:${item.az}:${item.workerType}:${item.time}`}>
                 <td className={columnNoWrap}>{item.az}</td>
-                <td className={columnNoWrap}>{item.type}</td>
+                <td className={columnNoWrap}>{this.getErrorType(item.type)}</td>
                 <td className={columnNoWrap}>{item.instanceType}</td>
                 <td className={columnNoWrap}>
                   <code>{item.code}</code>

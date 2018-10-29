@@ -9,3 +9,7 @@
 .tooltip {
   white-space: pre-wrap;
 }
+
+.description {
+  margin-bottom: 10px;
+}

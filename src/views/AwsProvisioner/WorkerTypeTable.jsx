@@ -281,7 +281,7 @@ export default class WorkerTypeTable extends PureComponent {
             bsStyle="primary"
             bsSize="sm"
             className={recentErrorsButton}>
-            <Glyphicon glyph="exclamation-sign" /> Recent Errors
+            <Glyphicon glyph="exclamation-sign" /> Recent Provisioning Errors
           </Button>
           <Button
             title="Health of each region/az/instanceType"
