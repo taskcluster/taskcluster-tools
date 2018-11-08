@@ -11,7 +11,8 @@
     "lint": "neutrino lint",
     "debug": "node --inspect ./node_modules/.bin/neutrino start --require dotenv/config",
     "build": "neutrino build --require dotenv/config",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "heroku-prebuild": "yarn install --frozen-lockfile"
   },
   "lint-staged": {
     "*.js*": [
