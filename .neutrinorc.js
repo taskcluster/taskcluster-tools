@@ -6,7 +6,9 @@ const GitRevisionPlugin = require('git-revision-webpack-plugin');
 // but hashes could remain the same
 const CACHE_VERSION = 'v1';
 
-process.env.COMMIT_HASH = new GitRevisionPlugin().commithash();
+// SOURCE_VERSION is for Heroku
+// https://github.com/pirelenito/git-revision-webpack-plugin/issues/19#issuecomment-389793896
+process.env.COMMIT_HASH = process.env.SOURCE_VERSION || new GitRevisionPlugin().commithash();
 
 module.exports = {
   use: [
