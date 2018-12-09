@@ -68,6 +68,8 @@ export default class CachePurgeInspector extends PureComponent {
     this.setState({ formCacheName: event.target.value });
 
   handleSendRequest = async () => {
+    const { formProvisionerId, formWorkerType, formCacheName } = this.state;
+
     try {
       await this.props.purgeCache.purgeCache(
         formProvisionerId,
@@ -143,10 +145,11 @@ export default class CachePurgeInspector extends PureComponent {
 
   renderForm() {
     const { formProvisionerId, formWorkerType, formCacheName } = this.state;
-    const nonEmptyFields=
-        formProvisionerId.length > 0 &&
-        formWorkerType.length > 0 &&
-        formCacheName.length > 0;
+    const nonEmptyFields =
+      formProvisionerId.length > 0 &&
+      formWorkerType.length > 0 &&
+      formCacheName.length > 0;
+
     if (this.state.formError) {
       return (
         <Alert bsStyle="danger" onDismiss={this.handleDismissError}>
@@ -203,7 +206,10 @@ export default class CachePurgeInspector extends PureComponent {
         </p>
 
         <ButtonToolbar>
-          <Button bsStyle="primary" onClick={this.handleSendRequest} disabled={nonEmptyFields}>
+          <Button
+            bsStyle="primary"
+            onClick={this.handleSendRequest}
+            disabled={!nonEmptyFields}>
             <Glyphicon glyph="plus" /> Create request
           </Button>
         </ButtonToolbar>
