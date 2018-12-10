@@ -33,7 +33,11 @@ export default class CachePurgeInspector extends PureComponent {
   componentWillMount() {
     this.loadCaches();
   }
+  isFormValid = () => {
+    const { formProvisionerId, formWorkerType, formCacheName } = this.state;
 
+    return formProvisionerId && formWorkerType && formCacheName;
+  };
   componentWillReceiveProps(nextProps) {
     if (
       UserSession.userChanged(this.props.userSession, nextProps.userSession)
@@ -144,12 +148,6 @@ export default class CachePurgeInspector extends PureComponent {
   );
 
   renderForm() {
-    const { formProvisionerId, formWorkerType, formCacheName } = this.state;
-    const nonEmptyFields =
-      formProvisionerId.length > 0 &&
-      formWorkerType.length > 0 &&
-      formCacheName.length > 0;
-
     if (this.state.formError) {
       return (
         <Alert bsStyle="danger" onDismiss={this.handleDismissError}>
@@ -209,7 +207,7 @@ export default class CachePurgeInspector extends PureComponent {
           <Button
             bsStyle="primary"
             onClick={this.handleSendRequest}
-            disabled={!nonEmptyFields}>
+            disabled={this.isFormValid}>
             <Glyphicon glyph="plus" /> Create request
           </Button>
         </ButtonToolbar>
