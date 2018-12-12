@@ -184,6 +184,8 @@ export default class ActionsMenu extends PureComponent {
     return taskId;
   };
 
+  handleRerunTask = () => this.props.queue.rerunTask(this.props.taskId);
+
   // copy fields from the parent task, intentionally excluding some
   // fields which might cause confusion if left unchanged
   handleCloneTask = () =>
@@ -254,6 +256,17 @@ export default class ActionsMenu extends PureComponent {
           <li>Strip self-dependencies from the task definition</li>
         </ul>
         Note: this may not work with all tasks.
+      </span>
+    );
+  }
+
+  rerunTaskModal() {
+    return (
+      <span>
+        This will cause a new run of the task to be created with the same{' '}
+        <code>taskId</code>. It will only succeed if the task hasn&quot;t passed
+        it&quot;s deadline. Notice that this may interfere with listeners who
+        only expects this tasks to be resolved once.
       </span>
     );
   }
@@ -540,6 +553,14 @@ export default class ActionsMenu extends PureComponent {
             disabled={!(queue && task && task.payload)}
             body={this.retriggerTaskModal()}>
             <Icon name="refresh" /> Retrigger Task
+          </ModalItem>
+        )}
+        {this.isDefaultActionVisible('rerun') && (
+          <ModalItem
+            onSubmit={this.handleRerunTask}
+            disabled={!(queue && task && task.payload)}
+            body={this.rerunTaskModal()}>
+            <Icon name="repeat" /> Rerun Task
           </ModalItem>
         )}
         {this.isDefaultActionVisible('cancel') && (
