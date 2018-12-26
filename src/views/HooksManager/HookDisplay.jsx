@@ -63,6 +63,21 @@ export default class HookDisplay extends PureComponent {
               <span>(no schedule)</span>
             )}
           </dd>
+          <dt>Bindings</dt>
+          <dd>
+            {hook.bindings.length ? (
+              <ul className="hookBindings" style={{ marginBottom: 0 }}>
+                {hook.bindings.map((binding, index) => (
+                  <li key={`hook-bindings-${index}`}>
+                    <code>{binding.exchange}</code> with{' '}
+                    <code>{binding.routingKeyPattern}</code>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span>(no bindings)</span>
+            )}
+          </dd>
         </dl>
         <HookStatusDisplay
           hookGroupId={hookGroupId}
