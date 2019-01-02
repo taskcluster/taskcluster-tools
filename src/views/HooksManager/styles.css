@@ -34,3 +34,13 @@
   -ms-transform: rotate(-90deg);
   transform: rotate(-90deg);
 }
+
+@media all and (min-width:800px) {
+  .div-horizontal {
+    display: inline-block;
+    width: 50%;
+  }
+}
+
+
+

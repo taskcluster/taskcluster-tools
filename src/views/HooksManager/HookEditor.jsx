@@ -468,7 +468,7 @@ export default class HookEditor extends PureComponent {
               ))}
             </ul>
             <div className="input-group">
-              <div>
+              <div className="div-horizontal">
                 <label className="control-label">Pulse Exchange</label>
                 <input
                   type="text"
@@ -478,7 +478,7 @@ export default class HookEditor extends PureComponent {
                   onChange={this.handleNewBindingsExchangeChange}
                 />
               </div>
-              <div>
+              <div className="div-horizontal">
                 <label className="control-label">Routing Key Pattern</label>
                 <input
                   type="text"
