@@ -187,20 +187,26 @@ export default class HookEditor extends PureComponent {
     const { newBindingsExchangeValue, newBindingsRkpValue } = this.state;
     const newBindingsValue = {
       exchange: newBindingsExchangeValue,
-      routingKeyPattern: newBindingsRkpValue
+      routingKeyPattern: newBindingsRkpValue || '#'
     };
 
-    if (newBindingsExchangeValue && newBindingsRkpValue) {
+    if (newBindingsExchangeValue) {
       this.setState({
         newBindingsExchangeValue: '',
         newBindingsRkpValue: '',
         hook: assocPath(
           ['bindings'],
-          [...clone(this.state.hook.bindings), newBindingsValue],
+          this.state.hook.bindings.concat(newBindingsValue),
           this.state.hook
         )
       });
     }
+  };
+
+  validBindingsItem = () => {
+    const { newBindingsExchangeValue, newBindingsRkpValue } = this.state;
+
+    return newBindingsExchangeValue.trim() && newBindingsRkpValue.trim();
   };
 
   handleTaskChange = value => {
@@ -303,7 +309,7 @@ export default class HookEditor extends PureComponent {
 
   render() {
     const { isCreating, hookGroupId, hookId } = this.props;
-    const { hook } = this.state;
+    const { hook, newBindingsExchangeValue, newBindingsRkpValue } = this.state;
 
     if (!hook) {
       return null;
@@ -468,7 +474,7 @@ export default class HookEditor extends PureComponent {
                   type="text"
                   className="form-control"
                   placeholder="exchange/<username>/some-exchange-name"
-                  value={this.state.newBindingsExchangeValue}
+                  value={newBindingsExchangeValue}
                   onChange={this.handleNewBindingsExchangeChange}
                 />
               </div>
@@ -477,15 +483,17 @@ export default class HookEditor extends PureComponent {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="#"
-                  value={this.state.newBindingsRkpValue}
+                  placeholder="*.some-interesting-key.#"
+                  value={newBindingsRkpValue}
                   onChange={this.handleNewBindingsRkpChange}
                 />
               </div>
               <span className="input-group-btn">
                 <button
+                  style={{ marginTop: 25 }}
                   className="btn btn-success"
                   type="button"
+                  disabled={!this.validBindingsItem()}
                   onClick={this.handleNewBindingsItem}>
                   <Glyphicon glyph="plus" /> Add
                 </button>
