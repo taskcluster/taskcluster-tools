@@ -40,13 +40,13 @@
     display: inline-block;
     width: 50%;
   }
-  .horizontal-left {
+  .bindings-exchange-input {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-top-left-radius: 4px !important;
     border-bottom-left-radius: 4px !important;
   }
-  .horizontal-right {
+  .bindings-rkp-input {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }

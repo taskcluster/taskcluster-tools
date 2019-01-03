@@ -472,7 +472,7 @@ export default class HookEditor extends PureComponent {
                 <label className="control-label">Pulse Exchange</label>
                 <input
                   type="text"
-                  className="form-control horizontal-left"
+                  className="form-control .bindings-exchange-input"
                   placeholder="exchange/<username>/some-exchange-name"
                   value={newBindingsExchangeValue}
                   onChange={this.handleNewBindingsExchangeChange}
@@ -482,7 +482,7 @@ export default class HookEditor extends PureComponent {
                 <label className="control-label">Routing Key Pattern</label>
                 <input
                   type="text"
-                  className="form-control horizontal-right"
+                  className="form-control .bindings-rkp-input"
                   placeholder="*.some-interesting-key.#"
                   value={newBindingsRkpValue}
                   onChange={this.handleNewBindingsRkpChange}
