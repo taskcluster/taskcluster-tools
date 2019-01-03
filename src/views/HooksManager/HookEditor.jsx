@@ -59,7 +59,7 @@ export default class HookEditor extends PureComponent {
     this.state = {
       newScheduleValue: '',
       newBindingsExchangeValue: '',
-      newBindingsRkpValue: '',
+      newBindingsRkpValue: '#',
       hook: null,
       hookValidJson: false,
       triggerSchemaValidJson: false
@@ -187,13 +187,13 @@ export default class HookEditor extends PureComponent {
     const { newBindingsExchangeValue, newBindingsRkpValue } = this.state;
     const newBindingsValue = {
       exchange: newBindingsExchangeValue,
-      routingKeyPattern: newBindingsRkpValue || '#'
+      routingKeyPattern: newBindingsRkpValue
     };
 
     if (newBindingsExchangeValue) {
       this.setState({
         newBindingsExchangeValue: '',
-        newBindingsRkpValue: '',
+        newBindingsRkpValue: '#',
         hook: assocPath(
           ['bindings'],
           this.state.hook.bindings.concat(newBindingsValue),
@@ -472,7 +472,7 @@ export default class HookEditor extends PureComponent {
                 <label className="control-label">Pulse Exchange</label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control horizontal-left"
                   placeholder="exchange/<username>/some-exchange-name"
                   value={newBindingsExchangeValue}
                   onChange={this.handleNewBindingsExchangeChange}
@@ -482,7 +482,7 @@ export default class HookEditor extends PureComponent {
                 <label className="control-label">Routing Key Pattern</label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control horizontal-right"
                   placeholder="*.some-interesting-key.#"
                   value={newBindingsRkpValue}
                   onChange={this.handleNewBindingsRkpChange}
@@ -490,7 +490,7 @@ export default class HookEditor extends PureComponent {
               </div>
               <span className="input-group-btn">
                 <button
-                  style={{ marginTop: 25 }}
+                  style={{ marginTop: 26 }}
                   className="btn btn-success"
                   type="button"
                   disabled={!this.validBindingsItem()}

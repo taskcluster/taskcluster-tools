@@ -40,6 +40,16 @@
     display: inline-block;
     width: 50%;
   }
+  .horizontal-left {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+  }
+  .horizontal-right {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 }
 
 
