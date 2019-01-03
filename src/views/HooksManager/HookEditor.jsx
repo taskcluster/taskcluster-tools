@@ -17,6 +17,7 @@ const initialHook = {
     emailOnError: true
   },
   schedule: [],
+  bindings: [],
   task: {
     provisionerId: 'aws-provisioner-v1',
     workerType: 'tutorial',
@@ -57,6 +58,8 @@ export default class HookEditor extends PureComponent {
 
     this.state = {
       newScheduleValue: '',
+      newBindingsExchangeValue: '',
+      newBindingsRkpValue: '#',
       hook: null,
       hookValidJson: false,
       triggerSchemaValidJson: false
@@ -87,6 +90,12 @@ export default class HookEditor extends PureComponent {
 
   handleNewScheduleChange = e =>
     this.setState({ newScheduleValue: e.target.value });
+
+  handleNewBindingsExchangeChange = e =>
+    this.setState({ newBindingsExchangeValue: e.target.value });
+
+  handleNewBindingsRkpChange = e =>
+    this.setState({ newBindingsRkpValue: e.target.value });
 
   validHook = () => {
     const { hook } = this.state;
@@ -166,6 +175,40 @@ export default class HookEditor extends PureComponent {
       hook: assocPath(['scheduleText'], e.target.value, this.state.hook)
     });
 
+  handleRemoveBindingsItem = index => {
+    const bindings = [...this.state.hook.bindings];
+
+    bindings.splice(index, 1);
+
+    this.setState({ hook: { ...this.state.hook, bindings } });
+  };
+
+  handleNewBindingsItem = () => {
+    const { newBindingsExchangeValue, newBindingsRkpValue } = this.state;
+    const newBindingsValue = {
+      exchange: newBindingsExchangeValue,
+      routingKeyPattern: newBindingsRkpValue
+    };
+
+    if (newBindingsExchangeValue) {
+      this.setState({
+        newBindingsExchangeValue: '',
+        newBindingsRkpValue: '#',
+        hook: assocPath(
+          ['bindings'],
+          this.state.hook.bindings.concat(newBindingsValue),
+          this.state.hook
+        )
+      });
+    }
+  };
+
+  validBindingsItem = () => {
+    const { newBindingsExchangeValue, newBindingsRkpValue } = this.state;
+
+    return newBindingsExchangeValue.trim() && newBindingsRkpValue.trim();
+  };
+
   handleTaskChange = value => {
     try {
       this.setState({
@@ -203,6 +246,7 @@ export default class HookEditor extends PureComponent {
         emailOnError: hook.metadata.emailOnError
       },
       schedule: hook.schedule,
+      bindings: hook.bindings,
       task: hook.task,
       triggerSchema: hook.triggerSchema
     };
@@ -265,7 +309,7 @@ export default class HookEditor extends PureComponent {
 
   render() {
     const { isCreating, hookGroupId, hookId } = this.props;
-    const { hook } = this.state;
+    const { hook, newBindingsExchangeValue, newBindingsRkpValue } = this.state;
 
     if (!hook) {
       return null;
@@ -400,6 +444,57 @@ export default class HookEditor extends PureComponent {
                   className="btn btn-success"
                   type="button"
                   onClick={this.handleNewScheduleItem}>
+                  <Glyphicon glyph="plus" /> Add
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="form-group">
+          <label className="control-label col-md-2">Bindings</label>
+          <div className="col-md-10">
+            <ul style={{ paddingLeft: 20 }}>
+              {hook.bindings.map((binding, index) => (
+                <li key={`hook-bindings-${index}`}>
+                  <code>{binding.exchange}</code> with{' '}
+                  <code>{binding.routingKeyPattern}</code>
+                  <Button
+                    bsStyle="danger"
+                    bsSize="xsmall"
+                    onClick={() => this.handleRemoveBindingsItem(index)}>
+                    <Glyphicon glyph="trash" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+            <div className="input-group">
+              <div className="div-horizontal">
+                <label className="control-label">Pulse Exchange</label>
+                <input
+                  type="text"
+                  className="form-control .bindings-exchange-input"
+                  placeholder="exchange/<username>/some-exchange-name"
+                  value={newBindingsExchangeValue}
+                  onChange={this.handleNewBindingsExchangeChange}
+                />
+              </div>
+              <div className="div-horizontal">
+                <label className="control-label">Routing Key Pattern</label>
+                <input
+                  type="text"
+                  className="form-control .bindings-rkp-input"
+                  placeholder="*.some-interesting-key.#"
+                  value={newBindingsRkpValue}
+                  onChange={this.handleNewBindingsRkpChange}
+                />
+              </div>
+              <span className="input-group-btn">
+                <button
+                  style={{ marginTop: 26 }}
+                  className="btn btn-success"
+                  type="button"
+                  disabled={!this.validBindingsItem()}
+                  onClick={this.handleNewBindingsItem}>
                   <Glyphicon glyph="plus" /> Add
                 </button>
               </span>

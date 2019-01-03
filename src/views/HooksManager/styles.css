@@ -34,3 +34,23 @@
   -ms-transform: rotate(-90deg);
   transform: rotate(-90deg);
 }
+
+@media all and (min-width:800px) {
+  .div-horizontal {
+    display: inline-block;
+    width: 50%;
+  }
+  .bindings-exchange-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+  }
+  .bindings-rkp-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+
+
