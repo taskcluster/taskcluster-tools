@@ -8,6 +8,7 @@ import { isNil, equals } from 'ramda';
 import Helmet from 'react-helmet';
 import PropsRoute from '../../components/PropsRoute';
 import Error from '../../components/Error';
+import TaskclusterWebBanner from '../../components/TaskclusterWebBanner';
 import SearchForm from './SearchForm';
 import ActionsMenu from './ActionsMenu';
 import RunsMenu from './RunsMenu';
@@ -742,6 +743,28 @@ export default class Inspector extends PureComponent {
           <link rel="shortcut icon" type="image/png" href={FavIcon} />
         </Helmet>
         <h4>Task &amp; Group Inspector</h4>
+        <TaskclusterWebBanner>
+          <div>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://taskcluster-web.netlify.com/tasks/groups${
+                taskGroupId ? `/${taskGroupId}` : ''
+              }`}>
+              Group View
+            </a>
+          </div>
+          <div>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://taskcluster-web.netlify.com/tasks${
+                taskId ? `/${taskId}` : ''
+              }`}>
+              Task View
+            </a>
+          </div>
+        </TaskclusterWebBanner>
         <Row>
           <Col xs={12}>
             <SearchForm
