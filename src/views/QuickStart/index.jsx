@@ -22,7 +22,7 @@ import { info } from './styles.module.css';
 /* eslint-disable react/no-unused-state */
 
 const initialYaml = {
-  version: 0,
+  version: 1,
   tasks: [
     {
       provisionerId: '{{ taskcluster.docker.provisionerId }}',
@@ -321,7 +321,7 @@ export default class YamlCreator extends Component {
               you favorite editor to add more functionality. Please refer to the{' '}
               <a
                 href={urls.docs(
-                  'reference/integrations/taskcluster-github/docs/taskcluster-yml-v0'
+                  'reference/integrations/taskcluster-github/docs/taskcluster-yml-v1'
                 )}
                 target="_blank"
                 rel="noopener noreferrer">
