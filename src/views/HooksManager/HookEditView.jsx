@@ -21,6 +21,7 @@ export default class HookEditView extends PureComponent {
     this.state = {
       hook: null,
       hookStatus: null,
+      hookLastFires: null,
       editing: true,
       error: null
     };
@@ -50,9 +51,10 @@ export default class HookEditView extends PureComponent {
     }
 
     try {
-      const [hookStatus, hook] = await Promise.all([
+      const [hookStatus, hook, { lastFires }] = await Promise.all([
         hooks.getHookStatus(hookGroupId, hookId),
-        hooks.hook(hookGroupId, hookId)
+        hooks.hook(hookGroupId, hookId),
+        hooks.listLastFires(hookGroupId, hookId)
       ]);
 
       this.setState({
@@ -60,6 +62,9 @@ export default class HookEditView extends PureComponent {
         // Some of the API functions return hook descriptions containing hookId and hookGroupId,
         // but the create and update methods do not take these properties.
         hook: omit(['hookGroupId', 'hookId'], hook),
+        hookLastFires: lastFires.sort(
+          (a, b) => new Date(b.taskCreateTime) - new Date(a.taskCreateTime)
+        ),
         editing: false,
         error: null
       });
@@ -67,6 +72,7 @@ export default class HookEditView extends PureComponent {
       this.setState({
         hook: null,
         hookStatus: null,
+        hookLastFires: null,
         editing: false,
         error: err
       });
@@ -149,7 +155,7 @@ export default class HookEditView extends PureComponent {
 
   render() {
     const { hookGroupId, hookId } = this.props;
-    const { error, editing, hook, hookStatus } = this.state;
+    const { error, editing, hook, hookStatus, hookLastFires } = this.state;
 
     if (error) {
       return (
@@ -185,6 +191,7 @@ export default class HookEditView extends PureComponent {
       <HookDisplay
         hook={hook}
         hookStatus={hookStatus}
+        hookLastFires={hookLastFires}
         hookId={hookId}
         hookGroupId={hookGroupId}
         startEditing={this.startEditing}

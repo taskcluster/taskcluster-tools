@@ -1,10 +1,17 @@
 import { PureComponent } from 'react';
-import { string, object, func } from 'prop-types';
-import { ButtonToolbar, Button, Glyphicon } from 'react-bootstrap';
+import { string, object, array, func } from 'prop-types';
+import {
+  ButtonToolbar,
+  Table,
+  Label,
+  Button,
+  Glyphicon
+} from 'react-bootstrap';
 import HookStatusDisplay from './HookStatusDisplay';
 import Code from '../../components/Code';
 import Markdown from '../../components/Markdown';
 import TriggerButton from './TriggerButton';
+import DateView from '../../components/DateView';
 import { urls } from '../../utils';
 
 export default class HookDisplay extends PureComponent {
@@ -12,6 +19,7 @@ export default class HookDisplay extends PureComponent {
     hookId: string.isRequired,
     hookGroupId: string.isRequired,
     hook: object.isRequired,
+    hookLastFires: array.isRequired,
     startEditing: func.isRequired
   };
 
@@ -21,6 +29,7 @@ export default class HookDisplay extends PureComponent {
       hookGroupId,
       hookId,
       hookStatus,
+      hookLastFires,
       refreshHookStatus,
       startEditing,
       triggerHook
@@ -77,6 +86,42 @@ export default class HookDisplay extends PureComponent {
             ) : (
               <span>(no bindings)</span>
             )}
+          </dd>
+        </dl>
+        <dl className="dl-horizontal">
+          <dt>Last Hook Fires</dt>
+          <dd>
+            <Table responsive>
+              <thead>
+                <tr>
+                  <th>Task ID</th>
+                  <th>Fired By</th>
+                  <th>Result</th>
+                  <th>Attempted</th>
+                  <th>Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {hookLastFires.map(
+                  ({ taskId, firedBy, result, taskCreateTime, error }) => (
+                    <tr key={taskId}>
+                      <td>{taskId}</td>
+                      <td>{firedBy}</td>
+                      <td>
+                        <Label
+                          bsStyle={result === 'success' ? 'success' : 'danger'}>
+                          {result}
+                        </Label>
+                      </td>
+                      <td>
+                        <DateView date={taskCreateTime} />
+                      </td>
+                      <td>{(result === 'error' && error) || 'N/A'}</td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </Table>
           </dd>
         </dl>
         <HookStatusDisplay
