@@ -107,11 +107,5 @@ export default [
     icon: 'book',
     description:
       'Visit the documentation site with documentation for all Taskcluster APIs and Pulse exchanges.'
-  },
-  {
-    title: 'Diagnostics',
-    link: '/diagnostics',
-    icon: 'cogs',
-    description: 'Display results from diagnostics tests.'
   }
 ];
