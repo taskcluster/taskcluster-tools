@@ -76,9 +76,6 @@ const HooksManager = loadable(() =>
 const SecretsManager = loadable(() =>
   import(/* webpackChunkName: 'SecretsManager' */ '../views/SecretsManager')
 );
-const Diagnostics = loadable(() =>
-  import(/* webpackChunkName: 'Diagnostics' */ '../views/Diagnostics')
-);
 const CredentialsManager = loadable(() =>
   import(/* webpackChunkName: 'CredentialsManager' */ '../views/CredentialsManager')
 );
@@ -290,7 +287,6 @@ export default class App extends Component {
                   path="/secrets/:secretId?"
                   component={SecretsManager}
                 />
-                <PropsRoute path="/diagnostics" component={Diagnostics} />
                 <PropsRoute
                   path="/credentials"
                   component={CredentialsManager}
