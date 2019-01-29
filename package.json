@@ -60,7 +60,7 @@
     "ramda": "^0.24.1",
     "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.6.2",
-    "react-bootstrap": "^0.31.5",
+    "react-bootstrap": "^0.32",
     "react-datepicker": "^0.61.0",
     "react-dom": "^15.5.4",
     "react-fontawesome": "^1.6.1",

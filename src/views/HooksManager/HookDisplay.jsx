@@ -7,6 +7,7 @@ import {
   Button,
   Glyphicon
 } from 'react-bootstrap';
+import Panel from 'react-bootstrap/lib/Panel';
 import HookStatusDisplay from './HookStatusDisplay';
 import Code from '../../components/Code';
 import Markdown from '../../components/Markdown';
@@ -116,7 +117,20 @@ export default class HookDisplay extends PureComponent {
                       <td>
                         <DateView date={taskCreateTime} />
                       </td>
-                      <td>{(result === 'error' && error) || 'N/A'}</td>
+                      <td>
+                        {result === 'error' ? (
+                          <Panel style={{ border: 0 }} defaultExpanded={false}>
+                            <Panel.Title toggle>
+                              <Button bsStyle="info">Error Info</Button>
+                            </Panel.Title>
+                            <Panel.Collapse>
+                              <Panel.Body>{error}</Panel.Body>
+                            </Panel.Collapse>
+                          </Panel>
+                        ) : (
+                          'N/A'
+                        )}
+                      </td>
                     </tr>
                   )
                 )}
