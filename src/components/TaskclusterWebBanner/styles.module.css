@@ -1,7 +1,8 @@
-.header {
-    margin-bottom: 8px;
+.footer {
+    display: flex;
+    justify-content: space-between;
 }
 
-.footer {
-    margin-top: 8px;
+.horizontalRule {
+    margin: 10px 0;
 }

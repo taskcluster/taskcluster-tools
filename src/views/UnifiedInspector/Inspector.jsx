@@ -19,6 +19,7 @@ import pendingFavIcon from '../../images/taskcluster-group-pending.png';
 import failedFavIcon from '../../images/taskcluster-group-failed.png';
 import { loadable, createListener } from '../../utils';
 import UserSession from '../../auth/UserSession';
+import { newSiteBanner } from './styles.module.css';
 
 const GroupProgress = loadable(() =>
   import(/* webpackChunkName: 'GroupProgress' */ './GroupProgress')
@@ -742,29 +743,31 @@ export default class Inspector extends PureComponent {
           <title>{`${task ? task.metadata.name : 'Task Inspector'}`}</title>
           <link rel="shortcut icon" type="image/png" href={FavIcon} />
         </Helmet>
-        <h4>Task &amp; Group Inspector</h4>
         <TaskclusterWebBanner>
-          <div>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`https://taskcluster-web.netlify.com/tasks/groups${
-                taskGroupId ? `/${taskGroupId}` : ''
-              }`}>
-              Group View
-            </a>
-          </div>
-          <div>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`https://taskcluster-web.netlify.com/tasks${
-                taskId ? `/${taskId}` : ''
-              }`}>
-              Task View
-            </a>
+          <div className={newSiteBanner}>
+            <div>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`https://taskcluster-web.netlify.com/tasks/groups${
+                  taskGroupId ? `/${taskGroupId}` : ''
+                }`}>
+                Group View
+              </a>
+            </div>
+            <div>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`https://taskcluster-web.netlify.com/tasks${
+                  taskId ? `/${taskId}` : ''
+                }`}>
+                Task View
+              </a>
+            </div>
           </div>
         </TaskclusterWebBanner>
+        <h4>Task &amp; Group Inspector</h4>
         <Row>
           <Col xs={12}>
             <SearchForm
