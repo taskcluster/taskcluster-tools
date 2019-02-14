@@ -1,0 +1,8 @@
+.footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.horizontalRule {
+    margin: 10px 0;
+}

@@ -1,0 +1,7 @@
+.newSiteBanner {
+    display: flex;
+}
+
+.newSiteBanner > div:not(:last-child) {
+    margin-right: 10px;
+}
