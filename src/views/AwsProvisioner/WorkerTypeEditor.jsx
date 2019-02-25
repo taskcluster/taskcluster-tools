@@ -75,7 +75,7 @@ export default class WorkerTypeEditor extends PureComponent {
   handleWorkerTypeChange = e => this.setState({ workerType: e.target.value });
 
   workerTypeValidationState() {
-    return /^[a-zA-Z0-9_-]{1,22}$/.test(this.state.workerType)
+    return /^[a-zA-Z0-9_-]{1,38}$/.test(this.state.workerType)
       ? 'success'
       : 'error';
   }
