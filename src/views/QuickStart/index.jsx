@@ -321,7 +321,7 @@ export default class YamlCreator extends Component {
               you favorite editor to add more functionality. Please refer to the{' '}
               <a
                 href={urls.docs(
-                  'reference/integrations/taskcluster-github/docs/taskcluster-yml-v0'
+                  'reference/integrations/github/taskcluster-yml-v0'
                 )}
                 target="_blank"
                 rel="noopener noreferrer">
