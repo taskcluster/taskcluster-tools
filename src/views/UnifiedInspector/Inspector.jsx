@@ -749,7 +749,7 @@ export default class Inspector extends PureComponent {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href={`https://taskcluster-web.netlify.com/tasks/groups${
+                href={`https://taskcluster-ui.herokuapp.com/tasks/groups${
                   taskGroupId ? `/${taskGroupId}` : ''
                 }`}>
                 Group View
@@ -759,7 +759,7 @@ export default class Inspector extends PureComponent {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href={`https://taskcluster-web.netlify.com/tasks${
+                href={`https://taskcluster-ui.herokuapp.com/tasks${
                   taskId ? `/${taskId}` : ''
                 }`}>
                 Task View
