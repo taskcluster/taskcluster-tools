@@ -158,10 +158,6 @@ export default class ActionsMenu extends PureComponent {
       return false;
     }
 
-    if (!Array.isArray(payload.command)) {
-      return false;
-    }
-
     return typeof payload.maxRunTime === 'number';
   }
 
