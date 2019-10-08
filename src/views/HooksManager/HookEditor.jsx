@@ -2,6 +2,7 @@ import { PureComponent } from 'react';
 import { string, bool, object, func } from 'prop-types';
 import { Button, Glyphicon, ButtonToolbar } from 'react-bootstrap';
 import clone from 'lodash.clonedeep';
+import { safeLoad, safeDump } from 'js-yaml';
 import equal from 'deep-equal';
 import { assocPath } from 'ramda';
 import Icon from 'react-fontawesome';
@@ -41,6 +42,7 @@ const initialHook = {
     additionalProperties: false
   }
 };
+const safeDumpOpts = { noCompatMode: true, noRefs: true };
 
 export default class HookEditor extends PureComponent {
   static propTypes = {
@@ -53,24 +55,20 @@ export default class HookEditor extends PureComponent {
     onDeleteHook: func.isRequired
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      newScheduleValue: '',
-      newBindingsExchangeValue: '',
-      newBindingsRkpValue: '#',
-      hook: null,
-      hookValidJson: false,
-      triggerSchemaValidJson: false
-    };
-  }
+  state = {
+    newScheduleValue: '',
+    newBindingsExchangeValue: '',
+    newBindingsRkpValue: '#',
+    hook: null,
+    hookValidYaml: false,
+    triggerSchemaValidYaml: false
+  };
 
   componentWillMount() {
     this.setState({
       hook: clone(this.props.isCreating ? initialHook : this.props.hook),
-      hookValidJson: true,
-      triggerSchemaValidJson: true
+      hookValidYaml: true,
+      triggerSchemaValidYaml: true
     });
   }
 
@@ -82,8 +80,8 @@ export default class HookEditor extends PureComponent {
     ) {
       this.setState({
         hook: clone(this.props.isCreating ? initialHook : this.props.hook),
-        hookValidJson: true,
-        triggerSchemaValidJson: true
+        hookValidYaml: true,
+        triggerSchemaValidYaml: true
       });
     }
   }
@@ -104,8 +102,8 @@ export default class HookEditor extends PureComponent {
       hook.metadata.name &&
       (hook.metadata.description || hook.metadata.description === '') &&
       hook.metadata.owner &&
-      this.state.hookValidJson &&
-      this.state.triggerSchemaValidJson
+      this.state.hookValidYaml &&
+      this.state.triggerSchemaValidYaml
     );
   };
 
@@ -212,12 +210,12 @@ export default class HookEditor extends PureComponent {
   handleTaskChange = value => {
     try {
       this.setState({
-        hook: assocPath(['task'], JSON.parse(value), this.state.hook),
-        hookValidJson: true
+        hook: assocPath(['task'], safeLoad(value), this.state.hook),
+        hookValidYaml: true
       });
     } catch (err) {
       this.setState({
-        hookValidJson: false
+        hookValidYaml: false
       });
     }
   };
@@ -225,12 +223,12 @@ export default class HookEditor extends PureComponent {
   handleTriggerSchemaChange = value => {
     try {
       this.setState({
-        hook: assocPath(['triggerSchema'], JSON.parse(value), this.state.hook),
-        triggerSchemaValidJson: true
+        hook: assocPath(['triggerSchema'], safeLoad(value), this.state.hook),
+        triggerSchemaValidYaml: true
       });
     } catch (err) {
       this.setState({
-        triggerSchemaValidJson: false
+        triggerSchemaValidYaml: false
       });
     }
   };
@@ -505,8 +503,9 @@ export default class HookEditor extends PureComponent {
           <label className="control-label col-md-2">Task Template</label>
           <div className="col-md-10">
             <CodeEditor
-              mode="json"
-              value={JSON.stringify(hook.task, null, 2)}
+              lint="true"
+              mode="yaml"
+              value={safeDump(hook.task, safeDumpOpts)}
               onChange={this.handleTaskChange}
             />
           </div>
@@ -515,8 +514,9 @@ export default class HookEditor extends PureComponent {
           <label className="control-label col-md-2">Trigger Schema</label>
           <div className="col-md-10">
             <CodeEditor
-              mode="json"
-              value={JSON.stringify(hook.triggerSchema, null, 2)}
+              lint="true"
+              mode="yaml"
+              value={safeDump(hook.triggerSchema, safeDumpOpts)}
               onChange={this.handleTriggerSchemaChange}
             />
           </div>
