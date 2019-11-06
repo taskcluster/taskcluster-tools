@@ -6,14 +6,7 @@ import chunk from 'lodash.chunk';
 import Markdown from '../../components/Markdown';
 import HelmetTitle from '../../components/HelmetTitle';
 import links from '../../links';
-import {
-  header,
-  hero,
-  logo,
-  entries,
-  entry,
-  description
-} from './styles.module.css';
+import { entries, entry, description } from './styles.module.css';
 
 // Please make sure that link matches location.pathname for the page otherwise
 // we won't be able to detect which page you're currently on.
@@ -24,16 +17,6 @@ export default class Home extends PureComponent {
     return (
       <div className={entries}>
         <HelmetTitle blank />
-        <Row className={hero}>
-          <Col md={8} mdOffset={2} sm={10} smOffset={1}>
-            <div className={header}>
-              <h2>
-                Welcome to{' '}
-                <span className={logo}>{process.env.APPLICATION_NAME}</span>
-              </h2>
-            </div>
-          </Col>
-        </Row>
         <Row className={description}>
           <Col sm={12}>
             <p>

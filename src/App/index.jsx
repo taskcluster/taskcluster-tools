@@ -6,6 +6,7 @@ import { Grid } from 'react-bootstrap';
 import PropsRoute from '../components/PropsRoute';
 import Navigation from '../components/Navigation';
 import NotFound from '../components/NotFound';
+import TaskclusterWebBanner from '../components/TaskclusterWebBanner';
 import { loadable } from '../utils';
 import './styles.css';
 import iconUrl from '../taskcluster.png';
@@ -169,6 +170,7 @@ export default class App extends Component {
           </Helmet>
           <PropsRoute component={Navigation} />
           <Grid fluid id="container">
+            <TaskclusterWebBanner />
             {authReady ? (
               <Switch>
                 <PropsRoute
