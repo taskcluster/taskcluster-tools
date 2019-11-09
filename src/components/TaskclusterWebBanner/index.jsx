@@ -8,12 +8,15 @@ export default class TaskclusterWebBanner extends PureComponent {
 
     return (
       <Alert bsStyle="warning">
-        <h4>This deployment of Taskcluster will shut down on November 9.</h4>
+        <h4>
+          This deployment of Taskcluster
+          <b>has been shut down as of November 9.</b>
+        </h4>
         {children}
         <hr className={horizontalRule} />
         <div className={footer}>
           <small>
-            After that date, access either the{' '}
+            Access either the{' '}
             <a href="https://firefox-ci-tc.services.mozilla.com/">Firefox-CI</a>{' '}
             deployment or the{' '}
             <a href="https://community-tc.services.mozilla.com/">
