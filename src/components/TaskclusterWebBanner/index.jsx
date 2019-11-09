@@ -9,7 +9,7 @@ export default class TaskclusterWebBanner extends PureComponent {
     return (
       <Alert bsStyle="warning">
         <h4>
-          This deployment of Taskcluster
+          This deployment of Taskcluster{' '}
           <b>has been shut down as of November 9.</b>
         </h4>
         {children}
